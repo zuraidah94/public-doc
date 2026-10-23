@@ -1,7 +1,7 @@
 /* ===== Edisi Lukisan Tangan HF — 3D people (prototype) =====
    Real rigged 3D bodies with skeletal animation, drawn into the painted isometric house one person at a time,
    in the game's own depth order. The camera matches the game's 2:1 projection (azimuth 45°, elevation 30°),
-   so a person stands exactly where the 2D figure stood. Models live in 3d/ (female.glb, male.glb, anims.glb);
+   so a person stands exactly where the 2D figure stood. Models are listed in 3d/models.json (female, male, anims);
    when they are missing the game simply keeps its 2D people. */
 import * as THREE from "three";
 import { GLTFLoader } from "./vendor/three/jsm/loaders/GLTFLoader.js";
@@ -73,8 +73,11 @@ function bake(clip, srcRoot, tgtRoot, fps = 30) {
 async function load() {
  try {
   if (!renderer) return;
+  /* 3d/models.json names the files; no animations listed = stay quietly in 2D */
+  const M = await fetch("3d/models.json").then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!M || !M.female || !M.male || !M.anims) { R.why = "3d/models.json: models or animations not added yet"; return }
   const L = new GLTFLoader();
-  const [fem, mal, anim] = await Promise.all(["3d/female.glb", "3d/male.glb", "3d/anims.glb"].map(u => L.loadAsync(u)));
+  const [fem, mal, anim] = await Promise.all([M.female, M.male, M.anims].map(u => L.loadAsync("3d/" + u)));
   base.f = prep(fem); base.m = prep(mal);
   /* world-space retarget: each clip is baked onto each body's own skeleton */
   for (const k of ["f", "m"]) {

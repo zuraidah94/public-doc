@@ -118,7 +118,7 @@ This copy keeps the whole game and adds a live mode in the spirit of The Sims 4 
 
 **3D people (prototype)**
 
-The copy can draw people as rigged 3D bodies with real walking, idle and sitting animation, placed in the painted house in the right depth order (`rk3d.js`, built on [three.js](https://threejs.org)). It needs openly licensed 3D models in `edisi-lukisan-tangan-hf/3d/` (`female.glb`, `male.glb`, `anims.glb`). Until those are added, the copy keeps its 2D people. When they're present, a **🧍 3D / 2D** button on the camera bar switches between the two.
+The copy can draw people as rigged 3D bodies with real walking, idle and sitting animation, placed in the painted house in the right depth order (`rk3d.js`, built on [three.js](https://threejs.org)). It uses the free CC0 [Quaternius](https://quaternius.com) *Universal Base Characters* (already in `edisi-lukisan-tangan-hf/3d/`) and needs the *Universal Animation Library* too. `3d/models.json` lists the files. Until the animations are added, the copy keeps its 2D people. When they're present, a **🧍 3D / 2D** button on the camera bar switches between the two.
 
 **Art:** backdrops, cut-ins, house paintings, drama cards, family portraits and maps were sharpened with the open [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) model (`realesr-general-x4v3`). Painted portraits were cut out with [BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) for the live card.
 
