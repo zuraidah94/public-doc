@@ -8,6 +8,8 @@ Public documents and projects.
 - [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
 - [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
 
+New to the game? Read [how to play](rumah-kita/README.md#how-to-play): which version to pick, the controls, and how saving works.
+
 ## Contents
 
 | Folder | What's inside |
