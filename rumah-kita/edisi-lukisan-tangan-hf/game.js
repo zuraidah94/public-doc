@@ -8567,6 +8567,8 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
 
 
 
+
+
 /* ===== Edisi Lukisan Tangan HF — live-mode layer in the spirit of Sims 4 / inZOI, in Rumah Kita's own look =====
    camera (wheel/pinch zoom 1–3×, drag pan, follow), walls Penuh / Potong / Rendah, build & buy (ghost preview,
    ↻ Pusing, search, price filter, drag to move), mood reasons (moodlets), on-canvas action queue and a live
@@ -8760,6 +8762,11 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
    zc.querySelector(".hff").addEventListener("click", e => { e.stopPropagation(); if (zNow() <= 1 && !HF.follow) zoomTo(1.8); setFollow(!HF.follow) });
    zc.querySelector(".hfw").addEventListener("click", e => { e.stopPropagation(); cycleWalls() })
   }
+  if (window.RK3D && window.RK3D.ready && !zc.querySelector(".hfp")) {
+   zc.insertAdjacentHTML("afterbegin", `<button class="hfb hfp" type="button" title="Orang 3D / 2D">🧍</button>`);
+   zc.querySelector(".hfp").addEventListener("click", e => { e.stopPropagation(); HF.p3d = !HF.p3d; lsSet("p3d", HF.p3d ? "1" : "0"); syncCtl(); toast(HF.p3d ? "🧍 Orang 3D (prototaip)." : "🖌️ Orang lukisan 2D.") })
+  }
+  const pb = zc.querySelector(".hfp"); if (pb) { pb.setAttribute("aria-pressed", HF.p3d ? "true" : "false"); pb.textContent = HF.p3d ? "🧍 3D" : "🧍 2D" }
   zc.querySelector(".hff").setAttribute("aria-pressed", HF.follow ? "true" : "false");
   zc.querySelector(".hfw").innerHTML = `🧱<span class="t"> ${WLBL[wallMode()]}</span>`; zc.querySelector(".hfw").title = `Dinding: ${WLBL[wallMode()]} (C)`;
   const l = $("#zoomlbl"); if (l) l.textContent = (+zNow().toFixed(2)) + "×"
@@ -9066,6 +9073,33 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
  }
  requestAnimationFrame(idleTick);   /* off: the game already shows its own action bubble over each person */
 
+ /* ---------- 7. 3D people (prototype, rk3d.js): a rigged 3D body replaces the 2D figure, same spot, size and depth order ---------- */
+ const DUMMY = (() => { const c = document.createElement("canvas"); c.width = c.height = 2; return c.getContext("2d") })();
+ HF.p3d = lsGet("p3d", "1") === "1"; HF.k3 = 0;
+ const on3d = () => HF.p3d && window.RK3D && window.RK3D.ready;
+ { const dp = drawPerson; drawPerson = function (a, ap, ts, stage) {
+   if (!on3d() || !a || a.x == null || !inHouse() || ctx.canvas !== cv || stage === "baby" || (typeof isBaby === "function" && isBaby(a))) return dp.apply(this, arguments);
+   /* the 2D code still runs (into a hidden canvas) so taps, name pills and seats keep working */
+   const real = ctx; let r;
+   a._sx = null;
+   ctx = DUMMY; try { r = dp.apply(this, arguments) } finally { ctx = real }
+   if (a._sx == null) return r;   /* the 2D code chose not to draw this person here (e.g. seated: drawn by drawSeated instead) */
+   try {
+    const [sx, sy] = P(a.x, a.y, a.zOff || 0);
+    let sc = 1; try { sc = SCALE[stage] || 1 } catch (e) { }
+    const ht = TW * 1.05 * sc * (.92 + ((ap && ap.height) ?? .5) * .16);
+    const mv = !!(a.path && a.path.length);
+    if (a._p3 && Math.abs(a.x - a._p3[0]) + Math.abs(a.y - a._p3[1]) > .002 && !a.sitPose) a._d3 = Math.atan2(a.x - a._p3[0], a.y - a._p3[1]);
+    else if (!mv) { const o = a.cur && a.cur.obj != null && objById(a.cur.obj); if (o) a._d3 = Math.atan2(o.x + .5 - a.x, o.y + .5 - a.y) }
+    a._p3 = [a.x, a.y];
+    const st = a.sitPose ? (a.sitPose === "bersila" ? "floor" : "sit") : mv ? "walk" : "idle";
+    const fem = !!(ap && (ap.shape ?? .5) < .5);
+    if (!a._k3) a._k3 = "p" + (++HF.k3);
+    if (!window.RK3D.draw(real, a._k3, fem, sx, sy, ht, a._d3 ?? Math.PI * .25, st, ts || performance.now())) return dp.apply(this, arguments)
+   } catch (e) { fail(e) }
+   return r
+  } }
+
  /* ---------- wiring ---------- */
  function wire() {
   try {
@@ -9084,6 +9118,7 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
   } catch (e) { fail(e); return false }
  }
  { let tries = 0; const t = setInterval(() => { if (wire() || ++tries > 60) clearInterval(t) }, 250) }
+ { let n3 = 0; const t3 = setInterval(() => { if (window.RK3D && window.RK3D.ready) { syncCtl(); clearInterval(t3) } else if (++n3 > 240) clearInterval(t3) }, 500) }
  requestAnimationFrame(followTick);
  try {
   const g = GUIDE.find(g2 => g2[0] === "asas");
