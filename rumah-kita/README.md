@@ -116,6 +116,10 @@ This copy keeps the whole game and adds a live mode in the spirit of The Sims 4 
 - A live card with the selected person's portrait, mood and top reasons sits on the house screen (top-right on phones). Tap it to open Keperluan.
 - People who stand idle breathe and glance around instead of standing frozen.
 
+**3D people (prototype)**
+
+The copy can draw people as rigged 3D bodies with real walking, idle and sitting animation, placed in the painted house in the right depth order (`rk3d.js`, built on [three.js](https://threejs.org)). It needs openly licensed 3D models in `edisi-lukisan-tangan-hf/3d/` (`female.glb`, `male.glb`, `anims.glb`). Until those are added, the copy keeps its 2D people. When they're present, a **🧍 3D / 2D** button on the camera bar switches between the two.
+
 **Art:** backdrops, cut-ins, house paintings, drama cards, family portraits and maps were sharpened with the open [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) model (`realesr-general-x4v3`). Painted portraits were cut out with [BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) for the live card.
 
 This copy shares its save with the other versions (same browser, same site). Furniture you turn here also shows turned in the other Edisi versions.
