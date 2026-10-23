@@ -1,6 +1,15 @@
 {
  "female": "Superhero_Female_FullBody.gltf",
  "male": "Superhero_Male_FullBody.gltf",
- "anims": null,
- "note": "Quaternius Universal Base Characters (CC0). anims: the Universal Animation Library file goes here once uploaded."
+ "anims": "UAL1_Standard.glb",
+ "clips": {
+  "idle": "Idle_Loop", "walk": "Walk_Loop", "talk": "Idle_Talking_Loop",
+  "sit": "Sitting_Idle_Loop", "sittalk": "Sitting_Talking_Loop",
+  "use": "Interact", "kneel": "Fixing_Kneeling", "dance": "Dance_Loop", "push": "Push_Loop"
+ },
+ "hair": {
+  "long": "Hair_Long.gltf", "buns": "Hair_Buns.gltf", "parted": "Hair_SimpleParted.gltf",
+  "buzzed": "Hair_Buzzed.gltf", "buzzedF": "Hair_BuzzedFemale.gltf", "beard": "Hair_Beard.gltf"
+ },
+ "note": "Quaternius Universal Base Characters + Universal Animation Library (CC0, quaternius.com)."
 }

@@ -8569,6 +8569,7 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
 
 
 
+
 /* ===== Edisi Lukisan Tangan HF — live-mode layer in the spirit of Sims 4 / inZOI, in Rumah Kita's own look =====
    camera (wheel/pinch zoom 1–3×, drag pan, follow), walls Penuh / Potong / Rendah, build & buy (ghost preview,
    ↻ Pusing, search, price filter, drag to move), mood reasons (moodlets), on-canvas action queue and a live
@@ -9092,10 +9093,11 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
     if (a._p3 && Math.abs(a.x - a._p3[0]) + Math.abs(a.y - a._p3[1]) > .002 && !a.sitPose) a._d3 = Math.atan2(a.x - a._p3[0], a.y - a._p3[1]);
     else if (!mv) { const o = a.cur && a.cur.obj != null && objById(a.cur.obj); if (o) a._d3 = Math.atan2(o.x + .5 - a.x, o.y + .5 - a.y) }
     a._p3 = [a.x, a.y];
-    const st = a.sitPose ? (a.sitPose === "bersila" ? "floor" : "sit") : mv ? "walk" : "idle";
+    const talk = !mv && a.cur && a.cur.phase === "do" && a.cur.type === "fam";   /* chatting with family */
+    const st = a.sitPose ? (a.sitPose === "bersila" ? "floor" : talk ? "sittalk" : "sit") : mv ? "walk" : talk ? "talk" : "idle";
     const fem = !!(ap && (ap.shape ?? .5) < .5);
     if (!a._k3) a._k3 = "p" + (++HF.k3);
-    if (!window.RK3D.draw(real, a._k3, fem, sx, sy, ht, a._d3 ?? Math.PI * .25, st, ts || performance.now())) return dp.apply(this, arguments)
+    if (!window.RK3D.draw(real, a._k3, fem, sx, sy, ht, a._d3 ?? Math.PI * .25, st, ts || performance.now(), Object.assign({}, ap, { wear: (() => { try { return wearOf(a) } catch (e) { return ap && ap.wear } })() }))) return dp.apply(this, arguments)
    } catch (e) { fail(e) }
    return r
   } }
