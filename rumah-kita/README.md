@@ -8,6 +8,7 @@ This folder collects every version of the game, plus the art tools and design do
 
 - [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
 - [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
+- [Edisi Lukisan Tangan HF (Sims-style test copy)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/)
 - [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
 
 ## How to play
@@ -20,6 +21,7 @@ All three run the same family life-sim; they differ in art and in how stories ar
 | --- | --- | --- |
 | [Edisi Episod](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/) | Hand-drawn art, and every 🎭 drama plays as a visual-novel episode with painted backdrops and a cast. Serial stories release a new episode every few game days. | You want the newest and fullest game. |
 | [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/) | Same hand-drawn art, but dramas open as a classic story sheet with painted key art. | You prefer quick, text-first dramas. |
+| [Edisi Lukisan Tangan HF](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/) | A test copy of Edisi Lukisan Tangan with a Sims 4 / inZOI-style live mode: free camera, wall modes, better build mode, mood reasons, an on-screen action queue, and sharper paintings. | You want to try the new controls. See [below](#edisi-lukisan-tangan-hf-sims-style-controls). |
 | [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/) | The first isometric build with simpler art. Older, so some newer features are missing. | You want to see where the game started. |
 
 Works on phone and computer. On a phone, "ketik" means tap; on a computer, click.
@@ -85,6 +87,39 @@ The tabs at the bottom of the screen:
 - **Cheats**, next to it, opens a box for cheat codes (money, full needs and more). Type `help` to list them, or see [the player guide](dokumen/panduan-rumah-kita.md#kod-tipu-cheats).
 - Everything else is covered in [Panduan Rumah Kita](dokumen/panduan-rumah-kita.md).
 
+### Edisi Lukisan Tangan HF: Sims-style controls
+
+This copy keeps the whole game and adds a live mode in the spirit of The Sims 4 and inZOI. It keeps Rumah Kita's own Malaysian painted style: there's no plumbob, no Simlish and no copied interface.
+
+**Camera**
+
+| Do this | Computer | Phone / tablet |
+| --- | --- | --- |
+| Zoom in and out (1× to 3×) | Mouse wheel or trackpad pinch, **+ / −** keys, or the ➖ ➕ buttons | Pinch with two fingers, or ➖ ➕ |
+| Look around when zoomed in | Drag with the mouse, or arrow keys / **W A S D** | Drag with one finger |
+| Follow the selected person | **🎯** button or **F** | **🎯** button |
+| Walls: Penuh / Potong / Rendah | **🧱** button or **C** | **🧱** button |
+
+*Potong* (cutaway) lowers only the walls in front of the selected person, so you can see into their room.
+
+**Build and buy** (tab **Bina**)
+
+- The item you're placing shows see-through on the tile under the pointer. It's solid-looking where it fits, and faint where it doesn't.
+- **↻ Pusing** (or **R**) turns the item before you place it. Kampung furniture turns all four ways; town furniture flips to face the other wall. Tap a placed piece and choose **↻ Pusing** to turn it later.
+- Drag a placed piece with the mouse to move it. Tapping still opens Alih / Jual / Pusing.
+- The search box and price buttons (≤ RM300, RM300–1,000, > RM1,000) filter the catalogue.
+
+**Mood and actions**
+
+- In the Keperluan tab, **Kenapa mood?** lists every reason the mood went up or down (room beauty, mess, hunger, sickness, traits, emotions) with the points and time left.
+- The current action and the queue show as round icons on the top-left of the house. A ring fills as the action progresses. Tap ✕ to cancel one.
+- A live card with the selected person's portrait, mood and top reasons sits on the house screen (top-right on phones). Tap it to open Keperluan.
+- People who stand idle breathe and glance around instead of standing frozen.
+
+**Art:** backdrops, cut-ins, house paintings, drama cards, family portraits and maps were sharpened with the open [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) model (`realesr-general-x4v3`). Painted portraits were cut out with [BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) for the live card.
+
+This copy shares its save with the other versions (same browser, same site). Furniture you turn here also shows turned in the other Edisi versions.
+
 ## Game versions
 
 Open the `index.html` in any folder to play. Newest first.
@@ -92,6 +127,7 @@ Open the `index.html` in any folder to play. Newest first.
 | Folder | Version | Last updated | Notes |
 | --- | --- | --- | --- |
 | [`edisi-episod/`](edisi-episod/) | Rumah Kita Edisi Episod | 22 Oct 2026 | Latest full game. Edisi Lukisan Tangan plus episode backdrops (`img/ep/`) and the episode cast sheet. |
+| [`edisi-lukisan-tangan-hf/`](edisi-lukisan-tangan-hf/) | Rumah Kita — Edisi Lukisan Tangan (HF) | 23 Oct 2026 | Test copy of Edisi Lukisan Tangan: Sims-style live mode, sharpened paintings and cut-out portraits. The new code is one marked block near the end of `game.js` (search for `Edisi Lukisan Tangan HF`). |
 | [`edisi-lukisan-tangan/`](edisi-lukisan-tangan/) | Rumah Kita — Edisi Lukisan Tangan | 22 Oct 2026 | Full game with hand-drawn art: houses, scenes, drama cards, families, maps, UI. |
 | [`episod/`](episod/) | Rumah Kita Episod | 22 Oct 2026 | Rumah Kita 2.0 prototype (PixiJS) with Nadia's 12 portrait expressions. |
 | [`gerbang-1/`](gerbang-1/) | Rumah Kita 2.0 Gerbang 1 | 19 Oct 2026 | First Rumah Kita 2.0 milestone (PixiJS): furniture atlas, floors and Nadia's poses. |

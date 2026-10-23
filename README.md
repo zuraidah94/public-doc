@@ -6,6 +6,7 @@ Public documents and projects.
 
 - [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
 - [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
+- [Edisi Lukisan Tangan HF](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/): test copy with Sims 4 / inZOI-style camera, build mode and mood reasons
 - [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
 
 New to the game? Read [how to play](rumah-kita/README.md#how-to-play): which version to pick, the controls, and how saving works.
