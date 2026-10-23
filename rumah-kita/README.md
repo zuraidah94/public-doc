@@ -4,6 +4,12 @@ Rumah Kita is a Malaysian family life-sim that plays in a web browser. All in-ga
 
 This folder collects every version of the game, plus the art tools and design documents, copied from the Claude artifacts where they were built (October 2026).
 
+## Play online
+
+- [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
+- [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
+- [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
+
 ## Game versions
 
 Open the `index.html` in any folder to play. Newest first.
