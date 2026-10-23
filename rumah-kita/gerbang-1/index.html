@@ -1,0 +1,693 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Rumah Kita 2.0 Gerbang 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+:root{
+  --paper:#F5EEDC; --paper2:#EADFC4; --ink:#3B2A20; --ink-soft:#6B5848; --wood:#8A5A34; --wood-hi:#B07A4A;
+  --maroon:#7E2632; --gold:#C99A2E; --teal:#2F7F86; --bg:#E9E1CD; --card:#FBF6EA; --line:#CDBF9F;
+  --good:#5E9F45; --mid:#D8A73A; --low:#C0503C;
+  --display:"Kalam","Comic Sans MS","Segoe Print",cursive; --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#2E2A33; --paper2:#3A3440; --ink:#F1E6D0; --ink-soft:#C8B9A0; --wood:#9A6A40; --wood-hi:#C28D58;
+  --maroon:#C25562; --gold:#E0B64A; --teal:#5FB0B6; --bg:#1E1B22; --card:#29252E; --line:#4A4350; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#2E2A33; --paper2:#3A3440; --ink:#F1E6D0; --ink-soft:#C8B9A0; --wood:#9A6A40; --wood-hi:#C28D58;
+  --maroon:#C25562; --gold:#E0B64A; --teal:#5FB0B6; --bg:#1E1B22; --card:#29252E; --line:#4A4350; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 28px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:14px}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+header.top h1{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.1;margin:0;text-wrap:balance}
+header.top p{margin:0;color:var(--ink-soft);font-size:.92rem;max-width:62ch}
+.stage{position:relative;border-radius:14px;overflow:hidden;background:#24345A;aspect-ratio:16/10;max-width:100%;
+  touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 1px 0 var(--line),0 10px 30px -18px rgba(40,25,10,.6)}
+@media (max-width:640px){.stage{aspect-ratio:390/560}}
+.stage canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.hud{position:absolute;inset:0;pointer-events:none}
+.hud>*{pointer-events:auto}
+.tag{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink);border-radius:6px 9px 7px 10px;padding:3px 10px;
+  box-shadow:2px 2px 0 rgba(59,42,32,.35);font-weight:800;font-size:.84rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag.wood{background:linear-gradient(180deg,var(--wood-hi),var(--wood));color:#FFF6E4;border-color:#4A2E18}
+.hud .tl{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:72%}
+.hud .tr{position:absolute;top:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.medal{position:absolute;left:10px;bottom:10px;display:flex;align-items:flex-end;gap:8px}
+.por{flex:none;width:76px;height:76px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 2px var(--ink),3px 4px 0 rgba(0,0,0,.25);
+  background-color:#F5EEDC;background-repeat:no-repeat;overflow:hidden}
+.who{display:grid;gap:3px}
+.pill{display:inline-block;background:var(--maroon);color:#FFF3E8;font-family:var(--display);font-weight:700;font-size:1rem;
+  padding:1px 12px 2px;border-radius:12px 8px 12px 9px;box-shadow:2px 2px 0 rgba(0,0,0,.3);justify-self:start}
+.needs{position:absolute;right:10px;bottom:10px;background:var(--paper);border:1.5px solid var(--ink);border-radius:10px 6px 11px 7px;
+  padding:6px 10px 8px;display:grid;gap:3px;min-width:150px;box-shadow:3px 3px 0 rgba(59,42,32,.3)}
+.needs h3{margin:0 0 2px;font-family:var(--display);font-size:.95rem}
+.need{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:6px;font-size:.75rem;font-weight:600}
+.tube{height:9px;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--paper2);position:relative}
+.tube i{position:absolute;inset:0 auto 0 0;border-radius:4px;transition:width .4s}
+@media (max-width:640px){.needs{min-width:124px;padding:5px 8px 6px}.need{grid-template-columns:56px 1fr;font-size:.68rem}.por{width:60px;height:60px}
+  .hud .tl{max-width:60%}}
+.card{position:absolute;left:50%;top:48px;transform:translateX(-50%);background:var(--card);border:1.5px solid var(--ink);border-radius:10px 7px 11px 8px;
+  padding:9px 12px 10px;box-shadow:4px 5px 0 rgba(0,0,0,.18);width:min(86%,280px);font-size:.85rem}
+.card h4{margin:0 0 2px;font-family:var(--display);font-size:1.15rem;line-height:1.15}
+.card .muted{color:var(--ink-soft);font-size:.78rem;margin:0 0 6px}
+.card .acts{display:flex;flex-wrap:wrap;gap:6px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font:inherit;font-weight:700;font-size:.85rem;color:var(--ink);background:var(--paper);border:1.5px solid var(--ink);
+  border-radius:6px 9px 7px 10px;padding:6px 11px;min-height:44px;cursor:pointer;box-shadow:2px 2px 0 rgba(59,42,32,.3);transition:transform .08s}
+.btn[aria-pressed="true"],.btn.go{background:linear-gradient(180deg,var(--wood-hi),var(--wood));color:#FFF6E4;border-color:#4A2E18}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:#F5EEDC;font-family:var(--display);font-size:1.2rem;background:#24345A}
+.drawer{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.ctl{display:grid;gap:6px;min-width:0;align-content:start}
+.ctl .lab{font-family:var(--display);font-weight:700;font-size:1rem}
+input[type=range]{width:100%;accent-color:var(--wood)}
+.note{font-size:.85rem;color:var(--ink-soft);margin:0}
+.facts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.facts section{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.facts h2{font-family:var(--display);font-size:1.15rem;margin:0 0 4px}
+.facts li,.facts p{font-size:.88rem;margin:0}
+.facts ul{margin:4px 0 0;padding-left:18px;display:grid;gap:3px}
+.ok{color:var(--good);font-weight:800}.bad{color:var(--low);font-weight:800}
+code{font-size:.82em;background:var(--paper2);padding:0 4px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){.btn,.tube i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Rumah Kita 2.0 · Gerbang 1</h1>
+    <p>Prototaip pemapar PixiJS 8: rumah kampung Nadia dibina daripada atlas WebP @2x (Aset 2.0) dan dibaca terus daripada data simpanan v394.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="loading" id="loading">Memuat atlas…</div>
+    <div class="hud">
+      <div class="tl"><span class="tag" id="hTime">06:32</span><span class="tag" id="hPhase">Subuh</span><span class="tag" id="hWx">☀️ Cerah</span></div>
+      <div class="tr"><span class="tag" id="hFps">— fps</span><span class="tag wood" id="hMoney">RM 1,200</span></div>
+      <div class="medal"><div class="por" id="por" role="img" aria-label="Potret Nadia"></div>
+        <div class="who"><span class="pill" id="hName">Nadia</span><span class="tag" id="hAct">Berdiri</span></div></div>
+      <div class="needs" id="needs" aria-label="Keperluan"><h3>Keperluan</h3></div>
+      <div class="card" id="card" hidden></div>
+    </div>
+  </div>
+
+  <div class="drawer">
+    <div class="ctl"><span class="lab">Masa dalam permainan</span>
+      <input type="range" id="tm" min="0" max="1439" step="1" value="392" aria-label="Masa">
+      <div class="seg"><button type="button" class="btn" id="play" aria-pressed="true">▶ Jam berjalan</button>
+        <button type="button" class="btn" data-h="9">Pagi</button><button type="button" class="btn" data-h="17.5">Petang</button>
+        <button type="button" class="btn" data-h="19">Maghrib</button><button type="button" class="btn" data-h="22">Malam</button></div></div>
+    <div class="ctl"><span class="lab">Cuaca</span>
+      <div class="seg" id="wx"><button type="button" class="btn" data-w="clear" aria-pressed="true">☀️ Cerah</button>
+        <button type="button" class="btn" data-w="rain" aria-pressed="false">🌧️ Hujan</button><button type="button" class="btn" data-w="haze" aria-pressed="false">🌫️ Jerebu</button></div>
+      <span class="lab">Mutu grafik</span>
+      <div class="seg" id="gq"><button type="button" class="btn" data-q="lancar" aria-pressed="true">🐇 Lancar · resolusi 1×</button>
+        <button type="button" class="btn" data-q="tajam" aria-pressed="false">💎 Tajam · resolusi penuh</button></div></div>
+    <div class="ctl"><span class="lab">Kamera</span>
+      <div class="seg"><button type="button" class="btn" id="zin">＋ Dekat</button><button type="button" class="btn" id="zout">－ Jauh</button>
+        <button type="button" class="btn" id="zfit">⤢ Seluruh rumah</button>
+        <button type="button" class="btn" id="follow" aria-pressed="false">🎯 Ikut Nadia</button></div>
+      <p class="note">Seret untuk alih, cubit atau roda tetikus untuk zum. Ketik perabot untuk suruh Nadia.</p>
+      <span class="lab">Simpanan v394</span>
+      <div class="seg"><label class="btn" for="file">📂 Buka fail simpanan (.json)</label><input type="file" id="file" accept=".json,application/json" hidden></div>
+      <p class="note" id="saveNote">Rumah contoh: kampung 10 × 10, 38 objek.</p></div>
+  </div>
+
+  <div class="facts">
+    <section><h2>Ujian Gerbang 1</h2>
+      <ul><li>Kadar bingkai, Lancar ≥ 30 fps: <span id="gFps">mengukur…</span></li>
+        <li>Paparan pertama &lt; 3 s: <span id="gLoad">mengukur…</span></li>
+        <li>Muat turun atlas Fasa 1: <span id="gSize">—</span></li>
+        <li>Sprite dalam satu atlas, satu panggilan lukis bagi perabot</li></ul></section>
+    <section><h2>Apa yang dipasang</h2>
+      <ul><li><b>33</b> perabot daripada <code>gerbang1-1@2x.webp</code>, dipetakan ke jenis objek v394</li>
+        <li>Rig Nadia: mesh 5 × 14 bucu atas 4 lukisan pusingan, langkah, alun pinggul dan pusing lembut; 12 ekspresi</li>
+        <li>Unjuran ¾ Pelukis v0.1: <code>k(y) = 0.78 + 0.22·y/N</code></li>
+        <li>Laluan A* 8 arah, diluruskan, dengan pecutan dan perlahan</li>
+        <li>8 pose tindakan Canva: duduk, duduk tandas, baring tidur, mandi di pancuran, masak, makan di meja, minum, siram pokok</li></ul></section>
+    <section><h2>Belum lagi</h2>
+      <ul><li>Perabot 4 arah dan bingkai jalan sebenar (perlu dilukis semula)</li>
+        <li>Sambungan terus ke <code>game.js</code>; tindakan di sini hanya simulasi ringkas</li>
+        <li>Tingkat atas, laman dan babak luar (Fasa 2)</li></ul></section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8.6.6/dist/pixi.min.js"></script>
+<script>
+const DATA={"S":{"v":2,"t":392.44979999999987,"lastDay":0,"money":1200,"style":"kampung","gridN":10,"objs":[{"id":92,"type":"kingbed","x":1,"y":0,"f":0,"kr":"y+"},{"id":93,"type":"almari","x":3,"y":0,"f":0,"kr":"y+"},{"id":94,"type":"mirror","x":0,"y":2,"f":0,"kr":"x+"},{"id":95,"type":"kipas","x":3,"y":2,"f":0,"kr":null},{"id":96,"type":"shower","x":4,"y":0,"f":0,"kr":null},{"id":97,"type":"toilet","x":5,"y":0,"f":0,"kr":null},{"id":98,"type":"tempayan","x":5,"y":2,"f":0,"kr":null},{"id":99,"type":"bed","x":7,"y":0,"f":0,"kr":"y+"},{"id":100,"type":"almari","x":6,"y":0,"f":0,"kr":"y+"},{"id":101,"type":"computer","x":7,"y":2,"f":0,"kr":null},{"id":102,"type":"bed","x":9,"y":0,"f":0,"kr":"y+"},{"id":103,"type":"kidbed","x":8,"y":0,"f":0,"kr":"y+"},{"id":104,"type":"bookshelf","x":8,"y":2,"f":0,"kr":null},{"id":105,"type":"almarikaca","x":0,"y":3,"f":0,"kr":"x+"},{"id":106,"type":"tv","x":3,"y":3,"f":0,"kr":"y+"},{"id":107,"type":"kerusirotan","x":2,"y":5,"f":0,"kr":"x+"},{"id":108,"type":"mejakopi","x":3,"y":5,"f":0,"kr":null},{"id":109,"type":"kerusirotan","x":4,"y":5,"f":0,"kr":"x-"},{"id":110,"type":"sofa","x":3,"y":6,"f":0,"kr":"y-"},{"id":111,"type":"plant","x":5,"y":3,"f":0,"kr":null},{"id":112,"type":"sejadah","x":0,"y":7,"f":0,"kr":null},{"id":113,"type":"kipas","x":5,"y":6,"f":0,"kr":null},{"id":114,"type":"stove","x":7,"y":3,"f":0,"kr":"y+"},{"id":115,"type":"rakpinggan","x":8,"y":3,"f":0,"kr":"y+"},{"id":116,"type":"fridge","x":6,"y":5,"f":0,"kr":"x+"},{"id":117,"type":"dining","x":8,"y":4,"f":0,"kr":null},{"id":118,"type":"kidbed","x":7,"y":6,"f":0,"kr":"y+"},{"id":119,"type":"mejabelajar","x":7,"y":7,"f":0,"kr":"y-"},{"id":120,"type":"bed","x":8,"y":7,"f":0,"kr":"y-"},{"id":121,"type":"almari","x":9,"y":7,"f":0,"kr":"y-"},{"id":122,"type":"kerusirotan","x":5,"y":9,"f":0,"kr":"x+"},{"id":123,"type":"mejakopi","x":6,"y":9,"f":0,"kr":null},{"id":124,"type":"kerusirotan","x":7,"y":9,"f":0,"kr":"x-"},{"id":125,"type":"plant","x":0,"y":9,"f":0,"kr":null},{"id":126,"type":"monstera","x":9,"y":9,"f":0,"kr":null},{"id":127,"type":"tikar","x":1,"y":9,"f":0,"kr":null},{"id":128,"type":"plant","x":9,"y":8,"f":0,"kr":null},{"id":129,"type":"radiokaset","x":4,"y":9,"f":0,"kr":"y+"}],"walls":["h,0,3","h,1,3","h,3,3","h,5,3","h,7,3","h,8,3","v,4,0","v,4,1","v,4,2","v,6,0","v,6,1","v,6,2","v,8,0","v,8,1","v,8,2","v,6,3","v,6,5","v,6,6","h,6,6","h,7,6","h,8,6","v,8,6","v,8,7","h,0,8","h,1,8","h,4,8","h,5,8","h,6,8","h,7,8","h,8,8","h,9,8"],"rooms":[{"t":"bed","x0":0,"y0":0,"x1":4,"y1":3},{"t":"bath","x0":4,"y0":0,"x1":6,"y1":3},{"t":"bed","x0":6,"y0":0,"x1":8,"y1":3},{"t":"bed","x0":8,"y0":0,"x1":10,"y1":3},{"t":"living","x0":0,"y0":3,"x1":6,"y1":8},{"t":"kitchen","x0":6,"y0":3,"x1":10,"y1":6},{"t":"kids","x0":6,"y0":6,"x1":8,"y1":8},{"t":"bed","x0":8,"y0":6,"x1":10,"y1":8},{"t":"open","x0":0,"y0":8,"x1":10,"y1":10}],"sims":[{"id":1,"name":"Nadia","stage":"adult","x":6.929669914110092,"y":3.5,"f":0,"needs":{"hunger":61.85301199999998,"energy":77.82851400000008,"hygiene":51.85301199999998,"fun":49.804015999999976,"social":41.84076300000005},"job":{"career":"quality","level":0,"perf":10},"ap":{"skin":"#c48d68","face":"heart","jaw":0.45,"eye":"almond","eyeSize":0.7,"eyeGap":0.5,"eyeColor":"#7a5a1e","brow":"arched","browW":0.65,"nose":"button","noseSize":0.45,"lips":"full","mouthW":0.5,"lipColor":"#c9706e","lipstick":true,"liner":true,"blush":0.55,"facial":"none","freckles":true,"mark":false,"glasses":"none","earrings":true,"hat":"none","hair":"wavy","hairColor":"#3a2216","hijab":"none","hijabColor":"#8a5cc0","height":0.46,"build":0.36,"shape":0.18,"lashes":0.85,"smile":0.6,"photo":null,"photoSrc":null,"crop":null,"wear":"casual","casual":{"top":"blouse","topC":"#23744f","bottom":"jeans","botC":"#2e3a4f"},"work":{"style":"factory","c":"#2f5d8a"},"trad":{"style":"kurung","c":"#23744f","c2":"#f0d27a"},"sleep":{"c":"#7aa6c9"}},"sifat":["rajin","romantik","aktif"],"look":{"shirt":"#23744f","pants":"#2e3a4f","skin":"#c48d68","hair":"#3a2216","long":true}}]},"names":{"bed":"Katil kayu","fridge":"Peti sejuk","stove":"Dapur gas","shower":"Pancuran mandi","sofa":"Kerusi kayu panjang","tv":"Televisyen","computer":"Meja komputer","bookshelf":"Rak buku","mirror":"Cermin berdiri","crib":"Katil bayi","aquarium":"Akuarium","plant":"Pokok pasu","lamp":"Lampu lantai","dining":"Meja makan","tikar":"Tikar mengkuang","kipas":"Kipas berdiri","sejadah":"Sejadah","kolam":"Seni lantai kolam","mesinjahit":"Mesin jahit","monstera":"Pokok monstera besar","tempayan":"Tempayan","rehal":"Rak buku kayu","kingbed":"Katil king mewah","island":"Pulau dapur (marmar)","luxfridge":"Peti sejuk dua pintu","dining8":"Meja makan mewah","luxsofa":"Sofa L mewah","tvwall":"TV 75\" dengan kabinet","bathtub":"Tab mandi marmar","toilet":"Tandas moden","vanity":"Meja solek & cermin","cctv":"Kamera CCTV","pemadam":"Alat pemadam api","purifier":"Penapis udara","bbqgrill":"Pemanggang BBQ","lounger":"Kerusi berjemur","umbrellatbl":"Meja payung taman","boardgame":"Meja permainan (permainan papan)","minilib":"Sudut bacaan (mini-library)","piano":"Piano besar","almari":"Almari baju kayu","almarikaca":"Almari kaca pinggan","kerusirotan":"Kerusi kayu berkusyen","mejakopi":"Meja kopi berlapik renda","rakpinggan":"Rak pinggan & periuk","kidbed":"Katil kanak-kanak","mejabelajar":"Meja belajar kanak-kanak","radiokaset":"Radio kaset 90-an"},"acts":{"bed":["sleep","nap","mesra","trybaby"],"fridge":["snack"],"stove":["cook"],"shower":["shower"],"sofa":["relax"],"tv":["tv"],"computer":["games","freelance","homework"],"bookshelf":["study","homework"],"mirror":["speech"],"crib":["feed","cuddle"],"aquarium":["fish"],"plant":["water"],"lamp":[],"dining":[],"tikar":["relax"],"kipas":["cool"],"sejadah":["pray"],"kolam":[],"mesinjahit":["sew"],"monstera":["water"],"tempayan":[],"rehal":["study"],"kingbed":["sleep","nap","mesra","trybaby"],"island":["cook"],"luxfridge":["snack"],"dining8":[],"luxsofa":["relax"],"tvwall":["tv"],"bathtub":["shower"],"toilet":[],"vanity":["speech"],"cctv":[],"pemadam":[],"purifier":["purify"],"bbqgrill":["bbqroof"],"lounger":["sunbathe"],"umbrellatbl":["teapetang"],"boardgame":["dam","boardgame"],"minilib":["read","storytime"],"piano":["piano"],"kidbed":["sleep","nap"],"mejabelajar":["study"]}};
+(async function(){
+"use strict";
+const T0=performance.now();
+const $=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let S=DATA.S; const NAMES=DATA.names, ACTS=DATA.acts;
+let N=S.gridN||10;
+const RM=new Intl.NumberFormat('ms-MY');
+const ACTL={sleep:'Tidur',nap:'Lelap sekejap',snack:'Makan snek',cook:'Masak',shower:'Mandi',relax:'Berehat',tv:'Tonton TV',
+  games:'Main permainan',freelance:'Kerja bebas',homework:'Buat kerja',study:'Belajar',speech:'Latih ucapan',feed:'Susukan',cuddle:'Dodoi',
+  fish:'Beri ikan makan',toilet:'Guna tandas',water:'Siram pokok',cool:'Sejukkan badan',pray:'Solat',sew:'Menjahit',read:'Membaca',piano:'Main piano'};
+const HIDE=new Set(['mesra','trybaby']);
+ACTS.toilet=[...(ACTS.toilet||[]),'toilet'];   // tiada pasangan dalam rumah contoh
+const EFFECT={sleep:{energy:60},nap:{energy:25},snack:{hunger:30},cook:{fun:5},_eat:{hunger:55},toilet:{hygiene:5},_fridge:{},shower:{hygiene:60},relax:{fun:20,energy:5},
+  tv:{fun:30},games:{fun:35},freelance:{fun:-5},homework:{fun:-5},study:{fun:5},speech:{social:20},water:{fun:10},cool:{energy:10},
+  pray:{fun:10,social:10},sew:{fun:25},read:{fun:20}};
+const FACE={sleep:12,nap:12,snack:1,cook:7,shower:10,relax:8,tv:5,games:5,study:11,homework:11,freelance:10,speech:4,water:7,cool:9,pray:9,sew:7,read:11};
+const NEEDL=[['hunger','Lapar'],['energy','Tenaga'],['hygiene','Kebersihan'],['fun','Seronok'],['social','Sosial']];
+/* jenis objek v394 -> [bingkai atlas, lebar, dalam, tinggi (unit petak), rata] */
+const F={kingbed:['bilik-tidur-01',2,2,1.05],bed:['item-11-set-e-kampung-dan-bayi-03',1,2,0.95],kidbed:['bilik-tidur-08',1,2,0.75],
+  almari:['bilik-tidur-02',1,1,1.55],mirror:['bilik-tidur-03',1,1,1.25],vanity:['bilik-tidur-03',1,1,1.25],kipas:['ruang-tamu-06',1,1,1.1],
+  shower:['bilik-air-dan-dobi-04',1,1,1.5],toilet:['bilik-air-dan-dobi-02',1,1,0.75],tempayan:['rumah-kampung-05',1,1,0.7],
+  computer:['pejabat-dan-hobi-01',1,1,0.95],bookshelf:['pejabat-dan-hobi-04',1,1,1.5],rehal:['pejabat-dan-hobi-04',1,1,1.2],
+  almarikaca:['item-11-set-e-kampung-dan-bayi-06',1,1,1.45],tv:['ruang-tamu-05',1,1,0.95],kerusirotan:['ruang-tamu-01',1,1,0.8],
+  mejakopi:['item-11-set-e-kampung-dan-bayi-08',1,1,0.5],sofa:['rumah-kampung-01',2,1,0.95],plant:['ruang-tamu-10',1,1,0.85],
+  monstera:['ruang-tamu-10',1,1,1.3],sejadah:['ruang-tamu-07',1,1,0,1],tikar:['rumah-kampung-02',2,1,0,1],stove:['dapur-01',1,1,0.75],
+  rakpinggan:['item-11-set-e-kampung-dan-bayi-07',1,1,1.35],fridge:['dapur-03',1,1,1.45],dining:['dapur-04',2,1,1.0],
+  mejabelajar:['item-11-set-e-kampung-dan-bayi-04',1,1,1.15],radiokaset:['item-11-set-e-kampung-dan-bayi-11',1,1,0.4],
+  lamp:['ruang-tamu-12',1,1,1.1],crib:['rumah-kampung-07',1,1,1.05],mesinjahit:['pejabat-dan-hobi-06',1,1,1.05],
+  pelita:['rumah-kampung-04',1,1,0.6],_:['ruang-tamu-03',1,1,0.9]};
+const GLOW={tv:'#9fc7ff',lamp:'#ffd88a',computer:'#9fc7ff',pelita:'#ffc46b',kipas:null};
+
+/* ---------- PixiJS ---------- */
+const stage=$('stage');
+const app=new PIXI.Application();
+await app.init({resizeTo:stage,antialias:true,autoDensity:true,resolution:1,background:'#24345A',preference:'webgl'});
+stage.prepend(app.canvas);
+app.canvas.setAttribute('aria-label','Diorama rumah kampung Nadia');
+let sheet,floorTex={};const nadiaTex={},poseTex={};let poseInfo=null;
+try{
+  sheet=await PIXI.Assets.load('aset/gerbang1-1@2x.json');
+  for(const k of ['depan','34','sisi','belakang'])nadiaTex[k]=await PIXI.Assets.load(`aset/nadia_${k}@2x.webp`);
+  try{const r=await fetch('aset/nadia_pose.json');if(r.ok){poseInfo=await r.json();
+    for(const k of Object.keys(poseInfo.poses))poseTex[k]=await PIXI.Assets.load(`aset/nadia_pose_${k}@2x.webp`)}}catch(e){poseInfo=null}
+  for(const k of ['papan','jubin','terrazzo','mengkuang'])
+    floorTex[k]=await PIXI.Assets.load({src:`aset/lantai_${k}@2x.webp`,data:{addressMode:'repeat'}});
+}catch(e){$('loading').textContent='Atlas tidak dapat dimuat.';throw e}
+const tex=n=>sheet.textures['perabot_'+n]||sheet.textures[n];
+const faceTex=i=>sheet.textures['watak_nadia-12-ekspresi-'+String(i).padStart(2,'0')];
+
+/* ---------- unjuran: ¾ rumah anak patung (Pelukis v0.1) ---------- */
+const TW=64;                            // petak di tepi depan, unit dunia
+let D=TW*N*0.42;
+const kOf=y=>0.78+0.22*(y/N);
+function P(x,y,z){const u=y/N,k=kOf(y);return [(x-N/2)*TW*k, D*(0.78*u+0.11*u*u)/0.89-(z||0)*TW*0.62*k]}
+const WALLH=2.5;
+
+/* lapisan */
+const skyL=new PIXI.Container(), world=new PIXI.Container(), fx=new PIXI.Container();
+app.stage.addChild(skyL,world,fx);
+const backL=new PIXI.Container(), floorL=new PIXI.Container(), sortL=new PIXI.Container(), frontL=new PIXI.Container(), glowL=new PIXI.Container();
+sortL.sortableChildren=true; world.addChild(backL,floorL,sortL,frontL,glowL);
+
+/* ---------- warna ---------- */
+const hex=c=>parseInt(c.slice(1),16);
+function mix(a,b,t){const A=hex(a),B=hex(b);return '#'+[16,8,0].map(s=>Math.round(((A>>s)&255)*(1-t)+((B>>s)&255)*t).toString(16).padStart(2,'0')).join('')}
+function shade(c,f){return f<0?mix(c,'#000000',-f):mix(c,'#ffffff',f)}
+const GRADE=[[0,'#0E1A33','#24345A','#2B3A66',.55,0],[5,'#1F2B52','#6E5F86','#3E4A78',.45,0],[6,'#5C79A6','#D9A48C','#8C8FB4',.28,.25],
+  [7,'#7FA9D6','#F2D1AE','#E9D6C0',.10,.6],[11,'#3B8ED0','#B9DDF2','#FFFFFF',0,1],[15,'#3A8BCB','#C6E3F1','#FFFFFF',0,1],
+  [17,'#E3A15F','#F6D59C','#F2B27A',.16,.85],[18.6,'#C77B76','#F2A97C','#D98C7E',.22,.55],[19.4,'#5D4E86','#C98C86','#6A5A96',.34,.2],
+  [20.3,'#18264A','#36406E','#2F3E6E',.5,0],[24,'#0E1A33','#24345A','#2B3A66',.55,0]];
+function grade(h){for(let i=0;i<GRADE.length-1;i++){const a=GRADE[i],b=GRADE[i+1];if(h>=a[0]&&h<=b[0]){const t=(h-a[0])/(b[0]-a[0]);
+  return {top:mix(a[1],b[1],t),bot:mix(a[2],b[2],t),tint:mix(a[3],b[3],t),ta:a[4]+(b[4]-a[4])*t,sun:a[5]+(b[5]-a[5])*t}}}return grade(0)}
+function phase(h){if(h>=5.5&&h<7)return 'Subuh';if(h>=7&&h<11)return 'Pagi';if(h>=11&&h<15)return 'Tengah hari';if(h>=15&&h<18.5)return 'Petang';if(h>=18.5&&h<19.5)return 'Maghrib';return 'Malam'}
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return((s>>>0)%100000)/100000}}
+
+/* ---------- langit (ruang skrin) ---------- */
+const skyCv=document.createElement('canvas');skyCv.width=2;skyCv.height=128;
+const skyTex=PIXI.Texture.from(skyCv);const skySpr=new PIXI.Sprite(skyTex);skyL.addChild(skySpr);
+const stars=new PIXI.Graphics();skyL.addChild(stars);
+{const r=rng(5);for(let i=0;i<90;i++)stars.circle(r(),r()*0.55,0.0016+r()*0.0016).fill({color:0xFFFAE6,alpha:.85})}
+const hills=new PIXI.Graphics(), clouds=new PIXI.Container(), palms=new PIXI.Graphics();
+backL.addChild(hills,clouds,palms);
+for(let i=0;i<4;i++){const c=new PIXI.Graphics();const r=rng(17+i);const s=TW*(1+(i%3)*.35);
+  for(let j=0;j<9;j++){c.circle((r()-.5)*s*2.2+s*.08,-r()*s*.7+s*.12,s*(.35+r()*.45)).fill({color:0x000000,alpha:.12})}
+  for(let j=0;j<9;j++){const rr=rng(17+i);}
+  const r2=rng(17+i);for(let j=0;j<9;j++){c.circle((r2()-.5)*s*2.2,-r2()*s*.7,s*(.35+r2()*.45)).fill(0xFFFFFF)}
+  c.x=-TW*8+i*TW*5;c.y=P(0,0,WALLH)[1]-TW*(1.6+(i%2)*1.1);c.baseX=c.x;clouds.addChild(c)}
+
+/* ---------- tanah, tiang, tangga ---------- */
+const ground=new PIXI.Graphics();backL.addChild(ground);
+function poly(g,pts,fill,o={}){g.poly(pts.flat()).fill(fill);if(o.line!==false)g.stroke({width:o.lw||1.2,color:o.ink||0x3B2A20,alpha:o.la??0.9,join:'round'});return g}
+function drawGround(gr){
+  ground.clear();
+  const [lx,ly]=P(0,N,0),[rx]=P(N,N,0),gy=ly+TW*0.9;
+  ground.rect(-TW*30,gy-TW*1.1,TW*60,TW*12).fill(mix('#7A9A4E',gr.tint,gr.ta*.6));
+  ground.rect(-TW*30,gy+TW*1.2,TW*60,TW*12).fill({color:mix('#C9764A',gr.tint,gr.ta*.6),alpha:.55});
+  ground.poly([lx,ly,rx,ly,rx-TW*.2,gy-TW*.2,lx+TW*.2,gy-TW*.2]).fill({color:0x1E140A,alpha:.28});
+  for(let i=0;i<=N;i+=2){const [sx]=P(i,N,0);poly(ground,[[sx-TW*.08,ly],[sx+TW*.08,ly],[sx+TW*.09,gy],[sx-TW*.09,gy]],'#6B4428')}
+  const s0=N/2-0.6;for(let i=0;i<3;i++){const y0=ly+TW*.28*i,[ax]=P(s0,N,0),[bx]=P(s0+1.2,N,0);
+    poly(ground,[[ax-i*3,y0],[bx+i*3,y0],[bx+i*3,y0+TW*.28],[ax-i*3,y0+TW*.28]],i===2?'#5E9C93':'#B7AE9C')}
+  const r=rng(9);const gc=mix('#4F7A33',gr.tint,gr.ta*.6);
+  for(let i=0;i<70;i++){const x=lx-TW*3+r()*(rx-lx+TW*6),y=gy+r()*TW*1.6;ground.moveTo(x,y).lineTo(x-2,y-6).moveTo(x,y).lineTo(x+2,y-7)}
+  ground.stroke({width:1.3,color:gc});
+}
+function drawHills(gr){
+  hills.clear();const hy=P(0,0,0)[1]-TW*.6;const pts=[-TW*30,hy];
+  for(let i=-14;i<=34;i++){pts.push((i-10)*TW*.8,hy-TW*(.55+Math.sin(i*1.3)*.25+Math.sin(i*.4)*.3))}
+  pts.push(TW*30,hy+TW*3,-TW*30,hy+TW*3);hills.poly(pts).fill(mix('#5F8A86',gr.top,.45));
+}
+function drawPalms(gr,sway){
+  palms.clear();const night=gr.sun<.15,pc=mix('#2E4A2A',gr.top,night?.55:.2);
+  const one=(x,y,h,sw)=>{palms.moveTo(x,y).quadraticCurveTo(x+h*.12,y-h*.5,x+h*.05+sw,y-h).stroke({width:h*.045,color:pc,cap:'round'});
+    const tx=x+h*.05+sw,ty=y-h;for(let i=0;i<7;i++){const a=-Math.PI*.95+i*Math.PI*.32;
+      palms.moveTo(tx,ty).quadraticCurveTo(tx+Math.cos(a)*h*.28,ty+Math.sin(a)*h*.18-h*.08,tx+Math.cos(a)*h*.42,ty+Math.sin(a)*h*.3+h*.1)}
+    palms.stroke({width:h*.03,color:pc,cap:'round'})};
+  one(P(-0.6,1,0)[0],P(0,1,0)[1],TW*5.2,sway);one(P(N+0.5,.5,0)[0],P(0,.5,0)[1],TW*4.4,-sway);one(P(N+1.4,3,0)[0],P(0,3,0)[1],TW*5.6,sway*.7);
+}
+
+/* ---------- lantai: satu Mesh bertekstur bagi setiap bilik ---------- */
+const ROOMFLOOR={bed:['papan','#F0D2B0'],living:['papan','#FFE2BE'],kitchen:['terrazzo','#FFFFFF'],bath:['jubin','#FFFFFF'],kids:['mengkuang','#FFE4DA'],open:['papan','#F2D6B4']};
+function floorMesh(r){
+  const [mat,tint]=ROOMFLOOR[r.t]||ROOMFLOOR.open;const pos=[],uv=[],idx=[];
+  for(let y=r.y0;y<r.y1;y++)for(let x=r.x0;x<r.x1;x++){
+    const i=pos.length/2;for(const [dx,dy] of [[0,0],[1,0],[1,1],[0,1]]){pos.push(...P(x+dx,y+dy,0));uv.push((x+dx)*.5,(y+dy)*.5)}
+    idx.push(i,i+1,i+2,i,i+2,i+3)}
+  const g=new PIXI.MeshGeometry({positions:new Float32Array(pos),uvs:new Float32Array(uv),indices:new Uint32Array(idx)});
+  const m=new PIXI.Mesh({geometry:g,texture:floorTex[mat]});m.tint=tint;return m;
+}
+
+/* ---------- dinding ---------- */
+const backWall=new PIXI.Container(), winG=new PIXI.Graphics(), sideG=new PIXI.Graphics();
+function buildBackWall(){
+  backWall.removeChildren();
+  const a=P(0,0,WALLH),c=P(N,0,0);
+  const t=new PIXI.TilingSprite({texture:floorTex.papan,width:c[0]-a[0],height:c[1]-a[1]});
+  t.position.set(a[0],a[1]);t.tileScale.set(.42);t.tint='#9C6A42';backWall.addChild(t);
+  const band=new PIXI.Graphics();const k0=P(0,0,WALLH*.86);
+  band.rect(a[0],a[1],c[0]-a[0],k0[1]-a[1]).fill('#6E4426');
+  for(let x=0.25;x<N;x+=0.5){const [px,py]=P(x,0,WALLH*.93);band.ellipse(px,py,TW*.11*.78,TW*.04).stroke({width:1,color:0xE7C48A});band.moveTo(px-TW*.086,py).lineTo(px+TW*.086,py).stroke({width:1,color:0xE7C48A})}
+  band.rect(a[0],a[1],c[0]-a[0],c[1]-a[1]).stroke({width:1.5,color:0x3B2A20});
+  backWall.addChild(band,winG);
+}
+const WINX=[1.4,5.0,8.4];
+function drawWindows(gr){
+  winG.clear();
+  for(const wx of WINX){const A=P(wx,0,1.95),C=P(wx+1.1,0,.95);const w=C[0]-A[0],h=C[1]-A[1];
+    winG.rect(A[0],A[1],w,h*.55).fill(gr.top);winG.rect(A[0],A[1]+h*.55,w,h*.45).fill(gr.bot);
+    if(S._wx==='haze')winG.rect(A[0],A[1],w,h).fill({color:0xD6AA78,alpha:.55});
+    winG.ellipse(C[0]-TW*.2,C[1],TW*.4,TW*.17).fill(mix('#2E4A2A',gr.top,.3));
+    winG.rect(A[0],A[1],w,h).stroke({width:TW*.04,color:0x4A2E18});winG.moveTo(A[0]+w/2,A[1]).lineTo(A[0]+w/2,C[1]).stroke({width:TW*.03,color:0x4A2E18});
+    for(const s of [-1,1]){const x0=s<0?A[0]:C[0],x1=x0+s*TW*.36;
+      winG.poly([x0,A[1],x1,A[1]+TW*.05,x1,C[1]-TW*.05,x0,C[1]]).fill('#2E8B57').stroke({width:1,color:0x1B3A26});
+      for(let i=1;i<8;i++){const y=A[1]+h*i/8;winG.moveTo(x0,y).lineTo(x1,y+TW*.02)}winG.stroke({width:1,color:0x142819,alpha:.6})}
+    winG.poly([A[0]+2,A[1]+2,A[0]+TW*.2,A[1]+2,A[0]+TW*.12,C[1]-2,A[0]+2,C[1]-2]).fill('#F2C4C8')}
+  // cucur atap zink
+  const e0=P(-0.5,0,WALLH),e1=P(N+0.5,0,WALLH);
+  winG.poly([e0[0],e0[1],e1[0],e1[1],e1[0]-TW*.25,e1[1]-TW*.55,e0[0]+TW*.25,e0[1]-TW*.55]).fill(mix('#9AA3A8',gr.tint,gr.ta*.4)).stroke({width:1.2,color:0x3B2A20});
+  for(let i=0;i<24;i++){const x=e0[0]+(e1[0]-e0[0])*i/24;winG.moveTo(x+TW*.03,e0[1]-TW*.5).lineTo(x,e0[1])}winG.stroke({width:TW*.025,color:0xA9583A,alpha:.55});
+}
+function drawSides(){
+  sideG.clear();
+  for(const xw of [0,N]){const a=P(xw,0,WALLH),b=P(xw,N,.55),c=P(xw,N,0),d=P(xw,0,0);
+    poly(sideG,[a,b,c,d],'#7E5130');
+    for(let y=.5;y<N;y+=.5){const p=P(xw,y,0),q=P(xw,y,WALLH+(.55-WALLH)*(y/N));sideG.moveTo(p[0],p[1]).lineTo(q[0],q[1])}
+    sideG.stroke({width:1,color:0x28190C,alpha:.4});sideG.moveTo(a[0],a[1]).lineTo(b[0],b[1]).stroke({width:TW*.05,color:0xD7A86E})}
+}
+function wallBox(kind,x,y){
+  const g=new PIXI.Graphics(),hh=.72,th=.09;
+  let x0,y0,w,d;if(kind==='h'){x0=x;y0=y-th/2;w=1;d=th}else{x0=x-th/2;y0=y;w=th;d=1}
+  const a=P(x0,y0,hh),b=P(x0+w,y0,hh),c=P(x0+w,y0+d,hh),e=P(x0,y0+d,hh),fa=P(x0,y0+d,0),fb=P(x0+w,y0+d,0);
+  if(kind==='v'){const p0=P(x0,y0,0),p1=P(x0+w,y0,0);if(x0>N/2)poly(g,[a,e,fa,p0],'#CDBF9F');else poly(g,[b,c,fb,p1],'#CDBF9F')}
+  poly(g,[e,c,fb,fa],'#E4D3AE');poly(g,[a,b,c,e],'#8A5A34');
+  const m=P(x0,y0+d,hh*.18),m2=P(x0+w,y0+d,hh*.18);g.moveTo(m[0],m[1]).lineTo(m2[0],m2[1]).stroke({width:2,color:0x8A5A34,alpha:.8});
+  g.zIndex=kind==='h'?y*100:(y+1)*100-50+x;return g;
+}
+function frontRail(){
+  const g=new PIXI.Graphics();
+  for(let x=0;x<N;x++){if(x===Math.floor(N/2)-1||x===Math.floor(N/2))continue;
+    const a=P(x,N,.69),b=P(x+1,N,.69),c=P(x+1,N,.62),d=P(x,N,.62);poly(g,[a,b,c,d],'#B98657');
+    for(let i=0;i<4;i++){const xx=x+i*.25+.1,p=P(xx,N,.62),q=P(xx+.05,N,0);poly(g,[[p[0],p[1]],[q[0],p[1]],[q[0],q[1]],[p[0],q[1]]],'#8A5A34',{lw:.8})}}
+  return g;
+}
+
+/* ---------- perabot ---------- */
+let objSpr=[], occ=new Set(), wallSet=new Set(), roomLights=[];
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.35,'rgba(255,255,255,.45)');r.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=r;g.fillRect(0,0,128,128);return PIXI.Texture.from(c)})();
+function placeObj(o){
+  const def=F[o.type]||F._;const [frame,fw,fd,hh,flat]=def;const t=tex(frame);if(!t)return;
+  const ox=o.x,oy=o.y;const k=kOf(oy+fd);
+  const s=new PIXI.Sprite(t);s.anchor.set(.5,1);
+  const [px,py]=P(ox+fw/2,oy+fd*(flat?.9:.86),0);s.position.set(px,py);
+  let sc;if(flat){sc=fw*TW*k*.92/t.width;s.scale.set(sc,sc*.85)}
+  else{sc=hh*TW*k/t.height;const maxW=(fw+.45)*TW*k;if(t.width*sc>maxW)sc=maxW/t.width;s.scale.set(sc)}
+  if(o.kr==='x-')s.scale.x*=-1;
+  s.zIndex=flat?-1:(oy+fd)*100-50+ox+fw/2;
+  s.eventMode='static';s.cursor='pointer';s.obj=o;s.on('pointertap',e=>{if(!dragMoved)openCard(o)});
+  sortL.addChild(s);objSpr.push(s);
+  if(!flat)for(let x=ox;x<ox+fw;x++)for(let y=oy;y<oy+fd;y++)occ.add(x+','+y);
+  if(GLOW[o.type]){const g=new PIXI.Sprite(glowTex);g.anchor.set(.5);g.tint=GLOW[o.type];g.blendMode='add';
+    g.position.set(px,py-t.height*Math.abs(s.scale.y)*.6);g.scale.set(TW*1.6/128);g.alpha=0;glowL.addChild(g);s.glow=g}
+}
+
+/* ---------- Nadia: rig mesh (badan dibengkokkan, bukan sprite kaku) ---------- */
+const nadia=new PIXI.Container(), nShadow=new PIXI.Graphics().ellipse(0,0,TW*.26,TW*.08).fill({color:0x281A0F,alpha:.28});
+const VX=5,VY=14;
+const body=new PIXI.MeshPlane({texture:nadiaTex['34'],verticesX:VX,verticesY:VY});
+nadia.addChild(nShadow,body);nadia.eventMode='static';nadia.cursor='pointer';
+const bubble=new PIXI.Container();{const b=new PIXI.Graphics();b.roundRect(-30,-64,60,58,14).fill(0xFBF6EA).stroke({width:2,color:0x3B2A20});
+  b.poly([-7,-7,7,-7,0,4]).fill(0xFBF6EA);b.moveTo(-7,-6).lineTo(0,4).lineTo(7,-6).stroke({width:2,color:0x3B2A20});
+  const f=new PIXI.Sprite(faceTex(1));f.anchor.set(.5);f.position.set(0,-35);bubble.face=f;
+  const m=new PIXI.Graphics().roundRect(-27,-61,54,52,11).fill(0xffffff);f.mask=m;bubble.addChild(b,m,f)}
+bubble.visible=false;nadia.addChild(bubble);
+let sim=null;
+const nd={queue:[],seatFrom:null,slide:null,pose:null,poseFlip:1,step:null,ang:null,path:[],face:'34',flip:1,want:'34',wantFlip:1,turn:0,busy:null,busyT:0,face12:7,idle:0,vx:0,vy:0,phase:0,sp:0,final:null,lean:0};
+function setFaceExpr(i){nd.face12=i;bubble.face.texture=faceTex(i);const f=bubble.face;const s=50/Math.max(f.texture.width,f.texture.height);f.scale.set(s);setPortrait(i)}
+const tileOf=(x,y)=>[Math.floor(x),Math.floor(y)];
+function blocked(ax,ay,bx,by){
+  if(bx<0||by<0||bx>=N||by>=N)return true;
+  if(bx!==ax){const xe=Math.max(ax,bx);if(wallSet.has('v,'+xe+','+ay))return true}
+  if(by!==ay){const ye=Math.max(ay,by);if(wallSet.has('h,'+ax+','+ye))return true}
+  return false}
+const free=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&!occ.has(x+','+y);
+function step(x,y,dx,dy){ // 8 arah; pepenjuru hanya jika kedua-dua laluan lurus terbuka
+  const nx=x+dx,ny=y+dy;if(!free(nx,ny))return false;
+  if(dx&&dy)return free(x+dx,y)&&free(x,y+dy)&&!blocked(x,y,x+dx,y)&&!blocked(x,y,x,y+dy)&&!blocked(x+dx,y,nx,ny)&&!blocked(x,y+dy,nx,ny);
+  return !blocked(x,y,nx,ny)}
+function astar(from,goals){
+  const key=(x,y)=>x+','+y,G=new Set(goals.map(g=>key(...g)));if(!G.size)return null;
+  const h=(x,y)=>Math.min(...goals.map(([gx,gy])=>Math.hypot(gx-x,gy-y)));
+  const open=[[h(...from),0,...from]],cost=new Map([[key(...from),0]]),prev=new Map([[key(...from),null]]);
+  while(open.length){open.sort((a,b)=>a[0]-b[0]);const [,g,x,y]=open.shift();const k=key(x,y);
+    if(G.has(k)){const p=[];let c=k;while(c){p.unshift(c.split(',').map(Number));c=prev.get(c)}return p}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){if(!step(x,y,dx,dy))continue;
+      const nk=key(x+dx,y+dy),ng=g+(dx&&dy?1.414:1);if(cost.has(nk)&&cost.get(nk)<=ng)continue;
+      cost.set(nk,ng);prev.set(nk,k);open.push([ng+h(x+dx,y+dy),ng,x+dx,y+dy])}}
+  return null}
+function sight(ax,ay,bx,by){ // garis lurus antara pusat petak bebas daripada dinding dan perabot?
+  const n=Math.ceil(Math.hypot(bx-ax,by-ay)*6);let [px,py]=tileOf(ax,ay);
+  for(let i=1;i<=n;i++){const x=ax+(bx-ax)*i/n,y=ay+(by-ay)*i/n,[tx,ty]=tileOf(x,y);
+    for(const [ox,oy] of [[.18,.18],[-.18,.18],[.18,-.18],[-.18,-.18]]){const [qx,qy]=tileOf(x+ox,y+oy);if(!free(qx,qy))return false}
+    if(tx!==px||ty!==py){if(tx!==px&&ty!==py){if(!step(px,py,tx-px,ty-py))return false}else if(blocked(px,py,tx,ty))return false;px=tx;py=ty}}
+  return true}
+function pull(pts){ // tarik tali: buang titik tengah yang boleh dilangkau
+  const out=[pts[0]];let i=0;
+  while(i<pts.length-1){let j=pts.length-1;while(j>i+1&&!sight(pts[i][0],pts[i][1],pts[j][0],pts[j][1]))j--;out.push(pts[j]);i=j}
+  return out}
+/* ---------- tindakan: rancang langkah, jalan, masuk ke perabot, berpose, keluar ---------- */
+const USE={kerusirotan:'sit',sofa:'sit',kingbed:'lie',bed:'lie',kidbed:'lie',toilet:'sitF',shower:'shower',computer:'sit',
+  mejabelajar:'sit',mesinjahit:'sit',dining:'eat',stove:'cook',plant:'water',monstera:'water'};
+const ENTER=new Set(['sit','sitF','lie','shower','drink','eat']);
+const POSE={sit:'duduk34',sitF:'duduk',lie:'baring',shower:'mandi',cook:'masak',eat:'makan',drink:'minum',water:'siram'};
+const DUR={toilet:4,sleep:9,nap:6,shower:6,cook:6,_eat:6,snack:5,_fridge:1.3,tv:7};
+const LABEL={_fridge:'Buka peti sejuk',_eat:'Makan'};
+const center=o=>{const d=F[o.type]||F._;return [o.x+d[1]/2,o.y+d[2]/2]};
+function nearest(types,from){let best=null,bd=1e9;for(const o of S.objs){if(!types.includes(o.type))continue;const [x,y]=center(o),d=Math.hypot(x-from[0],y-from[1]);if(d<bd){bd=d;best=o}}return best}
+function plan(o,act){
+  const din=nearest(['dining'],center(o));
+  if(act==='snack')return [{o,act:'_fridge',mode:'stand'},din?{o:din,act:'snack',mode:'eat'}:{o:nearest(['kerusirotan','sofa'],center(o))||o,act:'snack',mode:'drink'}];
+  if(act==='cook')return [{o,act:'cook',mode:'cook'},...(din?[{o:din,act:'_eat',mode:'eat'}]:[])];
+  if(act==='tv'){const seat=nearest(['sofa','kerusirotan'],center(o));return [{o:seat||o,act:'tv',mode:seat?'sit':'stand',look:o}]}
+  if(act==='relax'&&o.type==='tikar')return [{o,act,mode:'sitF'}];
+  return [{o,act,mode:act?(USE[o.type]||'stand'):'stand'}];
+}
+function order(o,act){nd.queue=plan(o,act);leaveThen(nextStep)}
+function leaveThen(fn){ // jika sedang duduk/baring, bangun dahulu
+  bubble.visible=false;nd.busy=null;nd.pose=null;
+  if(nd.seatFrom){const [x,y]=nd.seatFrom;nd.seatFrom=null;nd.slide={a:[sim.x,sim.y],b:[x,y],t:0,done:fn,out:true}}else fn()}
+function nextStep(){const st=nd.queue.shift();if(!st){$('hAct').textContent='Berdiri';return}goTo(st)}
+function goTo(st){
+  if(!st.o){nextStep();return false}
+  const o=st.o,def=F[o.type]||F._,fw=def[1],fd=def[2],flat=def[4];const goals=[];
+  if(flat){for(let x=o.x;x<o.x+fw;x++)for(let y=o.y;y<o.y+fd;y++)goals.push([x,y])}
+  else for(let x=o.x;x<o.x+fw;x++)for(let y=o.y;y<o.y+fd;y++)for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const gx=x+dx,gy=y+dy;
+    if(free(gx,gy)&&!blocked(x,y,gx,gy))goals.push([gx,gy])}
+  let from=tileOf(sim.x,sim.y);if(!free(...from)){const near=[[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>[from[0]+a,from[1]+b]).find(t=>free(...t)&&!blocked(from[0],from[1],t[0],t[1]));if(near)from=near}
+  const p=astar(from,goals);if(!p){flash('Nadia tidak dapat sampai ke '+(NAMES[o.type]||o.type).toLowerCase());nd.queue=[];return false}
+  const pts=[[sim.x,sim.y],...p.map(([x,y])=>[x+.5,y+.5])];
+  nd.path=pull(pts).slice(1);if(!nd.path.length)nd.path=[[from[0]+.5,from[1]+.5]];nd.final=nd.path[nd.path.length-1];
+  const [cx,cy]=center(o);nd.target={...st,cx,cy};bubble.visible=false;
+  $('hAct').textContent='Berjalan ke '+(NAMES[o.type]||o.type).toLowerCase();return true}
+function arrive(){
+  const t=nd.target;nd.target=null;if(!t)return;
+  faceToward(t.cx-sim.x,t.cy-sim.y);
+  if(ENTER.has(t.mode)&&poseTex[POSE[t.mode]]){
+    nd.seatFrom=[sim.x,sim.y];let [bx,by]=[t.cx,t.cy];
+    if(t.mode==='eat'){bx=sim.x+(t.cx-sim.x)*.5;by=sim.y+(t.cy-sim.y)*.5}   // duduk di tepi meja, di kerusi meja makan
+    nd.slide={a:[sim.x,sim.y],b:[bx,by],t:0,step:t,done:()=>startBusy(t)};
+  }else startBusy(t);
+}
+function startBusy(t){
+  nd.busy=t.act||'_stand';nd.busyT=reduce?3:(DUR[t.act]||5);nd.step=t;
+  const key=POSE[t.mode];nd.pose=poseTex[key]?key:null;
+  // arah pose: ikut objek yang dilihat, arah kerusi (kr), atau objek itu sendiri
+  const look=t.look?center(t.look):[t.cx,t.cy];let dx=look[0]-sim.x;
+  if(t.mode==='sit'&&!t.look){const kr=t.o.kr;if(kr==='y+'&&poseTex.duduk)nd.pose='duduk';dx=kr==='x-'?-1:kr==='x+'?1:(t.o.x<N/2?1:-1)}
+  nd.poseFlip=dx<-0.05?-1:1;
+  if(!t.act){$('hAct').textContent='Berdiri';nd.busyT=.01;return}
+  if(t.mode!=='shower'){setFaceExpr(t.act==='sleep'||t.act==='nap'?12:(FACE[t.act]||7));bubble.visible=true}
+  $('hAct').textContent=LABEL[t.act]||ACTL[t.act]||t.act;
+}
+/* arah: 8 sudut dipetakan ke 4 lukisan; sisi asal menghadap kiri, ¾ asal menghadap kanan.
+   Histeresis 12° supaya tidak berkelip di sempadan sektor. */
+function faceToward(dx,dy){
+  const a=Math.atan2(dy,dx)*180/Math.PI;
+  if(nd.ang!=null){let d=Math.abs(((a-nd.ang)%360+540)%360-180);if(d<22.5+12)return}
+  const sec=Math.round(a/45);nd.ang=sec*45;const i=((sec%8)+8)%8;
+  const MAP=[['sisi',-1],['34',1],['depan',1],['34',-1],['sisi',1],['belakang',-1],['belakang',1],['belakang',1]];
+  const [f,fl]=MAP[i];
+  if(f!==nd.want||fl!==nd.wantFlip){nd.want=f;nd.wantFlip=fl;if(nd.turn<=0)nd.turn=1}
+}
+function setFacing(dx,dy){faceToward(dx,dy)}
+function finishBusy(){
+  const act=nd.busy;const e=EFFECT[act]||{};for(const k in e)sim.needs[k]=Math.max(0,Math.min(100,sim.needs[k]+e[k]));
+  renderNeeds();const low=NEEDL.find(([k])=>sim.needs[k]<25);setFaceExpr(low?2:7);nd.idle=0;
+  leaveThen(nextStep);
+}
+function autonomy(){
+  // pilih keperluan paling rendah, cari objek yang memenuhinya
+  const lowest=NEEDL.map(([k])=>k).sort((a,b)=>sim.needs[a]-sim.needs[b])[0];
+  const opts=[];for(const o of S.objs){for(const a of (ACTS[o.type]||[])){if(!HIDE.has(a)&&(EFFECT[a]||{})[lowest]>0)opts.push([o,a])}}
+  if(!opts.length)return;const [o,a]=opts[Math.floor(Math.random()*opts.length)];order(o,a);
+}
+
+/* ---------- binaan semula daripada S ---------- */
+function build(){
+  N=S.gridN||10;D=TW*N*0.42;
+  floorL.removeChildren();sortL.removeChildren();frontL.removeChildren();glowL.removeChildren();backL.removeChildren();
+  backL.addChild(hills,clouds,palms,ground,backWall,sideG);
+  objSpr=[];occ=new Set();wallSet=new Set(S.walls||[]);
+  for(const r of S.rooms||[{t:'open',x0:0,y0:0,x1:N,y1:N}])floorL.addChild(floorMesh(r));
+  // garis petak halus
+  const grid=new PIXI.Graphics();for(let i=0;i<=N;i++){grid.moveTo(...P(i,0,0)).lineTo(...P(i,N,0));grid.moveTo(...P(0,i,0)).lineTo(...P(N,i,0))}
+  grid.stroke({width:.6,color:0x3B2A20,alpha:.12});floorL.addChild(grid);
+  buildBackWall();drawSides();
+  for(const w of S.walls||[]){const [k,x,y]=w.split(',');sortL.addChild(wallBox(k,+x,+y))}
+  for(const o of S.objs||[])placeObj(o);
+  roomLights=[];for(const r of S.rooms||[]){if(r.t==='open')continue;const [lx,ly]=P((r.x0+r.x1)/2,(r.y0+r.y1)/2,1.2);const l=new PIXI.Sprite(glowTex);l.anchor.set(.5);l.tint='#FFC77A';l.blendMode='add';
+    l.position.set(lx,ly);l.scale.set(TW*Math.max(r.x1-r.x0,r.y1-r.y0)*1.1/128,TW*Math.max(r.x1-r.x0,r.y1-r.y0)*.75/128);l.alpha=0;glowL.addChild(l);roomLights.push(l)}
+  frontL.addChild(frontRail());
+  sim=(S.sims||[])[0]||{name:'Nadia',x:N/2,y:N/2,needs:{hunger:60,energy:60,hygiene:60,fun:60,social:60}};
+  sortL.addChild(nadia);nd.path=[];nd.busy=null;nd.target=null;nd.vx=nd.vy=0;nd.queue=[];nd.pose=null;nd.seatFrom=null;nd.slide=null;
+  $('hName').textContent=sim.name;$('hMoney').textContent='RM '+RM.format(S.money||0);
+  lastH=-1;renderNeeds();fit();
+}
+
+/* ---------- HUD ---------- */
+const needEls={};
+for(const [k,l] of NEEDL){const d=document.createElement('div');d.className='need';d.innerHTML=`<span>${l}</span><span class="tube"><i></i></span>`;$('needs').appendChild(d);needEls[k]=d.querySelector('i')}
+function renderNeeds(){for(const [k] of NEEDL){const v=Math.round(sim.needs[k]);const i=needEls[k];i.style.width=v+'%';
+  i.style.background=v>=60?'var(--good)':v>=30?'var(--mid)':'var(--low)'}}
+const atlasURL='aset/gerbang1-1@2x.webp';
+function setPortrait(i){const f=faceTex(i).frame,size=sheet.textureSource.width,el=$('por'),w=el.clientWidth||76,s=w/Math.min(f.width,f.height)*1.05;
+  el.style.backgroundImage=`url("${atlasURL}")`;el.style.backgroundSize=`${size*s}px ${sheet.textureSource.height*s}px`;
+  el.style.backgroundPosition=`${-(f.x+(f.width-w/s)/2)*s}px ${-(f.y+f.height*.02)*s}px`}
+const card=$('card');
+function openCard(o){
+  const acts=(ACTS[o.type]||[]).filter(a=>!HIDE.has(a));
+  card.innerHTML=`<h4>${NAMES[o.type]||o.type}</h4><p class="muted">Petak (${o.x}, ${o.y}) · <code>${o.type}</code></p><div class="acts"></div>`;
+  const box=card.querySelector('.acts');
+  const add=(label,act,cls)=>{const b=document.createElement('button');b.type='button';b.className='btn'+(cls?' '+cls:'');b.textContent=label;
+    b.onclick=()=>{card.hidden=true;order(o,act)};box.appendChild(b)};
+  acts.forEach(a=>add(ACTL[a]||a,a,'go'));add('Pergi ke sini',null);
+  const x=document.createElement('button');x.type='button';x.className='btn';x.textContent='Tutup';x.onclick=()=>card.hidden=true;box.appendChild(x);
+  card.hidden=false;
+}
+let flashT=0;function flash(m){$('hAct').textContent=m;flashT=2.5}
+
+/* ---------- kamera ---------- */
+const cam={z:1,x:0,y:0};let base=1;
+function fit(){
+  const W=app.screen.width,H=app.screen.height;
+  const top=P(0,0,WALLH)[1]-TW*1.0,bot=P(0,N,0)[1]+TW*2.0,wid=TW*(N+2.4);
+  base=Math.min(W/wid,H/(bot-top));if(H>W*1.15)base=Math.min(W/(TW*(N+.4)),H/(bot-top));cam.cy=(top+bot)/2;applyCam();
+}
+function applyCam(){const W=app.screen.width,H=app.screen.height,s=base*cam.z;
+  world.scale.set(s);world.position.set(W/2+cam.x,H/2+cam.y-cam.cy*s);
+  skySpr.width=W;skySpr.height=H;stars.scale.set(W,H)}
+function zoomBy(f,px,py){const W=app.screen.width,H=app.screen.height;px??=W/2;py??=H/2;
+  const nz=Math.max(.8,Math.min(3.6,cam.z*f)),r=nz/cam.z;cam.x=(cam.x+W/2-px)*r-(W/2-px);cam.y=(cam.y+H/2-py)*r-(H/2-py);cam.z=nz;clamp();applyCam()}
+function clamp(){const W=app.screen.width,H=app.screen.height,m=W*cam.z*.6,n=H*cam.z*.6;cam.x=Math.max(-m,Math.min(m,cam.x));cam.y=Math.max(-n,Math.min(n,cam.y))}
+$('zin').onclick=()=>zoomBy(1.3);
+$('follow').onclick=e=>{follow=!follow;e.currentTarget.setAttribute('aria-pressed',follow);if(follow&&cam.z<1.8){cam.z=2.2}};$('zout').onclick=()=>zoomBy(1/1.3);$('zfit').onclick=()=>{follow=false;$('follow').setAttribute('aria-pressed',false);cam.z=1;cam.x=0;cam.y=0;applyCam()};
+const ptrs=new Map();let dragMoved=false,pinch0=0;
+app.canvas.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);dragMoved=false;if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1])}});
+app.canvas.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const p=ptrs.get(e.pointerId),dx=e.offsetX-p[0],dy=e.offsetY-p[1];
+  if(ptrs.size===1){if(Math.abs(dx)+Math.abs(dy)>2){dragMoved=true;if(follow){follow=false;$('follow').setAttribute('aria-pressed',false)}}cam.x+=dx;cam.y+=dy;clamp();applyCam()}
+  ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0){zoomBy(d/pinch0,(a[0]+b[0])/2,(a[1]+b[1])/2);dragMoved=true}pinch0=d}});
+const up=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch0=0};
+app.canvas.addEventListener('pointerup',up);app.canvas.addEventListener('pointercancel',up);app.canvas.addEventListener('pointerleave',up);
+app.canvas.addEventListener('wheel',e=>{e.preventDefault();zoomBy(e.deltaY<0?1.12:1/1.12,e.offsetX,e.offsetY)},{passive:false});
+app.renderer.on('resize',()=>fit());
+
+/* ---------- kawalan ---------- */
+let clockRun=true,minute=S.t%1440,lastH=-1;
+const tm=$('tm');tm.value=Math.floor(minute);
+tm.oninput=()=>{minute=+tm.value};
+$('play').onclick=e=>{clockRun=!clockRun;e.currentTarget.setAttribute('aria-pressed',clockRun);e.currentTarget.textContent=clockRun?'▶ Jam berjalan':'⏸ Jam berhenti'};
+document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{minute=+b.dataset.h*60;tm.value=minute;lastH=-1});
+S._wx='clear';
+document.querySelectorAll('#wx .btn').forEach(b=>b.onclick=()=>{S._wx=b.dataset.w;document.querySelectorAll('#wx .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  $('hWx').textContent=b.textContent;lastH=-1});
+let quality='lancar';
+function setQuality(q){quality=q;document.querySelectorAll('#gq .btn').forEach(x=>x.setAttribute('aria-pressed',x.dataset.q===q));
+  app.ticker.maxFPS=0;app.renderer.resolution=q==='lancar'?1:Math.min(2,devicePixelRatio||1);app.renderer.resize(app.screen.width,app.screen.height);fit()}
+document.querySelectorAll('#gq .btn').forEach(b=>b.onclick=()=>setQuality(b.dataset.q));
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{const j=JSON.parse(await f.text());const s=j.S||j;if(!Array.isArray(s.objs))throw new Error('tiada objs');
+    const keep=S._wx;S=s;S._wx=keep;build();$('saveNote').textContent=`${f.name}: ${s.objs.length} objek, ${(s.walls||[]).length} dinding.`}
+  catch(err){$('saveNote').textContent='Fail ini bukan simpanan Rumah Kita yang sah.'}};
+
+/* ---------- cuaca ---------- */
+const tintG=new PIXI.Graphics(), rainG=new PIXI.Graphics();fx.addChild(tintG,rainG);fx.eventMode='none';
+const drops=Array.from({length:160},(_,i)=>{const r=rng(i+3);return [r(),r(),.6+r()*.6]});
+function applyGrade(h){
+  const gr=grade(h);
+  const g=skyCv.getContext('2d'),lg=g.createLinearGradient(0,0,0,128);lg.addColorStop(0,gr.top);lg.addColorStop(.7,gr.bot);lg.addColorStop(1,gr.bot);
+  g.fillStyle=lg;g.fillRect(0,0,2,128);skyTex.source.update();
+  stars.visible=gr.sun<.15;drawHills(gr);drawGround(gr);drawWindows(gr);
+  clouds.children.forEach(c=>c.tint=gr.sun<.15?mix('#3A4672',gr.top,.3):gr.sun<.7?'#F6DCC0':'#FFFFFF');
+  const W=app.screen.width,H=app.screen.height;tintG.clear();
+  if(gr.ta>0.01)tintG.rect(0,0,W,H).fill({color:gr.tint,alpha:gr.ta*.75});
+  if(S._wx==='haze')tintG.rect(0,0,W,H).fill({color:0xC9A27A,alpha:.32});
+  if(S._wx==='rain')tintG.rect(0,0,W,H).fill({color:0x40506A,alpha:.18});
+  const night=gr.sun<.3;for(const s of objSpr)if(s.glow)s.glow.alpha=night?.55:0;
+  for(const l of roomLights)l.alpha=night?.42:0;
+  nd.gr=gr;
+}
+
+/* ---------- gerak Nadia: stereng lembut, pecut dan perlahan ---------- */
+const VMAX=1.55, STRIDE=0.62;           // petak sesaat, petak setiap langkah penuh
+function moveNadia(dt){
+  if(nd.slide){const sl=nd.slide;sl.t=Math.min(1,sl.t+dt/.45);const e=sl.t<.5?2*sl.t*sl.t:1-Math.pow(-2*sl.t+2,2)/2;
+    sim.x=sl.a[0]+(sl.b[0]-sl.a[0])*e;sim.y=sl.a[1]+(sl.b[1]-sl.a[1])*e;nd.vx=nd.vy=0;nd.sp=0;
+    if(sl.t>=1){nd.slide=null;sl.done&&sl.done()}return}
+  if(nd.path.length){
+    const [tx,ty]=nd.path[0],dx=tx-sim.x,dy=ty-sim.y,d=Math.hypot(dx,dy),last=nd.path.length===1;
+    let dFin=d;for(let i=1;i<nd.path.length;i++)dFin+=Math.hypot(nd.path[i][0]-nd.path[i-1][0],nd.path[i][1]-nd.path[i-1][1]);
+    const want=Math.min(VMAX,Math.max(.25,dFin*2.4));
+    const ux=d>1e-4?dx/d:0,uy=d>1e-4?dy/d:0;
+    const k=1-Math.exp(-dt*7);nd.vx+=(ux*want-nd.vx)*k;nd.vy+=(uy*want-nd.vy)*k;
+    if((!last&&d<.32)||(last&&d<.03)){nd.path.shift();if(!nd.path.length){sim.x=tx;sim.y=ty}}
+    nd.idle=0;
+  }else{const k=1-Math.exp(-dt*10);nd.vx-=nd.vx*k;nd.vy-=nd.vy*k;
+    if(nd.target&&Math.hypot(nd.vx,nd.vy)<.05)arrive();
+    if(!nd.target){if(nd.busy){nd.busyT-=dt;if(nd.busyT<=0)finishBusy()}else if(!nd.queue.length){nd.idle+=dt;if(nd.idle>7){nd.idle=0;autonomy()}}}}
+  sim.x+=nd.vx*dt;sim.y+=nd.vy*dt;
+  nd.sp=Math.hypot(nd.vx,nd.vy);
+  if(nd.sp>.2)faceToward(nd.vx,nd.vy);
+  nd.phase+=nd.sp*dt/STRIDE*Math.PI*2;
+  if(nd.sp<.05)nd.phase+=(Math.round(nd.phase/Math.PI)*Math.PI-nd.phase)*(1-Math.exp(-dt*8)); // kaki kembali rapat
+}
+/* rig: tekstur dibahagi 5 × 14 bucu; badan bawah melangkah, pinggul beralun, bahu imbang, rambut dan kain mengikut */
+function rigNadia(dt,now){
+  // pusing: kecilkan lebar ke 0, tukar lukisan, kembangkan semula (0.16 s)
+  if(nd.turn>0){const was=nd.turn;nd.turn-=dt/0.16;if(was>.5&&nd.turn<=.5){nd.face=nd.want;nd.flip=nd.wantFlip;body.texture=nadiaTex[nd.face]}}
+  if(nd.turn<0)nd.turn=0;
+  if(nd.turn===0&&(nd.face!==nd.want||nd.flip!==nd.wantFlip))nd.turn=1;   // jangan sekali-kali tertinggal arah lama (punca jalan mengundur)
+  const tq=nd.turn>0?Math.abs(nd.turn-.5)*2:1, turnSq=.18+.82*tq;
+  const [px,py]=P(sim.x,sim.y,0),k=kOf(sim.y);
+  nadia.position.set(px,py);nadia.zIndex=sim.y*100;
+  const posed=nd.pose&&!nd.slide?nd.pose:(nd.slide&&!nd.slide.out&&nd.slide.t>.5&&nd.slide.step?POSE[nd.slide.step.mode]:null);
+  const ptex=posed&&poseTex[posed];
+  if(ptex){if(body.texture!==ptex)body.texture=ptex}else if(body.texture!==nadiaTex[nd.face])body.texture=nadiaTex[nd.face];
+  const flipNow=ptex?nd.poseFlip*(poseInfo.poses[posed].face==='L'?-1:1):nd.flip;
+  if(nd.seatFrom){const st=nd.step||(nd.slide&&nd.slide.step);if(st){const os=objSpr.find(s=>s.obj===st.o);if(os)nadia.zIndex=os.zIndex+1}}
+  let lift=0;if(posed==='baring')lift=TW*k*.42;
+  const t=body.texture,w=t.width,h=t.height,H=TW*k*1.5,sc=ptex?H/(poseInfo.standH):H/h;
+  body.y=-lift+(ptex?(poseInfo.poses[posed].dy||0)*sc:0);
+  const m=Math.min(1,nd.sp/VMAX),ph=nd.phase,s1=Math.sin(ph),c1=Math.cos(ph);
+  const side=nd.face==='sisi',q=nd.face==='34';
+  nd.lean+=((side||q?m*.05:0)-nd.lean)*(1-Math.exp(-dt*6));
+  const bob=m*Math.abs(Math.cos(ph))*h*.022, breathe=reduce?0:Math.sin(now/900)*h*.004*(1-m);
+  const pos=body.geometry.positions;
+  for(let j=0;j<VY;j++)for(let i=0;i<VX;i++){
+    const u=i/(VX-1),v=j/(VY-1),n=(j*VX+i)*2;let x=(u-.5)*w,y=(v-1)*h;
+    const up=Math.max(0,1-v/.62);                         // 1 di kepala, 0 di pinggul
+    const low=Math.max(0,(v-.58)/.42);                      // 0 di pinggul, 1 di kaki
+    y-=bob*(1-low*low);                                     // badan naik turun, tapak kekal di lantai
+    y-=breathe*up;
+    x+=nd.lean*(1-v)*h*(side?-1:1);                        // condong ke arah jalan (lukisan asal: sisi ke kiri, ¾ ke kanan)
+    if(side){                                               // langkah dari tepi: hujung kain berayun depan-belakang
+      x+=s1*m*low*low*w*.32*(u<.5?1:.75);
+      x+=c1*m*up*w*.025;                                    // bahu imbang
+    }else{                                                  // depan/belakang/¾: pinggul beralun, kaki bergilir
+      const legSide=u<.5?-1:1;
+      y-=Math.max(0,s1*legSide)*m*low*low*h*.035;          // kaki yang diangkat
+      x+=s1*m*low*w*.06*(q?1.4:1);                          // kain beralun
+      x+=-s1*m*up*w*.02;                                     // bahu berlawanan
+      x+=Math.sin(ph*.5)*0;                                  // (rezab)
+    }
+    pos[n]=x*sc*(ptex?1:turnSq)*flipNow;pos[n+1]=y*sc;
+  }
+  body.geometry.getBuffer('aPosition').update();
+  nShadow.scale.set(k*(1-bob/h*2),k);
+  bubble.y=(ptex?-h*sc-lift:-H)-6;bubble.scale.set(.9);
+  fxNadia(dt,now,posed,k,H);
+}
+
+/* ---------- kesan: air pancuran, wap, zzz ---------- */
+const fxN=new PIXI.Graphics();nadia.addChild(fxN);
+const steam=[];for(let i=0;i<10;i++){const s=new PIXI.Sprite(glowTex);s.anchor.set(.5);s.alpha=0;s.tint=0xF4F1EA;nadia.addChild(s);steam.push(s)}
+let steamA=0;
+function fxNadia(dt,now,posed,k,H){
+  fxN.clear();const busy=nd.busy;
+  const want=(busy==='shower'&&!nd.slide)?1:0;steamA+=(want-steamA)*(1-Math.exp(-dt*1.5));
+  if(steamA>.02){for(let i=0;i<14;i++){const x=(i/13-.5)*TW*k*.55,o=((now*.6+i*37)%(H*.9));fxN.moveTo(x,-H*.98+o).lineTo(x-1,-H*.98+o+H*.12)}
+    fxN.stroke({width:1.4,color:0xCFE6F7,alpha:.7*steamA});
+    steam.forEach((s,i)=>{const ph=(now/2400+i/10)%1;s.position.set(Math.sin(i*2.3)*TW*k*.35,-H*(.15+ph*.9));s.scale.set(TW*k*(.6+ph*.8)/128);s.alpha=steamA*(.55-ph*.35)})}
+  else steam.forEach(s=>s.alpha=0);
+  if(busy==='cook'&&!nd.slide&&nd.step){const [ox,oy]=P(nd.step.cx,nd.step.cy,.9);const lx=ox-nadia.x,ly=oy-nadia.y;
+    for(let i=0;i<4;i++){const ph=(now/1600+i/4)%1;fxN.circle(lx+Math.sin(ph*6+i)*6,ly-ph*TW*.9,4+ph*7).fill({color:0xFFFFFF,alpha:.35*(1-ph)})}}
+  if((busy==='sleep'||busy==='nap')&&!nd.slide){for(let i=0;i<3;i++){const ph=(now/1800+i/3)%1;
+    fxN.moveTo(10+ph*14,-TW*k*.7-ph*TW*.8).lineTo(18+ph*14,-TW*k*.7-ph*TW*.8).lineTo(10+ph*14,-TW*k*.7-ph*TW*.8+8).lineTo(18+ph*14,-TW*k*.7-ph*TW*.8+8).stroke({width:2,color:0x3B2A20,alpha:1-ph})}}
+}
+
+/* ---------- gelung ---------- */
+let fpsAcc=[],sinceLoad=0,firstPaint=0;const hud={t:'',p:''};let follow=false;
+app.ticker.add(tk=>{
+  const dt=Math.min(.1,tk.deltaMS/1000);const now=performance.now();
+  if(clockRun){minute=(minute+dt*2)%1440;if(Math.floor(minute)!==+tm.value)tm.value=Math.floor(minute)}
+  const h=minute/60;if(Math.abs(h-lastH)>.02||lastH<0){applyGrade(h);lastH=h}
+  const hh=Math.floor(h),mm=Math.floor(minute%60);const tt=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');if(tt!==hud.t){hud.t=tt;$('hTime').textContent=tt;const ph=phase(h);if(ph!==hud.p){hud.p=ph;$('hPhase').textContent=ph}}
+  if(follow){const W=app.screen.width,H=app.screen.height,s=base*cam.z,[nx,ny]=P(sim.x,sim.y,.8);const tx=-(nx)*s,ty=-(ny-cam.cy)*s;const kk=1-Math.exp(-dt*4);cam.x+=(tx-cam.x)*kk;cam.y+=(ty-cam.y)*kk;applyCam()}
+  // awan dan pokok
+  if(!reduce){clouds.children.forEach((c,i)=>{c.x=((c.baseX+now*.004+TW*8)%(TW*20))-TW*8});if(now-(palms._t||0)>120){palms._t=now;drawPalms(nd.gr,Math.sin(now/1400)*TW*.06)}}
+  else if(!palms._d){drawPalms(nd.gr,0);palms._d=1}
+  // Nadia
+  moveNadia(dt);rigNadia(dt,now);
+  if(flashT>0){flashT-=dt;if(flashT<=0&&!nd.busy&&!nd.path.length)$('hAct').textContent='Berdiri'}
+  // hujan
+  rainG.clear();if(S._wx==='rain'){const W=app.screen.width,H=app.screen.height;
+    for(const d of drops){const y=((d[1]*H+now*.9*d[2])%(H+40))-20,x=(d[0]*W+y*.18)%W;rainG.moveTo(x,y).lineTo(x-3,y+11*d[2])}
+    rainG.stroke({width:1.2,color:0xD2E1F5,alpha:.55})}
+  // fps
+  fpsAcc.push(tk.FPS);if(fpsAcc.length>60)fpsAcc.shift();
+  if(Math.floor(now/500)!==Math.floor((now-tk.deltaMS)/500)){const f=Math.round(fpsAcc.reduce((a,b)=>a+b,0)/fpsAcc.length);$('hFps').textContent=f+' fps';
+    sinceLoad+=.5;if(sinceLoad>=4&&!$('gFps').dataset.done){const ok=quality==='lancar'?f>=29:f>=30;$('gFps').innerHTML=`<span class="${ok?'ok':'bad'}">${f} fps ${ok?'lulus':'gagal'}</span> (${quality==='lancar'?'Lancar':'Tajam'})`;$('gFps').dataset.done=1}}
+});
+
+window.RK={order:(i,a)=>order(S.objs[i],a),tp:(x,y)=>{sim.x=x;sim.y=y;nd.path=[];nd.vx=nd.vy=0},zoom:(z)=>{cam.z=z;follow=true},S:()=>S,nd};
+/* ---------- mula ---------- */
+build();setQuality('lancar');setFaceExpr(7);
+app.ticker.addOnce(()=>{requestAnimationFrame(()=>{firstPaint=(performance.now()-T0)/1000;$('loading').remove();
+  const ok=firstPaint<3;$('gLoad').innerHTML=`<span class="${ok?'ok':'bad'}">${firstPaint.toFixed(2)} s ${ok?'lulus':'gagal'}</span> selepas skrip dimuat`})});
+try{const sz=performance.getEntriesByType('resource').filter(r=>/aset\//.test(r.name)).reduce((a,r)=>a+(r.encodedBodySize||r.transferSize||0),0);
+  if(sz)$('gSize').textContent=(sz/1048576).toFixed(2)+' MB (sasaran ≤ 16 MB)';else $('gSize').textContent='≈ 0.75 MB (sasaran ≤ 16 MB)'}catch(e){}
+})();
+</script>
+
+</body></html>
