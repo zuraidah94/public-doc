@@ -59,11 +59,11 @@ const APP_PART = 90000;
 const APP_LOADER = '<script>\n(function () {\n' +
   '  var parts = [];\n' +
   '  function fail(e) { window.__startError("Could not load the app code: " + ((e && e.message) || e)); }\n' +
-  '  function get(i, done) { google.script.run.withFailureHandler(fail).withSuccessHandler(function (r) { done(JSON.parse(r)); }).apiAppCode(i); }\n' +
+  '  function get(i, version, done) { google.script.run.withFailureHandler(fail).withSuccessHandler(function (r) { done(JSON.parse(r)); }).apiAppCode(i, version); }\n' +
   '  function run() { var s = document.createElement("script"); s.textContent = parts.join(""); document.body.appendChild(s); }\n' +
-  '  get(0, function (r) {\n' +
+  '  get(0, "", function (r) {\n' +
   '    parts[0] = r.code; var left = r.parts - 1; if (!left) return run();\n' +
-  '    for (var i = 1; i < r.parts; i++) (function (i) { get(i, function (x) { parts[i] = x.code; if (!--left) run(); }); })(i);\n' +
+  '    for (var i = 1; i < r.parts; i++) (function (i) { get(i, r.version, function (x) { parts[i] = x.code; if (!--left) run(); }); })(i);\n' +
   '  });\n' +
   '})();\n</script>';
 
@@ -95,15 +95,30 @@ function page_() {
   return {
     shell: text.slice(0, start) + APP_LOADER + text.slice(end + '</script>'.length),
     code: text.slice(start + APP_OPEN.length, end),
+    version: newest.getId() + '-' + newest.getLastUpdated().getTime(),
   };
 }
 
-/** Piece i of the app script, as {parts, code}. See APP_LOADER. */
-function apiAppCode(i) {
+/**
+ * Piece i of the app script, as {parts, version, code}. See APP_LOADER. Piece 0 reads Index.html once
+ * and caches every piece for 10 minutes under its version; the other pieces ask for that version, so
+ * a load never mixes pieces of two uploads.
+ */
+function apiAppCode(i, version) {
   assertAccess_();
+  const cache = CacheService.getScriptCache();
+  if (version) {
+    const n = cache.get('app:' + version + ':n'), hit = cache.get('app:' + version + ':' + i);
+    if (n != null && hit != null) return JSON.stringify({ parts: Number(n), version: version, code: hit });
+  }
   const page = page_();
   if (!page.code) throw new Error(page.problem);
-  return JSON.stringify({ parts: Math.ceil(page.code.length / APP_PART), code: page.code.slice(i * APP_PART, (i + 1) * APP_PART) });
+  if (version && version !== page.version) throw new Error('The app was updated while it was loading. Please reload the page.');
+  const n = Math.ceil(page.code.length / APP_PART), pieces = {};
+  for (let k = 0; k < n; k++) pieces['app:' + page.version + ':' + k] = page.code.slice(k * APP_PART, (k + 1) * APP_PART);
+  pieces['app:' + page.version + ':n'] = String(n);
+  try { cache.putAll(pieces, 600); } catch (e) { /* too big for the cache: later pieces read Drive again */ }
+  return JSON.stringify({ parts: n, version: page.version, code: page.code.slice(i * APP_PART, (i + 1) * APP_PART) });
 }
 
 // ── Calls from the app (google.script.run). Arguments and results are JSON strings. ──
@@ -271,7 +286,13 @@ function writeRow_(sh, row, id, json, who) {
   for (let i = 0; i < json.length; i += CHUNK) cells.push(MARK + json.slice(i, i + CHUNK));
   if (sh.getMaxColumns() < cells.length) sh.insertColumnsAfter(sh.getMaxColumns(), cells.length - sh.getMaxColumns());
   if (row <= sh.getLastRow()) sh.getRange(row, 1, 1, sh.getLastColumn()).clearContent();
+  ensureRows_(sh, row);
   sh.getRange(row, 1, 1, cells.length).setValues([cells]);
+}
+
+// A new tab has 1,000 rows and writing past the last one fails, so add rows as the data grows.
+function ensureRows_(sh, lastRow) {
+  if (sh.getMaxRows() < lastRow) sh.insertRowsAfter(sh.getMaxRows(), lastRow - sh.getMaxRows());
 }
 
 // Clears rather than deletes: Sheets refuses to delete every unfrozen row.
@@ -351,6 +372,7 @@ function summarise_() {
     sh.getRange(1, 1, 1, header.length).setValues([header]);
     clearRows_(sh);
     const rows = t[2].map(function (row) { return row.map(text_); });
+    ensureRows_(sh, rows.length + 1);
     if (rows.length) sh.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
   });
 }

@@ -76,8 +76,9 @@
         if (!req.result.objectStoreNames.contains('p')) req.result.createObjectStore('p');
         if (!req.result.objectStoreNames.contains('kv')) req.result.createObjectStore('kv');
       };
-      req.onsuccess = () => resolve(req.result);
+      req.onsuccess = () => { req.result.onversionchange = () => req.result.close(); resolve(req.result); };
       req.onerror = () => resolve(null);
+      req.onblocked = () => resolve(null);   // another tab holds an older version open: carry on without it
     } catch { resolve(null); }
   });
   const idb = async (store, mode, fn) => {
@@ -140,14 +141,16 @@
     return mapStrings(value, (s) => (s.startsWith(REF) && photoOf.has(s.slice(REF.length)) ? photoOf.get(s.slice(REF.length)) : s));
   }
 
+  const local = (key) => `irapp:personal:${key}`;   // localStorage fallback for the personal keys
   const ls = () => { try { return window.localStorage; } catch { return null; } };
   const isRecordList = (v) => Array.isArray(v) && v.every((x) => x && typeof x === 'object' && x.id != null);
   const inOrder = (key, fn) => (queue[key] = (queue[key] || Promise.resolve()).catch(() => {}).then(fn));
 
-  // ── Outbox: key -> {upserts: {id: json}, deletes: [id], replace?: json, blind?: true} ──
-  // "blind" marks changes made without a successful load of that key; when they are sent, records
-  // that already exist on the server are left alone, so they can't overwrite real data (for
-  // example the default user list over changed passwords).
+  // ── Outbox: key -> {upserts: {id: json}, deletes: [id], replace?: json, blindIds?: [id], blind?: true} ──
+  // "blindIds" are records added without a successful load of that key, and "blind" marks a replace
+  // made that way; when they are sent, data that already exists on the server is left alone, so it
+  // can't be overwritten (for example the default user list over changed passwords). Changes made
+  // with the data loaded stay real edits even if more are added later without a load.
   const OUTBOX = 'irapp:outbox:v1';
   const readOutbox = () => { try { return JSON.parse(ls()?.getItem(OUTBOX) || '{}'); } catch { return {}; } };
   const writeOutbox = (box) => {
@@ -158,6 +161,9 @@
   };
   const pending = (box) => Object.values(box).reduce((n, e) => n + Object.keys(e.upserts || {}).length + (e.deletes || []).length + (e.replace != null ? 1 : 0), 0);
   const loaded = {};          // key -> true once a load from the server has succeeded
+  let lastError = '';         // why Google refused the last save, when it wasn't just a lost connection
+  const isNetworkError = (e) => /network|connection|http 0|failed to fetch|timed? ?out|offline/i.test(String(e?.message || e));
+  const failed = (e) => { if (!isNetworkError(e)) { lastError = String(e?.message || e); badge(); } };
 
   function badge(box = readOutbox()) {
     const n = pending(box);
@@ -170,22 +176,30 @@
       el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;max-width:calc(100% - 16px);background:#fef3c7;color:#92400e;' +
         'border:1px solid #f59e0b;border-radius:999px;padding:6px 12px;font:600 12px sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.15)';
     }
-    el.textContent = `⏳ ${n} change${n === 1 ? '' : 's'} saved on this device, waiting to upload. They upload by themselves when there is internet.`;
+    if (lastError) {
+      el.style.background = '#fee2e2'; el.style.color = '#991b1b'; el.style.borderColor = '#ef4444';
+      el.textContent = `⚠️ ${n} change${n === 1 ? '' : 's'} saved on this device but Google refused them: ${lastError}`;
+    } else {
+      el.style.background = '#fef3c7'; el.style.color = '#92400e'; el.style.borderColor = '#f59e0b';
+      el.textContent = `⏳ ${n} change${n === 1 ? '' : 's'} saved on this device, waiting to upload. They upload by themselves when there is internet.`;
+    }
   }
 
   // Send one key's outbox entry. Runs inside inOrder(key). Throws if Google can't be reached.
   async function send(key) {
     const box = readOutbox(), entry = box[key];
     if (!entry) return;
-    if (entry.blind) {
+    // An outbox written by the previous version marks a whole record list "blind".
+    const blindIds = entry.blind && entry.replace == null ? Object.keys(entry.upserts || {}) : (entry.blindIds || []);
+    if (entry.blind || blindIds.length) {
       const raw = await call('apiGet', key), res = JSON.parse(raw);
       refsIn(raw).forEach((h) => onServer.add(h));
       const there = new Set((res?.records || []).map((r) => String(r.id)));
-      Object.keys(entry.upserts || {}).forEach((id) => { if (there.has(id)) delete entry.upserts[id]; });
-      if (res && 'value' in res) delete entry.replace;
-      entry.deletes = [];
+      blindIds.forEach((id) => { if (there.has(id)) delete entry.upserts[id]; });
+      if (entry.blind && entry.replace != null && res && ('value' in res || res.records?.length)) delete entry.replace;
+      if (entry.blind) entry.deletes = [];
       if (res?.records) { synced[key] = new Map(res.records.map((r) => [String(r.id), JSON.stringify(r)])); loaded[key] = true; }
-      delete entry.blind;
+      delete entry.blind; delete entry.blindIds;
     }
     const jsons = entry.replace != null ? [entry.replace] : Object.values(entry.upserts || {});
     const uploads = {};
@@ -195,7 +209,10 @@
       if (p) uploads[h] = p;
     }
     const payload = entry.replace != null ? { replace: entry.replace, uploads } : { upserts: jsons, deletes: entry.deletes || [], uploads };
-    if (payload.replace == null && !payload.upserts.length && !payload.deletes.length) { delete box[key]; writeOutbox(box); return; }
+    if (payload.replace == null && !payload.upserts.length && !payload.deletes.length) {
+      const now = readOutbox(); delete now[key]; writeOutbox(now);   // re-read: other keys may have changed meanwhile
+      return;
+    }
     await call('apiSave', key, JSON.stringify(payload));
     if (entry.replace != null) synced[key] = null;
     else {
@@ -204,9 +221,21 @@
       (entry.deletes || []).forEach((id) => m.delete(id));
     }
     Object.keys(uploads).forEach((h) => onServer.add(h));
-    const now = readOutbox(); delete now[key]; writeOutbox(now);
+    // Remove exactly what was sent: another tab may have queued more changes to this key meanwhile.
+    const now = readOutbox(), cur = now[key];
+    if (cur) {
+      if (entry.replace != null) { if (cur.replace === entry.replace) delete now[key]; }
+      else {
+        jsons.forEach((j) => { const id = String(JSON.parse(j).id); if (cur.upserts?.[id] === j) delete cur.upserts[id]; });
+        cur.deletes = (cur.deletes || []).filter((id) => !(entry.deletes || []).includes(id));
+        if (cur.blindIds) cur.blindIds = cur.blindIds.filter((id) => id in (cur.upserts || {}));
+        if (cur.replace == null && !Object.keys(cur.upserts || {}).length && !cur.deletes.length) delete now[key];
+      }
+    }
+    lastError = '';
+    writeOutbox(now);
   }
-  const sendAll = () => Object.keys(readOutbox()).forEach((key) => inOrder(key, () => send(key)).catch(() => {}));
+  const sendAll = () => Object.keys(readOutbox()).forEach((key) => inOrder(key, () => send(key)).catch(failed));
   setInterval(() => { if (pending(readOutbox())) sendAll(); }, 15000);
   window.addEventListener('online', sendAll);
   document.addEventListener('DOMContentLoaded', () => badge());
@@ -225,11 +254,11 @@
   window.storage = {
     async get(key, shared = false) {
       if (!shared) {
-        const value = (await idb('kv', 'readonly', (s) => s.get(key))) ?? ls()?.getItem(`irapp:personal:${key}`);
+        const value = (await idb('kv', 'readonly', (s) => s.get(key))) ?? ls()?.getItem(local(key));
         return value == null ? null : { key, value, shared };
       }
       return inOrder(key, async () => {
-        try { await send(key); } catch { /* still offline: shown from the outbox below */ }
+        try { await send(key); } catch (e) { failed(e); /* shown from the outbox below */ }
         let res;
         let raw;
         try { raw = await call('apiGet', key); res = JSON.parse(raw); } catch (e) {
@@ -258,10 +287,10 @@
 
     async set(key, value, shared = false) {
       if (!shared) {
-        if (await idb('kv', 'readwrite', (s) => s.put(value, key))) { ls()?.removeItem(`irapp:personal:${key}`); return { key, value, shared }; }
+        if (await idb('kv', 'readwrite', (s) => s.put(value, key))) { ls()?.removeItem(local(key)); return { key, value, shared }; }
         const s = ls();
         if (!s) throw new Error('Browser storage is not available');
-        s.setItem(`irapp:personal:${key}`, value);
+        s.setItem(local(key), value);
         return { key, value, shared };
       }
       return inOrder(key, async () => {
@@ -269,21 +298,29 @@
         const refd = await toRefs(JSON.parse(value));
         const box = readOutbox();
         const entry = box[key] || { upserts: {}, deletes: [] };
-        if (!loaded[key]) entry.blind = true;
         if (!isRecordList(refd)) {
-          box[key] = { replace: JSON.stringify(refd), upserts: {}, deletes: [], ...(entry.blind ? { blind: true } : {}) };
+          // Blind unless it builds on a replace already waiting here (which the app was shown).
+          const blind = entry.blind || (!loaded[key] && entry.replace == null);
+          box[key] = { replace: JSON.stringify(refd), upserts: {}, deletes: [], ...(blind ? { blind: true } : {}) };
         } else {
           delete entry.replace;
           const known = synced[key] || new Map();
           const now = new Map(refd.map((r) => [String(r.id), JSON.stringify(r)]));
-          now.forEach((j, id) => { if (known.get(id) !== j) entry.upserts[id] = j; else delete entry.upserts[id]; });
+          const blind = new Set(entry.blindIds || []);
+          now.forEach((j, id) => {
+            if (known.get(id) === j) { delete entry.upserts[id]; return; }
+            if (!loaded[key] && !known.has(id) && !(id in entry.upserts)) blind.add(id);
+            entry.upserts[id] = j;
+          });
           Object.keys(entry.upserts).forEach((id) => { if (!now.has(id)) delete entry.upserts[id]; });
-          entry.deletes = [...new Set([...(entry.deletes || []), ...[...known.keys()].filter((id) => !now.has(id))])].filter((id) => !now.has(id));
+          entry.blindIds = [...blind].filter((id) => id in entry.upserts);
+          if (!entry.blindIds.length) delete entry.blindIds;
+          entry.deletes = [...new Set([...(entry.deletes || []), ...known.keys()])].filter((id) => !now.has(id));
           if (Object.keys(entry.upserts).length || entry.deletes.length) box[key] = entry; else delete box[key];
         }
         writeOutbox(box);            // kept on this device first; throws only if that fails
         lastValue[key] = value;
-        try { await send(key); } catch { /* stays in the outbox and is sent again later */ }
+        try { await send(key); } catch (e) { failed(e); /* stays in the outbox and is sent again later */ }
         return { key, value, shared };
       });
     },
@@ -291,7 +328,7 @@
     async delete(key, shared = false) {
       if (!shared) {
         await idb('kv', 'readwrite', (s) => s.delete(key));
-        ls()?.removeItem(`irapp:personal:${key}`);
+        ls()?.removeItem(local(key));
         return { key, deleted: true, shared };
       }
       return inOrder(key, async () => {
@@ -310,7 +347,7 @@
 </script>
 </head>
 <body>
-<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 370ab03</small></p></div>
+<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 217258d</small></p></div>
 <script>document.getElementById('boot').textContent += ' · scripts running';</script>
 <script>
 if (!window.React || !window.ReactDOM || !window.LucideReact) window.__startError('React or lucide did not load. Check the internet connection, then reload.');
@@ -582,6 +619,7 @@ const normalizeImportedInspection = raw => {
   const areas = {};
   Object.entries(raw.areas || {}).forEach(([areaId, items]) => {
     areas[areaId] = (items || []).map((item, i) => ({
+      ...item,
       id: item.id || areaId + '-imp-' + i + '-' + Math.random().toString(36).slice(2, 7),
       area: item.area || areaId,
       areaName: item.areaName || areaId,
@@ -933,7 +971,8 @@ const InspectionCard = memo(({
   Object.values(insp.areas).forEach(items => items.forEach(item => {
     photoCount += item.photos?.length || 0;
   }));
-  const hasSigs = !!(insp.inspectorSignature || insp.verifierSignatureCleaning || insp.verifierSignatureGlass);
+  const verifierSigned = VERIFY_FORMS.some(f => insp['verifierSignature' + typeCapOf(f.type)]);
+  const hasSigs = !!(insp.inspectorSignature || verifierSigned);
   return React.createElement("div", {
     className: 'border rounded-xl overflow-hidden ' + (insp.overallStatus === 'OK' ? 'border-emerald-200' : 'border-red-200')
   }, React.createElement("div", {
@@ -1032,11 +1071,11 @@ const InspectionCard = memo(({
   }, insp.inspectorSignature ? '✍️' : '—'), React.createElement("p", {
     className: insp.inspectorSignature ? 'text-emerald-700 font-bold' : 'text-gray-400'
   }, "Inspector")), React.createElement("div", {
-    className: 'flex-1 rounded-lg p-2 text-center text-[10px] ' + (insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? 'bg-purple-50 border border-purple-300' : 'bg-gray-50 border border-gray-200')
+    className: 'flex-1 rounded-lg p-2 text-center text-[10px] ' + (verifierSigned ? 'bg-purple-50 border border-purple-300' : 'bg-gray-50 border border-gray-200')
   }, React.createElement("p", {
     className: "text-lg"
-  }, insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? '✍️' : '—'), React.createElement("p", {
-    className: insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? 'text-purple-700 font-bold' : 'text-gray-400'
+  }, verifierSigned ? '✍️' : '—'), React.createElement("p", {
+    className: verifierSigned ? 'text-purple-700 font-bold' : 'text-gray-400'
   }, "Verifier"))), React.createElement("div", {
     className: "flex flex-wrap gap-1.5"
   }, React.createElement("button", {
@@ -2364,14 +2403,6 @@ function ImpactRankApp() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [ir, sr, dr, cr] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null)]);
-        if (ir?.value) setInspections(JSON.parse(ir.value));
-        if (sr?.value) setSchedules(JSON.parse(sr.value));
-        if (dr?.value) setDrafts(JSON.parse(dr.value));
-        if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
-        setLastGlobalSync(new Date());
-      } catch {}
-      try {
         const r = await window.storage.get('active-inspection', false);
         if (r?.value) {
           const active = JSON.parse(r.value);
@@ -2382,6 +2413,14 @@ function ImpactRankApp() {
             setCurrentView('inspection');
           } else await window.storage.delete('active-inspection', false);
         }
+      } catch {}
+      try {
+        const [ir, sr, dr, cr] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null)]);
+        if (ir?.value) setInspections(JSON.parse(ir.value));
+        if (sr?.value) setSchedules(JSON.parse(sr.value));
+        if (dr?.value) setDrafts(JSON.parse(dr.value));
+        if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
+        setLastGlobalSync(new Date());
       } catch {}
     };
     load();
@@ -3131,7 +3170,7 @@ function ImpactRankApp() {
     const signedAt = new Date().toLocaleString('en-MY', {
       timeZone: 'Asia/Kuala_Lumpur'
     });
-    const verifierSigField = reportType === 'glass' ? 'verifierSignatureGlass' : reportType === 'cleaning' ? 'verifierSignatureCleaning' : null;
+    const verifierSigField = VERIFIER_RULES[reportType] ? 'verifierSignature' + typeCapOf(reportType) : null;
     const updated = inspections.map(i => i.id === insp.id ? {
       ...i,
       inspectorSignature: inspectorSig,
@@ -4102,7 +4141,13 @@ function ImpactRankApp() {
   }, "\uD83D\uDCE5 01.1"), inspectionHasBuilding(viewingReport) && React.createElement("button", {
     onClick: () => exportToPDF(viewingReport, 'building'),
     className: "px-2 py-1.5 bg-orange-600 text-white rounded text-xs font-bold"
-  }, "\uD83D\uDCE5 14.1"), countNCs(viewingReport.areas) > 0 && React.createElement("button", {
+  }, "\uD83D\uDCE5 14.1"), inspectionHasSafety(viewingReport) && React.createElement("button", {
+    onClick: () => exportToPDF(viewingReport, 'safety'),
+    className: "px-2 py-1.5 bg-amber-600 text-white rounded text-xs font-bold"
+  }, "\uD83D\uDCE5 OSHP-06.02"), inspectionHasEnvironment(viewingReport) && React.createElement("button", {
+    onClick: () => exportToPDF(viewingReport, 'environment'),
+    className: "px-2 py-1.5 bg-teal-600 text-white rounded text-xs font-bold"
+  }, "\uD83D\uDCE5 ISO 14001"), countNCs(viewingReport.areas) > 0 && React.createElement("button", {
     onClick: () => {
       setViewingNCReport(viewingReport);
       setViewingReport(null);

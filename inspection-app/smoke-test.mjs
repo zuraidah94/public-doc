@@ -135,6 +135,23 @@ try {
   check(reports[1].includes('ENVIRONMENTAL WALKTHROUGH') && reports[1].includes('Drum of waste oil') && reports[1].includes('Ali Ahmad'),
     'printed Environmental report has the ✖ remark and the Person In Charge');
 
+  // A backup import keeps the Safety and Environmental fields.
+  const imported = await page.evaluate(([s, e]) => [normalizeImportedInspection(s), normalizeImportedInspection(e)], [safety, env]);
+  check(imported[0].areas.safety[0].itemTextEn && imported[0].areas.safety[0].group && imported[1].areas.environment[0].evidence,
+    'importing a backup keeps the Safety English text and groups, and the Environmental evidence');
+
+  // The report view offers the Safety and Environmental downloads.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const reportButtons = async (badge) => {
+    const card = page.locator('div.overflow-hidden', { hasText: badge }).filter({ has: page.locator('text=' + badge) }).last();
+    await card.locator('div.cursor-pointer').first().click();
+    await card.locator('button', { hasText: 'View' }).first().click();
+    const texts = await page.locator('button', { hasText: '📥' }).allInnerTexts();
+    await page.keyboard.press('Escape').catch(() => {});
+    return texts.join(' ');
+  };
+  check((await reportButtons('🦺 Safety')).includes('OSHP-06.02'), 'the report view of a Safety inspection has a 📥 OSHP-06.02 download');
+
   // Corrective actions: three separate lists.
   await page.locator('button', { hasText: 'CAR' }).first().click();
   await page.locator('button', { hasText: 'Environmental' }).first().click();

@@ -60,8 +60,10 @@ const compareRows = (label, want, got, key) => {
 };
 compareRows('OSHP-06.02', safetyForm.rows, safetyApp, (r) => `${r.no}${r.sub ? ' ' + r.sub : ''}. ${norm(r.bm)}`);
 compareRows('ISO 14001 walkthrough', envForm.rows, envApp, (r) => `${norm(r.item)} | ${norm(r.evidence)}`);
-const safetyRev = jsx.match(/safety:\s*\{\s*number:\s*'OSHP-06\.02',\s*rev:\s*'([^']+)'/);
-if (!safetyRev || safetyRev[1] !== safetyForm.issue) problems.push(`OSHP-06.02 issue in the app is "${safetyRev?.[1]}", form is "${safetyForm.issue}"`);
+// Like the IR-PP-02.1 Rev, the Issue is in the initial doc details and in the Form screen's Reset button.
+const safetyRevs = [...jsx.matchAll(/safety:\s*\{\s*number:\s*'OSHP-06\.02',\s*rev:\s*'([^']+)'/g)].map(r => r[1]);
+if (safetyRevs.length < 2) problems.push(`OSHP-06.02 issue found ${safetyRevs.length} time(s) in the doc details, expected 2`);
+safetyRevs.forEach((rev, i) => { if (rev !== safetyForm.issue) problems.push(`OSHP-06.02 doc details #${i + 1}: issue is "${rev}", form is "${safetyForm.issue}"`); });
 
 if (problems.length) {
   console.log(`${problems.length} difference(s) between the app and the forms:\n`);

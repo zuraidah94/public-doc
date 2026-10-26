@@ -96,12 +96,20 @@ try {
 
   await inspect(a);
   check(records('inspections-data').length === 1, 'inspector A submits; the Sheet has 1 inspection');
+  check(await a.evaluate(() => window.storage.get('active-inspection', false)) === null,
+    'after submitting, the unfinished-inspection copy on the phone is cleared (a refresh will not reopen it)');
   const summary = records('Inspections');
   check(summary.length === 1 && summary[0][2] === 'IR-PP-02.1' && summary[0][3] === 'OK',
     `Inspections tab shows it (${JSON.stringify(summary[0]?.slice(2, 6))})`);
   check(records('inspections-data')[0][2] === 'verifier@impactrank.com.my', 'the row records who saved it');
 
+  const readsBefore = gas.state.blobReads;
   const b = await open('inspector@impactrank.com.my');
+  check(gas.state.blobReads - readsBefore <= 2, `opening the app reads Index.html from Drive at most twice (read ${gas.state.blobReads - readsBefore} times)`);
+  gas.state.cache = {};
+  let mixed = '';
+  try { gas.ctx.apiAppCode(1, 'an-older-upload'); } catch (e) { mixed = e.message; }
+  check(/updated while it was loading/.test(mixed), 'a load that would mix two uploads of Index.html is stopped with "please reload"');
   await login(b, 'inspector');
   check(await shown(b) === '1', 'inspector B, on another phone, sees A\'s inspection');
   await inspect(b);
@@ -164,6 +172,12 @@ try {
 
   await c.evaluate(([v]) => window.storage.set('corrective-actions', v, true), [JSON.stringify([car('c2', [photo])])]);
   check(records('corrective-actions').length === 1, 'a record deleted in the app is deleted from the Sheet');
+
+  const full = gas.tab('corrective-actions');
+  full.maxRows = full.getLastRow();   // the tab is full to its last row
+  await c.evaluate(([v]) => window.storage.set('corrective-actions', v, true),
+    [JSON.stringify([car('c2', [photo]), car('r1', []), car('r2', []), car('r3', [])])]);
+  check(records('corrective-actions').length === 4, 'when a tab is full, rows are added and saving carries on');
 
   gas.tab('Access').getRange(2, 1).setValues([['someone@else.com']]);
   gas.state.user = 'verifier@impactrank.com.my';
@@ -234,6 +248,16 @@ try {
   await c.waitForTimeout(1500);
   check(gas.state.created === filesBefore + 1 && json('corrective-actions').some((j) => j.includes('"c9"')),
     'a record with a photo, saved with no signal and then refreshed, uploads with its photo');
+
+  // Google refuses a save (not a lost connection): the badge says so instead of "waiting".
+  gas.tab('Access').getRange(2, 1).setValues([['someone@else.com']]);
+  const list = JSON.parse((await c.evaluate(() => window.storage.get('corrective-actions', true).catch(() => null)))?.value || '[]');
+  await c.evaluate(([v]) => window.storage.set('corrective-actions', v, true), [JSON.stringify([...list, { id: 'c10', description: 'Spill' }])]);
+  check(/Google refused them: .*not on the access list/.test(await badgeText(c)), 'when Google refuses a save, the badge turns red and says why');
+  gas.tab('Access').getRange(2, 1).setValues([['']]);
+  await comeOnline(c);
+  check(json('corrective-actions').some((j) => j.includes('"c10"')) && !(await badgeText(c)),
+    'once access is restored, the kept change uploads and the badge clears');
 
   for (const [name, p] of [['A', a], ['B', b], ['C', c]]) check(!p.errors.length, `no page errors on ${name}` + (p.errors.length ? ': ' + p.errors.join(' | ') : ''));
 } catch (e) {

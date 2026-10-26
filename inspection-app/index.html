@@ -74,7 +74,7 @@
 </script>
 </head>
 <body>
-<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 370ab03</small></p></div>
+<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 217258d</small></p></div>
 <script>document.getElementById('boot').textContent += ' · scripts running';</script>
 <script>
 if (!window.React || !window.ReactDOM || !window.LucideReact) window.__startError('React or lucide did not load. Check the internet connection, then reload.');
@@ -346,6 +346,7 @@ const normalizeImportedInspection = raw => {
   const areas = {};
   Object.entries(raw.areas || {}).forEach(([areaId, items]) => {
     areas[areaId] = (items || []).map((item, i) => ({
+      ...item,
       id: item.id || areaId + '-imp-' + i + '-' + Math.random().toString(36).slice(2, 7),
       area: item.area || areaId,
       areaName: item.areaName || areaId,
@@ -697,7 +698,8 @@ const InspectionCard = memo(({
   Object.values(insp.areas).forEach(items => items.forEach(item => {
     photoCount += item.photos?.length || 0;
   }));
-  const hasSigs = !!(insp.inspectorSignature || insp.verifierSignatureCleaning || insp.verifierSignatureGlass);
+  const verifierSigned = VERIFY_FORMS.some(f => insp['verifierSignature' + typeCapOf(f.type)]);
+  const hasSigs = !!(insp.inspectorSignature || verifierSigned);
   return React.createElement("div", {
     className: 'border rounded-xl overflow-hidden ' + (insp.overallStatus === 'OK' ? 'border-emerald-200' : 'border-red-200')
   }, React.createElement("div", {
@@ -796,11 +798,11 @@ const InspectionCard = memo(({
   }, insp.inspectorSignature ? '✍️' : '—'), React.createElement("p", {
     className: insp.inspectorSignature ? 'text-emerald-700 font-bold' : 'text-gray-400'
   }, "Inspector")), React.createElement("div", {
-    className: 'flex-1 rounded-lg p-2 text-center text-[10px] ' + (insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? 'bg-purple-50 border border-purple-300' : 'bg-gray-50 border border-gray-200')
+    className: 'flex-1 rounded-lg p-2 text-center text-[10px] ' + (verifierSigned ? 'bg-purple-50 border border-purple-300' : 'bg-gray-50 border border-gray-200')
   }, React.createElement("p", {
     className: "text-lg"
-  }, insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? '✍️' : '—'), React.createElement("p", {
-    className: insp.verifierSignatureCleaning || insp.verifierSignatureGlass ? 'text-purple-700 font-bold' : 'text-gray-400'
+  }, verifierSigned ? '✍️' : '—'), React.createElement("p", {
+    className: verifierSigned ? 'text-purple-700 font-bold' : 'text-gray-400'
   }, "Verifier"))), React.createElement("div", {
     className: "flex flex-wrap gap-1.5"
   }, React.createElement("button", {
@@ -2128,14 +2130,6 @@ function ImpactRankApp() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [ir, sr, dr, cr] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null)]);
-        if (ir?.value) setInspections(JSON.parse(ir.value));
-        if (sr?.value) setSchedules(JSON.parse(sr.value));
-        if (dr?.value) setDrafts(JSON.parse(dr.value));
-        if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
-        setLastGlobalSync(new Date());
-      } catch {}
-      try {
         const r = await window.storage.get('active-inspection', false);
         if (r?.value) {
           const active = JSON.parse(r.value);
@@ -2146,6 +2140,14 @@ function ImpactRankApp() {
             setCurrentView('inspection');
           } else await window.storage.delete('active-inspection', false);
         }
+      } catch {}
+      try {
+        const [ir, sr, dr, cr] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null)]);
+        if (ir?.value) setInspections(JSON.parse(ir.value));
+        if (sr?.value) setSchedules(JSON.parse(sr.value));
+        if (dr?.value) setDrafts(JSON.parse(dr.value));
+        if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
+        setLastGlobalSync(new Date());
       } catch {}
     };
     load();
@@ -2895,7 +2897,7 @@ function ImpactRankApp() {
     const signedAt = new Date().toLocaleString('en-MY', {
       timeZone: 'Asia/Kuala_Lumpur'
     });
-    const verifierSigField = reportType === 'glass' ? 'verifierSignatureGlass' : reportType === 'cleaning' ? 'verifierSignatureCleaning' : null;
+    const verifierSigField = VERIFIER_RULES[reportType] ? 'verifierSignature' + typeCapOf(reportType) : null;
     const updated = inspections.map(i => i.id === insp.id ? {
       ...i,
       inspectorSignature: inspectorSig,
@@ -3866,7 +3868,13 @@ function ImpactRankApp() {
   }, "\uD83D\uDCE5 01.1"), inspectionHasBuilding(viewingReport) && React.createElement("button", {
     onClick: () => exportToPDF(viewingReport, 'building'),
     className: "px-2 py-1.5 bg-orange-600 text-white rounded text-xs font-bold"
-  }, "\uD83D\uDCE5 14.1"), countNCs(viewingReport.areas) > 0 && React.createElement("button", {
+  }, "\uD83D\uDCE5 14.1"), inspectionHasSafety(viewingReport) && React.createElement("button", {
+    onClick: () => exportToPDF(viewingReport, 'safety'),
+    className: "px-2 py-1.5 bg-amber-600 text-white rounded text-xs font-bold"
+  }, "\uD83D\uDCE5 OSHP-06.02"), inspectionHasEnvironment(viewingReport) && React.createElement("button", {
+    onClick: () => exportToPDF(viewingReport, 'environment'),
+    className: "px-2 py-1.5 bg-teal-600 text-white rounded text-xs font-bold"
+  }, "\uD83D\uDCE5 ISO 14001"), countNCs(viewingReport.areas) > 0 && React.createElement("button", {
     onClick: () => {
       setViewingNCReport(viewingReport);
       setViewingReport(null);

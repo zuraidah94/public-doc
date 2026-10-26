@@ -40,7 +40,8 @@ compiled = subprocess.run(
 assert "</script" not in compiled, "compiled app contains </script>, which would end the inline script early"
 
 # Shown on the loading line, so a screenshot tells which version is deployed.
-build = hashlib.sha256((source + (HERE / "template.html").read_text(encoding="utf-8")).encode()).hexdigest()[:7]
+shell = "".join((HERE / f).read_text(encoding="utf-8") for f in ["template.html", "storage-local.js", "storage-google.js"])
+build = hashlib.sha256((source + shell).encode()).hexdigest()[:7]
 template = (HERE / "template.html").read_text(encoding="utf-8")
 for out, storage in [("index.html", "storage-local.js"), ("apps-script/Index.html", "storage-google.js")]:
     html = template.replace("/*__STORAGE__*/", (HERE / storage).read_text(encoding="utf-8").strip())
