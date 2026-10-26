@@ -23,6 +23,8 @@ const records = (key) => gas.rows(key).filter((r) => r[0] !== '');
 const json = (key) => records(key).map((r) => r.slice(3).filter((c) => c !== '').map((c) => String(c).slice(1)).join(''));
 
 const browser = await chromium.launch();
+let offline = false;   // while true, every call to Google fails, as with no signal
+let failing = null;     // (fn, args) => true to make just some calls fail
 async function open(email) {
   const context = await browser.newContext({ viewport: { width: 420, height: 900 } });
   const page = await context.newPage();
@@ -31,6 +33,7 @@ async function open(email) {
   page.on('console', (m) => { if (m.type() === 'error') page.errors.push(m.text()); });
   page.on('dialog', (d) => d.accept());
   await page.exposeFunction('__gas', (fn, args) => {
+    if (offline || failing?.(fn, args)) return { err: 'NetworkError: no connection' };
     gas.state.user = email;
     try { return { ok: gas.ctx[fn](...JSON.parse(args)) }; } catch (e) { return { err: e.message }; }
   });
@@ -171,6 +174,66 @@ try {
   gas.tab('Access').getRange(2, 1).setValues([['@impactrank.com.my']]);
   check(gas.ctx.doGet().title !== 'No access', 'an "@impactrank.com.my" entry lets the whole company in');
   gas.tab('Access').getRange(2, 1).setValues([['']]);
+
+  // ── No signal and refreshes: nothing is lost ──
+  const badgeText = async (p) => (await p.locator('#irapp-outbox').count()) ? p.locator('#irapp-outbox').innerText() : '';
+  const comeOnline = async (p) => { offline = false; await p.evaluate(() => window.dispatchEvent(new Event('online'))); await p.waitForTimeout(1500); };
+  const usersBefore = records('app-users').length;
+  // Someone has changed a password on the server (C loads the users first, so its change is a real edit).
+  const users = JSON.parse((await c.evaluate(() => window.storage.get('app-users', true))).value);
+  users[0].password = 'changed-pw';
+  await c.evaluate(([v]) => window.storage.set('app-users', v, true), [JSON.stringify(users)]);
+  const pwOnServer = () => JSON.parse(json('app-users').find((j) => JSON.parse(j).id === users[0].id)).password;
+  check(pwOnServer() === 'changed-pw', 'a changed password is saved to the Sheet');
+
+  const before = records('inspections-data').length;
+  offline = true;
+  await inspect(a);
+  check(records('inspections-data').length === before, 'with no signal, a submitted inspection is not on the Sheet yet');
+  check(/1 change saved on this device/.test(await badgeText(a)), 'the "waiting to upload" badge shows 1 change');
+  // The tab is refreshed; the app opens again once there is signal. Loading the user list happens to
+  // fail this time, so the app re-saves its default users without knowing what is on the Sheet.
+  offline = false;
+  failing = (fn, args) => fn === 'apiGet' && args.includes('app-users');
+  await a.reload();
+  await a.waitForSelector('text=Login', { timeout: 20000 });
+  await a.waitForTimeout(1500);
+  check(records('inspections-data').length === before + 1, 'after the refresh, the inspection that was waiting uploads by itself');
+  await login(a, 'verifier');
+  check(await shown(a) === String(before + 1), 'and the app shows it');
+  failing = null;
+  await comeOnline(a);
+  check(!(await badgeText(a)), 'once everything has uploaded, the badge goes away');
+  check(records('app-users').length === usersBefore && pwOnServer() === 'changed-pw',
+    'the default users the app re-saved while it could not load them did not overwrite the changed password');
+
+  // Refresh in the middle of an inspection: the ticks are restored.
+  await a.locator('button', { hasText: 'New' }).first().click();
+  await a.locator('label', { hasText: 'OSHP-06.02' }).first().click();
+  await a.locator('button', { hasText: 'Today' }).first().click();
+  await a.waitForSelector('text=All Baik');
+  await a.locator('button', { hasText: 'All Baik' }).first().dispatchEvent('pointerdown');
+  await a.waitForTimeout(500);
+  await a.reload();
+  await a.waitForSelector('text=Login', { timeout: 20000 });
+  await login(a, 'verifier').catch(() => {});
+  await a.waitForTimeout(800);
+  const progress = (await a.innerText('body')).match(/(\d+)\/(\d+) \(100%\)/);
+  check(!!progress, 'after a refresh mid-inspection, the inspection comes back with every tick (100%)');
+
+  // A photo saved with no signal still reaches Google after a refresh.
+  const cas = JSON.parse((await c.evaluate(() => window.storage.get('corrective-actions', true))).value);
+  const photo2 = photo.replace(/.{8}$/, 'AAAAAAA=');
+  offline = true;
+  const filesBefore = gas.state.created;
+  await c.evaluate(([v]) => window.storage.set('corrective-actions', v, true), [JSON.stringify([...cas, { id: 'c9', description: 'Leak', photos: [photo2] }])]);
+  check(gas.state.created === filesBefore, 'with no signal, the photo is not uploaded yet');
+  offline = false;
+  await c.reload();
+  await c.waitForSelector('text=Login', { timeout: 20000 });
+  await c.waitForTimeout(1500);
+  check(gas.state.created === filesBefore + 1 && json('corrective-actions').some((j) => j.includes('"c9"')),
+    'a record with a photo, saved with no signal and then refreshed, uploads with its photo');
 
   for (const [name, p] of [['A', a], ['B', b], ['C', c]]) check(!p.errors.length, `no page errors on ${name}` + (p.errors.length ? ': ' + p.errors.join(' | ') : ''));
 } catch (e) {

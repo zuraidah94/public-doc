@@ -56,9 +56,23 @@ The app only sends the records that changed, and only deletes records the phone 
 can work at the same time without overwriting each other's inspections. If two people change the
 **same** inspection at once, the last save wins. Press 🔄 Sync to see other people's latest records.
 
-The inspection in progress is also autosaved on the phone itself, so it survives a reload. If a save
-fails (no signal), the app warns once and then retries every 5 seconds while the page is open, so keep
-the page open until there is signal again.
+### No signal, refreshes and closed tabs
+
+The app needs internet to open (it is served by Google). Once open, nothing is lost:
+
+- The inspection being filled in is saved on the phone (in the browser's IndexedDB, which has room for
+  photos) after every change. After a refresh, or reopening the app, it opens again where you left off.
+- Every submit, draft, verification and corrective action is first kept on the phone, then uploaded.
+  If there is no signal, it stays on the phone, even through a refresh or a closed tab, and uploads
+  by itself: every 15 seconds while the app is open, when the signal returns, and the next time the
+  app opens. A yellow badge ("⏳ N changes saved on this device, waiting to upload") shows until
+  everything has reached the Google Sheet.
+- If the app opens but can't load a list from Google, changes it saves to that list without having
+  seen it never overwrite records already on the Sheet (for example the default user list can't
+  reset a changed password).
+
+Don't clear the browser's site data for the app while the badge is showing; that would delete the
+waiting changes.
 
 ## Set it up on Google (once)
 

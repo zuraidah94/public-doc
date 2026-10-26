@@ -1215,7 +1215,7 @@ export default function ImpactRankApp() {
   useEffect(()=>{
     const load=async()=>{
       try{const [ir,sr,dr,cr]=await Promise.all([window.storage.get('inspections-data',true).catch(()=>null),window.storage.get('inspection-schedules',true).catch(()=>null),window.storage.get('inspection-drafts',true).catch(()=>null),window.storage.get('corrective-actions',true).catch(()=>null)]);if(ir?.value) setInspections(JSON.parse(ir.value));if(sr?.value) setSchedules(JSON.parse(sr.value));if(dr?.value) setDrafts(JSON.parse(dr.value));if(cr?.value) setCorrectiveActions(JSON.parse(cr.value));setLastGlobalSync(new Date());}catch{}
-      try{const r=await window.storage.get('active-inspection',false);if(r?.value){const active=JSON.parse(r.value);const age=(Date.now()-new Date(active.savedAt).getTime())/3600000;if(age<24){setCurrentInspection(active.inspection);setActiveAreaTab(active.activeTab||'extrusion');}else await window.storage.delete('active-inspection',false);}}catch{}
+      try{const r=await window.storage.get('active-inspection',false);if(r?.value){const active=JSON.parse(r.value);const age=(Date.now()-new Date(active.savedAt).getTime())/3600000;if(age<24){setCurrentInspection(active.inspection);setActiveAreaTab(active.activeTab||'extrusion');setCurrentView('inspection');}else await window.storage.delete('active-inspection',false);}}catch{}
     };
     load();
   },[]);

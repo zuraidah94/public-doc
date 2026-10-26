@@ -47,6 +47,11 @@
 // since they were last loaded or saved, and only deletes records this browser has seen.
 // A phone holding older data therefore can't overwrite records others saved since.
 // Photos and signatures go up once each, as files, and travel as "file:<sha256>".
+//
+// Every change goes into an outbox in this browser before it is sent, and leaves it only once
+// Google has it. A refresh, a closed tab or no signal therefore loses nothing: the outbox is sent
+// again every 15 seconds, when the connection comes back, and the next time the app opens, and
+// a badge says how many changes are still waiting.
 (() => {
   const REF = 'file:';
   const call = (fn, ...args) => new Promise((resolve, reject) =>
@@ -54,7 +59,7 @@
 
   const synced = {};          // key -> Map(id -> record JSON with photo refs), as the server has it
   const lastValue = {};       // key -> the exact value string last loaded or saved
-  const queue = {};           // key -> promise chain, so saves to one key run in order
+  const queue = {};           // key -> promise chain, so loads, saves and resends of one key run in order
   const onServer = new Set(); // photo hashes the server already has
   const photoOf = new Map(), hashOf = new Map();
 
@@ -62,30 +67,35 @@
   const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))]
     .map((b) => b.toString(16).padStart(2, '0')).join('');
 
-  // Photos never change once saved (the name is their hash), so keep them in IndexedDB between visits.
+  // IndexedDB: photos by hash ('p'; they never change once saved) and the personal keys ('kv').
+  // It holds far more than localStorage, so an inspection in progress with many photos still fits.
   const db = new Promise((resolve) => {
     try {
-      const req = indexedDB.open('irapp-photos', 1);
-      req.onupgradeneeded = () => req.result.createObjectStore('p');
+      const req = indexedDB.open('irapp-photos', 2);
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains('p')) req.result.createObjectStore('p');
+        if (!req.result.objectStoreNames.contains('kv')) req.result.createObjectStore('kv');
+      };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => resolve(null);
     } catch { resolve(null); }
   });
-  const cacheOp = async (mode, fn) => {
+  const idb = async (store, mode, fn) => {
     const d = await db;
     if (!d) return null;
     return new Promise((resolve) => {
       try {
-        const r = fn(d.transaction('p', mode).objectStore('p'));
-        r.onsuccess = () => resolve(r.result ?? null);
-        r.onerror = () => resolve(null);
+        const tx = d.transaction(store, mode), r = fn(tx.objectStore(store));
+        if (mode === 'readwrite') { tx.oncomplete = () => resolve(true); tx.onerror = tx.onabort = () => resolve(null); }
+        else { r.onsuccess = () => resolve(r.result ?? null); r.onerror = () => resolve(null); }
       } catch { resolve(null); }
     });
   };
   const remember = (hash, photo) => {
     photoOf.set(hash, photo); hashOf.set(photo, hash);
-    cacheOp('readwrite', (s) => s.put(photo, hash));
+    return idb('p', 'readwrite', (s) => s.put(photo, hash));
   };
+  const photo = async (h) => photoOf.get(h) || await idb('p', 'readonly', (s) => s.get(h));
 
   const mapStrings = async (v, fn) => {
     if (typeof v === 'string') return fn(v);
@@ -97,58 +107,150 @@
     }
     return v;
   };
+  // Photo hashes referenced in a JSON text (also inside JSON nested as a string, where quotes are escaped).
+  const refsIn = (json) => [...String(json).matchAll(/file:([0-9a-f]{64})/g)].map((m) => m[1]);
 
+  // Replace photos with refs. New photos are stored in IndexedDB before the record goes in the
+  // outbox, so a resend after a refresh can still upload them.
   async function toRefs(value) {
-    const uploads = {};
+    const stored = [];
     const refd = await mapStrings(value, async (s) => {
       if (!isPhoto(s)) return s;
       let h = hashOf.get(s);
-      if (!h) { h = await sha256(s); remember(h, s); }
-      if (!onServer.has(h)) uploads[h] = s;
+      if (!h) { h = await sha256(s); stored.push(remember(h, s)); }
       return REF + h;
     });
-    return { refd, uploads };
+    await Promise.all(stored);
+    return refd;
   }
 
   async function fromRefs(value) {
     const wanted = new Set();
     await mapStrings(value, (s) => { if (s.startsWith(REF)) wanted.add(s.slice(REF.length)); return s; });
-    wanted.forEach((h) => onServer.add(h));
     let missing = [...wanted].filter((h) => !photoOf.has(h));
     for (const h of missing) {
-      const cached = await cacheOp('readonly', (s) => s.get(h));
+      const cached = await idb('p', 'readonly', (s) => s.get(h));
       if (cached) { photoOf.set(h, cached); hashOf.set(cached, h); }
     }
     missing = missing.filter((h) => !photoOf.has(h));
     for (let i = 0; i < missing.length; i += 20) {
       const got = JSON.parse(await call('apiFiles', JSON.stringify(missing.slice(i, i + 20))));
-      Object.entries(got).forEach(([h, photo]) => remember(h, photo));
+      Object.entries(got).forEach(([h, p]) => { onServer.add(h); remember(h, p); });
     }
     return mapStrings(value, (s) => (s.startsWith(REF) && photoOf.has(s.slice(REF.length)) ? photoOf.get(s.slice(REF.length)) : s));
   }
 
-  const local = (key) => `irapp:personal:${key}`;
   const ls = () => { try { return window.localStorage; } catch { return null; } };
   const isRecordList = (v) => Array.isArray(v) && v.every((x) => x && typeof x === 'object' && x.id != null);
   const inOrder = (key, fn) => (queue[key] = (queue[key] || Promise.resolve()).catch(() => {}).then(fn));
 
+  // ── Outbox: key -> {upserts: {id: json}, deletes: [id], replace?: json, blind?: true} ──
+  // "blind" marks changes made without a successful load of that key; when they are sent, records
+  // that already exist on the server are left alone, so they can't overwrite real data (for
+  // example the default user list over changed passwords).
+  const OUTBOX = 'irapp:outbox:v1';
+  const readOutbox = () => { try { return JSON.parse(ls()?.getItem(OUTBOX) || '{}'); } catch { return {}; } };
+  const writeOutbox = (box) => {
+    const s = ls();
+    if (!s) throw new Error('Browser storage is not available, so changes cannot be kept until they upload');
+    Object.keys(box).length ? s.setItem(OUTBOX, JSON.stringify(box)) : s.removeItem(OUTBOX);
+    badge(box);
+  };
+  const pending = (box) => Object.values(box).reduce((n, e) => n + Object.keys(e.upserts || {}).length + (e.deletes || []).length + (e.replace != null ? 1 : 0), 0);
+  const loaded = {};          // key -> true once a load from the server has succeeded
+
+  function badge(box = readOutbox()) {
+    const n = pending(box);
+    let el = document.getElementById('irapp-outbox');
+    if (!n) { if (el) el.remove(); return; }
+    if (!document.body) return;
+    if (!el) {
+      el = document.body.appendChild(document.createElement('div'));
+      el.id = 'irapp-outbox';
+      el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;max-width:calc(100% - 16px);background:#fef3c7;color:#92400e;' +
+        'border:1px solid #f59e0b;border-radius:999px;padding:6px 12px;font:600 12px sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.15)';
+    }
+    el.textContent = `⏳ ${n} change${n === 1 ? '' : 's'} saved on this device, waiting to upload. They upload by themselves when there is internet.`;
+  }
+
+  // Send one key's outbox entry. Runs inside inOrder(key). Throws if Google can't be reached.
+  async function send(key) {
+    const box = readOutbox(), entry = box[key];
+    if (!entry) return;
+    if (entry.blind) {
+      const raw = await call('apiGet', key), res = JSON.parse(raw);
+      refsIn(raw).forEach((h) => onServer.add(h));
+      const there = new Set((res?.records || []).map((r) => String(r.id)));
+      Object.keys(entry.upserts || {}).forEach((id) => { if (there.has(id)) delete entry.upserts[id]; });
+      if (res && 'value' in res) delete entry.replace;
+      entry.deletes = [];
+      if (res?.records) { synced[key] = new Map(res.records.map((r) => [String(r.id), JSON.stringify(r)])); loaded[key] = true; }
+      delete entry.blind;
+    }
+    const jsons = entry.replace != null ? [entry.replace] : Object.values(entry.upserts || {});
+    const uploads = {};
+    for (const h of new Set(jsons.flatMap(refsIn))) {
+      if (onServer.has(h)) continue;
+      const p = await photo(h);
+      if (p) uploads[h] = p;
+    }
+    const payload = entry.replace != null ? { replace: entry.replace, uploads } : { upserts: jsons, deletes: entry.deletes || [], uploads };
+    if (payload.replace == null && !payload.upserts.length && !payload.deletes.length) { delete box[key]; writeOutbox(box); return; }
+    await call('apiSave', key, JSON.stringify(payload));
+    if (entry.replace != null) synced[key] = null;
+    else {
+      const m = synced[key] || (synced[key] = new Map());
+      jsons.forEach((j) => m.set(String(JSON.parse(j).id), j));
+      (entry.deletes || []).forEach((id) => m.delete(id));
+    }
+    Object.keys(uploads).forEach((h) => onServer.add(h));
+    const now = readOutbox(); delete now[key]; writeOutbox(now);
+  }
+  const sendAll = () => Object.keys(readOutbox()).forEach((key) => inOrder(key, () => send(key)).catch(() => {}));
+  setInterval(() => { if (pending(readOutbox())) sendAll(); }, 15000);
+  window.addEventListener('online', sendAll);
+  document.addEventListener('DOMContentLoaded', () => badge());
+
+  // Put the outbox's not-yet-sent changes on top of what the server returned, so the app shows them.
+  const withOutbox = (key, records) => {
+    const entry = readOutbox()[key];
+    if (!entry) return records;
+    if (entry.replace != null) return JSON.parse(entry.replace);
+    const byId = new Map((records || []).map((r) => [String(r.id), r]));
+    (entry.deletes || []).forEach((id) => byId.delete(id));
+    Object.entries(entry.upserts || {}).forEach(([id, j]) => byId.set(id, JSON.parse(j)));
+    return [...byId.values()];
+  };
+
   window.storage = {
     async get(key, shared = false) {
       if (!shared) {
-        const value = ls()?.getItem(local(key));
+        const value = (await idb('kv', 'readonly', (s) => s.get(key))) ?? ls()?.getItem(`irapp:personal:${key}`);
         return value == null ? null : { key, value, shared };
       }
       return inOrder(key, async () => {
-        const res = JSON.parse(await call('apiGet', key));
-        if (!res) return null;
-        let value;
-        if ('value' in res) {
-          synced[key] = null;
-          value = await fromRefs(JSON.parse(res.value));
-        } else {
-          synced[key] = new Map(res.records.map((r) => [String(r.id), JSON.stringify(r)]));
-          value = await fromRefs(res.records);
+        try { await send(key); } catch { /* still offline: shown from the outbox below */ }
+        let res;
+        let raw;
+        try { raw = await call('apiGet', key); res = JSON.parse(raw); } catch (e) {
+          const entry = readOutbox()[key];
+          if (!entry) throw e;
+          const value = await fromRefs(withOutbox(key, []));
+          lastValue[key] = JSON.stringify(value);
+          return { key, value: lastValue[key], shared };
         }
+        loaded[key] = true;
+        refsIn(raw).forEach((h) => onServer.add(h));   // photos in the server's records are already there
+        let value;
+        if (res && 'value' in res) {
+          synced[key] = null;
+          value = withOutbox(key, JSON.parse(res.value));
+        } else {
+          synced[key] = new Map((res?.records || []).map((r) => [String(r.id), JSON.stringify(r)]));
+          if (!res && !readOutbox()[key]) return null;
+          value = withOutbox(key, res?.records || []);
+        }
+        value = await fromRefs(value);
         lastValue[key] = JSON.stringify(value);
         return { key, value: lastValue[key], shared };
       });
@@ -156,60 +258,59 @@
 
     async set(key, value, shared = false) {
       if (!shared) {
+        if (await idb('kv', 'readwrite', (s) => s.put(value, key))) { ls()?.removeItem(`irapp:personal:${key}`); return { key, value, shared }; }
         const s = ls();
         if (!s) throw new Error('Browser storage is not available');
-        s.setItem(local(key), value);
+        s.setItem(`irapp:personal:${key}`, value);
         return { key, value, shared };
       }
       return inOrder(key, async () => {
         if (lastValue[key] === value) return { key, value, shared };
-        const parsed = JSON.parse(value);
-        const { refd, uploads } = await toRefs(parsed);
-        let payload, apply;
+        const refd = await toRefs(JSON.parse(value));
+        const box = readOutbox();
+        const entry = box[key] || { upserts: {}, deletes: [] };
+        if (!loaded[key]) entry.blind = true;
         if (!isRecordList(refd)) {
-          payload = { replace: JSON.stringify(refd), uploads };
-          apply = () => { synced[key] = null; };
+          box[key] = { replace: JSON.stringify(refd), upserts: {}, deletes: [], ...(entry.blind ? { blind: true } : {}) };
         } else {
+          delete entry.replace;
           const known = synced[key] || new Map();
           const now = new Map(refd.map((r) => [String(r.id), JSON.stringify(r)]));
-          const upserts = [...now].filter(([id, j]) => known.get(id) !== j).map(([, j]) => j);
-          const deletes = [...known.keys()].filter((id) => !now.has(id));
-          if (!upserts.length && !deletes.length) { lastValue[key] = value; return { key, value, shared }; }
-          payload = { upserts, deletes, uploads };
-          apply = () => {
-            const m = synced[key] || (synced[key] = new Map());
-            upserts.forEach((j) => { const r = JSON.parse(j); m.set(String(r.id), j); });
-            deletes.forEach((id) => m.delete(id));
-          };
+          now.forEach((j, id) => { if (known.get(id) !== j) entry.upserts[id] = j; else delete entry.upserts[id]; });
+          Object.keys(entry.upserts).forEach((id) => { if (!now.has(id)) delete entry.upserts[id]; });
+          entry.deletes = [...new Set([...(entry.deletes || []), ...[...known.keys()].filter((id) => !now.has(id))])].filter((id) => !now.has(id));
+          if (Object.keys(entry.upserts).length || entry.deletes.length) box[key] = entry; else delete box[key];
         }
-        await call('apiSave', key, JSON.stringify(payload));
-        apply();
-        Object.keys(uploads).forEach((h) => onServer.add(h));
+        writeOutbox(box);            // kept on this device first; throws only if that fails
         lastValue[key] = value;
+        try { await send(key); } catch { /* stays in the outbox and is sent again later */ }
         return { key, value, shared };
       });
     },
 
     async delete(key, shared = false) {
-      if (!shared) { ls()?.removeItem(local(key)); return { key, deleted: true, shared }; }
+      if (!shared) {
+        await idb('kv', 'readwrite', (s) => s.delete(key));
+        ls()?.removeItem(`irapp:personal:${key}`);
+        return { key, deleted: true, shared };
+      }
       return inOrder(key, async () => {
         await call('apiDelete', key);
+        const box = readOutbox(); delete box[key]; writeOutbox(box);
         delete synced[key]; delete lastValue[key];
         return { key, deleted: true, shared };
       });
     },
 
     async list(prefix = '', shared = false) {
-      const s = ls(), keys = [], p = local(prefix);
-      if (!shared && s) for (let i = 0; i < s.length; i++) if (s.key(i).startsWith(p)) keys.push(s.key(i).slice(local('').length));
-      return { keys, prefix, shared };
+      return { keys: [], prefix, shared };
     },
   };
 })();
 </script>
 </head>
 <body>
-<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 2759ff1</small></p></div>
+<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 370ab03</small></p></div>
 <script>document.getElementById('boot').textContent += ' · scripts running';</script>
 <script>
 if (!window.React || !window.ReactDOM || !window.LucideReact) window.__startError('React or lucide did not load. Check the internet connection, then reload.');
@@ -2278,6 +2379,7 @@ function ImpactRankApp() {
           if (age < 24) {
             setCurrentInspection(active.inspection);
             setActiveAreaTab(active.activeTab || 'extrusion');
+            setCurrentView('inspection');
           } else await window.storage.delete('active-inspection', false);
         }
       } catch {}
