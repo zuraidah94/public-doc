@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workplace Inspection</title>
+<script>
+// If something stops the app from starting, show why on the page instead of leaving it blank.
+(function () {
+  var shown = [];
+  function show(msg) {
+    shown.push(msg);
+    var put = function () {
+      var box = document.getElementById('start-error') || document.body.appendChild(Object.assign(document.createElement('pre'), { id: 'start-error' }));
+      box.style.cssText = 'white-space:pre-wrap;font:13px monospace;color:#b91c1c;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px;margin:16px';
+      box.textContent = 'The app could not start. Please send this message to the app owner:\n\n' + shown.join('\n');
+    };
+    if (document.body) put(); else document.addEventListener('DOMContentLoaded', put);
+  }
+  window.addEventListener('error', function (e) {
+    if (e.target && e.target.tagName === 'SCRIPT') show('Could not load ' + e.target.src);
+    else show((e.message || 'Error') + (e.lineno ? ' (line ' + e.lineno + ')' : ''));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) { show('Error: ' + ((e.reason && e.reason.message) || e.reason)); });
+  window.__startError = show;
+  // If the app still hasn't replaced the loading text after 15 s, say how far it got.
+  setTimeout(function () {
+    var root = document.getElementById('root');
+    if (!root || root.textContent.indexOf('Loading the inspection app') !== 0) return;
+    show('Still loading after 15 seconds. Stage: ' + (window.__appStage || 'the app script did not run (Index.html may be cut off)') +
+      '. React: ' + (window.React ? React.version : 'missing') + '. lucide: ' + (window.LucideReact ? 'ok' : 'missing') +
+      '. google.script.run: ' + (window.google && google.script && google.script.run ? 'ok' : 'missing') + '.');
+  }, 15000);
+})();
+</script>
+<script src="https://cdn.tailwindcss.com/3.4.5"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<!-- lucide's browser build looks for React under the lowercase global "react". -->
+<script>window.react = window.React;</script>
+<script src="https://cdn.jsdelivr.net/npm/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
+<script>
+/*__STORAGE__*/
+</script>
+</head>
+<body>
+<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build /*__BUILD__*/</small></p></div>
+<script>document.getElementById('boot').textContent += ' · scripts running';</script>
+<script>
+if (!window.React || !window.ReactDOM || !window.LucideReact) window.__startError('React or lucide did not load. Check the internet connection, then reload.');
+</script>
+<script id="app-code">
+window.__appStage = 'app script started';
+/*__APP__*/
+window.__appStage = 'render requested';
+</script>
+<!-- end of Index.html -->
+</body>
+</html>

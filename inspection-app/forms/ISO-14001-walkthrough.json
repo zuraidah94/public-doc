@@ -1,0 +1,87 @@
+{
+ "number": "(none on the form)",
+ "title": "ISO 14001:2015 Environmental Walkthrough Inspection Checklist",
+ "source": {
+  "file": "(ISO 14001) ISO_14001_2015_ENVIRONMENTAL_WALKTHROUGH_INSPECTION_CHECKLIST.docx",
+  "modified": "2026-08-11"
+ },
+ "ratings": [
+  "✔ Comply",
+  "✖ Non-Comply",
+  "N/A"
+ ],
+ "rows": [
+  {
+   "item": "Environmental Policy is displayed, communicated and understood at the work area.",
+   "evidence": "Environmental Policy, Awareness Records"
+  },
+  {
+   "item": "Significant environmental aspects and impacts for the area are identified and controlled.",
+   "evidence": "Environmental Aspect & Impact Register"
+  },
+  {
+   "item": "Scheduled waste is correctly segregated, labelled (SW code) and dated at point of generation.",
+   "evidence": "Scheduled Waste Labelling – Third Schedule, EQ(SW) Regs 2005"
+  },
+  {
+   "item": "Scheduled waste store is bunded, covered, secured, signposted and within the 180-day / 20,000 kg storage limit.",
+   "evidence": "SW Store Inspection Checklist, Regulation 9 EQ(SW) Regs 2005"
+  },
+  {
+   "item": "Scheduled waste inventory and e-Consignment Notes (eSWIS) are updated and reconciled.",
+   "evidence": "SW Inventory Record, eSWIS / e-Consignment Note"
+  },
+  {
+   "item": "Chemical containers are labelled and stored correctly, with SDS available and secondary containment provided.",
+   "evidence": "Chemical Register, Safety Data Sheets (SDS)"
+  },
+  {
+   "item": "Spill kits are available, complete, accessible and staff are aware of the spill response procedure.",
+   "evidence": "Spill Response Procedure, Spill Kit Inspection Record"
+  },
+  {
+   "item": "General, domestic and recyclable waste are segregated, stored and disposed of properly.",
+   "evidence": "Solid Waste Disposal Record, Recycling Log"
+  },
+  {
+   "item": "Effluent / wastewater discharge is controlled and monitored within permitted limits.",
+   "evidence": "Effluent Monitoring Record, DOE Discharge Standard (if applicable)"
+  },
+  {
+   "item": "Air emission / Local Exhaust Ventilation (LEV) is functioning and monitoring records are available.",
+   "evidence": "LEV Monitoring Record, CHRA (if applicable)"
+  },
+  {
+   "item": "Storm drains and surface water channels are clean and free from contamination or spillage.",
+   "evidence": "Visual Inspection, Site Drainage Layout"
+  },
+  {
+   "item": "Energy (electricity) and water consumption are monitored; no obvious wastage or leakage.",
+   "evidence": "Energy & Water Consumption Monitoring Record"
+  },
+  {
+   "item": "Noise levels at the work area are controlled and within permissible exposure limits.",
+   "evidence": "Noise Monitoring / Exposure Report (if applicable)"
+  },
+  {
+   "item": "Applicable environmental legal register, DOE licences and permits are current and complied with.",
+   "evidence": "Environmental Legal & Other Requirements Register"
+  },
+  {
+   "item": "Environmental emergency preparedness equipment is available and staff are aware of response procedures.",
+   "evidence": "Emergency Preparedness & Response Plan, Drill Record"
+  },
+  {
+   "item": "Personnel are trained and aware of their environmental responsibilities and operational controls.",
+   "evidence": "Environmental Training & Awareness Record"
+  },
+  {
+   "item": "Housekeeping controls prevent contamination of land, water and air throughout the area.",
+   "evidence": "Visual Inspection"
+  },
+  {
+   "item": "Overall compliance with ISO 14001 environmental operational controls is maintained.",
+   "evidence": "Auditor Observation"
+  }
+ ]
+}

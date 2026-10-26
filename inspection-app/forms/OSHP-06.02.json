@@ -1,0 +1,227 @@
+{
+ "number": "OSHP-06.02",
+ "issue": "Issue 00",
+ "title": "Borang Laporan Pemeriksaan Tempat Kerja / Workplace Safety Inspection Report",
+ "sheet": "Laporan Pemeriksaan Tempat Kerja (Workplace Safety Inspection Report) only; the JKKP checklist sheet is not in the app.",
+ "source": {
+  "file": "06 OSHP-06.02 - Workplace Safety Inspection Report.docx",
+  "modified": "2026-09-30"
+ },
+ "ratings": [
+  "Baik",
+  "Kurang Baik",
+  "N/A"
+ ],
+ "rows": [
+  {
+   "no": "1",
+   "sub": "",
+   "bm": "Dasar/ Polisi Keselamatan dan Kesihatan Pekerjaan"
+  },
+  {
+   "no": "2",
+   "sub": "",
+   "bm": "Manual Keselamatan dan Kesihatan Pekerjaan"
+  },
+  {
+   "no": "3",
+   "sub": "",
+   "bm": "Pelan Tindakan Kecemasan"
+  },
+  {
+   "no": "4",
+   "sub": "i",
+   "bm": "Disediakan dan sesuai"
+  },
+  {
+   "no": "4",
+   "sub": "ii",
+   "bm": "Diselenggara"
+  },
+  {
+   "no": "4",
+   "sub": "iii",
+   "bm": "Sesuai dengan jenis kerja."
+  },
+  {
+   "no": "4",
+   "sub": "v",
+   "bm": "Rekod Penggunaan"
+  },
+  {
+   "no": "4",
+   "sub": "vi",
+   "bm": "Latihan PPE"
+  },
+  {
+   "no": "5",
+   "sub": "i",
+   "bm": "Tanda amaran dipamer di lokasi yang mudah dilihat."
+  },
+  {
+   "no": "5",
+   "sub": "ii",
+   "bm": "Tanda amaran adalah mengikut maksud tujuan tanda itu disediakan."
+  },
+  {
+   "no": "1",
+   "sub": "i",
+   "bm": "Keadaan lantai kukuh"
+  },
+  {
+   "no": "1",
+   "sub": "ii",
+   "bm": "Semua lubang, takungan, pit, bekas tetap di lantai telah ditutup."
+  },
+  {
+   "no": "1",
+   "sub": "iii",
+   "bm": "Lantai tidak licin dan bebas dari bahan yang boleh mengakibatkan jatuh"
+  },
+  {
+   "no": "1",
+   "sub": "iv",
+   "bm": "Perbezaan ketinggian pada lantai telah ditanda dengan jelas"
+  },
+  {
+   "no": "2",
+   "sub": "i",
+   "bm": "Dalam keadaan baik dan stabil."
+  },
+  {
+   "no": "2",
+   "sub": "ii",
+   "bm": "Peralatan atau jentera bagi melakukan kerja – kerja memikul, mengangkat atau menggerakkan beban berat disediakan."
+  },
+  {
+   "no": "2",
+   "sub": "iii",
+   "bm": "Terdapat ruang laluan yang mencukupi jika berlaku kecemasan"
+  },
+  {
+   "no": "3",
+   "sub": "i",
+   "bm": "Berada dalam keadaan kondusif"
+  },
+  {
+   "no": "3",
+   "sub": "ii",
+   "bm": "Tiada pertumbuhan kulat atau bau hapak di persekitaran tempat kerja."
+  },
+  {
+   "no": "3",
+   "sub": "iii",
+   "bm": "Pengudaraan mencukupi"
+  },
+  {
+   "no": "4",
+   "sub": "i",
+   "bm": "Kadar kebisingan pada tahap yang baik dan tidak mengganggu pendengaran dan emosi"
+  },
+  {
+   "no": "5",
+   "sub": "i",
+   "bm": "Kadar pencahayaan adalah mencukupi dan tidak mengganggu aktiviti kerja."
+  },
+  {
+   "no": "6",
+   "sub": "ii",
+   "bm": "Jentera dalam keadaan baik dan telah diselenggara."
+  },
+  {
+   "no": "6",
+   "sub": "iii",
+   "bm": "Bahagian jentera berbahaya (tajam, bergerak, panas, menghentam dan menghimpit) telah dipagar."
+  },
+  {
+   "no": "6",
+   "sub": "iv",
+   "bm": "Mesin Angkat, Mesin Tekanan dan Mesin Dandang memiliki sijil kelayakan yang masih sah dan dipamerkan pada jentera."
+  },
+  {
+   "no": "7",
+   "sub": "i",
+   "bm": "Alat elektrik dalam keadaan baik"
+  },
+  {
+   "no": "7",
+   "sub": "ii",
+   "bm": "Penyambungan elektrik berada dalam keadaan baik dan selamat."
+  },
+  {
+   "no": "7",
+   "sub": "iii",
+   "bm": "Tiada penyambungan haram dan terbuka"
+  },
+  {
+   "no": "8",
+   "sub": "i",
+   "bm": "Alatan Pengesan Kebakaran dan Alatan Pencegahan Kebakaran disediakan dan diselenggara."
+  },
+  {
+   "no": "8",
+   "sub": "ii",
+   "bm": "Pelan Laluan Kecemasan disediakan"
+  },
+  {
+   "no": "8",
+   "sub": "iii",
+   "bm": "Tanda “KELUAR” disediakan dan boleh dilihat dengan jelas sewaktu kecemasan."
+  },
+  {
+   "no": "8",
+   "sub": "iv",
+   "bm": "Tempat Berkumpul Kecemasan disediakan dan di tanda."
+  },
+  {
+   "no": "8",
+   "sub": "v",
+   "bm": "Maklumat nombor telefon agensi (dalam dan luar) yang perlu dihubungi bila berlaku kecemasan dipamerkan."
+  },
+  {
+   "no": "9",
+   "sub": "i",
+   "bm": "Helaian Data Keselamatan (SDS) disediakan dan mudah dicapai di tempat kerja."
+  },
+  {
+   "no": "9",
+   "sub": "ii",
+   "bm": "Terdapat Tempat Simpanan khusus bagi Bahan Kimia Berbahaya dan Buangan Terjadual (BT) dan diletakkan tanda amaran (signage) yang berkaitan."
+  },
+  {
+   "no": "9",
+   "sub": "iii",
+   "bm": "Kelengkapan kawalan kejuruteraan (Local Exhaust Ventilation (LEV)). -Diperiksa oleh PIC dan direkod dengan baik setiap bulan. -Rekod pengujian dan pemeriksaaan keberkesanan oleh Juruteknik Higien II setiap 12 bulan"
+  },
+  {
+   "no": "9",
+   "sub": "iv",
+   "bm": "Semua Bahan Kimia dan BT disimpan di dalam bekas dan mengikut kelas/kategori BT (Kod SW) yang bersesuaian berdasarkan garis panduan yang berkaitan."
+  },
+  {
+   "no": "9",
+   "sub": "v",
+   "bm": "Semua bahan kimia dilabel dan/atau dilabel semula mengikut garis panduan yang disediakan."
+  },
+  {
+   "no": "9",
+   "sub": "vi",
+   "bm": "Semua bahan BT dilabel mengikut garis panduan yang disediakan."
+  },
+  {
+   "no": "9",
+   "sub": "vii",
+   "bm": "Terdapat maklumat, arahan dan latihan kepada pengendali Bahan Kimia Berbahaya"
+  },
+  {
+   "no": "10",
+   "sub": "i",
+   "bm": "Hazad Ergonomik"
+  },
+  {
+   "no": "10",
+   "sub": "ii",
+   "bm": "Hazad Psikososial (Buli, Gangguan Seksual)"
+  }
+ ]
+}

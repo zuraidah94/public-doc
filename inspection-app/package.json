@@ -1,0 +1,16 @@
+{
+  "name": "impact-rank-inspection-app",
+  "private": true,
+  "description": "Build and checks for the HACCP Workplace Inspection app. The dependencies compile the JSX and serve the CDN scripts locally in tests.",
+  "scripts": {
+    "build": "python3 build.py",
+    "check": "node check-checklist.mjs",
+    "test": "python3 build.py && node check-checklist.mjs && node smoke-test.mjs && node test/apps-script.test.mjs"
+  },
+  "devDependencies": {
+    "@babel/standalone": "7.24.7",
+    "lucide-react": "0.383.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

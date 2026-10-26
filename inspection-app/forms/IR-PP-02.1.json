@@ -1,0 +1,131 @@
+{
+ "number": "IR-PP-02.1",
+ "rev": "Rev 05",
+ "issue": "Issue 05",
+ "title": "Cleaning and Sanitation Inspection Checksheet",
+ "source": {
+  "file": "Form PP02.1 Issue 05 - Cleaning and Sanitation Inspection Checksheet.docx",
+  "modified": "2026-10-12"
+ },
+ "changes": [
+  "Rev 05 adds the Surroundings row for pails, containers and open receptacles (stagnant water, Aedes larvae)."
+ ],
+ "areas": [
+  {
+   "form": "Production (Extrusion)",
+   "app": "extrusion",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact",
+    "Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt",
+    "Stand Fan/ Exhaust Fan – Clean and free from dust",
+    "Other unmentioned areas"
+   ]
+  },
+  {
+   "form": "Production (Offline Printing)",
+   "app": "offline-printing",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact",
+    "Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt",
+    "Stand Fan/ Exhaust Fan – Clean and free from dust",
+    "Other unmentioned areas"
+   ]
+  },
+  {
+   "form": "Production (Mixing)",
+   "app": "mixing",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact",
+    "Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt",
+    "Stand Fan/ Exhaust Fan – Clean and free from dust",
+    "Other unmentioned areas"
+   ]
+  },
+  {
+   "form": "Production (Cutting & Sealing Area)",
+   "app": "cutting-sealing",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact",
+    "Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt",
+    "Stand Fan/ Exhaust Fan – Clean and free from dust",
+    "Other unmentioned areas"
+   ]
+  },
+  {
+   "form": "Cleanroom",
+   "app": "cleanroom",
+   "rows": [
+    "Floor– Clean and free from dust",
+    "Walls- clean, organic dirt and debris free, not major cracks",
+    "Ceiling– no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact",
+    "Machine surfaces [dust, flaked paint]- no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder",
+    "Other unmentioned areas"
+   ]
+  },
+  {
+   "form": "Changing Room",
+   "app": "changing-room",
+   "rows": [
+    "Floor– clean, debris free, not major cracks",
+    "Walls- clean, organic dirt and debris free, not major cracks",
+    "Ceiling- no spider webs, fully closed, no uncovered fluorescent tubes",
+    "Cabinets and shelves– Free from dust and dirt, not cracked",
+    "Washing Basin– not cracked",
+    "Dispenser always with soap and Hand dryer is functioning"
+   ]
+  },
+  {
+   "form": "Toilet",
+   "app": "toilet",
+   "rows": [
+    "Toilet Environment- free from odour, dispenser always with soap, flushing system in good condition"
+   ]
+  },
+  {
+   "form": "Surroundings",
+   "app": "surroundings",
+   "rows": [
+    "Floor– no rubbish",
+    "Drain– not clogged, no rubbish",
+    "Extraneous Plantation– grass shorter than ankle, trees are trimmed thin",
+    "Main Rubbish Bin– waste is fully wrapped with plastic",
+    "Food Waste Bin– fully covered, wrapped with plastic, no pests",
+    "Pails, containers and any open receptacle– no stagnant or unused water; emptied, overturned or covered when not in use; no Aedes mosquito larvae"
+   ]
+  },
+  {
+   "form": "Upper Store",
+   "app": "upper-store",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Racking - clean, debris free, no dust trapped in rack holes",
+    "Ceiling – no spider webs, fully closed, no uncovered fluorescent tubes",
+    "Forklift and Pallet Jack –clean, no heavy dust, no leaking of water or oil",
+    "Roller Shutter Closed"
+   ]
+  },
+  {
+   "form": "Lower Store Area",
+   "app": "lower-store",
+   "rows": [
+    "Floor – clean, debris free, not major cracks",
+    "Walls - clean, organic dirt and debris free, not major cracks",
+    "Racking - clean, debris free, no dust trapped in rack holes",
+    "Ceiling – no spider webs, fully closed, no uncovered fluorescent tubes",
+    "Forklift and Pallet Jack –clean, no heavy dust, no leaking of water or oil",
+    "Roller Shutter Closed"
+   ]
+  }
+ ],
+ "footer": "Report to Maintenance HoD IMMEDIATELY if any discrepancies are found in facilties",
+ "verifiedBy": "HACCP Team Leader"
+}

@@ -1,0 +1,2337 @@
+import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
+import { FileText, LogOut, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// ── Default users (stored/merged with storage) ───────────────────────
+const DEFAULT_USERS = [
+  { id:1, username:'admin',      name:'Admin',       role:'admin',              avatar:'👑', password:'123' },
+  { id:2, username:'verifier',   name:'Verifier',    role:'inspector_verifier', avatar:'⭐', password:'123' },
+  { id:3, username:'inspector',  name:'Inspector',   role:'inspector',          avatar:'🔍', password:'123' },
+  { id:4, username:'inspector2', name:'Inspector 2', role:'inspector',          avatar:'🔍', password:'123' },
+];
+
+const ROLE_LABELS = { admin:'👑 Admin', inspector_verifier:'⭐ Verifier', inspector:'🔍 Inspector', visitor:'👁️ Visitor' };
+const ROLE_COLORS = { admin:'bg-amber-100 text-amber-800', inspector_verifier:'bg-purple-100 text-purple-700', inspector:'bg-blue-100 text-blue-700', visitor:'bg-gray-100 text-gray-600' };
+
+const AREAS = [
+  {id:'extrusion',name:'Extrusion',icon:'🌲'},
+  {id:'offline-printing',name:'Offline Printing',icon:'🍃'},
+  {id:'mixing',name:'Mixing',icon:'🌿'},
+  {id:'cutting-sealing',name:'Cutting & Sealing',icon:'✂️'},
+  {id:'cleanroom',name:'Cleanroom',icon:'💚'},
+  {id:'changing-room',name:'Changing Room',icon:'🌱'},
+  {id:'toilet',name:'Toilet',icon:'🚻'},
+  {id:'surroundings',name:'Surroundings',icon:'🌳'},
+  {id:'upper-store',name:'Upper Store',icon:'📦'},
+  {id:'lower-store',name:'Lower Store',icon:'📦'}
+];
+const CHECKLIST_ITEMS = {
+  'extrusion':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact'],'Machine Surfaces':['Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt'],'Ventilation':['Stand Fan/ Exhaust Fan – Clean and free from dust'],'Other':['Other unmentioned areas'],'Glass & Windows [IR-PP-13.1]':['Glass Windows and walls - Intact and not broken'],'Clocks [IR-PP-13.1]':['Wall clocks with plastic covers - Intact and not broken'],'Wooden Items [IR-PP-13.1]':['Wooden pallets - No protruding nails and wood shreds. Not moldy. Not broken.','Wooden sticks - No protruding nails and wood shreds. Not moldy. Not broken. Smoothened surfaces/ wrapped with plastic'],'Lighting [IR-PP-13.1]':['Fluorescent tubes - None existent/ if used, covered with plastic','LED light tubes - Not cracked or broken','Insectocutor/insect trap lightings - Not cracked or broken'],'Metal & Plastic Items [IR-PP-13.1]':['Metal blades condition - No broken blades, not rusty','Plastic mat [for cutting only] - No hanging plastic strips','Plastic containers and small pails [for extrusion and mixing only] - Not broken or cracked [do not fix with adhesive tapes]','Thickness gauge cover - Not broken or cracked [do not fix with adhesive tapes]'],'Personnel Hygiene [IR-PP-01.1]':['People are clean in appearance','People practice good personal hygiene','Hair cover is worn and it covers all of the hair','Hair pins, clips, etc are not used to keep hair coverings in place','No makeup-only lipstick is allowed','No Jewelry','Hands and finger nails are clean-nails are trimmed','Nail polish, false finger nails and false eyelashes are not worn','Wrist watches are not worn','Only working shoes are worn-toes are fully enclosed','Working shoes are clean, neat and in good repair','Utensils/Food are not carried in the pockets of clothing','Visitors wear hair covers and working shoes','No one with a particular illness/disease-they should check with their supervisor','7 hand washing steps is followed by everyone','The hand is dried before enter production area']},
+  'offline-printing':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact'],'Machine Surfaces':['Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt'],'Ventilation':['Stand Fan/ Exhaust Fan – Clean and free from dust'],'Other':['Other unmentioned areas'],'Personnel Hygiene [IR-PP-01.1]':['People are clean in appearance','Hair cover is worn and it covers all of the hair','No Jewelry','Hands and finger nails are clean-nails are trimmed','Only working shoes are worn-toes are fully enclosed']},
+  'mixing':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact'],'Machine Surfaces':['Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt'],'Ventilation':['Stand Fan/ Exhaust Fan – Clean and free from dust'],'Other':['Other unmentioned areas'],'Glass & Windows [IR-PP-13.1]':['Glass Windows and walls - Intact and not broken'],'Clocks [IR-PP-13.1]':['Wall clocks with plastic covers - Intact and not broken'],'Wooden Items [IR-PP-13.1]':['Wooden pallets - No protruding nails and wood shreds. Not moldy. Not broken.','Wooden sticks - No protruding nails and wood shreds. Not moldy. Not broken. Smoothened surfaces/ wrapped with plastic'],'Lighting [IR-PP-13.1]':['Fluorescent tubes - None existent/ if used, covered with plastic','LED light tubes - Not cracked or broken','Insectocutor/insect trap lightings - Not cracked or broken'],'Metal & Plastic Items [IR-PP-13.1]':['Metal blades condition - No broken blades, not rusty','Plastic mat [for cutting only] - No hanging plastic strips','Plastic containers and small pails [for extrusion and mixing only] - Not broken or cracked [do not fix with adhesive tapes]','Thickness gauge cover - Not broken or cracked [do not fix with adhesive tapes]'],'Personnel Hygiene [IR-PP-01.1]':['People are clean in appearance','Hair cover is worn','No Jewelry','Hands and finger nails are clean']},
+  'cutting-sealing':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact'],'Machine Surfaces':['Machine surfaces [dust, flaked paint] – no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder, no oil dirt'],'Ventilation':['Stand Fan/ Exhaust Fan – Clean and free from dust'],'Other':['Other unmentioned areas'],'Glass & Windows [IR-PP-13.1]':['Glass Windows and walls - Intact and not broken'],'Clocks [IR-PP-13.1]':['Wall clocks with plastic covers - Intact and not broken'],'Wooden Items [IR-PP-13.1]':['Wooden pallets - No protruding nails and wood shreds. Not moldy. Not broken.','Wooden sticks - No protruding nails and wood shreds. Not moldy. Not broken. Smoothened surfaces/ wrapped with plastic'],'Lighting [IR-PP-13.1]':['Fluorescent tubes - None existent/ if used, covered with plastic','LED light tubes - Not cracked or broken','Insectocutor/insect trap lightings - Not cracked or broken'],'Metal & Plastic Items [IR-PP-13.1]':['Metal blades condition - No broken blades, not rusty','Plastic mat [for cutting only] - No hanging plastic strips','Plastic containers and small pails [for extrusion and mixing only] - Not broken or cracked [do not fix with adhesive tapes]','Thickness gauge cover - Not broken or cracked [do not fix with adhesive tapes]'],'Personnel Hygiene [IR-PP-01.1]':['People are clean in appearance','Hair cover is worn','No Jewelry','Working shoes are clean']},
+  'cleanroom':{'Floor':['Floor– Clean and free from dust'],'Walls':['Walls- clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling– no spider webs, fully closed, no uncovered lights, air-cond blower cover sealer intact'],'Machine Surfaces':['Machine surfaces [dust, flaked paint]- no dust, no paint flakes, no heavy rust, no old and torn product roll holder, no cloth used as product roll holder'],'Other':['Other unmentioned areas'],'Personnel Hygiene [IR-PP-01.1]':['People are clean in appearance','Hair cover is worn and it covers all of the hair','No Jewelry','Hands and finger nails are clean','Only working shoes are worn']},
+  'changing-room':{'Floor':['Floor– clean, debris free, not major cracks'],'Walls':['Walls- clean, organic dirt and debris free, not major cracks'],'Ceiling':['Ceiling- no spider webs, fully closed, no uncovered fluorescent tubes'],'Cabinets':['Cabinets and shelves– Free from dust and dirt, not cracked'],'Washing Basin':['Washing Basin– not cracked'],'Hygiene Facilities':['Dispenser always with soap and Hand dryer is functioning']},
+  'toilet':{'Toilet Environment':['Toilet Environment- free from odour, dispenser always with soap, flushing system in good condition']},
+  'surroundings':{'Floor Area':['Floor– no rubbish'],'Drainage':['Drain– not clogged, no rubbish'],'Plantation':['Extraneous Plantation– grass shorter than ankle, trees are trimmed thin'],'Main Waste':['Main Rubbish Bin– waste is fully wrapped with plastic'],'Food Waste':['Food Waste Bin– fully covered, wrapped with plastic, no pests'],'Stagnant Water':['Pails, containers and any open receptacle– no stagnant or unused water; emptied, overturned or covered when not in use; no Aedes mosquito larvae']},
+  'upper-store':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Racking':['Racking - clean, debris free, no dust trapped in rack holes'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered fluorescent tubes'],'Equipment':['Forklift and Pallet Jack –clean, no heavy dust, no leaking of water or oil'],'Door':['Roller Shutter Closed']},
+  'lower-store':{'Floor':['Floor – clean, debris free, not major cracks'],'Walls':['Walls - clean, organic dirt and debris free, not major cracks'],'Racking':['Racking - clean, debris free, no dust trapped in rack holes'],'Ceiling':['Ceiling – no spider webs, fully closed, no uncovered fluorescent tubes'],'Equipment':['Forklift and Pallet Jack –clean, no heavy dust, no leaking of water or oil'],'Door':['Roller Shutter Closed']}
+};
+
+const countNCs = (areas) => { let c=0; Object.values(areas).forEach(items=>{ c+=items.filter(i=>i.status==='NG').length; }); return c; };
+// IR-PP-02.1 items are the ones without another form's tag in their section name.
+const NON_CLEANING_TAGS = ['[IR-PP-13.1]', '[IR-PP-01.1]', '[IR-PP-14.1]', '[OSHP-06.02]', '[ISO 14001]'];
+const inspectionHasCleaning = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>!NON_CLEANING_TAGS.some(t=>i.section?.includes(t))));
+const inspectionHasGlass = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>i.section?.includes('[IR-PP-13.1]')));
+const inspectionHasBuilding = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>i.section?.includes('[IR-PP-14.1]')));
+const inspectionHasHygiene = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>i.section?.includes('[IR-PP-01.1]')));
+const inspectionHasSafety = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>i.section?.includes('[OSHP-06.02]')));
+const inspectionHasEnvironment = (insp) => Object.values(insp.areas||{}).some(items=>items.some(i=>i.section?.includes('[ISO 14001]')));
+// Whole-factory forms keep their items under one pseudo-area instead of the production areas.
+const PSEUDO_AREA_META = {
+  'buildings-fabrication': { id:'buildings-fabrication', name:'Buildings & Fabrication', icon:'🏢' },
+  'safety': { id:'safety', name:'Safety (whole factory)', icon:'🦺' },
+  'environment': { id:'environment', name:'Environmental (whole factory)', icon:'🌍' },
+};
+const ALL_AREAS = () => [...AREAS, ...Object.values(PSEUDO_AREA_META)];
+const WHOLE_FACTORY_TYPES = { building: 'buildings-fabrication', safety: 'safety', environment: 'environment' };
+// The forms that are verified, in the order their Verify buttons and sign-off lines are shown.
+const VERIFY_FORMS = [
+  { type:'cleaning', short:'02.1', has:(i)=>inspectionHasCleaning(i) },
+  { type:'glass', short:'13.1', has:(i)=>inspectionHasGlass(i) },
+  { type:'building', short:'14.1', has:(i)=>inspectionHasBuilding(i) },
+  { type:'safety', short:'Safety', has:(i)=>inspectionHasSafety(i) },
+  { type:'environment', short:'Env', has:(i)=>inspectionHasEnvironment(i) },
+];
+const typeCapOf = (type) => type.charAt(0).toUpperCase()+type.slice(1);
+const getAreaMetaSafe = (areaId) => AREAS.find(a=>a.id===areaId) || PSEUDO_AREA_META[areaId] || { id:areaId, name:areaId, icon:'📍' };
+const isFullyVerified = (insp) => {
+  return VERIFY_FORMS.every(f => !f.has(insp) || !!insp['verifiedBy'+typeCapOf(f.type)]);
+};
+
+// Normalizes an inspection object coming from an import (this app's own older exports, or a
+// similar/forked app) into the current data model — fills in missing fields with safe defaults
+// and migrates legacy single verifiedBy/verifierSignature fields into the per-form fields this
+// version uses, so nothing is silently lost when transferring data between app versions.
+const normalizeImportedInspection = (raw) => {
+  const areas = {};
+  Object.entries(raw.areas || {}).forEach(([areaId, items]) => {
+    areas[areaId] = (items || []).map((item, i) => ({
+      id: item.id || (areaId + '-imp-' + i + '-' + Math.random().toString(36).slice(2, 7)),
+      area: item.area || areaId,
+      areaName: item.areaName || areaId,
+      section: item.section || '',
+      itemText: item.itemText || '',
+      status: item.status ?? null,
+      remarks: item.remarks ?? '',
+      photos: Array.isArray(item.photos) ? item.photos : [],
+    }));
+  });
+  const inspectors = Array.isArray(raw.inspectors) && raw.inspectors.length ? raw.inspectors : (raw.inspector ? [raw.inspector] : ['Unknown']);
+  const normalized = {
+    ...raw,
+    id: raw.id != null ? String(raw.id) : ('import_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)),
+    dateTime: raw.dateTime || new Date().toISOString(),
+    areas,
+    documentType: raw.documentType || 'all',
+    inspectors,
+    inspector: raw.inspector || inspectors[0],
+    overallStatus: raw.overallStatus || (Object.values(areas).some(items => items.some(i => i.status === 'NG')) ? 'NG' : 'OK'),
+    status: raw.status === 'verified' ? 'pending_verification' : (raw.status || 'pending_verification'),
+    notes: raw.notes || '',
+  };
+  // Migrate legacy shared verifiedBy/verifiedAt/verifierSignature (pre-split single-field versions)
+  if (raw.verifiedBy && !normalized.verifiedByCleaning && !normalized.verifiedByGlass) {
+    if (inspectionHasCleaning(normalized)) { normalized.verifiedByCleaning = raw.verifiedBy; normalized.verifiedAtCleaning = raw.verifiedAt || normalized.dateTime; }
+    if (inspectionHasGlass(normalized)) { normalized.verifiedByGlass = raw.verifiedBy; normalized.verifiedAtGlass = raw.verifiedAt || normalized.dateTime; }
+  }
+  if (raw.verifierSignature) {
+    if (!normalized.verifierSignatureCleaning && inspectionHasCleaning(normalized)) normalized.verifierSignatureCleaning = raw.verifierSignature;
+    if (!normalized.verifierSignatureGlass && inspectionHasGlass(normalized)) normalized.verifierSignatureGlass = raw.verifierSignature;
+  }
+  delete normalized.verifiedBy;
+  delete normalized.verifiedAt;
+  delete normalized.verifierSignature;
+  return normalized;
+};
+
+// Merge two arrays of records by id, keeping the existing record on a collision (never silently
+// overwrites local data with imported data) and appending anything genuinely new.
+const mergeById = (existing, incoming, idKey = 'id') => {
+  const seen = new Set(existing.map(r => r[idKey]));
+  const additions = incoming.filter(r => r && r[idKey] != null && !seen.has(r[idKey]));
+  return [...existing, ...additions];
+};
+
+// ── Signature Pad ────────────────────────────────────────────────────
+const SignaturePad = memo(({ label, value, onChange, required }) => {
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+  const lastPos = useRef(null);
+  const getPos = (e, canvas) => { const rect=canvas.getBoundingClientRect(); const sx=canvas.width/rect.width; const sy=canvas.height/rect.height; if(e.touches) return {x:(e.touches[0].clientX-rect.left)*sx,y:(e.touches[0].clientY-rect.top)*sy}; return {x:(e.clientX-rect.left)*sx,y:(e.clientY-rect.top)*sy}; };
+  const startDraw = useCallback((e)=>{ e.preventDefault(); drawing.current=true; lastPos.current=getPos(e,canvasRef.current); },[]);
+  const draw = useCallback((e)=>{ if(!drawing.current) return; e.preventDefault(); const canvas=canvasRef.current; const ctx=canvas.getContext('2d'); const pos=getPos(e,canvas); ctx.beginPath(); ctx.moveTo(lastPos.current.x,lastPos.current.y); ctx.lineTo(pos.x,pos.y); ctx.strokeStyle='#1a237e'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); lastPos.current=pos; },[]);
+  const endDraw = useCallback(()=>{ if(!drawing.current) return; drawing.current=false; onChange(canvasRef.current.toDataURL('image/png')); },[onChange]);
+  const clear = useCallback(()=>{ const canvas=canvasRef.current; canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height); onChange(null); },[onChange]);
+  useEffect(()=>{ if(value&&canvasRef.current){ const img=new Image(); img.onload=()=>{ const ctx=canvasRef.current.getContext('2d'); ctx.clearRect(0,0,canvasRef.current.width,canvasRef.current.height); ctx.drawImage(img,0,0); }; img.src=value; } },[]);
+  return (
+    <div className={'rounded-xl border-2 overflow-hidden '+(required&&!value?'border-red-400':value?'border-emerald-400':'border-gray-300')}>
+      <div className={'flex justify-between items-center px-3 py-1.5 '+(value?'bg-emerald-50':'bg-gray-50')}>
+        <span className="text-xs font-bold text-gray-700">{label} {required&&<span className="text-red-500">*</span>}</span>
+        <div className="flex items-center gap-2">{value&&<span className="text-[10px] text-emerald-600 font-bold">✓ Signed</span>}<button onClick={clear} className="text-[10px] text-red-500 font-bold px-2 py-0.5 bg-red-50 rounded hover:bg-red-100">Clear</button></div>
+      </div>
+      <div className="bg-white relative">
+        {!value&&<p className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs pointer-events-none select-none">Sign here ✍️</p>}
+        <canvas ref={canvasRef} width={600} height={120} className="w-full cursor-crosshair touch-none" style={{height:'80px'}} onMouseDown={startDraw} onMouseMove={draw} onMouseUp={endDraw} onMouseLeave={endDraw} onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={endDraw}/>
+      </div>
+    </div>
+  );
+});
+
+// ── Signature Modal ──────────────────────────────────────────────────
+const SignatureModal = memo(({ inspection, onClose, onExport }) => {
+  const [verifierSigs, setVerifierSigs] = useState({
+    cleaning: inspection.verifierSignatureCleaning||null,
+    glass: inspection.verifierSignatureGlass||null,
+    building: inspection.verifierSignatureBuilding||null,
+    safety: inspection.verifierSignatureSafety||null,
+    environment: inspection.verifierSignatureEnvironment||null,
+  });
+  const availableTypes = [
+    {v:'cleaning',l:'IR-PP-02.1',icon:'🧹',has:inspectionHasCleaning(inspection)},
+    {v:'glass',l:'IR-PP-13.1',icon:'📦',has:inspectionHasGlass(inspection)},
+    {v:'hygiene',l:'IR-PP-01.1',icon:'⭐',has:inspectionHasHygiene(inspection)},
+    {v:'building',l:'IR-PP-14.1',icon:'🏢',has:inspectionHasBuilding(inspection)},
+    {v:'safety',l:'OSHP-06.02',icon:'🦺',has:inspectionHasSafety(inspection)},
+    {v:'environment',l:'ISO 14001',icon:'🌍',has:inspectionHasEnvironment(inspection)},
+  ].filter(t=>t.has);
+  const [reportType, setReportType] = useState(availableTypes[0]?.v||'cleaning');
+  const inspectorName = inspection.inspectors?.join(', ')||inspection.inspector;
+  const rule = VERIFIER_RULES[reportType];
+  const verifierSig = verifierSigs[reportType]||null;
+  const setVerifierSig = (val) => setVerifierSigs(prev=>({...prev,[reportType]:val}));
+  const handleExport = () => {
+    const typeCap = reportType.charAt(0).toUpperCase()+reportType.slice(1);
+    const recordedSig = VERIFIER_RULES[reportType] ? inspection['verifierSignature'+typeCap] : null;
+    onExport(inspection,reportType,null,recordedSig||verifierSig);
+    onClose();
+  };
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
+        <div className="bg-gradient-to-r from-blue-700 to-blue-900 p-4 text-white">
+          <div className="flex items-center gap-3"><div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-xl">📝</div><div><h2 className="font-bold text-base">Export Report</h2><p className="text-xs opacity-80">Inspector name only — verifier restricted by form</p></div><button onClick={onClose} className="ml-auto p-2 bg-white bg-opacity-20 rounded-lg text-white font-bold text-sm">✕</button></div>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3"><div className="grid grid-cols-2 gap-2 text-xs"><div><p className="text-gray-500">Inspector(s)</p><p className="font-bold truncate">{inspectorName}</p></div><div><p className="text-gray-500">Date</p><p className="font-bold">{new Date(inspection.dateTime).toLocaleDateString('en-GB')}</p></div><div><p className="text-gray-500">Status</p><p className={'font-bold '+(inspection.overallStatus==='OK'?'text-emerald-600':'text-red-600')}>{inspection.overallStatus}</p></div><div><p className="text-gray-500">NCs</p><p className="font-bold text-red-600">{countNCs(inspection.areas)}</p></div></div></div>
+          <div><p className="text-xs font-bold text-gray-700 mb-2">📋 Report Type</p><div className="grid grid-cols-2 gap-2">{availableTypes.map(rt=>(<button key={rt.v} onClick={()=>setReportType(rt.v)} className={'p-2 rounded-xl border-2 text-center transition '+(reportType===rt.v?'border-blue-500 bg-blue-50':'border-gray-200 hover:border-gray-300')}><div className="text-lg">{rt.icon}</div><p className="text-[10px] font-bold">{rt.l}</p></button>))}</div></div>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 flex items-start gap-2"><span className="text-lg flex-shrink-0">✍️</span><div><p className="text-xs font-bold text-gray-700">Inspector — {inspectorName}</p><p className="text-[10px] text-gray-500 mt-0.5">No signature needed — the inspector's name is printed on the report as-is.</p></div></div>
+          {rule ? (()=>{
+            const typeCap = reportType.charAt(0).toUpperCase()+reportType.slice(1);
+            const verifiedName = inspection['verifiedBy'+typeCap];
+            const verifiedSig = inspection['verifierSignature'+typeCap];
+            return (
+              <div>
+                <div className="flex items-center gap-2 mb-1.5"><span className="text-lg">⭐</span><p className="text-xs font-bold text-gray-700">Verifier — {verifiedName||'Pending'}</p></div>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 mb-2"><p className="text-[10px] text-amber-800"><strong>Allowed:</strong> {allowedVerifiers(rule)} ({rule.title})</p></div>
+                {verifiedName ? (
+                  <div className="border-2 border-emerald-400 rounded-xl overflow-hidden">
+                    <div className="flex justify-between items-center px-3 py-1.5 bg-emerald-50"><span className="text-xs font-bold text-gray-700">Verified by {verifiedName}</span><span className="text-[10px] text-emerald-600 font-bold">✓ Recorded</span></div>
+                    <div className="bg-white p-2 flex items-center justify-center" style={{height:'80px'}}>{verifiedSig?<img src={verifiedSig} alt="Verifier Signature" style={{height:'70px'}}/>:<span className="text-xs text-gray-400 italic">Signed via Verify action (no drawing captured)</span>}</div>
+                  </div>
+                ) : (
+                  <>
+                    <SignaturePad key={reportType} label="Verifier signature (optional)" value={verifierSig} onChange={setVerifierSig} required={false}/>
+                    <p className="text-[10px] text-gray-400 mt-1">Optional preview only — use the ⭐ Verify action on the dashboard to officially record the verifier's name and signature.</p>
+                  </>
+                )}
+              </div>
+            );
+          })() : (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-start gap-2"><span className="text-lg flex-shrink-0">ℹ️</span><p className="text-[11px] text-emerald-800">IR-PP-01.1 (Personnel Hygiene) does not require a verifier — inspector name only.</p></div>
+          )}
+          <div className="flex gap-3"><button onClick={onClose} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm">Cancel</button><button onClick={handleExport} className="flex-1 py-3 rounded-xl font-bold text-sm bg-blue-700 text-white hover:bg-blue-800">📥 Download</button></div>
+          <div className="h-2 sm:h-0"></div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// ── Inspection Card ──────────────────────────────────────────────────
+const InspectionCard = memo(({ insp, currentUser, correctiveActions, onView, onViewNC, onVerify, onUnverify, onDelete, onPhotoGallery }) => {
+  const [expanded, setExpanded] = useState(false);
+  const inspName = insp.inspectors?.length>0?insp.inspectors.join(', '):insp.inspector;
+  const ncCount = countNCs(insp.areas);
+  const linkedCARs = correctiveActions.filter(ca=>ca.inspectionId===insp.id).length;
+  let totalItems=0,okItems=0; Object.values(insp.areas).forEach(items=>{totalItems+=items.length;okItems+=items.filter(i=>i.status==='OK').length;});
+  const compliance = totalItems>0?Math.round((okItems/totalItems)*100):100;
+  let photoCount=0; Object.values(insp.areas).forEach(items=>items.forEach(item=>{photoCount+=item.photos?.length||0;}));
+  const hasSigs = !!(insp.inspectorSignature||insp.verifierSignatureCleaning||insp.verifierSignatureGlass);
+  return (
+    <div className={'border rounded-xl overflow-hidden '+(insp.overallStatus==='OK'?'border-emerald-200':'border-red-200')}>
+      <div className={'flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-50 '+(insp.overallStatus==='OK'?'bg-emerald-50':'bg-red-50')} onClick={()=>setExpanded(e=>!e)}>
+        <div className={'w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 '+(insp.overallStatus==='OK'?'bg-emerald-500':'bg-red-500')}>{insp.overallStatus==='OK'?'✓':'!'}</div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-xs sm:text-sm text-gray-800 truncate">{inspName}</p>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <p className="text-[10px] text-gray-500">{new Date(insp.dateTime).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</p>
+            {inspectionKinds(insp).map(k=>{const kind=SECTION_KINDS.find(x=>x.key===k);return <span key={k} className="text-[9px] bg-gray-100 text-gray-700 px-1 rounded">{kind.icon} {kind.label}</span>;})}
+            {insp.isBackdated&&<span className="text-[9px] bg-orange-100 text-orange-700 px-1 rounded">⏮️</span>}
+            {insp.importedFrom&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1 rounded">📥</span>}
+            {hasSigs&&<span className="text-[9px] bg-purple-100 text-purple-700 px-1 rounded">🔏</span>}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {isFullyVerified(insp)&&<span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-bold">✓ Ver</span>}
+          {ncCount>0&&<span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">{ncCount} NC</span>}
+          {expanded?<ChevronUp className="w-4 h-4 text-gray-400"/>:<ChevronDown className="w-4 h-4 text-gray-400"/>}
+        </div>
+      </div>
+      {expanded&&(
+        <div className="bg-white border-t border-gray-100 p-3 space-y-3">
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <div className="bg-gray-50 rounded-lg p-2"><p className="text-sm font-bold">{compliance}%</p><p className="text-[10px] text-gray-500">OK</p></div>
+            <div className="bg-gray-50 rounded-lg p-2"><p className="text-sm font-bold text-red-600">{ncCount}</p><p className="text-[10px] text-gray-500">NC</p></div>
+            <div className="bg-gray-50 rounded-lg p-2"><p className="text-sm font-bold text-purple-600">{linkedCARs}</p><p className="text-[10px] text-gray-500">CAR</p></div>
+            <div className="bg-gray-50 rounded-lg p-2"><p className="text-sm font-bold text-blue-600">{photoCount}</p><p className="text-[10px] text-gray-500">📷</p></div>
+          </div>
+          <div className="flex flex-wrap gap-1">{ALL_AREAS().map(area=>{const items=insp.areas[area.id]||[];if(!items.length) return null;const ng=items.filter(i=>i.status==='NG').length;return(<span key={area.id} className={'text-[9px] px-1.5 py-0.5 rounded-full font-medium '+(ng>0?'bg-red-100 text-red-700':'bg-emerald-100 text-emerald-700')}>{area.icon} {area.name.split(' ')[0]} {ng>0?`(${ng}❌)`:'✓'}</span>);})}</div>
+          {VERIFY_FORMS.map(f=>{const by=insp['verifiedBy'+typeCapOf(f.type)];if(!by) return null;return <p key={f.type} className="text-[10px] text-purple-600 bg-purple-50 rounded px-2 py-1 flex items-center justify-between gap-2"><span>✓ {FORM_LABELS[f.type]} verified by {by} · {new Date(insp['verifiedAt'+typeCapOf(f.type)]).toLocaleDateString()}</span>{currentUser?.role!=='visitor'&&<button onClick={()=>onUnverify(insp,f.type)} className="text-[9px] font-bold text-orange-600 hover:text-orange-700 flex-shrink-0">↩ Undo</button>}</p>;})}
+          <div className="flex gap-2">
+            <div className={'flex-1 rounded-lg p-2 text-center text-[10px] '+(insp.inspectorSignature?'bg-emerald-50 border border-emerald-300':'bg-gray-50 border border-gray-200')}><p className="text-lg">{insp.inspectorSignature?'✍️':'—'}</p><p className={insp.inspectorSignature?'text-emerald-700 font-bold':'text-gray-400'}>Inspector</p></div>
+            <div className={'flex-1 rounded-lg p-2 text-center text-[10px] '+((insp.verifierSignatureCleaning||insp.verifierSignatureGlass)?'bg-purple-50 border border-purple-300':'bg-gray-50 border border-gray-200')}><p className="text-lg">{(insp.verifierSignatureCleaning||insp.verifierSignatureGlass)?'✍️':'—'}</p><p className={(insp.verifierSignatureCleaning||insp.verifierSignatureGlass)?'text-purple-700 font-bold':'text-gray-400'}>Verifier</p></div>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <button onClick={()=>onView(insp)} className="px-2.5 py-1.5 bg-blue-500 text-white rounded-lg text-[10px] font-medium hover:bg-blue-600">📋 View</button>
+            {currentUser?.role!=='visitor'&&VERIFY_FORMS.filter(f=>f.has(insp)&&!insp['verifiedBy'+typeCapOf(f.type)]).map(f=><button key={f.type} onClick={()=>onVerify(insp,f.type)} className="px-2.5 py-1.5 bg-purple-500 text-white rounded-lg text-[10px] font-medium hover:bg-purple-600">⭐ Verify {f.short}</button>)}
+            {ncCount>0&&<button onClick={()=>onViewNC(insp)} className="px-2.5 py-1.5 bg-orange-500 text-white rounded-lg text-[10px] font-medium hover:bg-orange-600">🚨 NC</button>}
+            {photoCount>0&&<button onClick={()=>onPhotoGallery(insp)} className="px-2.5 py-1.5 bg-indigo-500 text-white rounded-lg text-[10px] font-medium hover:bg-indigo-600">📸</button>}
+            {currentUser?.role!=='visitor'&&<button onClick={()=>onDelete(insp)} className="px-2.5 py-1.5 bg-red-500 text-white rounded-lg text-[10px] font-medium hover:bg-red-600 ml-auto">🗑️</button>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+const StatsCard = memo(({label,value,icon,color})=>(<div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100"><div className="flex items-center justify-between"><div><p className="text-[10px] text-gray-500 mb-0.5">{label}</p><p className={`text-xl font-bold ${color||'text-gray-800'}`}>{value}</p></div><div className="text-xl opacity-50">{icon}</div></div></div>));
+
+// ── Personnel Hygiene Table (matches IR-PP-01.1 paper form exactly) ──
+const HygieneChecklistTable = memo(({ items, dateTime, inspectorNames, docNumber, onUpdate }) => {
+  const totals = [1,2,3,4,5].map(n=>items.filter(i=>i.status===n.toString()).length);
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">IMPACT RANK [M] SDN BHD</p>
+        <p className="font-bold text-[11px]">Personnel Hygiene and GMP Inspection Checklist</p>
+      </div>
+      <div className="grid grid-cols-3 gap-1 text-[9px] px-2 py-1.5 border-b-2 border-gray-800">
+        <p><span className="font-bold">Date:</span> {new Date(dateTime).toLocaleDateString('en-GB')}</p>
+        <p><span className="font-bold">Time:</span> {new Date(dateTime).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'})}</p>
+        <p className="truncate"><span className="font-bold">Checked by:</span> {inspectorNames}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[9px] min-w-[420px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th rowSpan={2} className="border border-gray-400 p-1 w-6">No</th>
+              <th rowSpan={2} className="border border-gray-400 p-1 text-left">Checklist</th>
+              <th colSpan={5} className="border border-gray-400 p-1">Rating</th>
+              <th rowSpan={2} className="border border-gray-400 p-1">Comment</th>
+            </tr>
+            <tr className="bg-gray-100">
+              {[1,2,3,4,5].map(n=><th key={n} className="border border-gray-400 p-1 w-5">{n}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item,idx)=>(
+              <tr key={item.id} className={!item.status?'bg-red-50':''}>
+                <td className="border border-gray-300 p-1 text-center">{idx+1}</td>
+                <td className="border border-gray-300 p-1 leading-tight">{item.itemText}</td>
+                {[1,2,3,4,5].map(n=>(
+                  <td key={n} onClick={()=>onUpdate(item.id,'status',n.toString())} className="border border-gray-300 p-1 text-center cursor-pointer select-none">
+                    <span className={'inline-flex items-center justify-center w-4 h-4 rounded-full '+(item.status===n.toString()?'ring-2 ring-emerald-600 bg-emerald-600 text-white font-bold':'text-gray-500 hover:bg-gray-100')}>{n}</span>
+                  </td>
+                ))}
+                <td className="border border-gray-300 p-0.5">
+                  <input value={item.remarks||''} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} className="w-full px-1 py-0.5 text-[9px] border-none focus:outline-none bg-transparent"/>
+                </td>
+              </tr>
+            ))}
+            <tr className="bg-gray-100 font-bold">
+              <td colSpan={2} className="border border-gray-400 p-1 text-right">Total</td>
+              {totals.map((t,i)=>(<td key={i} className="border border-gray-400 p-1 text-center">{t||''}</td>))}
+              <td className="border border-gray-400 p-1"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 leading-snug space-y-0.5 border-t border-gray-300">
+        <p>5 – Excellent, all personnel followed the requirements and rules</p>
+        <p>4 – Good, all personnel followed the requirements and rules except for less than 2 cases very minor non-compliances that can be corrected</p>
+        <p>3 – Average, 2 or more cases of non-compliances and requires re-briefing</p>
+        <p>2 – Below Average, generally not complying to company requirements and rules. Re-training is needed</p>
+        <p>1 – Unsatisfactory, Lack of compliance and willingness of co-operation from production personnel. Shall need to communicate issue to Top Management</p>
+      </div>
+      <div className="text-right text-[8px] text-gray-400 px-2 pb-1">{docNumber}</div>
+    </div>
+  );
+});
+
+const ITEMS_PER_PAGE = 10;
+
+const escapeHTML = (s='') => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const AREA_LABEL_FOR_PRINT = {
+  'extrusion': 'Production (Extrusion)',
+  'offline-printing': 'Production (Offline Printing)',
+  'mixing': 'Production (Mixing)',
+  'cutting-sealing': 'Production (Cutting & Sealing Area)',
+  'cleanroom': 'Cleanroom',
+  'changing-room': 'Changing Room',
+  'toilet': 'Toilet',
+  'surroundings': 'Surroundings',
+  'upper-store': 'Upper Store',
+  'lower-store': 'Lower Store Area',
+};
+
+// Glass/Metal register only applies to Extrusion, Mixing, and Cutting & Sealing —
+// Extrusion and Mixing share one department form ("Mixing & Extrusion"), matching the paper forms.
+const GLASS_DEPARTMENT_LABEL = {
+  'extrusion': 'Mixing & Extrusion',
+  'mixing': 'Mixing & Extrusion',
+  'cutting-sealing': 'Cutting [including enclosed room]',
+};
+
+// Buildings and Fabrication Inspection Record (IR-PP-14.1) — one facility-wide checklist,
+// not tied to a specific production area.
+const BUILDING_MASTER_ITEMS = [
+  'Ceiling – Check for cracks, paint flakes and holes',
+  'Ceiling – Check for lighting conditions, s.a. brightness, functionality, broken lights',
+  'Ceiling – Check for air conditioner conditions, s.a. dust, heavy dirt, leakages',
+  'Walls – Check for paint flakes, cracks and breakages',
+  'Walls – Check for windows and doors condition, s.a. functionality and physical conditions',
+  'Walls – Check for air conditioner conditions, s.a. dust, heavy dirt, leakages',
+  'Floors – Check for holes, breakage, leaks, floor paint conditions',
+];
+
+// Workplace Safety Inspection Report (OSHP-06.02 Issue 00, sheet "Laporan Pemeriksaan Tempat Kerja") —
+// one whole-factory checklist rated Baik / Kurang Baik / N/A (stored as OK / NG / NA), with Cadangan
+// as the remarks. BM text and numbering are as printed on the form (it skips iv under item 4 and i under
+// item 6); the English lines are translations added for the app.
+const SAFETY_TAG = '[OSHP-06.02]';
+const SAFETY_GROUPS = [
+  { bm: 'Pengurusan Keselamatan dan Kesihatan Pekerjaan', en: 'Occupational Safety and Health Management', topics: [
+    { no: '1', bm: 'Dasar/ Polisi Keselamatan dan Kesihatan Pekerjaan', en: 'Occupational Safety and Health Policy', items: [['', '', '']] },
+    { no: '2', bm: 'Manual Keselamatan dan Kesihatan Pekerjaan', en: 'Occupational Safety and Health Manual', items: [['', '', '']] },
+    { no: '3', bm: 'Pelan Tindakan Kecemasan', en: 'Emergency Response Plan', items: [['', '', '']] },
+    { no: '4', bm: 'Penggunaan Peralatan Perlindungan Diri (PPE)', en: 'Use of Personal Protective Equipment (PPE)', items: [
+      ['i', 'Disediakan dan sesuai', 'Provided and suitable'],
+      ['ii', 'Diselenggara', 'Maintained'],
+      ['iii', 'Sesuai dengan jenis kerja.', 'Suitable for the type of work.'],
+      ['v', 'Rekod Penggunaan', 'Usage records'],
+      ['vi', 'Latihan PPE', 'PPE training'],
+    ] },
+    { no: '5', bm: 'Tanda amaran/ Keselamatan', en: 'Warning / safety signs', items: [
+      ['i', 'Tanda amaran dipamer di lokasi yang mudah dilihat.', 'Warning signs are displayed where they are easy to see.'],
+      ['ii', 'Tanda amaran adalah mengikut maksud tujuan tanda itu disediakan.', 'Warning signs match the purpose they are provided for.'],
+    ] },
+  ] },
+  { bm: 'Keadaan Tidak Selamat', en: 'Unsafe Conditions', topics: [
+    { no: '1', bm: 'Lantai', en: 'Floors', items: [
+      ['i', 'Keadaan lantai kukuh', 'Floors are sound'],
+      ['ii', 'Semua lubang, takungan, pit, bekas tetap di lantai telah ditutup.', 'All holes, sumps, pits and fixed containers in the floor are covered.'],
+      ['iii', 'Lantai tidak licin dan bebas dari bahan yang boleh mengakibatkan jatuh', 'Floors are not slippery and are free of anything that could cause a fall'],
+      ['iv', 'Perbezaan ketinggian pada lantai telah ditanda dengan jelas', 'Changes in floor level are clearly marked'],
+    ] },
+    { no: '2', bm: 'Susun Atur Barang, Bahan dan Alatan', en: 'Arrangement of goods, materials and tools', items: [
+      ['i', 'Dalam keadaan baik dan stabil.', 'In good and stable condition.'],
+      ['ii', 'Peralatan atau jentera bagi melakukan kerja – kerja memikul, mengangkat atau menggerakkan beban berat disediakan.', 'Equipment or machinery for carrying, lifting or moving heavy loads is provided.'],
+      ['iii', 'Terdapat ruang laluan yang mencukupi jika berlaku kecemasan', 'There is enough passage space in an emergency'],
+    ] },
+    { no: '3', bm: 'Kualiti Udara Dalaman', en: 'Indoor air quality', items: [
+      ['i', 'Berada dalam keadaan kondusif', 'Conditions are comfortable'],
+      ['ii', 'Tiada pertumbuhan kulat atau bau hapak di persekitaran tempat kerja.', 'No mould growth or musty smell around the workplace.'],
+      ['iii', 'Pengudaraan mencukupi', 'Ventilation is adequate'],
+    ] },
+    { no: '4', bm: 'Kebisingan', en: 'Noise', items: [
+      ['i', 'Kadar kebisingan pada tahap yang baik dan tidak mengganggu pendengaran dan emosi', 'Noise is at an acceptable level and does not affect hearing or well-being'],
+    ] },
+    { no: '5', bm: 'Pencahayaan', en: 'Lighting', items: [
+      ['i', 'Kadar pencahayaan adalah mencukupi dan tidak mengganggu aktiviti kerja.', 'Lighting is adequate and does not hinder work.'],
+    ] },
+    { no: '6', bm: 'Hazad jentera', en: 'Machinery hazards', items: [
+      ['ii', 'Jentera dalam keadaan baik dan telah diselenggara.', 'Machinery is in good condition and maintained.'],
+      ['iii', 'Bahagian jentera berbahaya (tajam, bergerak, panas, menghentam dan menghimpit) telah dipagar.', 'Dangerous machine parts (sharp, moving, hot, striking and crushing) are guarded.'],
+      ['iv', 'Mesin Angkat, Mesin Tekanan dan Mesin Dandang memiliki sijil kelayakan yang masih sah dan dipamerkan pada jentera.', 'Lifting machines, pressure vessels and boilers have a valid certificate of fitness displayed on the machine.'],
+    ] },
+    { no: '7', bm: 'Hazad Elektrik', en: 'Electrical hazards', items: [
+      ['i', 'Alat elektrik dalam keadaan baik', 'Electrical equipment is in good condition'],
+      ['ii', 'Penyambungan elektrik berada dalam keadaan baik dan selamat.', 'Electrical connections are in good and safe condition.'],
+      ['iii', 'Tiada penyambungan haram dan terbuka', 'No illegal or exposed connections'],
+    ] },
+    { no: '8', bm: 'Hazard Kebakaran', en: 'Fire hazards', items: [
+      ['i', 'Alatan Pengesan Kebakaran dan Alatan Pencegahan Kebakaran disediakan dan diselenggara.', 'Fire detection and fire prevention equipment is provided and maintained.'],
+      ['ii', 'Pelan Laluan Kecemasan disediakan', 'An emergency route plan is provided'],
+      ['iii', 'Tanda “KELUAR” disediakan dan boleh dilihat dengan jelas sewaktu kecemasan.', '"EXIT" signs are provided and clearly visible in an emergency.'],
+      ['iv', 'Tempat Berkumpul Kecemasan disediakan dan di tanda.', 'An emergency assembly point is provided and marked.'],
+      ['v', 'Maklumat nombor telefon agensi (dalam dan luar) yang perlu dihubungi bila berlaku kecemasan dipamerkan.', 'Phone numbers of the internal and external agencies to call in an emergency are displayed.'],
+    ] },
+    { no: '9', bm: 'Hazard Kimia', en: 'Chemical hazards', items: [
+      ['i', 'Helaian Data Keselamatan (SDS) disediakan dan mudah dicapai di tempat kerja.', 'Safety Data Sheets (SDS) are provided and easy to reach at the workplace.'],
+      ['ii', 'Terdapat Tempat Simpanan khusus bagi Bahan Kimia Berbahaya dan Buangan Terjadual (BT) dan diletakkan tanda amaran (signage) yang berkaitan.', 'There is a dedicated store for hazardous chemicals and scheduled waste (SW), with the relevant warning signs.'],
+      ['iii', 'Kelengkapan kawalan kejuruteraan (Local Exhaust Ventilation (LEV)). -Diperiksa oleh PIC dan direkod dengan baik setiap bulan. -Rekod pengujian dan pemeriksaaan keberkesanan oleh Juruteknik Higien II setiap 12 bulan', 'Engineering controls (Local Exhaust Ventilation, LEV): checked by the PIC and recorded every month; effectiveness test and examination records by a Hygiene Technician II every 12 months'],
+      ['iv', 'Semua Bahan Kimia dan BT disimpan di dalam bekas dan mengikut kelas/kategori BT (Kod SW) yang bersesuaian berdasarkan garis panduan yang berkaitan.', 'All chemicals and SW are stored in containers by the correct SW class/category (SW code), following the relevant guidelines.'],
+      ['v', 'Semua bahan kimia dilabel dan/atau dilabel semula mengikut garis panduan yang disediakan.', 'All chemicals are labelled and/or relabelled following the guidelines provided.'],
+      ['vi', 'Semua bahan BT dilabel mengikut garis panduan yang disediakan.', 'All SW is labelled following the guidelines provided.'],
+      ['vii', 'Terdapat maklumat, arahan dan latihan kepada pengendali Bahan Kimia Berbahaya', 'Handlers of hazardous chemicals are given information, instructions and training'],
+    ] },
+    { no: '10', bm: 'Lain-Lain hazad', en: 'Other hazards', items: [
+      ['i', 'Hazad Ergonomik', 'Ergonomic hazards'],
+      ['ii', 'Hazad Psikososial (Buli, Gangguan Seksual)', 'Psychosocial hazards (bullying, sexual harassment)'],
+    ] },
+  ] },
+];
+// One checklist row per sub-item; a numbered topic with no sub-items is itself the row.
+const SAFETY_MASTER_ITEMS = SAFETY_GROUPS.flatMap(g => g.topics.flatMap(t => t.items.map(([sub, bm, en]) => ({
+  group: g.bm, groupEn: g.en, no: t.no, sub, topic: t.bm, topicEn: t.en, bm: bm || t.bm, en: en || t.en,
+}))));
+
+// ISO 14001:2015 Environmental Walkthrough Inspection Checklist — one whole-factory checklist rated
+// ✔ Comply / ✖ Non-Comply / N/A (stored as OK / NG / NA). Text as on the form; it has no document number.
+const ENV_TAG = '[ISO 14001]';
+const ENV_MASTER_ITEMS = [
+  ['Environmental Policy is displayed, communicated and understood at the work area.', 'Environmental Policy, Awareness Records'],
+  ['Significant environmental aspects and impacts for the area are identified and controlled.', 'Environmental Aspect & Impact Register'],
+  ['Scheduled waste is correctly segregated, labelled (SW code) and dated at point of generation.', 'Scheduled Waste Labelling – Third Schedule, EQ(SW) Regs 2005'],
+  ['Scheduled waste store is bunded, covered, secured, signposted and within the 180-day / 20,000 kg storage limit.', 'SW Store Inspection Checklist, Regulation 9 EQ(SW) Regs 2005'],
+  ['Scheduled waste inventory and e-Consignment Notes (eSWIS) are updated and reconciled.', 'SW Inventory Record, eSWIS / e-Consignment Note'],
+  ['Chemical containers are labelled and stored correctly, with SDS available and secondary containment provided.', 'Chemical Register, Safety Data Sheets (SDS)'],
+  ['Spill kits are available, complete, accessible and staff are aware of the spill response procedure.', 'Spill Response Procedure, Spill Kit Inspection Record'],
+  ['General, domestic and recyclable waste are segregated, stored and disposed of properly.', 'Solid Waste Disposal Record, Recycling Log'],
+  ['Effluent / wastewater discharge is controlled and monitored within permitted limits.', 'Effluent Monitoring Record, DOE Discharge Standard (if applicable)'],
+  ['Air emission / Local Exhaust Ventilation (LEV) is functioning and monitoring records are available.', 'LEV Monitoring Record, CHRA (if applicable)'],
+  ['Storm drains and surface water channels are clean and free from contamination or spillage.', 'Visual Inspection, Site Drainage Layout'],
+  ['Energy (electricity) and water consumption are monitored; no obvious wastage or leakage.', 'Energy & Water Consumption Monitoring Record'],
+  ['Noise levels at the work area are controlled and within permissible exposure limits.', 'Noise Monitoring / Exposure Report (if applicable)'],
+  ['Applicable environmental legal register, DOE licences and permits are current and complied with.', 'Environmental Legal & Other Requirements Register'],
+  ['Environmental emergency preparedness equipment is available and staff are aware of response procedures.', 'Emergency Preparedness & Response Plan, Drill Record'],
+  ['Personnel are trained and aware of their environmental responsibilities and operational controls.', 'Environmental Training & Awareness Record'],
+  ['Housekeeping controls prevent contamination of land, water and air throughout the area.', 'Visual Inspection'],
+  ['Overall compliance with ISO 14001 environmental operational controls is maintained.', 'Auditor Observation'],
+];
+
+// Which part of the system an item belongs to, from the tag in its section name.
+const SECTION_KINDS = [
+  { key: 'haccp', label: 'HACCP', icon: '🧹', caTitle: 'Corrective Action Requests (CAR)', caShort: 'CAR' },
+  { key: 'safety', label: 'Safety', icon: '🦺', caTitle: 'Corrective Safety Action Requests (CSAR, OSHP-06.03)', caShort: 'CSAR' },
+  { key: 'environment', label: 'Environmental', icon: '🌍', caTitle: 'Environmental Findings', caShort: 'Finding' },
+];
+const itemKind = (item) => item.section?.includes(SAFETY_TAG) ? 'safety' : item.section?.includes(ENV_TAG) ? 'environment' : 'haccp';
+const inspectionKinds = (insp) => [...new Set(Object.values(insp.areas || {}).flat().map(itemKind))];
+
+// Sign-off rules per form: inspector is name-only (no signature required) on every form.
+// Verifier is restricted by name, and is not required at all for IR-PP-01.1.
+const VERIFIER_RULES = {
+  cleaning: { title: 'Food Safety Team Leader (or above)', names: ['Admin','Verifier'] },
+  glass: { title: 'Production HoD', names: ['Verifier'] },
+  building: { title: 'Production HoD', names: ['Verifier'] },
+  // The form names a role, not a person, so any Verifier or Admin may review it (names: null).
+  safety: { title: 'Penyelaras Keselamatan / Pengerusi JKKP (Safety Coordinator / OSH Committee Chairman)', names: null },
+  environment: { title: 'Reviewed by', names: ['Admin'] },
+};
+const FORM_LABELS = { cleaning: 'IR-PP-02.1', glass: 'IR-PP-13.1', building: 'IR-PP-14.1', safety: 'OSHP-06.02', environment: 'ISO 14001' };
+const mayVerify = (rule, user) => !rule.names || rule.names.includes(user?.name);
+const allowedVerifiers = (rule) => rule.names ? rule.names.join(' / ') : 'any Verifier or Admin';
+
+const PRINT_HYGIENE_LEGEND = [
+  ['5','Excellent, all personnel followed the requirements and rules'],
+  ['4','Good, all personnel followed the requirements and rules except for less than 2 cases very minor non-compliances that can be corrected'],
+  ['3','Average, 2 or more cases of non-compliances and requires re-briefing'],
+  ['2','Below Average, generally not complying to company requirements and rules. Re-training is needed'],
+  ['1','Unsatisfactory, Lack of compliance and willingness of co-operation from production personnel. Shall need to communicate issue to Top Management'],
+];
+
+// Builds the exact paper-form HTML body (title, header fields, table, footer) for a given
+// reportType, reusing the same layout as the on-screen Cleaning/Hygiene/Glass tables so the
+// printed/exported document is identical to what was filled in, and identical to the source form.
+function buildFormHTML(insp, reportType, docDetails, editableChecklist) {
+  const inspectorNames = insp.inspectors?.join(', ')||insp.inspector;
+  const dateStr = new Date(insp.dateTime).toLocaleDateString('en-GB');
+  const timeStr = new Date(insp.dateTime).toTimeString().slice(0,5);
+  const checkedBy = insp.checkedBy || inspectorNames;
+
+  if (reportType === 'cleaning') {
+    let rows = '';
+    AREAS.forEach(area => {
+      const items = (insp.areas[area.id]||[]).filter(i => !i.section?.includes('[IR-PP-13.1]') && !i.section?.includes('[IR-PP-01.1]'));
+      if (!items.length) return;
+      const areaLabel = AREA_LABEL_FOR_PRINT[area.id] || area.name;
+      items.forEach((item, idx) => {
+        const cleanRemarksText = item.remarks?.trim() ? escapeHTML(item.remarks) : (item.status==='NG' ? '' : 'N/A');
+        rows += `<tr>${idx===0?`<td rowspan="${items.length}" style="font-weight:700;background:#f7f7f7;vertical-align:top">${escapeHTML(areaLabel)}</td>`:''}<td>${escapeHTML(item.itemText)}</td><td style="text-align:center;font-weight:600">${item.status||'-'}</td><td>${cleanRemarksText}</td></tr>`;
+      });
+    });
+    return `
+      <h2 style="margin:2px 0;text-align:center">Impact Rank [M] Sdn Bhd</h2>
+      <h3 style="margin:2px 0 10px;text-align:center">Cleaning and Sanitation Inspection Checksheet</h3>
+      <div style="display:flex;justify-content:space-between;font-size:9pt;margin-bottom:8px"><span><strong>Checked by:</strong> ${escapeHTML(checkedBy)}</span><span><strong>Date:</strong> ${dateStr}</span></div>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th style="border:1px solid #333;padding:4px;width:14%">Area</th><th style="border:1px solid #333;padding:4px;text-align:left">Sub-area</th><th style="border:1px solid #333;padding:4px;width:10%">Condition</th><th style="border:1px solid #333;padding:4px;width:22%;text-align:left">Remarks</th></tr></thead><tbody>${rows.replace(/<td/g,'<td style="border:1px solid #333;padding:4px"')}</tbody></table>
+      <p style="color:#b91c1c;font-weight:700;font-size:8pt;margin-top:10px">Report to Maintenance HoD IMMEDIATELY if any discrepancies are found in facilties</p>
+      <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:8pt"><span>Prepared by:<br/><strong>${escapeHTML(inspectorNames)}</strong><br/>Inspector</span><span style="text-align:right">Verified by:<br/>${insp.verifiedByCleaning?`${insp.verifierSignatureCleaning?`<img src="${insp.verifierSignatureCleaning}" alt="Verifier Signature" style="height:36px;display:block;margin:2px 0 2px auto">`:''}<strong>${escapeHTML(insp.verifiedByCleaning)}</strong>`:'_________________'}<br/>HACCP Team Leader</span></div>
+      <div style="text-align:right;font-size:8pt;color:#666;margin-top:8px">${docDetails.number} ${docDetails.rev}</div>
+    `;
+  }
+
+  if (reportType === 'hygiene') {
+    const masterList = editableChecklist?.['extrusion']?.['Personnel Hygiene [IR-PP-01.1]']||[];
+    const findItem = (text) => {
+      for (const area of AREAS) {
+        const found = (insp.areas[area.id]||[]).find(i => i.itemText===text && i.section?.includes('[IR-PP-01.1]'));
+        if (found) return found;
+      }
+      return null;
+    };
+    const totals = [0,0,0,0,0];
+    let rows = '';
+    masterList.forEach((text, idx) => {
+      const found = findItem(text);
+      const status = found?.status || '';
+      if (['1','2','3','4','5'].includes(status)) totals[Number(status)-1]++;
+      rows += `<tr><td style="text-align:center">${idx+1}</td><td>${escapeHTML(text)}</td>${[1,2,3,4,5].map(r=>`<td style="text-align:center">${status===String(r)?'✓':''}</td>`).join('')}<td>${escapeHTML(found?.remarks||'')}</td></tr>`;
+    });
+    const totalRow = `<tr style="font-weight:700;background:#f3f4f6"><td colspan="2" style="text-align:right">Total</td>${totals.map(t=>`<td style="text-align:center">${t||''}</td>`).join('')}<td></td></tr>`;
+    return `
+      <h2 style="margin:2px 0;text-align:center">IMPACT RANK [M] SDN BHD</h2>
+      <h3 style="margin:2px 0 10px;text-align:center">Personnel Hygiene and GMP Inspection Checklist</h3>
+      <div style="display:flex;justify-content:space-between;font-size:9pt;margin-bottom:8px"><span><strong>Date:</strong> ${dateStr}</span><span><strong>Time:</strong> ${timeStr}</span><span><strong>Checked by:</strong> ${escapeHTML(checkedBy)}</span></div>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th rowspan="2" style="border:1px solid #333;padding:4px;width:5%">No</th><th rowspan="2" style="border:1px solid #333;padding:4px;text-align:left">Checklist</th><th colspan="5" style="border:1px solid #333;padding:4px">Rating</th><th rowspan="2" style="border:1px solid #333;padding:4px;width:20%;text-align:left">Comment</th></tr><tr style="background:#f0f0f0">${[1,2,3,4,5].map(r=>`<th style="border:1px solid #333;padding:4px;width:4%">${r}</th>`).join('')}</tr></thead><tbody>${(rows+totalRow).replace(/<td/g,'<td style="border:1px solid #333;padding:4px"')}</tbody></table>
+      <div style="font-size:7.5pt;line-height:1.5;margin-top:10px">${PRINT_HYGIENE_LEGEND.map(([n,t])=>`<p style="margin:1px 0">${n} – ${t}</p>`).join('')}</div>
+      <div style="text-align:right;font-size:8pt;color:#666;margin-top:6px">${docDetails.number} ${docDetails.rev}</div>
+    `;
+  }
+
+  if (reportType === 'glass') {
+    const groups = [
+      { areas: ['extrusion','mixing'], label: GLASS_DEPARTMENT_LABEL['extrusion'] },
+      { areas: ['cutting-sealing'], label: GLASS_DEPARTMENT_LABEL['cutting-sealing'] },
+    ];
+    let blocks = '';
+    groups.forEach(group => {
+      const sourceAreaId = group.areas.find(id => (insp.areas[id]||[]).some(i=>i.section?.includes('[IR-PP-13.1]')));
+      if (!sourceAreaId) return;
+      const masterItems = (insp.areas[sourceAreaId]||[]).filter(i=>i.section?.includes('[IR-PP-13.1]'));
+      if (!masterItems.length) return;
+      let rows = '';
+      masterItems.forEach((baseItem, idx) => {
+        let merged = null;
+        group.areas.forEach(aid => {
+          const found = (insp.areas[aid]||[]).find(i => i.itemText===baseItem.itemText && i.section?.includes('[IR-PP-13.1]'));
+          if (found && (!merged || found.status==='NG')) merged = found;
+        });
+        const use = merged || baseItem;
+        const { name, condition } = parseGlassItemText(use.itemText);
+        const purpose = GLASS_PURPOSE_MAP[name]||'';
+        const conditionMark = use.status==='OK'?'✓':use.status==='NG'?'×':use.status==='NA'?'N/A':'';
+        const remarksText = use.remarks?.trim() ? escapeHTML(use.remarks) : (use.status==='NG' ? '' : 'N/A');
+        rows += `<tr><td style="text-align:center">${idx+1}</td><td>${escapeHTML(name)}</td><td>${escapeHTML(purpose)}</td><td>${escapeHTML(condition)}</td><td style="text-align:center;font-weight:600">${conditionMark}</td><td>${remarksText}</td></tr>`;
+      });
+      blocks += `
+        <div style="page-break-inside:avoid;margin-bottom:24px">
+          <h2 style="margin:2px 0;text-align:center">Impact Rank (M) Sdn Bhd</h2>
+          <h3 style="margin:2px 0 8px;text-align:center">Glass, Hard Plastic, Wood and Metal Register</h3>
+          <p style="font-size:9pt;margin:0 0 8px"><strong>Department:</strong> ${escapeHTML(group.label)}</p>
+          <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th style="border:1px solid #333;padding:4px;width:4%">No</th><th style="border:1px solid #333;padding:4px;width:16%;text-align:left">Item</th><th style="border:1px solid #333;padding:4px;width:18%;text-align:left">Purpose</th><th style="border:1px solid #333;padding:4px;width:20%;text-align:left">Target conditions</th><th style="border:1px solid #333;padding:4px;width:8%">✓ / ×</th><th style="border:1px solid #333;padding:4px;text-align:left">Remarks</th></tr></thead><tbody>${rows.replace(/<td/g,'<td style="border:1px solid #333;padding:4px"')}</tbody></table>
+          <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:8pt"><span>Prepared by:<br/><strong>${escapeHTML(inspectorNames)}</strong><br/>(Admin)</span><span>Verified by:<br/>${insp.verifiedByGlass?`<strong>${escapeHTML(insp.verifiedByGlass)}</strong>`:'_________________'}<br/>(Production HoD)</span></div>
+        </div>
+      `;
+    });
+    return blocks || '<p>No glass/metal items recorded for this inspection.</p>';
+  }
+
+  if (reportType === 'building') {
+    const items = (insp.areas['buildings-fabrication']||[]);
+    if (!items.length) return '<p>No Buildings and Fabrication items recorded for this inspection.</p>';
+    let rows = '';
+    items.forEach((item, idx) => {
+      const mark = item.status==='OK'?'✓':item.status==='NG'?'×':'';
+      const remarksText = item.remarks?.trim() ? escapeHTML(item.remarks) : (item.status==='NG' ? '' : 'N/A');
+      rows += `<tr><td style="text-align:center">${idx+1}</td><td>${escapeHTML(item.itemText)}</td><td style="text-align:center;font-weight:600">${mark}</td><td>${remarksText}</td></tr>`;
+    });
+    return `
+      <h2 style="margin:2px 0;text-align:center">Impact Rank (M) Sdn Bhd</h2>
+      <h3 style="margin:2px 0 8px;text-align:center">Buildings and Fabrication Inspection Record</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th style="border:1px solid #333;padding:4px;width:4%">No</th><th style="border:1px solid #333;padding:4px;text-align:left">Building and Fabrication Parts</th><th style="border:1px solid #333;padding:4px;width:8%">✓ / ×</th><th style="border:1px solid #333;padding:4px;width:26%;text-align:left">Further Actions<br/><span style="font-weight:400">[Filled by Production HOD]</span></th></tr></thead><tbody>${rows.replace(/<td/g,'<td style="border:1px solid #333;padding:4px"')}</tbody></table>
+      <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:8pt"><span>Inspected by:<br/><strong>${escapeHTML(inspectorNames)}</strong><br/>(Food Safety Team Member)</span><span>Verified and Accepted by:<br/>${insp.verifiedByBuilding?`${insp.verifierSignatureBuilding?`<img src="${insp.verifierSignatureBuilding}" alt="Verifier Signature" style="height:36px;display:block;margin:2px 0">`:''}<strong>${escapeHTML(insp.verifiedByBuilding)}</strong>`:'_________________'}<br/>(Production HoD)</span></div>
+      <div style="text-align:right;font-size:8pt;color:#666;margin-top:8px">${docDetails.number} ${docDetails.rev}</div>
+    `;
+  }
+
+  const cell = (html) => html.replace(/<td/g,'<td style="border:1px solid #333;padding:4px;vertical-align:top"');
+  const mark = (item, v) => item.status===v ? '✓' : '';
+  const remarkHTML = (item) => escapeHTML(item.remarks||'');
+  const verifierHTML = (type) => {
+    const by = insp['verifiedBy'+typeCapOf(type)], sig = insp['verifierSignature'+typeCapOf(type)];
+    return by ? `${sig?`<img src="${sig}" alt="Verifier Signature" style="height:36px;display:block;margin:2px 0">`:''}<strong>${escapeHTML(by)}</strong>` : '_________________';
+  };
+
+  if (reportType === 'safety') {
+    const items = insp.areas['safety']||[];
+    if (!items.length) return '<p>No safety items recorded for this inspection.</p>';
+    let rows = '', lastGroup = null, lastTopic = null;
+    items.forEach(item => {
+      if (item.group!==lastGroup) { lastGroup = item.group; lastTopic = null; rows += `<tr style="background:#f0fdf4"><td colspan="6"><strong>${escapeHTML(item.group)}</strong><br/><span style="color:#555">${escapeHTML(item.groupEn)}</span></td></tr>`; }
+      if (item.sub && item.no!==lastTopic) rows += `<tr><td style="text-align:center"><strong>${item.no}</strong></td><td colspan="5"><strong>${escapeHTML(item.topic)}</strong><br/><span style="color:#555">${escapeHTML(item.topicEn)}</span></td></tr>`;
+      lastTopic = item.no;
+      rows += `<tr><td style="text-align:center">${item.sub ? item.sub+'.' : `<strong>${item.no}</strong>`}</td><td>${escapeHTML(item.itemText)}<br/><span style="color:#555">${escapeHTML(item.itemTextEn)}</span></td><td style="text-align:center">${mark(item,'OK')}</td><td style="text-align:center">${mark(item,'NG')}</td><td style="text-align:center">${mark(item,'NA')}</td><td>${remarkHTML(item)}</td></tr>`;
+    });
+    return `
+      <h2 style="margin:2px 0;text-align:center">IMPACT RANK (M) SDN. BHD.</h2>
+      <h3 style="margin:2px 0;text-align:center">LAPORAN PEMERIKSAAN TEMPAT KERJA</h3>
+      <h3 style="margin:0 0 10px;text-align:center;color:#555">WORKPLACE SAFETY INSPECTION REPORT</h3>
+      <div style="display:flex;justify-content:space-between;font-size:9pt;margin-bottom:8px"><span><strong>Jabatan / Unit (Department):</strong> Seluruh kilang (Whole factory)</span><span><strong>Tarikh (Date):</strong> ${dateStr}</span></div>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th style="border:1px solid #333;padding:4px;width:5%">Bil</th><th style="border:1px solid #333;padding:4px;text-align:left">Perkara (Item)</th><th style="border:1px solid #333;padding:4px;width:7%">Baik</th><th style="border:1px solid #333;padding:4px;width:8%">Kurang Baik</th><th style="border:1px solid #333;padding:4px;width:6%">N/A</th><th style="border:1px solid #333;padding:4px;width:24%;text-align:left">Cadangan (Recommendation)</th></tr></thead><tbody>${cell(rows)}</tbody></table>
+      <p style="font-size:8pt;margin-top:10px"><strong>Perakuan Tidak Selamat</strong> (Unsafe findings): ${escapeHTML(insp.notes||'') || '—'}</p>
+      <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:8pt"><span>Pengesahan Pegawai Pemeriksa (Inspecting officer):<br/><strong>${escapeHTML(inspectorNames)}</strong><br/>Tarikh: ${dateStr}</span><span style="text-align:right">Disemak oleh Penyelaras Keselamatan / Pengerusi JKKP:<br/>${verifierHTML('safety')}${insp.verifiedAtSafety?`<br/>Tarikh: ${new Date(insp.verifiedAtSafety).toLocaleDateString('en-GB')}`:''}</span></div>
+      <div style="text-align:right;font-size:8pt;color:#666;margin-top:8px">Form ${docDetails.number} ${docDetails.rev}</div>
+    `;
+  }
+
+  if (reportType === 'environment') {
+    const items = insp.areas['environment']||[];
+    if (!items.length) return '<p>No environmental items recorded for this inspection.</p>';
+    const totals = ['OK','NG','NA'].map(v=>items.filter(i=>i.status===v).length);
+    const rows = items.map((item, idx) => `<tr><td style="text-align:center">${idx+1}</td><td>${escapeHTML(item.itemText)}</td><td>${escapeHTML(item.evidence||'')}</td><td style="text-align:center">${mark(item,'OK')}</td><td style="text-align:center">${mark(item,'NG')}</td><td style="text-align:center">${mark(item,'NA')}</td><td>${remarkHTML(item)}</td></tr>`).join('')
+      + `<tr style="font-weight:700;background:#f3f4f6"><td colspan="3" style="text-align:right">Total</td>${totals.map(t=>`<td style="text-align:center">${t||''}</td>`).join('')}<td></td></tr>`;
+    return `
+      <h2 style="margin:2px 0;text-align:center">IMPACT RANK (M) SDN. BHD.</h2>
+      <h3 style="margin:2px 0 10px;text-align:center">ISO 14001:2015 ENVIRONMENTAL WALKTHROUGH INSPECTION CHECKLIST</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:6px">${cell(`<tr><td><strong>Date</strong></td><td>${dateStr}</td><td><strong>Department / Area</strong></td><td>Whole factory</td></tr><tr><td><strong>Inspector</strong></td><td>${escapeHTML(inspectorNames)}</td><td><strong>Person In Charge</strong></td><td>${escapeHTML(insp.personInCharge||'')}</td></tr>`)}</table>
+      <p style="font-size:7.5pt;margin:0 0 6px">INSPECTION LEGEND: ✔ = Comply ✖ = Non-Comply N/A = Not Applicable. Record objective evidence in Remarks. Every ✖ must be raised in the Findings table.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:8pt"><thead><tr style="background:#f0f0f0"><th style="border:1px solid #333;padding:4px;width:5%">No.</th><th style="border:1px solid #333;padding:4px;text-align:left">Inspection Item</th><th style="border:1px solid #333;padding:4px;width:22%;text-align:left">Evidence / Form to Verify</th><th style="border:1px solid #333;padding:4px;width:5%">✔</th><th style="border:1px solid #333;padding:4px;width:5%">✖</th><th style="border:1px solid #333;padding:4px;width:6%">N/A</th><th style="border:1px solid #333;padding:4px;width:20%;text-align:left">Remarks</th></tr></thead><tbody>${cell(rows)}</tbody></table>
+      <p style="font-size:8pt;margin-top:10px"><strong>AUDITOR COMMENTS / GENERAL OBSERVATIONS:</strong> ${escapeHTML(insp.notes||'') || '—'}</p>
+      <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:8pt"><span>INSPECTED BY (AUDITOR):<br/><strong>${escapeHTML(inspectorNames)}</strong><br/>Date: ${dateStr}</span><span style="text-align:right">REVIEWED BY:<br/>${verifierHTML('environment')}${insp.verifiedAtEnvironment?`<br/>Date: ${new Date(insp.verifiedAtEnvironment).toLocaleDateString('en-GB')}`:''}</span></div>
+      <div style="text-align:right;font-size:8pt;color:#666;margin-top:8px">${docDetails.number} ${docDetails.rev}</div>
+    `;
+  }
+
+  return '';
+}
+
+// ── Glass, Hard Plastic, Wood & Metal Register (matches IR-PP-13.1 exactly) ──
+const GLASS_PURPOSE_MAP = {
+  'Glass Windows and walls': 'Part of building',
+  'Wall clocks with plastic covers': 'Time indication',
+  'Wooden pallets': 'To contain materials, WIP and finished goods',
+  'Wooden sticks': 'To hold materials, WIP and finished goods in position / To mix ink solutions / To flatten plastic surface',
+  'Fluorescent tubes': 'For lighting purposes',
+  'LED light tubes': 'For lighting purposes',
+  'Insectocutor/insect trap lightings': 'To capture flying insects',
+  'Metal blades condition': 'To cut sheets',
+  'Plastic mat [for cutting only]': 'To align cut sheets',
+  'Plastic containers and small pails [for extrusion and mixing only]': 'To scoop resin and masterbatches',
+  'Thickness gauge cover': 'To cover needle inside',
+};
+const parseGlassItemText = (text) => {
+  const idx = text.indexOf(' - ');
+  if (idx === -1) return { name: text, condition: '' };
+  return { name: text.slice(0, idx), condition: text.slice(idx + 3) };
+};
+
+const GlassChecklistTable = memo(({ items, departmentName, docNumber, inspectorNames, onUpdate, onPhoto, onRemovePhoto, submitErrors }) => {
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">Impact Rank (M) Sdn Bhd</p>
+        <p className="font-bold text-[11px]">Glass, Hard Plastic, Wood and Metal Register</p>
+      </div>
+      <div className="px-2 py-1.5 border-b-2 border-gray-800 text-[9px]">
+        <p><span className="font-bold">Department:</span> {departmentName}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[9px] min-w-[600px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-400 p-1 w-6">No</th>
+              <th className="border border-gray-400 p-1 text-left w-28">Item</th>
+              <th className="border border-gray-400 p-1 text-left w-28">Purpose</th>
+              <th className="border border-gray-400 p-1 text-left w-32">Target conditions</th>
+              <th className="border border-gray-400 p-1 w-14">✓ / ×</th>
+              <th className="border border-gray-400 p-1 text-left w-32">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item,idx)=>{
+              const {name,condition} = parseGlassItemText(item.itemText);
+              const purpose = GLASS_PURPOSE_MAP[name] || '';
+              const incomplete=!item.status;
+              const ngNoInfo=item.status==='NG'&&(!item.remarks.trim()||!item.photos?.length);
+              const hasError=submitErrors?.some(e=>e.itemId===item.id);
+              return (
+                <tr key={item.id} id={'item-'+item.id} className={incomplete?'bg-red-50':ngNoInfo?'bg-orange-50':hasError?'bg-red-50':''}>
+                  <td className="border border-gray-400 p-1 text-center">{idx+1}</td>
+                  <td className="border border-gray-400 p-1 leading-tight">{name}</td>
+                  <td className="border border-gray-400 p-1 leading-tight text-gray-600">{purpose}</td>
+                  <td className="border border-gray-400 p-1 leading-tight">{condition}</td>
+                  <td className="border border-gray-400 p-1">
+                    <div className="flex gap-1 justify-center">
+                      <button onClick={()=>onUpdate(item.id,'status','OK')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='OK'?'bg-green-500 text-white':'bg-gray-200')}>✓</button>
+                      <button onClick={()=>onUpdate(item.id,'status','NG')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='NG'?'bg-red-500 text-white':'bg-gray-200')}>×</button>
+                      <button onClick={()=>onUpdate(item.id,'status','NA')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='NA'?'bg-gray-500 text-white':'bg-gray-200')}>N/A</button>
+                    </div>
+                  </td>
+                  <td className="border border-gray-400 p-1">
+                    {item.status==='NG' ? (
+                      <div className="space-y-1">
+                        <textarea value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="Remarks *" className={'w-full p-1 border rounded text-[9px] '+(!item.remarks.trim()?'border-orange-400 bg-orange-50':'border-gray-300')} rows="1"/>
+                        <label className={'block cursor-pointer text-center py-1 rounded font-bold text-[9px] '+(!item.photos?.length?'bg-orange-500 text-white':'bg-blue-500 text-white')}>
+                          📷 {item.photos?.length?'Add ('+item.photos.length+')':'Photo *'}
+                          <input type="file" accept="image/*" multiple onChange={e=>onPhoto(item.id,e)} className="hidden"/>
+                        </label>
+                        {item.photos?.length>0 && (
+                          <div className="grid grid-cols-3 gap-0.5">
+                            {item.photos.map((ph,pi)=>(
+                              <div key={pi} className="relative border border-gray-300 rounded overflow-hidden">
+                                <img src={ph} alt="" className="w-full h-10 object-cover"/>
+                                <button onClick={()=>onRemovePhoto(item.id,pi)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[7px]">✕</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <input type="text" value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="N/A" className="w-full p-1 border border-gray-200 rounded text-[9px] text-gray-500 focus:outline-none focus:border-gray-400"/>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 border-t border-gray-300">
+        <div className="grid grid-cols-2 gap-4 pt-1">
+          <p>Prepared by:<br/><span className="font-bold text-gray-700">{inspectorNames||'_________________'}</span><br/><span className="text-gray-500">(Admin)</span></p>
+          <p>Verified by:<br/>_________________<br/><span className="text-gray-500">(Production HoD)</span></p>
+        </div>
+        <p className="text-right text-gray-400 mt-2">{docNumber}</p>
+      </div>
+    </div>
+  );
+});
+
+// ── Buildings and Fabrication Inspection Record (matches IR-PP-14.1 exactly) ──
+const BuildingChecklistTable = memo(({ items, inspectorNames, verifiedByBuilding, verifierSignatureBuilding, docNumber, onUpdate, onPhoto, onRemovePhoto, submitErrors }) => {
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">Impact Rank (M) Sdn Bhd</p>
+        <p className="font-bold text-[11px]">Buildings and Fabrication Inspection Record</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[9px] min-w-[520px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-400 p-1 w-6">No</th>
+              <th className="border border-gray-400 p-1 text-left">Building and Fabrication Parts</th>
+              <th className="border border-gray-400 p-1 w-14">✓ / ×</th>
+              <th className="border border-gray-400 p-1 text-left w-40">Further Actions<br/><span className="font-normal text-gray-500">[Filled by Production HOD]</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item,idx)=>{
+              const incomplete=!item.status;
+              const ngNoInfo=item.status==='NG'&&(!item.remarks.trim()||!item.photos?.length);
+              const hasError=submitErrors?.some(e=>e.itemId===item.id);
+              return (
+                <tr key={item.id} id={'item-'+item.id} className={incomplete?'bg-red-50':ngNoInfo?'bg-orange-50':hasError?'bg-red-50':''}>
+                  <td className="border border-gray-400 p-1 text-center">{idx+1}</td>
+                  <td className="border border-gray-400 p-1 leading-tight">{item.itemText}</td>
+                  <td className="border border-gray-400 p-1">
+                    <div className="flex gap-1 justify-center">
+                      <button onClick={()=>onUpdate(item.id,'status','OK')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='OK'?'bg-green-500 text-white':'bg-gray-200')}>✓</button>
+                      <button onClick={()=>onUpdate(item.id,'status','NG')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='NG'?'bg-red-500 text-white':'bg-gray-200')}>×</button>
+                    </div>
+                  </td>
+                  <td className="border border-gray-400 p-1">
+                    {item.status==='NG' ? (
+                      <div className="space-y-1">
+                        <textarea value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="Action required *" className={'w-full p-1 border rounded text-[9px] '+(!item.remarks.trim()?'border-orange-400 bg-orange-50':'border-gray-300')} rows="1"/>
+                        <label className={'block cursor-pointer text-center py-1 rounded font-bold text-[9px] '+(!item.photos?.length?'bg-orange-500 text-white':'bg-blue-500 text-white')}>
+                          📷 {item.photos?.length?'Add ('+item.photos.length+')':'Photo *'}
+                          <input type="file" accept="image/*" multiple onChange={e=>onPhoto(item.id,e)} className="hidden"/>
+                        </label>
+                        {item.photos?.length>0 && (
+                          <div className="grid grid-cols-3 gap-0.5">
+                            {item.photos.map((ph,pi)=>(
+                              <div key={pi} className="relative border border-gray-300 rounded overflow-hidden">
+                                <img src={ph} alt="" className="w-full h-10 object-cover"/>
+                                <button onClick={()=>onRemovePhoto(item.id,pi)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[7px]">✕</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <input type="text" value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="N/A" className="w-full p-1 border border-gray-200 rounded text-[9px] text-gray-500 focus:outline-none focus:border-gray-400"/>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 border-t border-gray-300">
+        <div className="grid grid-cols-2 gap-4 pt-1">
+          <p>Inspected by:<br/><span className="font-bold text-gray-700">{inspectorNames||'_________________'}</span><br/><span className="text-gray-500">(Food Safety Team Member)</span></p>
+          <p>Verified and Accepted by:<br/>{verifiedByBuilding?(<>{verifierSignatureBuilding&&<img src={verifierSignatureBuilding} alt="Verifier Signature" className="h-9 my-0.5"/>}<span className="font-bold text-gray-700">{verifiedByBuilding}</span></>):'_________________'}<br/><span className="text-gray-500">(Production HoD)</span></p>
+        </div>
+        <p className="text-right text-gray-400 mt-2">{docNumber}</p>
+      </div>
+    </div>
+  );
+});
+
+// Remarks cell shared by the Safety and Environmental tables: a failed item needs a remark and a photo.
+const NgRemarksCell = memo(({ item, placeholder, onUpdate, onPhoto, onRemovePhoto }) => item.status==='NG' ? (
+  <div className="space-y-1">
+    <textarea value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder={placeholder+' *'} className={'w-full p-1 border rounded text-[9px] '+(!item.remarks.trim()?'border-orange-400 bg-orange-50':'border-gray-300')} rows="2"/>
+    <label className={'block cursor-pointer text-center py-1 rounded font-bold text-[9px] '+(!item.photos?.length?'bg-orange-500 text-white':'bg-blue-500 text-white')}>
+      📷 {item.photos?.length?'Add ('+item.photos.length+')':'Photo *'}
+      <input type="file" accept="image/*" multiple onChange={e=>onPhoto(item.id,e)} className="hidden"/>
+    </label>
+    {item.photos?.length>0 && (
+      <div className="grid grid-cols-3 gap-0.5">
+        {item.photos.map((ph,pi)=>(
+          <div key={pi} className="relative border border-gray-300 rounded overflow-hidden">
+            <img src={ph} alt="" className="w-full h-10 object-cover"/>
+            <button onClick={()=>onRemovePhoto(item.id,pi)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[7px]">✕</button>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+) : (
+  <input type="text" value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder={placeholder} className="w-full p-1 border border-gray-200 rounded text-[9px] text-gray-600 focus:outline-none focus:border-gray-400"/>
+));
+
+// Status buttons for one row: labels are the form's own words, stored as OK / NG / NA.
+const RatingCells = ({ item, labels, onUpdate }) => [['OK','bg-green-500'],['NG','bg-red-500'],['NA','bg-gray-500']].map(([v,on],i)=>(
+  <td key={v} className="border border-gray-400 p-1 text-center">
+    <button onClick={()=>onUpdate(item.id,'status',v)} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status===v?on+' text-white':'bg-gray-200')}>{labels[i]}</button>
+  </td>
+));
+
+const rowClass = (item, submitErrors) => !item.status ? 'bg-red-50'
+  : item.status==='NG'&&(!item.remarks.trim()||!item.photos?.length) ? 'bg-orange-50'
+  : submitErrors?.some(e=>e.itemId===item.id) ? 'bg-red-50' : '';
+
+// ── Workplace Safety Inspection Report (matches OSHP-06.02, "Laporan Pemeriksaan Tempat Kerja") ──
+const SafetyChecklistTable = memo(({ items, notes, onNotes, inspectorNames, dateTime, verifiedBy, docNumber, onUpdate, onPhoto, onRemovePhoto, submitErrors }) => {
+  let lastGroup = null, lastTopic = null;
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">IMPACT RANK (M) SDN. BHD.</p>
+        <p className="font-bold text-[11px]">LAPORAN PEMERIKSAAN TEMPAT KERJA</p>
+        <p className="font-bold text-[10px] text-gray-600">WORKPLACE SAFETY INSPECTION REPORT</p>
+      </div>
+      <div className="grid grid-cols-2 gap-1 text-[9px] px-2 py-1.5 border-b-2 border-gray-800">
+        <p><span className="font-bold">Jabatan / Unit (Department):</span> Seluruh kilang (Whole factory)</p>
+        <p className="text-right"><span className="font-bold">Tarikh (Date):</span> {new Date(dateTime).toLocaleDateString('en-GB')}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[9px] min-w-[620px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-400 p-1 w-8">Bil</th>
+              <th className="border border-gray-400 p-1 text-left">Perkara <span className="font-normal text-gray-500">(Item)</span></th>
+              <th className="border border-gray-400 p-1 w-12">Baik</th>
+              <th className="border border-gray-400 p-1 w-14">Kurang Baik</th>
+              <th className="border border-gray-400 p-1 w-10">N/A</th>
+              <th className="border border-gray-400 p-1 text-left w-40">Cadangan <span className="font-normal text-gray-500">(Recommendation)</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.flatMap(item=>{
+              const rows = [];
+              if (item.group!==lastGroup) {
+                lastGroup = item.group; lastTopic = null;
+                rows.push(<tr key={'g-'+item.id} className="bg-emerald-50"><td colSpan={6} className="border border-gray-400 p-1 font-bold">{item.group}<span className="block font-normal text-gray-500">{item.groupEn}</span></td></tr>);
+              }
+              const topicRow = !item.sub;
+              if (!topicRow && item.no!==lastTopic) {
+                rows.push(<tr key={'t-'+item.id}><td className="border border-gray-400 p-1 text-center font-bold">{item.no}</td><td colSpan={5} className="border border-gray-400 p-1 font-bold">{item.topic}<span className="block font-normal text-gray-500">{item.topicEn}</span></td></tr>);
+              }
+              lastTopic = item.no;
+              rows.push(
+                <tr key={item.id} id={'item-'+item.id} className={rowClass(item, submitErrors)}>
+                  <td className="border border-gray-400 p-1 text-center">{topicRow ? <span className="font-bold">{item.no}</span> : item.sub+'.'}</td>
+                  <td className="border border-gray-400 p-1 leading-tight">{item.itemText}<span className="block text-gray-500">{item.itemTextEn}</span></td>
+                  <RatingCells item={item} labels={['Baik','Kurang','N/A']} onUpdate={onUpdate}/>
+                  <td className="border border-gray-400 p-1"><NgRemarksCell item={item} placeholder="Cadangan" onUpdate={onUpdate} onPhoto={onPhoto} onRemovePhoto={onRemovePhoto}/></td>
+                </tr>
+              );
+              return rows;
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[9px] border-t border-gray-300 space-y-1">
+        <p className="font-bold">Perakuan Tidak Selamat <span className="font-normal text-gray-500">(Unsafe findings: state any unsafe findings, if any)</span></p>
+        <textarea value={notes||''} onChange={e=>onNotes(e.target.value)} rows="2" className="w-full p-1 border border-gray-300 rounded text-[9px]"/>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 border-t border-gray-300">
+        <div className="grid grid-cols-2 gap-4 pt-1">
+          <p>Pengesahan Pegawai Pemeriksa<br/><span className="text-gray-500">(Inspecting officer)</span><br/><span className="font-bold text-gray-700">{inspectorNames||'_________________'}</span></p>
+          <p>Disemak oleh Penyelaras Keselamatan / Pengerusi JKKP<br/><span className="text-gray-500">(Reviewed by Safety Coordinator / OSH Committee Chairman)</span><br/><span className="font-bold text-gray-700">{verifiedBy||'_________________'}</span></p>
+        </div>
+        <p className="text-right text-gray-400 mt-2">{docNumber}</p>
+      </div>
+    </div>
+  );
+});
+
+// ── ISO 14001:2015 Environmental Walkthrough Inspection Checklist (matches the form) ──
+const EnvironmentChecklistTable = memo(({ items, notes, onNotes, personInCharge, onPersonInCharge, inspectorNames, dateTime, verifiedBy, docNumber, onUpdate, onPhoto, onRemovePhoto, submitErrors }) => {
+  const totals = ['OK','NG','NA'].map(v=>items.filter(i=>i.status===v).length);
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">IMPACT RANK (M) SDN. BHD.</p>
+        <p className="font-bold text-[11px]">ISO 14001:2015 ENVIRONMENTAL WALKTHROUGH INSPECTION CHECKLIST</p>
+      </div>
+      <div className="grid grid-cols-2 gap-1 text-[9px] px-2 py-1.5 border-b-2 border-gray-800">
+        <p><span className="font-bold">Date:</span> {new Date(dateTime).toLocaleDateString('en-GB')}</p>
+        <p><span className="font-bold">Department / Area:</span> Whole factory</p>
+        <p className="truncate"><span className="font-bold">Inspector:</span> {inspectorNames}</p>
+        <label className="flex items-center gap-1"><span className="font-bold whitespace-nowrap">Person In Charge:</span><input value={personInCharge||''} onChange={e=>onPersonInCharge(e.target.value)} className="flex-1 min-w-0 px-1 py-0.5 border border-gray-300 rounded text-[9px]"/></label>
+      </div>
+      <p className="px-2 py-1 text-[8px] text-gray-600 border-b border-gray-300">INSPECTION LEGEND: ✔ = Comply ✖ = Non-Comply N/A = Not Applicable. Record objective evidence in Remarks. Every ✖ must be raised in the Findings table.</p>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[9px] min-w-[680px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-400 p-1 w-7">No.</th>
+              <th className="border border-gray-400 p-1 text-left">Inspection Item</th>
+              <th className="border border-gray-400 p-1 text-left w-36">Evidence / Form to Verify</th>
+              <th className="border border-gray-400 p-1 w-8">✔</th>
+              <th className="border border-gray-400 p-1 w-8">✖</th>
+              <th className="border border-gray-400 p-1 w-10">N/A</th>
+              <th className="border border-gray-400 p-1 text-left w-36">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item,idx)=>(
+              <tr key={item.id} id={'item-'+item.id} className={rowClass(item, submitErrors)}>
+                <td className="border border-gray-400 p-1 text-center">{idx+1}</td>
+                <td className="border border-gray-400 p-1 leading-tight">{item.itemText}</td>
+                <td className="border border-gray-400 p-1 leading-tight text-gray-600">{item.evidence}</td>
+                <RatingCells item={item} labels={['✔','✖','N/A']} onUpdate={onUpdate}/>
+                <td className="border border-gray-400 p-1"><NgRemarksCell item={item} placeholder="Remarks" onUpdate={onUpdate} onPhoto={onPhoto} onRemovePhoto={onRemovePhoto}/></td>
+              </tr>
+            ))}
+            <tr className="bg-gray-100 font-bold">
+              <td colSpan={3} className="border border-gray-400 p-1 text-right">Total</td>
+              {totals.map((t,i)=><td key={i} className="border border-gray-400 p-1 text-center">{t||''}</td>)}
+              <td className="border border-gray-400 p-1"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[9px] border-t border-gray-300 space-y-1">
+        <p className="font-bold">AUDITOR COMMENTS / GENERAL OBSERVATIONS</p>
+        <textarea value={notes||''} onChange={e=>onNotes(e.target.value)} rows="2" className="w-full p-1 border border-gray-300 rounded text-[9px]"/>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 border-t border-gray-300">
+        <div className="grid grid-cols-2 gap-4 pt-1">
+          <p>INSPECTED BY (AUDITOR)<br/><span className="font-bold text-gray-700">{inspectorNames||'_________________'}</span></p>
+          <p>REVIEWED BY<br/><span className="font-bold text-gray-700">{verifiedBy||'_________________'}</span></p>
+        </div>
+        <p className="text-right text-gray-400 mt-2">{docNumber}</p>
+      </div>
+    </div>
+  );
+});
+
+// ── Cleaning & Sanitation Table (matches IR-PP-02.1 paper form exactly) ──
+const CleaningChecklistTable = memo(({ items, areaName, dateTime, inspectorNames, docNumber, onUpdate, onPhoto, onRemovePhoto, submitErrors }) => {
+  return (
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white mb-2">
+      <div className="text-center py-2 border-b-2 border-gray-800">
+        <p className="font-bold text-xs">Impact Rank [M] Sdn Bhd</p>
+        <p className="font-bold text-[11px]">Cleaning and Sanitation Inspection Checksheet</p>
+      </div>
+      <div className="grid grid-cols-2 gap-1 text-[9px] px-2 py-1.5 border-b-2 border-gray-800">
+        <p className="truncate"><span className="font-bold">Checked by:</span> {inspectorNames}</p>
+        <p><span className="font-bold">Date:</span> {new Date(dateTime).toLocaleDateString('en-GB')}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[10px] min-w-[480px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-400 p-1 text-left w-16">Area</th>
+              <th className="border border-gray-400 p-1 text-left">Sub-area</th>
+              <th className="border border-gray-400 p-1 w-24">Condition</th>
+              <th className="border border-gray-400 p-1 text-left w-36">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item,idx)=>{
+              const incomplete=!item.status;
+              const ngNoInfo=item.status==='NG'&&(!item.remarks.trim()||!item.photos?.length);
+              const hasError=submitErrors?.some(e=>e.itemId===item.id);
+              return (
+                <tr key={item.id} id={'item-'+item.id} className={incomplete?'bg-red-50':ngNoInfo?'bg-orange-50':hasError?'bg-red-50':''}>
+                  {idx===0 && <td rowSpan={items.length} className="border border-gray-400 p-1 align-top font-bold bg-gray-50 text-[9px]">{areaName}</td>}
+                  <td className="border border-gray-400 p-1 leading-tight">{item.itemText}</td>
+                  <td className="border border-gray-400 p-1">
+                    <div className="flex gap-1 justify-center">
+                      <button onClick={()=>onUpdate(item.id,'status','OK')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='OK'?'bg-green-500 text-white':'bg-gray-200')}>OK</button>
+                      <button onClick={()=>onUpdate(item.id,'status','NG')} className={'px-1.5 py-0.5 rounded text-[9px] font-bold '+(item.status==='NG'?'bg-red-500 text-white':'bg-gray-200')}>NG</button>
+                    </div>
+                  </td>
+                  <td className="border border-gray-400 p-1">
+                    {item.status==='NG' ? (
+                      <div className="space-y-1">
+                        <textarea value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="Remarks *" className={'w-full p-1 border rounded text-[9px] '+(!item.remarks.trim()?'border-orange-400 bg-orange-50':'border-gray-300')} rows="1"/>
+                        <label className={'block cursor-pointer text-center py-1 rounded font-bold text-[9px] '+(!item.photos?.length?'bg-orange-500 text-white':'bg-blue-500 text-white')}>
+                          📷 {item.photos?.length?'Add ('+item.photos.length+')':'Photo *'}
+                          <input type="file" accept="image/*" multiple onChange={e=>onPhoto(item.id,e)} className="hidden"/>
+                        </label>
+                        {item.photos?.length>0 && (
+                          <div className="grid grid-cols-3 gap-0.5">
+                            {item.photos.map((ph,pi)=>(
+                              <div key={pi} className="relative border border-gray-300 rounded overflow-hidden">
+                                <img src={ph} alt="" className="w-full h-10 object-cover"/>
+                                <button onClick={()=>onRemovePhoto(item.id,pi)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[7px]">✕</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <input type="text" value={item.remarks} onChange={e=>onUpdate(item.id,'remarks',e.target.value)} placeholder="N/A" className="w-full p-1 border border-gray-200 rounded text-[9px] text-gray-500 focus:outline-none focus:border-gray-400"/>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-2 text-[8px] text-gray-600 leading-snug border-t border-gray-300 space-y-1.5">
+        <p className="font-semibold text-red-700">Report to Maintenance HoD IMMEDIATELY if any discrepancies are found in facilties</p>
+        <div className="flex justify-between items-end pt-1">
+          <p>Prepared by:<br/><span className="font-bold text-gray-700">{inspectorNames||'_________________'}</span><br/><span className="text-gray-500">Inspector</span></p>
+          <p className="text-right">Verified by:<br/>_________________<br/><span className="text-gray-500">HACCP Team Leader</span></p>
+        </div>
+        <p className="text-right text-gray-400">{docNumber}</p>
+      </div>
+    </div>
+  );
+});
+
+const parseUploadedHTML = (htmlText) => {
+  try {
+    const parser=new DOMParser(); const doc=parser.parseFromString(htmlText,'text/html');
+    const bodyText=doc.body?.innerText||'';
+    const inspectorMatch=bodyText.match(/Inspector[:\s]+([^\n|]+)/i);
+    const dateMatch=bodyText.match(/(?:Inspection )?Date[:\s]+([^\n|]+)/i);
+    const statusMatch=bodyText.match(/Status[:\s]+(OK|NG)/i);
+    const inspectorRaw=inspectorMatch?inspectorMatch[1].trim():'Unknown';
+    const inspectors=inspectorRaw.split(/[,&]/).map(s=>s.trim()).filter(Boolean);
+    let dateTime=new Date().toISOString();
+    if(dateMatch){const parsed=new Date(dateMatch[1].trim());if(!isNaN(parsed)) dateTime=parsed.toISOString();}
+    const overallStatus=statusMatch?statusMatch[1].trim():'OK';
+    const areas={}; AREAS.forEach(area=>{areas[area.id]=[];});
+    let currentAreaId=null,itemIdx=0;
+    Array.from(doc.body.querySelectorAll('*')).forEach(el=>{
+      const text=(el.innerText||el.textContent||'').trim();
+      const matchedArea=AREAS.find(a=>text.toLowerCase().includes(a.name.toLowerCase())&&text.length<60);
+      if(matchedArea){currentAreaId=matchedArea.id;return;}
+      if(el.tagName==='TR'&&currentAreaId){
+        const cells=Array.from(el.querySelectorAll('td,th'));
+        if(cells.length>=2){
+          const itemText=(cells[0]?.innerText||cells[0]?.textContent||'').trim();
+          const statusRaw=(cells[1]?.innerText||cells[1]?.textContent||'').trim().toUpperCase();
+          const remarks=cells[2]?(cells[2]?.innerText||cells[2]?.textContent||'').trim():'';
+          if(itemText&&itemText.length>3&&!itemText.toLowerCase().includes('item')&&!itemText.toLowerCase().includes('status')){
+            const status=statusRaw==='OK'?'OK':statusRaw==='NG'?'NG':statusRaw.match(/^[1-5]$/)?statusRaw:'OK';
+            areas[currentAreaId].push({id:currentAreaId+'-'+itemIdx++,area:currentAreaId,areaName:AREAS.find(a=>a.id===currentAreaId)?.name||currentAreaId,section:'Imported',itemText,status,remarks:remarks==='-'?'':remarks,photos:[]});
+          }
+        }
+      }
+    });
+    AREAS.forEach(area=>{if(areas[area.id].length===0) areas[area.id].push({id:area.id+'-0',area:area.id,areaName:area.name,section:'Imported',itemText:'(Imported)',status:'OK',remarks:'',photos:[]});});
+    return {id:'import_'+Date.now(),dateTime,inspector:inspectors[0]||'Unknown',inspectors,areas,notes:'Imported',overallStatus,status:'pending_verification',submittedAt:new Date().toISOString(),importedFrom:'HTML',importedAt:new Date().toISOString()};
+  } catch(err){return null;}
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  MAIN APP
+// ═══════════════════════════════════════════════════════════════════
+export default function ImpactRankApp() {
+  // ── Auth state ──
+  const [users, setUsers] = useState(DEFAULT_USERS);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  // Admin sub-views: 'list' | 'change_pw' | 'new_user' | 'edit_user'
+  const [adminView, setAdminView] = useState('list');
+  const [adminTarget, setAdminTarget] = useState(null); // user being edited
+  const [adminForm, setAdminForm] = useState({});
+  const [adminMsg, setAdminMsg] = useState('');
+
+  // ── App state ──
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [activeAreaTab, setActiveAreaTab] = useState('extrusion');
+  const [inspections, setInspections] = useState([]);
+  const [currentInspection, setCurrentInspection] = useState(null);
+  const [viewingReport, setViewingReport] = useState(null);
+  const [viewingNCReport, setViewingNCReport] = useState(null);
+  const [schedules, setSchedules] = useState([]);
+  const [drafts, setDrafts] = useState([]);
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date().toISOString().slice(0,7));
+  const [correctiveActions, setCorrectiveActions] = useState([]);
+  const [showCAForm, setShowCAForm] = useState(null);
+  const [caKind, setCaKind] = useState('haccp'); // which corrective list is shown: haccp | safety | environment
+  const [lastAutoSave, setLastAutoSave] = useState(null);
+  const [showPhotoGallery, setShowPhotoGallery] = useState(null);
+  const [deleteConfirmPopup, setDeleteConfirmPopup] = useState(null);
+  const [deactivateConfirmPopup, setDeactivateConfirmPopup] = useState(null);
+  const [unverifyConfirmPopup, setUnverifyConfirmPopup] = useState(null);
+  const [verifyPopup, setVerifyPopup] = useState(null);
+  const [verifySignature, setVerifySignature] = useState(null);
+  const [lastGlobalSync, setLastGlobalSync] = useState(null);
+  const [signatureModal, setSignatureModal] = useState(null);
+  const [dashPage, setDashPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterMonth, setFilterMonth] = useState('');
+  const [searchInspector, setSearchInspector] = useState('');
+  const [htmlImportResult, setHtmlImportResult] = useState(null);
+  const [htmlImportError, setHtmlImportError] = useState('');
+  const [htmlImportPhotos, setHtmlImportPhotos] = useState({});
+  const [showFormEditor, setShowFormEditor] = useState(false);
+  const [editableDocDetails, setEditableDocDetails] = useState({
+    cleaning: { number: 'IR-PP-02.1', rev: 'Rev 05', title: 'Cleaning and Sanitation Inspection Checksheet' },
+    glass:    { number: 'IR-PP-13.1', rev: 'Rev 02', title: 'Glass, Hard Plastic, Wood and Metal Register' },
+    hygiene:  { number: 'IR-PP-01.1', rev: 'Rev 01', title: 'Personnel Hygiene and GMP Inspection Checklist' },
+    building: { number: 'IR-PP-14.1', rev: 'Rev 00', title: 'Buildings and Fabrication Inspection Record' },
+    safety:   { number: 'OSHP-06.02', rev: 'Issue 00', title: 'Workplace Safety Inspection Report' },
+    // The walkthrough checklist carries no document number; set one on the Form screen if it gets one.
+    environment: { number: 'ISO 14001 Walkthrough', rev: '', title: 'ISO 14001:2015 Environmental Walkthrough Inspection Checklist' },
+  });
+  const [editableChecklist, setEditableChecklist] = useState(()=>JSON.parse(JSON.stringify(CHECKLIST_ITEMS)));
+  const [editorArea, setEditorArea] = useState('extrusion');
+  const [editorSection, setEditorSection] = useState(null);
+  const [submitErrors, setSubmitErrors] = useState([]);
+  const [showSubmitErrorPanel, setShowSubmitErrorPanel] = useState(false);
+
+  // ── Load users from storage ──
+  useEffect(()=>{
+    const load=async()=>{
+      try{
+        const r=await window.storage.get('app-users',true).catch(()=>null);
+        if(r?.value){
+          const stored=JSON.parse(r.value);
+          // Merge: keep stored, add any DEFAULT_USERS not present
+          const merged=[...stored];
+          DEFAULT_USERS.forEach(du=>{ if(!merged.find(u=>u.id===du.id)) merged.push(du); });
+          setUsers(merged);
+        } else {
+          await window.storage.set('app-users',JSON.stringify(DEFAULT_USERS),true);
+        }
+      }catch{}
+    };
+    load();
+  },[]);
+
+  // ── Load inspection data ──
+  useEffect(()=>{
+    const load=async()=>{
+      try{const [ir,sr,dr,cr]=await Promise.all([window.storage.get('inspections-data',true).catch(()=>null),window.storage.get('inspection-schedules',true).catch(()=>null),window.storage.get('inspection-drafts',true).catch(()=>null),window.storage.get('corrective-actions',true).catch(()=>null)]);if(ir?.value) setInspections(JSON.parse(ir.value));if(sr?.value) setSchedules(JSON.parse(sr.value));if(dr?.value) setDrafts(JSON.parse(dr.value));if(cr?.value) setCorrectiveActions(JSON.parse(cr.value));setLastGlobalSync(new Date());}catch{}
+      try{const r=await window.storage.get('active-inspection',false);if(r?.value){const active=JSON.parse(r.value);const age=(Date.now()-new Date(active.savedAt).getTime())/3600000;if(age<24){setCurrentInspection(active.inspection);setActiveAreaTab(active.activeTab||'extrusion');}else await window.storage.delete('active-inspection',false);}}catch{}
+    };
+    load();
+  },[]);
+
+  useEffect(()=>{
+    if(!currentInspection) return;
+    const save=async()=>{try{await window.storage.set('active-inspection',JSON.stringify({inspection:currentInspection,activeTab:activeAreaTab,savedAt:new Date().toISOString()}),false);setLastAutoSave(new Date());}catch{}};
+    save(); const iv=setInterval(save,10000); return()=>clearInterval(iv);
+  },[currentInspection,activeAreaTab]);
+
+  useEffect(()=>{
+    if(!currentUser) return;
+    const sync=async()=>{try{await Promise.all([inspections.length>0?window.storage.set('inspections-data',JSON.stringify(inspections),true):Promise.resolve(),schedules.length>0?window.storage.set('inspection-schedules',JSON.stringify(schedules),true):Promise.resolve(),drafts.length>0?window.storage.set('inspection-drafts',JSON.stringify(drafts),true):Promise.resolve(),correctiveActions.length>0?window.storage.set('corrective-actions',JSON.stringify(correctiveActions),true):Promise.resolve()]);setLastGlobalSync(new Date());}catch{}};
+    sync(); const iv=setInterval(sync,5000); return()=>clearInterval(iv);
+  },[currentUser,inspections,schedules,drafts,correctiveActions]);
+
+  const saveData=useCallback(async(d)=>{try{await window.storage.set('inspections-data',JSON.stringify(d),true);}catch(e){alert('Save failed: '+e.message);}}, []);
+  const saveSchedules=useCallback(async(d)=>{try{await window.storage.set('inspection-schedules',JSON.stringify(d),true);}catch{}}, []);
+  const saveDraftsToStorage=useCallback(async(d)=>{try{await window.storage.set('inspection-drafts',JSON.stringify(d),true);}catch{}}, []);
+  const saveCorrectiveActions=useCallback(async(d)=>{try{await window.storage.set('corrective-actions',JSON.stringify(d),true);}catch{}}, []);
+  const saveUsers=useCallback(async(d)=>{try{await window.storage.set('app-users',JSON.stringify(d),true);}catch{}}, []);
+
+  const manualSync=useCallback(async()=>{
+    try{const [ir,sr,dr,cr,ur]=await Promise.all([window.storage.get('inspections-data',true).catch(()=>null),window.storage.get('inspection-schedules',true).catch(()=>null),window.storage.get('inspection-drafts',true).catch(()=>null),window.storage.get('corrective-actions',true).catch(()=>null),window.storage.get('app-users',true).catch(()=>null)]);
+    if(ir?.value) setInspections(JSON.parse(ir.value));if(sr?.value) setSchedules(JSON.parse(sr.value));if(dr?.value) setDrafts(JSON.parse(dr.value));if(cr?.value) setCorrectiveActions(JSON.parse(cr.value));if(ur?.value) setUsers(JSON.parse(ur.value));setLastGlobalSync(new Date());
+    const t=document.createElement('div');t.className='fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';t.textContent='✅ Synced!';document.body.appendChild(t);setTimeout(()=>t.remove(),1500);}catch{}
+  }, []);
+
+  // ── Login ──
+  const handleLogin = useCallback(() => {
+    setLoginError('');
+    const normalize = (s) => (s||'').toLowerCase().replace(/\s+/g,'');
+    const typed = normalize(loginUsername);
+    const user = users.find(u => normalize(u.username) === typed || normalize(u.name) === typed);
+    if (!user) { setLoginError('❌ Username not found'); return; }
+    if (user.password !== loginPassword) { setLoginError('❌ Incorrect password'); return; }
+    if (user.active === false) { setLoginError('❌ This account has been deactivated. Contact Admin.'); return; }
+    setCurrentUser(user);
+    setLoginUsername(''); setLoginPassword('');
+  }, [users, loginUsername, loginPassword]);
+
+  const handleLogout = useCallback(() => { setCurrentUser(null); setLoginError(''); }, []);
+
+  // ── Admin: change password ──
+  const adminChangePw = useCallback(() => {
+    if (!adminForm.newPw || adminForm.newPw.length < 3) { setAdminMsg('❌ Password must be at least 3 characters'); return; }
+    if (adminForm.newPw !== adminForm.confirmPw) { setAdminMsg('❌ Passwords do not match'); return; }
+    const updated = users.map(u => u.id === adminTarget.id ? { ...u, password: adminForm.newPw } : u);
+    setUsers(updated); saveUsers(updated);
+    setAdminMsg('✅ Password changed for ' + adminTarget.name);
+    setAdminForm({}); setAdminView('list'); setAdminTarget(null);
+  }, [users, adminTarget, adminForm, saveUsers]);
+
+  // ── Admin: rename user (e.g. relabel the shared 'Inspector' account) ──
+  const adminRenameUser = useCallback(() => {
+    if (!adminForm.name?.trim()) { setAdminMsg('❌ Name required'); return; }
+    const newName = adminForm.name.trim();
+    const updated = users.map(u => u.id === adminTarget.id ? { ...u, name: newName } : u);
+    setUsers(updated); saveUsers(updated);
+    if (currentUser?.id === adminTarget.id) setCurrentUser(prev => ({ ...prev, name: newName }));
+    setAdminMsg('✅ Renamed to ' + newName);
+    setAdminForm({}); setAdminView('list'); setAdminTarget(null);
+  }, [users, adminTarget, adminForm, saveUsers, currentUser]);
+
+  // ── Admin: create user ──
+  const adminCreateUser = useCallback(() => {
+    if (!adminForm.name?.trim()) { setAdminMsg('❌ Name required'); return; }
+    if (!adminForm.username?.trim()) { setAdminMsg('❌ Username required'); return; }
+    if (users.find(u => u.username.toLowerCase() === adminForm.username.toLowerCase())) { setAdminMsg('❌ Username already exists'); return; }
+    if (!adminForm.password || adminForm.password.length < 3) { setAdminMsg('❌ Password min 3 characters'); return; }
+    const roleAvatars = { admin:'👑', inspector_verifier:'⭐', inspector:'🔍', visitor:'👁️' };
+    const newUser = { id: Date.now(), username: adminForm.username.trim().toLowerCase().replace(/\s+/g,''), name: adminForm.name.trim(), role: adminForm.role||'inspector', avatar: adminForm.avatar||roleAvatars[adminForm.role||'inspector'], password: adminForm.password };
+    const updated = [...users, newUser];
+    setUsers(updated); saveUsers(updated);
+    setAdminMsg('✅ User "' + newUser.name + '" created');
+    setAdminForm({}); setAdminView('list');
+  }, [users, adminForm, saveUsers]);
+
+  // ── Admin: deactivate/reactivate user (no delete — deleting would break historical
+  // inspector/verifier name references on past inspections) ──
+  const applyActiveChange = useCallback((userId, makeActive) => {
+    const updated = users.map(u => u.id === userId ? { ...u, active: makeActive } : u);
+    setUsers(updated); saveUsers(updated);
+    const target = users.find(u => u.id === userId);
+    setAdminMsg(makeActive ? `✅ "${target?.name}" reactivated` : `🚫 "${target?.name}" deactivated`);
+  }, [users, saveUsers]);
+
+  const adminToggleActive = useCallback((user) => {
+    if (user.id === currentUser.id) { setAdminMsg('❌ Cannot deactivate yourself'); return; }
+    if (user.active === false) { applyActiveChange(user.id, true); return; }
+    setDeactivateConfirmPopup(user);
+  }, [currentUser, applyActiveChange]);
+
+  const confirmDeactivate = useCallback(() => {
+    if (!deactivateConfirmPopup) return;
+    applyActiveChange(deactivateConfirmPopup.id, false);
+    setDeactivateConfirmPopup(null);
+  }, [deactivateConfirmPopup, applyActiveChange]);
+
+  // ── My Profile: change own password ──
+  const [showMyProfile, setShowMyProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({});
+  const [profileMsg, setProfileMsg] = useState('');
+  const changeMyPw = useCallback(() => {
+    if (!profileForm.current || profileForm.current !== currentUser.password) { setProfileMsg('❌ Current password incorrect'); return; }
+    if (!profileForm.newPw || profileForm.newPw.length < 3) { setProfileMsg('❌ New password min 3 characters'); return; }
+    if (profileForm.newPw !== profileForm.confirmPw) { setProfileMsg('❌ Passwords do not match'); return; }
+    const updated = users.map(u => u.id === currentUser.id ? { ...u, password: profileForm.newPw } : u);
+    setUsers(updated); saveUsers(updated);
+    setCurrentUser(prev => ({ ...prev, password: profileForm.newPw }));
+    setProfileMsg('✅ Password updated!'); setProfileForm({});
+  }, [users, currentUser, profileForm, saveUsers]);
+
+  // ── Checklist ──
+  const createChecklistItems=useCallback((documentType='all')=>{
+    if(documentType==='building'){
+      const items = BUILDING_MASTER_ITEMS.map((itemText,idx)=>({id:'bf-'+idx,area:'buildings-fabrication',areaName:'Buildings & Fabrication',section:'Buildings and Fabrication [IR-PP-14.1]',itemText,status:null,remarks:'',photos:[]}));
+      return {'buildings-fabrication':items};
+    }
+    if(documentType==='safety'){
+      return {'safety':SAFETY_MASTER_ITEMS.map((m,idx)=>({id:'sf-'+idx,area:'safety',areaName:'Safety',section:m.group+' '+SAFETY_TAG,group:m.group,groupEn:m.groupEn,no:m.no,sub:m.sub,topic:m.topic,topicEn:m.topicEn,itemText:m.bm,itemTextEn:m.en,status:null,remarks:'',photos:[]}))};
+    }
+    if(documentType==='environment'){
+      return {'environment':ENV_MASTER_ITEMS.map(([itemText,evidence],idx)=>({id:'env-'+idx,area:'environment',areaName:'Environmental',section:'Environmental Walkthrough '+ENV_TAG,itemText,evidence,status:null,remarks:'',photos:[]}))};
+    }
+    const allItems={}; AREAS.forEach(area=>{ const areaItems=[]; const sections=editableChecklist[area.id]; let idx=0; Object.keys(sections).forEach(sn=>{ const isGlass=sn.includes('[IR-PP-13.1]'); const isHygiene=sn.includes('[IR-PP-01.1]'); const isCleaning=!isGlass&&!isHygiene; if(area.id==='mixing'&&isGlass) return; const inc=documentType==='all'||(documentType==='cleaning'&&isCleaning)||(documentType==='glass'&&isGlass)||(documentType==='hygiene'&&isHygiene); if(inc) sections[sn].forEach(itemText=>{ areaItems.push({id:area.id+'-'+idx++,area:area.id,areaName:area.name,section:sn,itemText,status:null,remarks:'',photos:[]}); }); }); allItems[area.id]=areaItems; }); return allItems;
+  },[editableChecklist]);
+
+  const startInspection=useCallback((inspectorNames,documentType='all')=>{ if(currentInspection) return; setCurrentInspection({id:Date.now().toString(),dateTime:new Date().toISOString(),inspector:inspectorNames[0],inspectors:inspectorNames,areas:createChecklistItems(documentType),notes:'',isBackdated:false,documentType}); setActiveAreaTab('extrusion'); setCurrentView('inspection'); },[currentInspection,createChecklistItems]);
+
+  const updateItem=useCallback((areaId,itemId,field,value)=>{ setCurrentInspection(prev=>({...prev,areas:{...prev.areas,[areaId]:prev.areas[areaId].map(item=>item.id===itemId?{...item,[field]:value}:item)}})); if(field==='status'||field==='remarks'||field==='photos'){ setSubmitErrors(prev=>prev.filter(e=>!(e.itemId===itemId&&((field==='status'&&e.type==='missing'&&value)||(field==='remarks'&&e.type==='no_remarks'&&value?.trim())||(field==='photos'&&e.type==='no_photo'&&value?.length>0))))); } },[]);
+  const markSectionOK=useCallback((areaId,section)=>{ setCurrentInspection(prev=>({...prev,areas:{...prev.areas,[areaId]:prev.areas[areaId].map(item=>item.section===section?{...item,status:'OK',remarks:'',photos:[]}:item)}})); },[]);
+
+  const handlePhoto=useCallback((areaId,itemId,e)=>{ const files=Array.from(e.target.files); if(!files.length) return; Promise.all(files.map(file=>new Promise(res=>{ const reader=new FileReader(); reader.onloadend=()=>{ const img=new Image(); img.onload=()=>{ const canvas=document.createElement('canvas'); const maxSize=800; let {width,height}=img; if(width>maxSize||height>maxSize){if(width>height){height=(height/width)*maxSize;width=maxSize;}else{width=(width/height)*maxSize;height=maxSize;}} canvas.width=width;canvas.height=height; canvas.getContext('2d').drawImage(img,0,0,width,height); res(canvas.toDataURL('image/jpeg',0.35)); }; img.src=reader.result; }; reader.readAsDataURL(file); }))).then(results=>{ setCurrentInspection(prev=>({...prev,areas:{...prev.areas,[areaId]:prev.areas[areaId].map(item=>item.id===itemId?{...item,photos:[...(item.photos||[]),...results]}:item)}})); }); e.target.value=''; },[]);
+  const removePhoto=useCallback((areaId,itemId,pi)=>{ setCurrentInspection(prev=>({...prev,areas:{...prev.areas,[areaId]:prev.areas[areaId].map(item=>item.id===itemId?{...item,photos:item.photos.filter((_,i)=>i!==pi)}:item)}})); },[]);
+
+  const submitInspection=useCallback(async()=>{ const errors=[]; Object.entries(currentInspection.areas).forEach(([areaId,items])=>{ items.forEach(item=>{ if(!item.status) errors.push({areaId,itemId:item.id,itemText:item.itemText,areaName:item.areaName,type:'missing'}); else if(item.status==='NG'&&!item.remarks.trim()) errors.push({areaId,itemId:item.id,itemText:item.itemText,areaName:item.areaName,type:'no_remarks'}); else if(item.status==='NG'&&!item.photos?.length) errors.push({areaId,itemId:item.id,itemText:item.itemText,areaName:item.areaName,type:'no_photo'}); }); }); if(errors.length>0){setSubmitErrors(errors);setShowSubmitErrorPanel(true);return;} const completed={...currentInspection,overallStatus:Object.values(currentInspection.areas).flat().some(i=>i.status==='NG')?'NG':'OK',submittedAt:new Date().toISOString(),status:'pending_verification'}; const updated=[...inspections,completed]; setInspections(updated); saveData(updated); if(currentInspection.isDraft){const ud=drafts.filter(d=>d.id!==currentInspection.id);setDrafts(ud);saveDraftsToStorage(ud);} window.storage.delete('active-inspection',false).catch(()=>{}); setCurrentView('dashboard'); setCurrentInspection(null); setTimeout(()=>alert('✅ Submitted! Status: '+completed.overallStatus),100); },[currentInspection,inspections,drafts,saveData,saveDraftsToStorage]);
+
+  const saveDraft=async()=>{ const draftData={...currentInspection,isDraft:true,savedAt:new Date().toISOString()}; const idx=drafts.findIndex(d=>d.id===currentInspection.id); const updatedDrafts=idx>=0?drafts.map((d,i)=>i===idx?draftData:d):[...drafts,draftData]; setDrafts(updatedDrafts); await saveDraftsToStorage(updatedDrafts); try{await window.storage.delete('active-inspection',false);}catch{} alert('✅ Draft saved!'); setCurrentView('dashboard'); setCurrentInspection(null); };
+  const loadDraft=useCallback((draft)=>{ setCurrentInspection(draft); setActiveAreaTab('extrusion'); setCurrentView('inspection'); },[]);
+  const draftProgress=useMemo(()=>drafts.map(draft=>{let total=0,completed=0;Object.values(draft.areas).forEach(items=>{total+=items.length;completed+=items.filter(i=>i.status).length;});return{id:draft.id,total,completed,progress:Math.round((completed/total)*100)};}),[drafts]);
+  const getDraftProgress=useCallback((id)=>draftProgress.find(p=>p.id===id),[draftProgress]);
+
+  const filteredInspections=useMemo(()=>{let list=[...inspections].reverse();if(filterStatus!=='all') list=list.filter(i=>i.overallStatus===filterStatus);if(filterMonth) list=list.filter(i=>i.dateTime.startsWith(filterMonth));if(searchInspector.trim()){const q=searchInspector.trim().toLowerCase();list=list.filter(i=>(i.inspectors?.join(' ')||i.inspector||'').toLowerCase().includes(q));}return list;},[inspections,filterStatus,filterMonth,searchInspector]);
+  const totalPages=Math.max(1,Math.ceil(filteredInspections.length/ITEMS_PER_PAGE));
+  const pagedInspections=useMemo(()=>filteredInspections.slice((dashPage-1)*ITEMS_PER_PAGE,dashPage*ITEMS_PER_PAGE),[filteredInspections,dashPage]);
+  useEffect(()=>{setDashPage(1);},[filterStatus,filterMonth,searchInspector]);
+  const dashboardStats=useMemo(()=>{ const total=inspections.length; const okCount=inspections.filter(i=>i.overallStatus==='OK').length; const ngCount=inspections.filter(i=>i.overallStatus==='NG').length; const compliance=total?Math.round((okCount/total)*100):0; const now=new Date(); const monthCount=inspections.filter(i=>{const d=new Date(i.dateTime);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length; return{total,okCount,ngCount,compliance,monthCount}; },[inspections]);
+
+  const handleNavigate=useCallback((view)=>{if(currentView!==view){setCurrentView(view);setCurrentInspection(null);}},[currentView]);
+  const deleteInspection=useCallback((insp)=>{setDeleteConfirmPopup({id:insp.id,inspectors:insp.inspectors?.join(', ')||insp.inspector,date:new Date(insp.dateTime).toLocaleDateString(),status:insp.overallStatus,verified:isFullyVerified(insp)});},[]);
+  const confirmDelete=useCallback(async()=>{ const id=deleteConfirmPopup.id; const updated=inspections.filter(i=>i.id!==id); setInspections(updated); await saveData(updated); setDeleteConfirmPopup(null); const t=document.createElement('div');t.className='fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';t.textContent='✅ Deleted!';document.body.appendChild(t);setTimeout(()=>t.remove(),1500); },[deleteConfirmPopup,inspections,saveData]);
+  const handleVerify=useCallback((insp,verifyType)=>{ const rule=VERIFIER_RULES[verifyType]; if(!rule){alert('ℹ️ This form does not require verification.');return;} if(!['admin','inspector_verifier'].includes(currentUser?.role)){alert('⚠️ Only Verifiers/Admin can verify');return;} if(!mayVerify(rule,currentUser)){alert(`⚠️ Only ${allowedVerifiers(rule)} (${rule.title}) can verify this form`);return;} setVerifyPopup({id:insp.id,inspectors:insp.inspectors?.join(', ')||insp.inspector,date:new Date(insp.dateTime).toLocaleDateString(),status:insp.overallStatus,verifyType}); },[currentUser]);
+
+  // ── Undo a verification so it can be corrected and re-signed ──
+  const handleUnverify=useCallback((insp,verifyType)=>{
+    const rule=VERIFIER_RULES[verifyType];
+    if(!rule){return;}
+    if(currentUser?.role!=='admin' && !(rule.names ? rule.names.includes(currentUser?.name) : currentUser?.role==='inspector_verifier')){alert(`⚠️ Only ${allowedVerifiers(rule)} (${rule.title}) or Admin can undo this verification`);return;}
+    setUnverifyConfirmPopup({inspId:insp.id,verifyType});
+  },[currentUser]);
+
+  const confirmUnverify=useCallback(async()=>{
+    if(!unverifyConfirmPopup) return;
+    const {inspId,verifyType}=unverifyConfirmPopup;
+    const typeCap=verifyType.charAt(0).toUpperCase()+verifyType.slice(1);
+    const byField='verifiedBy'+typeCap, atField='verifiedAt'+typeCap, sigField='verifierSignature'+typeCap;
+    const updated=inspections.map(i=>i.id===inspId?{...i,[byField]:null,[atField]:null,[sigField]:null}:i);
+    setInspections(updated); await saveData(updated); setUnverifyConfirmPopup(null);
+    const t=document.createElement('div');t.className='fixed top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';t.textContent='↩️ Verification undone';document.body.appendChild(t);setTimeout(()=>t.remove(),1500);
+  },[unverifyConfirmPopup,inspections,saveData]);
+  const confirmVerify=useCallback(async(isBackdated)=>{ if(!verifySignature){alert('Please sign to confirm verification');return;} let verificationDate=new Date().toISOString(); if(isBackdated){const di=document.getElementById('verify-backdate-input')?.value;const ti=document.getElementById('verify-backdate-time-input')?.value;if(!di||!ti){alert('Select date and time');return;}const sd=new Date(di+'T'+ti+':00');if(sd>new Date()){alert('Cannot select future date');return;}verificationDate=sd.toISOString();} const typeCap=verifyPopup.verifyType.charAt(0).toUpperCase()+verifyPopup.verifyType.slice(1); const byField='verifiedBy'+typeCap; const atField='verifiedAt'+typeCap; const sigField='verifierSignature'+typeCap; const updated=inspections.map(i=>i.id===verifyPopup.id?{...i,[byField]:currentUser.name,[atField]:verificationDate,[sigField]:verifySignature}:i); setInspections(updated); await saveData(updated); setVerifyPopup(null); setVerifySignature(null); const t=document.createElement('div');t.className='fixed top-4 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';t.textContent='⭐ Verified!';document.body.appendChild(t);setTimeout(()=>t.remove(),1500); },[verifyPopup,verifySignature,inspections,currentUser,saveData]);
+
+  const handleHTMLUpload=useCallback((e)=>{ const file=e.target.files[0];if(!file) return; setHtmlImportError('');setHtmlImportResult(null);setHtmlImportPhotos({}); const reader=new FileReader(); reader.onload=(ev)=>{const parsed=parseUploadedHTML(ev.target.result);if(!parsed){setHtmlImportError('❌ Could not parse this HTML file.');return;}setHtmlImportResult(parsed);}; reader.readAsText(file); e.target.value=''; },[]);
+  const handleImportPhoto=useCallback((key,files)=>{ if(!files.length) return; Promise.all(Array.from(files).map(file=>new Promise(res=>{const reader=new FileReader();reader.onloadend=()=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const maxSize=800;let{width,height}=img;if(width>maxSize||height>maxSize){if(width>height){height=(height/width)*maxSize;width=maxSize;}else{width=(width/height)*maxSize;height=maxSize;}}canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);res(canvas.toDataURL('image/jpeg',0.45));};img.src=reader.result;};reader.readAsDataURL(file);}))).then(results=>{setHtmlImportPhotos(prev=>({...prev,[key]:[...(prev[key]||[]),...results]}));}); },[]);
+  const confirmHTMLImport=useCallback(async()=>{ if(!htmlImportResult) return; const enriched=JSON.parse(JSON.stringify(htmlImportResult)); Object.entries(htmlImportPhotos).forEach(([key,photos])=>{ const[areaId,...rest]=key.split('::');const itemId=rest.join('::'); if(enriched.areas[areaId]){const item=enriched.areas[areaId].find(i=>i.id===itemId);if(item) item.photos=photos;} }); const updated=[...inspections,enriched];setInspections(updated);await saveData(updated);setHtmlImportResult(null);setHtmlImportPhotos({}); const t=document.createElement('div');t.className='fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';t.textContent='✅ Imported!';document.body.appendChild(t);setTimeout(()=>t.remove(),2000); },[htmlImportResult,htmlImportPhotos,inspections,saveData]);
+
+  const exportSignedHTML=useCallback((insp,reportType,inspectorSig,verifierSig)=>{ const inspectorNames=insp.inspectors?.join(', ')||insp.inspector;     const _dd=editableDocDetails[reportType]||editableDocDetails.cleaning;
+    const docDetails={..._dd, fullNumber:`${_dd.number} ${_dd.rev}`.trim()};
+    const signedAt=new Date().toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}); const verifierSigField=reportType==='glass'?'verifierSignatureGlass':reportType==='cleaning'?'verifierSignatureCleaning':null; const updated=inspections.map(i=>i.id===insp.id?{...i,inspectorSignature:inspectorSig,...(verifierSigField?{[verifierSigField]:verifierSig||null}:{}),signedAt:new Date().toISOString()}:i); setInspections(updated); saveData(updated);
+    const formHTML=buildFormHTML(insp,reportType,_dd,editableChecklist);
+    const ncSummary=countNCs(insp.areas);
+    const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${docDetails.fullNumber}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;color:#222;font-size:11pt}.page{max-width:800px;margin:0 auto;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.15)}.doc-header{background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);color:#fff;padding:20px 24px 16px}.doc-header h1{font-size:15pt;font-weight:700;margin-bottom:4px}.doc-num{font-size:10pt;opacity:.85}.company-logo{display:flex;align-items:center;gap:12px;margin-bottom:12px}.logo-icon{width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}.info-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:2px solid #e5e7eb}.info-cell{padding:10px 14px;border-right:1px solid #e5e7eb}.info-cell:last-child{border-right:none}.info-label{font-size:8pt;color:#6b7280;text-transform:uppercase;font-weight:600;letter-spacing:.5px}.info-value{font-size:11pt;font-weight:700;color:#111;margin-top:2px}.status-ok{color:#059669}.status-ng{color:#dc2626}.form-body{padding:16px 24px}.form-body table{width:100%}.nc-banner{background:#fef2f2;border-left:5px solid #dc2626;padding:10px 16px;font-size:10pt;color:#991b1b;font-weight:700;margin:0 24px 12px}.sig-section{padding:20px 24px 10px;border-top:2px solid #e5e7eb}.sig-section h3{font-size:11pt;font-weight:700;color:#1e3a5f;margin-bottom:14px}.sig-grid{display:grid;grid-template-columns:${VERIFIER_RULES[reportType]?'1fr 1fr':'1fr'};gap:20px}.sig-box{border:2px solid #d1d5db;border-radius:10px;overflow:hidden}.sig-box.signed{border-color:#2563eb}.sig-box-header{background:#f8fafc;padding:8px 12px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}.sig-role{font-size:9pt;font-weight:700;color:#374151}.sig-name{font-size:8pt;color:#6b7280}.sig-img{padding:8px;background:#fff;min-height:90px;display:flex;align-items:center;justify-content:center}.sig-img img{max-width:100%;height:80px;object-fit:contain}.name-only{font-size:11pt;font-weight:700;color:#1e3a5f}.no-sig{color:#d1d5db;font-size:9pt;font-style:italic}.sig-timestamp{font-size:7.5pt;color:#6b7280;padding:4px 12px 8px;background:#f8fafc;border-top:1px solid #f1f5f9}.validation-strip{background:#1e3a5f;color:#fff;padding:10px 24px;display:flex;align-items:center;font-size:8pt}.seal{font-size:16px;margin-right:8px}.doc-footer{background:#f9fafb;border-top:1px solid #e5e7eb;padding:10px 24px;font-size:8pt;color:#9ca3af;display:flex;justify-content:space-between}@media print{body{background:#fff}.page{box-shadow:none}@page{margin:10mm;size:A4}}</style></head><body><div class="page"><div class="doc-header"><div class="company-logo"><div class="logo-icon">🏭</div><div><div style="font-size:13pt;font-weight:700">Impact Rank (M) Sdn. Bhd.</div></div></div><h1>${docDetails.title}</h1><div class="doc-num">${docDetails.fullNumber}</div></div><div class="info-bar"><div class="info-cell"><div class="info-label">Inspector(s)</div><div class="info-value" style="font-size:10pt">${inspectorNames}</div></div><div class="info-cell"><div class="info-label">Inspection Date</div><div class="info-value">${new Date(insp.dateTime).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div></div><div class="info-cell"><div class="info-label">Time</div><div class="info-value">${new Date(insp.dateTime).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="info-cell"><div class="info-label">Overall Status</div><div class="info-value ${insp.overallStatus==='OK'?'status-ok':'status-ng'}">${insp.overallStatus==='OK'?'✓ COMPLIANT':'✗ NON-COMPLIANT'}</div></div></div>${ncSummary>0?`<div class="nc-banner">⚠️ ${ncSummary} Non-Conformit${ncSummary===1?'y':'ies'} Detected</div>`:''}<div class="form-body">${formHTML}</div><div class="sig-section"><h3>Sign-off</h3><div class="sig-grid"><div class="sig-box signed"><div class="sig-box-header"><span class="sig-role">Inspector</span><span class="sig-name">Name only</span></div><div class="sig-img"><span class="name-only">${inspectorNames}</span></div><div class="sig-timestamp">Recorded: ${new Date(insp.dateTime).toLocaleDateString('en-GB')}</div></div>${VERIFIER_RULES[reportType]?(()=>{const typeCap=reportType.charAt(0).toUpperCase()+reportType.slice(1);const vBy=insp['verifiedBy'+typeCap];const vAt=insp['verifiedAt'+typeCap];return `<div class="sig-box ${vBy?'signed':''}"><div class="sig-box-header"><span class="sig-role">Verified By</span><span class="sig-name">${VERIFIER_RULES[reportType]?.title||''}</span></div><div class="sig-img">${vBy?`<span class="name-only">${vBy}</span>`:verifierSig?`<img src="${verifierSig}" alt="Verifier Signature">`:'<span class="no-sig">Pending</span>'}</div><div class="sig-timestamp">Verified: ${vAt?new Date(vAt).toLocaleString('en-MY',{timeZone:'Asia/Kuala_Lumpur'}):'—'}</div></div>`;})():''}</div></div><div class="validation-strip"><span class="seal">🔒</span> Document electronically signed · Impact Rank Workplace Inspection</div><div class="doc-footer"><span>${docDetails.fullNumber} · Impact Rank (M) Sdn. Bhd.</span><span>Ref: ${insp.id.slice(-8).toUpperCase()}</span><span>Page 1 of 1</span></div></div></body></html>`;
+    const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`${docDetails.number}_Signed_${new Date(insp.dateTime).toISOString().split('T')[0]}.html`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  },[inspections,saveData,editableDocDetails,editableChecklist]);
+
+  const exportToPDF=useCallback((insp,reportType='cleaning')=>{
+    const docDetails=editableDocDetails[reportType]||editableDocDetails.cleaning;
+    const bodyHTML=buildFormHTML(insp,reportType,docDetails,editableChecklist);
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${docDetails.number}</title><style>body{font-family:Arial,Helvetica,sans-serif;margin:18px;font-size:9pt;color:#111}@media print{@page{margin:10mm;size:A4}}</style></head><body>${bodyHTML}</body></html>`;
+    const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`${docDetails.number}_${insp.id}.html`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  },[editableDocDetails,editableChecklist]);
+
+  const exportNCOnly=useCallback((insp)=>{ let totalNC=0;const ncByDept={}; ALL_AREAS().forEach(area=>{const ng=(insp.areas[area.id]||[]).filter(i=>i.status==='NG');if(ng.length){ncByDept[area.id]={name:area.name,icon:area.icon,items:ng};totalNC+=ng.length;}}); if(!totalNC){alert('No NCs!');return;} let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NC Report</title><style>body{font-family:Arial;margin:15px;font-size:12pt}.nc-item{border:2px solid #dc2626;padding:15px;margin:10px 0;border-radius:8px}.area-title{background:#dc2626;color:white;padding:10px;font-weight:bold}img{max-width:300px;border:2px solid #ddd;border-radius:4px;margin:5px}</style></head><body>`; html+=`<h1 style="color:#dc2626;text-align:center">🚨 NC REPORT</h1><p style="text-align:center">${insp.inspectors?.join(', ')||insp.inspector} | ${new Date(insp.dateTime).toLocaleDateString()}<br>Total NCs: ${totalNC}</p>`; Object.values(ncByDept).forEach(dept=>{html+=`<div class="area-title">${dept.icon} ${dept.name}</div>`;dept.items.forEach((item,i)=>{html+=`<div class="nc-item"><p><strong>NC #${i+1}:</strong> ${item.itemText}</p><p><strong>Issue:</strong> ${item.remarks}</p>`;item.photos?.forEach(ph=>{html+=`<img src="${ph}">`;});html+=`</div>`;});}); html+=`</body></html>`; const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`NC_${insp.id}.html`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url); },[]);
+
+  const exportAllData=()=>{ if(!inspections.length&&!schedules.length&&!drafts.length&&!correctiveActions.length){alert('No data');return;} const blob=new Blob([JSON.stringify({app:'ImpactRankInspectionSystem',schemaVersion:2,exportDate:new Date().toISOString(),data:{inspections,schedules,drafts,correctiveActions,users}},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ImpactRank_Backup_'+new Date().toISOString().split('T')[0]+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('✅ Backup downloaded!'); };
+  const importData=async(e)=>{
+    const file=e.target.files[0];if(!file) return;
+    const reader=new FileReader();
+    reader.onload=async(ev)=>{
+      try{
+        const imp=JSON.parse(ev.target.result);
+        const data = imp.data || imp; // tolerate a bare {inspections,schedules,...} export with no wrapper
+        if(!data || (!data.inspections && !data.schedules && !data.drafts && !data.correctiveActions && !data.users)){ alert('❌ Invalid backup file — no recognizable data found'); return; }
+        if(!window.confirm('Import? This adds any new records to what you already have — existing records are never overwritten.')) return;
+
+        let addedInspections=0, addedSchedules=0, addedDrafts=0, addedCAs=0, addedUsers=0;
+
+        if(Array.isArray(data.inspections) && data.inspections.length){
+          const normalized = data.inspections.map(normalizeImportedInspection);
+          const merged = mergeById(inspections, normalized);
+          addedInspections = merged.length - inspections.length;
+          setInspections(merged); await saveData(merged);
+        }
+        if(Array.isArray(data.schedules) && data.schedules.length){
+          const cleaned = data.schedules.filter(s=>s && s.date && Array.isArray(s.inspectors)).map(s=>({...s, id: s.id!=null?String(s.id):('sched_'+Date.now()+'_'+Math.random().toString(36).slice(2,8))}));
+          const merged = mergeById(schedules, cleaned);
+          addedSchedules = merged.length - schedules.length;
+          setSchedules(merged); await saveSchedules(merged);
+        }
+        if(Array.isArray(data.drafts) && data.drafts.length){
+          const normalized = data.drafts.map(normalizeImportedInspection);
+          const merged = mergeById(drafts, normalized);
+          addedDrafts = merged.length - drafts.length;
+          setDrafts(merged); await saveDraftsToStorage(merged);
+        }
+        if(Array.isArray(data.correctiveActions) && data.correctiveActions.length){
+          const cleaned = data.correctiveActions.map(ca=>({...ca, id: ca.id!=null?String(ca.id):('ca_'+Date.now()+'_'+Math.random().toString(36).slice(2,8))}));
+          const merged = mergeById(correctiveActions, cleaned);
+          addedCAs = merged.length - correctiveActions.length;
+          setCorrectiveActions(merged); await saveCorrectiveActions(merged);
+        }
+        if(Array.isArray(data.users) && data.users.length){
+          // Match by username (not id) since ids can collide across separate app instances.
+          // Never overwrites an existing account — only adds genuinely new usernames.
+          const existingUsernames = new Set(users.map(u=>u.username?.toLowerCase()));
+          const newUsers = data.users.filter(u=>u && u.username && !existingUsernames.has(u.username.toLowerCase())).map(u=>({...u, id: Date.now()+Math.floor(Math.random()*10000)}));
+          if(newUsers.length){ const merged=[...users,...newUsers]; addedUsers=newUsers.length; setUsers(merged); await saveUsers(merged); }
+        }
+
+        alert(`✅ Imported — ${addedInspections} inspection(s), ${addedSchedules} schedule(s), ${addedDrafts} draft(s), ${addedCAs} corrective action(s), ${addedUsers} user(s) added.`);
+      }catch(err){ alert('❌ Import failed: '+err.message); }
+    };
+    reader.readAsText(file); e.target.value='';
+  };
+
+  const getInspectorAvatar=useCallback((name)=>{ const u=users.find(u=>u.name===name); return u?.avatar||'👤'; },[users]);
+
+  // ════════════════════════════════════════
+  //  LOGIN SCREEN
+  // ════════════════════════════════════════
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-700 via-green-700 to-teal-700 flex items-center justify-center p-4">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-2xl mb-4"><span className="text-5xl">🏭</span></div>
+            <h1 className="text-3xl font-bold text-white">Workplace Inspection</h1>
+            <p className="text-white text-sm mt-1 font-semibold">HACCP · Safety · Environmental</p>
+            <p className="text-emerald-200 text-sm mt-1">Impact Rank (M) Sdn Bhd</p>
+          </div>
+          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-600 to-green-700 px-6 py-4">
+              <h2 className="text-white font-bold text-lg text-center">🔐 Login</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-600 mb-1.5">Username or Name</label>
+                <input value={loginUsername} onChange={e=>setLoginUsername(e.target.value)} onKeyPress={e=>e.key==='Enter'&&handleLogin()} placeholder="e.g. Inspector or inspector" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition" autoComplete="username"/>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-600 mb-1.5">Password</label>
+                <div className="relative">
+                  <input value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} onKeyPress={e=>e.key==='Enter'&&handleLogin()} type={showPassword?'text':'password'} placeholder="Enter your password" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition pr-12" autoComplete="current-password"/>
+                  <button onClick={()=>setShowPassword(s=>!s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg">{showPassword?'🙈':'👁️'}</button>
+                </div>
+              </div>
+              {loginError && <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-xs text-red-700 font-medium">{loginError}</div>}
+              <button onClick={handleLogin} className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition shadow-md">Login →</button>
+              <div className="bg-gray-50 rounded-xl p-3 text-center">
+                <p className="text-[10px] text-gray-400 font-medium">Default password: <span className="font-bold text-gray-600">123</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════
+  //  MAIN APP
+  // ════════════════════════════════════════
+  return (
+    <div className="min-h-screen bg-gray-50">
+
+      {/* ── Admin Panel ── */}
+      {showAdminPanel && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col" style={{maxHeight:'92vh'}}>
+            <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-4 text-white flex-shrink-0 flex items-center gap-3">
+              <span className="text-2xl">👑</span>
+              <div className="flex-1"><h2 className="font-bold text-base">User Management</h2><p className="text-xs opacity-80">Admin: {currentUser.name}</p></div>
+              <button onClick={()=>{setShowAdminPanel(false);setAdminView('list');setAdminMsg('');setAdminForm({});}} className="p-2 bg-white bg-opacity-20 rounded-lg font-bold">✕</button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4">
+              {adminMsg && <div className={`mb-3 px-3 py-2 rounded-xl text-xs font-bold ${adminMsg.startsWith('✅')?'bg-green-50 text-green-700 border border-green-200':'bg-red-50 text-red-700 border border-red-200'}`}>{adminMsg}</div>}
+
+              {adminView === 'list' && (
+                <div className="space-y-3">
+                  <button onClick={()=>{setAdminView('new_user');setAdminMsg('');setAdminForm({role:'inspector',password:'123'});}} className="w-full py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700">➕ Create New User</button>
+                  {users.map(u=>(
+                    <div key={u.id} className={'border rounded-xl p-3 flex items-center gap-3 '+(u.active===false?'border-gray-200 bg-gray-50 opacity-70':'border-gray-200')}>
+                      <span className="text-2xl">{u.avatar}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm truncate">{u.name} {u.id===currentUser.id&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full ml-1">You</span>} {u.active===false&&<span className="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full ml-1">Inactive</span>}</p>
+                        <p className="text-[10px] text-gray-500">@{u.username}</p>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${ROLE_COLORS[u.role]||'bg-gray-100 text-gray-600'}`}>{ROLE_LABELS[u.role]||u.role}</span>
+                      </div>
+                      <div className="flex gap-1.5 flex-shrink-0">
+                        <button onClick={()=>{setAdminTarget(u);setAdminView('edit_user');setAdminMsg('');setAdminForm({name:u.name});}} className="px-2.5 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold hover:bg-emerald-200">✏️ Name</button>
+                        <button onClick={()=>{setAdminTarget(u);setAdminView('change_pw');setAdminMsg('');setAdminForm({});}} className="px-2.5 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold hover:bg-blue-200">🔑 PW</button>
+                        {u.id!==currentUser.id&&(u.active===false?<button onClick={()=>adminToggleActive(u)} className="px-2.5 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold hover:bg-emerald-200">✅ Activate</button>:<button onClick={()=>adminToggleActive(u)} className="px-2.5 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-[10px] font-bold hover:bg-orange-200">🚫 Deactivate</button>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {adminView === 'edit_user' && adminTarget && (
+                <div className="space-y-3">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-3">
+                    <span className="text-3xl">{adminTarget.avatar}</span>
+                    <div><p className="font-bold">@{adminTarget.username}</p><p className="text-xs text-gray-500">{ROLE_LABELS[adminTarget.role]||adminTarget.role}</p></div>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Useful for shared logins like the generic "Inspector" account — rename it to whoever is actually inspecting right now.</p>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Display Name</label><input placeholder="e.g. Ahmad bin Ali" value={adminForm.name||''} onChange={e=>setAdminForm(f=>({...f,name:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+                  <div className="flex gap-3">
+                    <button onClick={()=>{setAdminView('list');setAdminMsg('');setAdminForm({});}} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200">← Back</button>
+                    <button onClick={adminRenameUser} className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700">✅ Save</button>
+                  </div>
+                </div>
+              )}
+
+              {adminView === 'change_pw' && adminTarget && (
+                <div className="space-y-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center gap-3">
+                    <span className="text-3xl">{adminTarget.avatar}</span>
+                    <div><p className="font-bold">{adminTarget.name}</p><p className="text-xs text-gray-500">@{adminTarget.username}</p></div>
+                  </div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">New Password</label><input type="password" placeholder="Min 3 characters" value={adminForm.newPw||''} onChange={e=>setAdminForm(f=>({...f,newPw:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/></div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Confirm Password</label><input type="password" placeholder="Repeat password" value={adminForm.confirmPw||''} onChange={e=>setAdminForm(f=>({...f,confirmPw:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400"/></div>
+                  <div className="flex gap-3">
+                    <button onClick={()=>{setAdminView('list');setAdminMsg('');setAdminForm({});}} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200">← Back</button>
+                    <button onClick={adminChangePw} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">✅ Change</button>
+                  </div>
+                </div>
+              )}
+
+              {adminView === 'new_user' && (
+                <div className="space-y-3">
+                  <p className="font-bold text-sm text-gray-700">➕ New User</p>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Full Name *</label><input placeholder="e.g. Ahmad bin Ali" value={adminForm.name||''} onChange={e=>setAdminForm(f=>({...f,name:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Username * <span className="font-normal text-gray-400">(no spaces)</span></label><input placeholder="e.g. ahmad" value={adminForm.username||''} onChange={e=>setAdminForm(f=>({...f,username:e.target.value.replace(/\s/g,'')}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:border-emerald-400"/></div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Role *</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[{v:'inspector',l:'Inspector',icon:'🔍'},{v:'inspector_verifier',l:'Verifier',icon:'⭐'},{v:'admin',l:'Admin',icon:'👑'},{v:'visitor',l:'Visitor',icon:'👁️'}].map(r=>(
+                        <button key={r.v} onClick={()=>setAdminForm(f=>({...f,role:r.v}))} className={'p-2 rounded-xl border-2 text-center text-xs font-bold transition '+(adminForm.role===r.v?'border-emerald-500 bg-emerald-50 text-emerald-700':'border-gray-200 text-gray-600 hover:border-gray-300')}>
+                          <div className="text-xl mb-0.5">{r.icon}</div>{r.l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Avatar Emoji</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['👤','👨‍💼','👩‍💼','👨‍🔬','👩‍🔬','👨‍🔧','👩‍🔧','👨‍⚕️','👩‍⚕️','👨‍💻','👩‍💻','👨‍🏫','👩‍🏫'].map(av=>(
+                        <button key={av} onClick={()=>setAdminForm(f=>({...f,avatar:av}))} className={'w-9 h-9 rounded-xl border-2 text-xl flex items-center justify-center '+(adminForm.avatar===av?'border-emerald-500 bg-emerald-50':'border-gray-200 hover:border-gray-300')}>{av}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div><label className="block text-xs font-bold text-gray-600 mb-1">Password *</label><input type="password" placeholder="Min 3 characters" value={adminForm.password||''} onChange={e=>setAdminForm(f=>({...f,password:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+                  <div className="flex gap-3">
+                    <button onClick={()=>{setAdminView('list');setAdminMsg('');setAdminForm({role:'inspector',password:'123'});}} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200">← Back</button>
+                    <button onClick={adminCreateUser} className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700">✅ Create</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── My Profile / Change Own PW ── */}
+      {showMyProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-sm sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-600 to-green-700 p-4 text-white flex items-center gap-3">
+              <span className="text-3xl">{currentUser.avatar}</span>
+              <div className="flex-1"><h2 className="font-bold">{currentUser.name}</h2><p className="text-xs opacity-80">@{currentUser.username} · {ROLE_LABELS[currentUser.role]}</p></div>
+              <button onClick={()=>{setShowMyProfile(false);setProfileMsg('');setProfileForm({});}} className="p-2 bg-white bg-opacity-20 rounded-lg font-bold">✕</button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-xs font-bold text-gray-700">🔑 Change My Password</p>
+              {profileMsg&&<div className={`px-3 py-2 rounded-xl text-xs font-bold ${profileMsg.startsWith('✅')?'bg-green-50 text-green-700 border border-green-200':'bg-red-50 text-red-700 border border-red-200'}`}>{profileMsg}</div>}
+              <div><label className="block text-[10px] font-bold text-gray-500 mb-1">Current Password</label><input type="password" value={profileForm.current||''} onChange={e=>setProfileForm(f=>({...f,current:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+              <div><label className="block text-[10px] font-bold text-gray-500 mb-1">New Password</label><input type="password" value={profileForm.newPw||''} onChange={e=>setProfileForm(f=>({...f,newPw:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+              <div><label className="block text-[10px] font-bold text-gray-500 mb-1">Confirm New Password</label><input type="password" value={profileForm.confirmPw||''} onChange={e=>setProfileForm(f=>({...f,confirmPw:e.target.value}))} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-400"/></div>
+              <button onClick={changeMyPw} className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700">✅ Update Password</button>
+              <div className="h-2 sm:h-0"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Form Editor ── */}
+      {showFormEditor && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col" style={{maxHeight:'92vh'}}>
+            <div className="bg-gradient-to-r from-slate-700 to-slate-900 p-4 text-white flex-shrink-0 flex items-center gap-3">
+              <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-xl">⚙️</div>
+              <div><h2 className="font-bold text-base">Form Editor</h2><p className="text-xs opacity-80">Edit document numbers & checklist items</p></div>
+              <button onClick={()=>setShowFormEditor(false)} className="ml-auto p-2 bg-white bg-opacity-20 rounded-lg font-bold">✕</button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4 space-y-5">
+              <div>
+                <p className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">📋 Document Numbers & Versions</p>
+                <div className="space-y-3">
+                  {[{key:'cleaning',icon:'🧹',label:'Cleaning & Sanitation'},{key:'glass',icon:'📦',label:'Glass, Metal & Wood'},{key:'hygiene',icon:'⭐',label:'Personnel Hygiene'},{key:'building',icon:'🏢',label:'Buildings & Fabrication'},{key:'safety',icon:'🦺',label:'Workplace Safety'},{key:'environment',icon:'🌍',label:'Environmental Walkthrough'}].map(({key,icon,label})=>(
+                    <div key={key} className="border-2 border-gray-200 rounded-xl p-3 space-y-2">
+                      <p className="text-xs font-bold text-gray-600">{icon} {label}</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div><p className="text-[10px] text-gray-500 mb-1">Document No. / Version</p><input value={editableDocDetails[key].number} onChange={e=>setEditableDocDetails(prev=>({...prev,[key]:{...prev[key],number:e.target.value}}))} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-xs font-mono focus:outline-none focus:border-blue-400"/></div>
+                        <div><p className="text-[10px] text-gray-500 mb-1">Document Title</p><input value={editableDocDetails[key].title} onChange={e=>setEditableDocDetails(prev=>({...prev,[key]:{...prev[key],title:e.target.value}}))} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-blue-400"/></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-3">📝 Checklist Items</p>
+                <div className="flex gap-1 overflow-x-auto pb-1 mb-3">{AREAS.map(area=>(<button key={area.id} onClick={()=>{setEditorArea(area.id);setEditorSection(null);}} className={'px-2.5 py-1.5 rounded-lg text-[10px] font-bold whitespace-nowrap flex-shrink-0 '+(editorArea===area.id?'bg-slate-700 text-white':'bg-gray-100 text-gray-600 hover:bg-gray-200')}>{area.icon} {area.name.split(' ')[0]}</button>))}</div>
+                <div className="space-y-2">
+                  {Object.keys(editableChecklist[editorArea]||{}).map(section=>{
+                    const items=editableChecklist[editorArea][section]; const isOpen=editorSection===section;
+                    return (
+                      <div key={section} className="border border-gray-200 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between p-2.5 bg-gray-50 cursor-pointer" onClick={()=>setEditorSection(isOpen?null:section)}>
+                          <div className="flex-1 min-w-0"><p className="text-xs font-bold text-gray-700 truncate">{section.replace(' [IR-PP-13.1]','').replace(' [IR-PP-01.1]','')}</p><p className="text-[10px] text-gray-400">{items.length} item{items.length!==1?'s':''}</p></div>
+                          <div className="flex items-center gap-2">{section.includes('[IR-PP-13.1]')&&<span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-bold">13.1</span>}{section.includes('[IR-PP-01.1]')&&<span className="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-bold">01.1</span>}<span className="text-gray-400 text-sm">{isOpen?'▲':'▼'}</span></div>
+                        </div>
+                        {isOpen&&(
+                          <div className="p-3 space-y-2 bg-white">
+                            {items.map((item,idx)=>(
+                              <div key={idx} className="flex gap-2 items-start">
+                                <span className="text-[10px] text-gray-400 mt-2 w-4 flex-shrink-0">{idx+1}.</span>
+                                <textarea value={item} rows={2} onChange={e=>{const updated=JSON.parse(JSON.stringify(editableChecklist));updated[editorArea][section][idx]=e.target.value;setEditableChecklist(updated);}} className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:border-blue-400 resize-none"/>
+                                <button onClick={()=>{const updated=JSON.parse(JSON.stringify(editableChecklist));updated[editorArea][section].splice(idx,1);setEditableChecklist(updated);}} className="mt-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-lg flex items-center justify-center text-xs font-bold hover:bg-red-200 flex-shrink-0">✕</button>
+                              </div>
+                            ))}
+                            <button onClick={()=>{const updated=JSON.parse(JSON.stringify(editableChecklist));updated[editorArea][section].push('New checklist item');setEditableChecklist(updated);}} className="w-full py-1.5 border-2 border-dashed border-emerald-400 text-emerald-600 rounded-lg text-xs font-bold hover:bg-emerald-50">+ Add Item</button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="flex-shrink-0 border-t p-4 flex gap-3 bg-white">
+              <button onClick={()=>{setEditableChecklist(JSON.parse(JSON.stringify(CHECKLIST_ITEMS)));              setEditableDocDetails({cleaning:{number:'IR-PP-02.1',rev:'Rev 05',title:'Cleaning and Sanitation Inspection Checksheet'},glass:{number:'IR-PP-13.1',rev:'Rev 02',title:'Glass, Hard Plastic, Wood and Metal Register'},hygiene:{number:'IR-PP-01.1',rev:'Rev 01',title:'Personnel Hygiene and GMP Inspection Checklist'},building:{number:'IR-PP-14.1',rev:'Rev 00',title:'Buildings and Fabrication Inspection Record'},safety:{number:'OSHP-06.02',rev:'Issue 00',title:'Workplace Safety Inspection Report'},environment:{number:'ISO 14001 Walkthrough',rev:'',title:'ISO 14001:2015 Environmental Walkthrough Inspection Checklist'}});alert('✅ Reset to defaults!');}} className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200">↺ Reset</button>
+              <button onClick={()=>setShowFormEditor(false)} className="flex-1 py-3 bg-slate-700 text-white rounded-xl font-bold text-sm hover:bg-slate-800">✅ Save & Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Signature Modal ── */}
+      {signatureModal && <SignatureModal inspection={signatureModal} onClose={()=>setSignatureModal(null)} onExport={exportSignedHTML}/>}
+
+      {/* ── Delete popup ── */}
+      {deleteConfirmPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-red-500 to-red-600 p-4 text-white text-center"><div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">🗑️</div><h2 className="text-lg font-bold">Delete Inspection?</h2></div>
+            <div className="p-4"><div className="bg-gray-50 rounded-xl p-3 mb-4"><p className="font-bold truncate">{deleteConfirmPopup.inspectors}</p><p className="text-sm text-gray-500">{deleteConfirmPopup.date}</p><div className="flex gap-2 mt-2"><span className={'px-2 py-1 rounded-full text-xs font-bold '+(deleteConfirmPopup.status==='OK'?'bg-green-100 text-green-700':'bg-red-100 text-red-700')}>{deleteConfirmPopup.status}</span>{deleteConfirmPopup.verified&&<span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">✓ Verified</span>}</div></div><p className="text-center text-gray-600 text-sm mb-4">This cannot be undone.</p><div className="flex gap-3"><button onClick={()=>setDeleteConfirmPopup(null)} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold">Cancel</button><button onClick={confirmDelete} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">Delete</button></div><div className="h-4 sm:h-0"></div></div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Deactivate user popup ── */}
+      {deactivateConfirmPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 text-white text-center"><div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">🚫</div><h2 className="text-lg font-bold">Deactivate User?</h2></div>
+            <div className="p-4">
+              <div className="bg-gray-50 rounded-xl p-3 mb-4 flex items-center gap-3"><span className="text-3xl">{deactivateConfirmPopup.avatar}</span><div><p className="font-bold">{deactivateConfirmPopup.name}</p><p className="text-xs text-gray-500">@{deactivateConfirmPopup.username}</p></div></div>
+              <p className="text-center text-gray-600 text-sm mb-4">They won't be able to log in, but their name stays intact on every past inspection, verification, and corrective action. You can reactivate them anytime.</p>
+              <div className="flex gap-3"><button onClick={()=>setDeactivateConfirmPopup(null)} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold">Cancel</button><button onClick={confirmDeactivate} className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold">Deactivate</button></div>
+              <div className="h-4 sm:h-0"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Unverify popup ── */}
+      {unverifyConfirmPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 text-white text-center"><div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">↩️</div><h2 className="text-lg font-bold">Undo Verification?</h2></div>
+            <div className="p-4">
+              <p className="text-center text-gray-600 text-sm mb-4">Undo verification for <strong>{FORM_LABELS[unverifyConfirmPopup.verifyType]}</strong>? The verifier name and signature will be cleared so it can be corrected and re-signed.</p>
+              <div className="flex gap-3"><button onClick={()=>setUnverifyConfirmPopup(null)} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold">Cancel</button><button onClick={confirmUnverify} className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold">Undo</button></div>
+              <div className="h-4 sm:h-0"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Verify popup ── */}
+      {verifyPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 text-white text-center"><div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2 text-3xl">⭐</div><h2 className="text-lg font-bold">Verify {FORM_LABELS[verifyPopup.verifyType]}</h2></div>
+            <div className="p-4"><div className="bg-gray-50 rounded-xl p-3 mb-4"><p className="font-bold truncate">{verifyPopup.inspectors}</p><p className="text-sm text-gray-500">{verifyPopup.date}</p></div><div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 mb-3"><p className="text-[10px] text-amber-800">Verifying as <strong>{currentUser.name}</strong> — {VERIFIER_RULES[verifyPopup.verifyType]?.title}</p></div><div className="mb-3"><SignaturePad label="Verifier signature" value={verifySignature} onChange={setVerifySignature} required/></div><button onClick={()=>confirmVerify(false)} disabled={!verifySignature} className={'w-full py-3 rounded-xl font-bold mb-3 '+(verifySignature?'bg-purple-600 text-white hover:bg-purple-700':'bg-gray-200 text-gray-400 cursor-not-allowed')}>⭐ Verify Now<div className="text-xs font-normal opacity-90">{new Date().toLocaleString()}</div></button><div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-3 mb-3"><p className="font-bold text-orange-800 text-sm mb-2 text-center">⏮️ Backdate</p><div className="grid grid-cols-2 gap-2 mb-2"><input type="date" id="verify-backdate-input" max={new Date().toISOString().split('T')[0]} defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-2 border-2 border-gray-300 rounded-lg text-sm"/><input type="time" id="verify-backdate-time-input" defaultValue="12:00" className="w-full p-2 border-2 border-gray-300 rounded-lg text-sm"/></div><button onClick={()=>confirmVerify(true)} disabled={!verifySignature} className={'w-full py-2 rounded-xl font-bold text-sm '+(verifySignature?'bg-orange-500 text-white':'bg-gray-200 text-gray-400 cursor-not-allowed')}>⏮️ Verify with Date</button></div><button onClick={()=>{setVerifyPopup(null);setVerifySignature(null);}} className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-bold">Cancel</button><div className="h-4 sm:h-0"></div></div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Report viewer ── */}
+      {viewingReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b z-10 p-3"><div className="flex justify-between items-center gap-2 mb-2"><h2 className="text-base font-bold">📋 Report</h2><button onClick={()=>setViewingReport(null)} className="px-3 py-2 bg-gray-300 rounded font-bold text-sm">Close</button></div><div className="flex gap-1 flex-wrap"><button onClick={()=>{setSignatureModal(viewingReport);setViewingReport(null);}} className="px-2 py-1.5 bg-blue-800 text-white rounded text-xs font-bold">🔏 Sign</button>{inspectionHasCleaning(viewingReport)&&<button onClick={()=>exportToPDF(viewingReport,'cleaning')} className="px-2 py-1.5 bg-green-600 text-white rounded text-xs font-bold">📥 02.1</button>}{inspectionHasGlass(viewingReport)&&<button onClick={()=>exportToPDF(viewingReport,'glass')} className="px-2 py-1.5 bg-blue-600 text-white rounded text-xs font-bold">📥 13.1</button>}{inspectionHasHygiene(viewingReport)&&<button onClick={()=>exportToPDF(viewingReport,'hygiene')} className="px-2 py-1.5 bg-purple-600 text-white rounded text-xs font-bold">📥 01.1</button>}{inspectionHasBuilding(viewingReport)&&<button onClick={()=>exportToPDF(viewingReport,'building')} className="px-2 py-1.5 bg-orange-600 text-white rounded text-xs font-bold">📥 14.1</button>}{countNCs(viewingReport.areas)>0&&<button onClick={()=>{setViewingNCReport(viewingReport);setViewingReport(null);}} className="px-2 py-1.5 bg-red-600 text-white rounded text-xs font-bold">🚨 NC</button>}</div></div>
+            <div className="p-4"><p className="font-bold text-lg mb-1">{viewingReport.inspectors?.join(', ')||viewingReport.inspector}</p><p className="text-sm text-gray-600 mb-3">{new Date(viewingReport.dateTime).toLocaleString()} · <span className={'font-bold '+(viewingReport.overallStatus==='OK'?'text-green-600':'text-red-600')}>{viewingReport.overallStatus}</span></p>{ALL_AREAS().map(area=>{const items=viewingReport.areas[area.id]||[];if(!items.length) return null;return(<div key={area.id} className="mb-3"><div className="bg-blue-600 text-white p-2 rounded-t font-bold text-sm">{area.icon} {area.name}</div><table className="w-full text-xs border border-t-0 border-gray-300"><thead className="bg-gray-100"><tr><th className="text-left p-1.5">Item</th><th className="text-center p-1.5 w-14">Status</th><th className="text-left p-1.5">Remarks</th></tr></thead><tbody>{items.map(item=>(<tr key={item.id} className="border-t"><td className="p-1.5">{item.itemText}</td><td className={'p-1.5 text-center font-bold '+(item.status==='OK'?'text-green-600':item.status==='NG'?'text-red-600':'text-gray-500')}>{item.status}</td><td className="p-1.5">{item.remarks?.trim()||(item.status==='NG'?'-':'N/A')}</td></tr>))}</tbody></table></div>);})}</div>
+          </div>
+        </div>
+      )}
+
+      {/* ── NC Report ── */}
+      {viewingNCReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-lg w-full max-w-3xl max-h-screen overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b z-10 p-3 flex justify-between items-center gap-2"><h2 className="text-base font-bold text-red-700">🚨 NC Report</h2><div className="flex gap-2"><button onClick={()=>exportNCOnly(viewingNCReport)} className="px-3 py-2 bg-red-600 text-white rounded font-bold text-xs">📥</button><button onClick={()=>setViewingNCReport(null)} className="px-3 py-2 bg-gray-300 rounded font-bold text-xs">Close</button></div></div>
+            <div className="p-4"><p className="font-bold text-lg mb-1">{viewingNCReport.inspectors?.join(', ')||viewingNCReport.inspector}</p><p className="text-sm text-gray-600 mb-4">{new Date(viewingNCReport.dateTime).toLocaleString()}</p>{ALL_AREAS().map(area=>{const ng=(viewingNCReport.areas[area.id]||[]).filter(i=>i.status==='NG');if(!ng.length) return null;return(<div key={area.id} className="mb-4"><div className="bg-red-600 text-white p-2 rounded-t font-bold">{area.icon} {area.name} ({ng.length})</div>{ng.map((item,i)=>(<div key={item.id} className="border border-red-300 p-3 mb-1 bg-red-50"><p className="text-xs font-bold text-red-700 mb-1">NC #{i+1}</p><p className="text-sm mb-1">{item.itemText}</p>{item.remarks&&<p className="text-sm text-red-800 font-medium bg-white rounded p-2 mb-2">📝 {item.remarks}</p>}{item.photos?.length>0&&<div className="grid grid-cols-3 gap-1">{item.photos.map((ph,pi)=><img key={pi} src={ph} alt="" className="w-full h-20 object-cover rounded border border-red-300"/>)}</div>}</div>))}</div>);})}</div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Photo Gallery ── */}
+      {showPhotoGallery && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-2">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-3 flex justify-between items-center"><h2 className="text-base font-bold">📸 Photos</h2><button onClick={()=>setShowPhotoGallery(null)} className="px-3 py-2 bg-gray-500 text-white rounded font-bold text-sm">Close</button></div>
+            <div className="p-4">{(()=>{const allPhotos=[];ALL_AREAS().forEach(area=>{(showPhotoGallery.areas[area.id]||[]).forEach(item=>{item.photos?.forEach((ph)=>{allPhotos.push({ph,areaName:area.name,areaIcon:area.icon,remarks:item.remarks,status:item.status});});});});if(!allPhotos.length) return <div className="text-center py-12 text-gray-500 text-sm">No photos</div>;return(<div><p className="font-bold text-green-800 mb-3">{allPhotos.length} photo(s)</p><div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{allPhotos.map((pd,i)=>(<div key={i} className="border rounded-lg overflow-hidden shadow"><div className={'p-1.5 text-white text-xs font-bold text-center '+(pd.status==='NG'?'bg-red-500':'bg-green-500')}>{pd.areaIcon} {pd.areaName}</div><img src={pd.ph} alt="" className="w-full h-40 object-cover cursor-pointer" onClick={()=>{const a=document.createElement('a');a.href=pd.ph;a.download=`Photo_${i+1}.jpg`;document.body.appendChild(a);a.click();document.body.removeChild(a);}}/>{pd.remarks&&<p className="text-xs p-1.5 text-red-700 bg-red-50">{pd.remarks}</p>}</div>))}</div></div>);})()}</div>
+          </div>
+        </div>
+      )}
+
+      {/* ── HTML Import Modal ── */}
+      {htmlImportResult && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden flex flex-col" style={{maxHeight:'92vh'}}>
+            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white flex-shrink-0 flex items-center gap-3">
+              <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-xl">📥</div>
+              <div><h2 className="font-bold text-base">Import HTML Inspection</h2><p className="text-xs opacity-80">Review NCs and upload matching photos</p></div>
+              <button onClick={()=>{setHtmlImportResult(null);setHtmlImportPhotos({});}} className="ml-auto p-2 bg-white bg-opacity-20 rounded-lg font-bold">✕</button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4 space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3"><div className="grid grid-cols-2 gap-2 text-xs"><div><p className="text-gray-500">Inspector(s)</p><p className="font-bold truncate">{htmlImportResult.inspectors?.join(', ')||'Unknown'}</p></div><div><p className="text-gray-500">Date</p><p className="font-bold">{new Date(htmlImportResult.dateTime).toLocaleDateString('en-GB')}</p></div><div><p className="text-gray-500">Status</p><p className={'font-bold '+(htmlImportResult.overallStatus==='OK'?'text-emerald-600':'text-red-600')}>{htmlImportResult.overallStatus==='OK'?'✓ Compliant':'✗ Non-Compliant'}</p></div><div><p className="text-gray-500">NCs</p><p className="font-bold text-red-600">{countNCs(htmlImportResult.areas)}</p></div></div></div>
+              {(()=>{
+                const ncItems=[]; AREAS.forEach(area=>{(htmlImportResult.areas[area.id]||[]).forEach(item=>{if(item.status==='NG') ncItems.push({...item,areaIcon:AREAS.find(a=>a.id===item.area)?.icon||'📍'});});});
+                if(!ncItems.length) return <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center"><p className="text-2xl mb-1">✅</p><p className="font-bold text-emerald-700 text-sm">No Non-Conformities</p></div>;
+                const totalPhotos=Object.values(htmlImportPhotos).reduce((s,p)=>s+p.length,0);
+                const covered=ncItems.filter(item=>(htmlImportPhotos[item.areaId+'::'+item.id]||[]).length>0).length;
+                return (<div>
+                  <div className="flex items-center justify-between mb-2"><p className="text-xs font-bold text-gray-700">📷 NC Photo Evidence</p><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${covered===ncItems.length?'bg-emerald-100 text-emerald-700':'bg-orange-100 text-orange-700'}`}>{covered}/{ncItems.length} · {totalPhotos} photo{totalPhotos!==1?'s':''}</span></div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3"><div className={`h-1.5 rounded-full transition-all ${covered===ncItems.length?'bg-emerald-500':'bg-orange-400'}`} style={{width:ncItems.length?`${(covered/ncItems.length)*100}%`:'0%'}}></div></div>
+                  <div className="space-y-3">
+                    {ncItems.map((item)=>{
+                      const key=item.areaId+'::'+item.id; const photos=htmlImportPhotos[key]||[]; const hasPh=photos.length>0;
+                      return (<div key={key} className={`border-2 rounded-xl overflow-hidden ${hasPh?'border-emerald-400':'border-red-300'}`}>
+                        <div className={`px-3 py-2 flex items-start gap-2 ${hasPh?'bg-emerald-50':'bg-red-50'}`}>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 mt-0.5 ${hasPh?'bg-emerald-500':'bg-red-500'}`}>{hasPh?'✓':'!'}</div>
+                          <div className="flex-1 min-w-0"><p className="text-[10px] font-bold text-gray-500">{item.areaIcon} {item.areaName}</p><p className="text-xs font-medium text-gray-800 leading-tight">{item.itemText}</p>{item.remarks&&<p className="text-[10px] text-red-700 bg-red-100 rounded px-1.5 py-0.5 mt-1 inline-block">⚠️ {item.remarks}</p>}</div>
+                          {hasPh&&<span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded-full">{photos.length}📷</span>}
+                        </div>
+                        <div className="bg-white p-2.5">
+                          {photos.length>0&&(<div className="grid grid-cols-3 gap-1.5 mb-2">{photos.map((ph,pi)=>(<div key={pi} className="relative rounded-lg overflow-hidden border border-gray-200"><img src={ph} alt="" className="w-full h-16 object-cover"/><button onClick={()=>setHtmlImportPhotos(prev=>({...prev,[key]:prev[key].filter((_,i)=>i!==pi)}))} className="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[9px] font-bold">✕</button></div>))}</div>)}
+                          <label className="block cursor-pointer"><div className={`flex items-center justify-center gap-2 py-2 rounded-lg border-2 border-dashed text-xs font-bold ${hasPh?'border-emerald-300 text-emerald-600 hover:bg-emerald-50':'border-red-300 text-red-500 hover:bg-red-50'}`}><span>📷</span><span>{hasPh?'Add more':'Upload photo *'}</span></div><input type="file" accept="image/*" multiple className="hidden" onChange={e=>{handleImportPhoto(key,e.target.files);e.target.value='';} }/></label>
+                        </div>
+                      </div>);
+                    })}
+                  </div>
+                </div>);
+              })()}
+            </div>
+            <div className="flex-shrink-0 border-t bg-white p-4 flex gap-3">
+              <button onClick={()=>{setHtmlImportResult(null);setHtmlImportPhotos({});}} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold">Cancel</button>
+              <button onClick={confirmHTMLImport} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">📥 Import</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Header ── */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center"><span className="text-xl">🏭</span></div>
+            <div><h1 className="text-base font-bold text-gray-800">Workplace Inspection</h1><div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><p className="text-xs text-emerald-600">{lastGlobalSync?lastGlobalSync.toLocaleTimeString():'Ready'}</p></div></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={manualSync} className="p-2 rounded-lg text-xs font-bold bg-blue-100 text-blue-600 hover:bg-blue-200">🔄</button>
+            <button onClick={()=>{setShowMyProfile(true);setProfileMsg('');setProfileForm({});}} className="flex items-center gap-2 bg-gray-50 rounded-full px-3 py-1.5 hover:bg-gray-100">
+              <span className="text-xl">{currentUser.avatar}</span>
+              <div className="text-right hidden sm:block"><p className="text-sm font-semibold text-gray-800">{currentUser.name}</p><p className="text-xs text-gray-500">{ROLE_LABELS[currentUser.role]}</p></div>
+            </button>
+            {currentUser.role==='admin'&&<button onClick={()=>{setShowAdminPanel(true);setAdminView('list');setAdminMsg('');}} className="p-2 bg-amber-100 text-amber-700 rounded-lg font-bold text-sm hover:bg-amber-200">👑</button>}
+            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"><LogOut className="w-5 h-5"/></button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Navigation ── */}
+      <div className="bg-white border-b border-gray-100 px-2 py-2">
+        <div className="flex gap-1 overflow-x-auto">
+          {(currentUser.role==='visitor'?[{id:'dashboard',label:'Dashboard',icon:'📊'}]:[{id:'dashboard',label:'Dashboard',icon:'📊'},{id:'schedule',label:'Schedule',icon:'📅'},{id:'new',label:'New',icon:'➕'},{id:'corrective',label:'CAR',icon:'🔧'},{id:'backup',label:'Backup',icon:'📦'},{id:'editor',label:'Form',icon:'⚙️'}]).map(({id,label,icon})=>(
+            <button key={id} onClick={()=>id==='editor'?setShowFormEditor(true):handleNavigate(id)} className={'flex-1 min-w-0 px-3 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-1.5 '+(currentView===id&&id!=='editor'?'bg-emerald-600 text-white shadow-md':'text-gray-600 hover:bg-gray-100')}>
+              <span>{icon}</span><span className="hidden sm:inline">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-2.5 sm:p-3">
+
+        {/* ═══ DASHBOARD ═══ */}
+        {currentView==='dashboard'&&(
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2"><span>☁️</span><div><p className="text-xs font-bold">Cloud Synced</p><p className="text-[10px] opacity-90">{lastGlobalSync?lastGlobalSync.toLocaleTimeString():'Ready'}</p></div></div>
+              <button onClick={manualSync} className="px-3 py-1.5 rounded-lg font-bold text-xs bg-white text-blue-600">🔄 Sync</button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2"><StatsCard label="Compliance" value={`${dashboardStats.compliance}%`} icon="📈" color="text-emerald-600"/><StatsCard label="Total" value={dashboardStats.total} icon="📋" color="text-blue-600"/><StatsCard label="Issues" value={dashboardStats.ngCount} icon="⚠️" color="text-red-500"/><StatsCard label="This Month" value={dashboardStats.monthCount} icon="📅" color="text-purple-600"/></div>
+            <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100"><h3 className="font-semibold text-gray-800 mb-2 text-sm">Quick Actions</h3><div className={'grid gap-2 '+(currentUser.role==='visitor'?'grid-cols-1':'grid-cols-3')}>{currentUser.role!=='visitor'&&<><button onClick={()=>setCurrentView('new')} className="p-3 bg-emerald-50 hover:bg-emerald-100 rounded-xl text-center"><span className="text-xl block mb-0.5">➕</span><span className="text-[10px] font-medium text-emerald-700">New</span></button><button onClick={()=>setCurrentView('schedule')} className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl text-center"><span className="text-xl block mb-0.5">📅</span><span className="text-[10px] font-medium text-blue-700">Schedule</span></button></>}<button onClick={manualSync} className="p-3 bg-purple-50 hover:bg-purple-100 rounded-xl text-center"><span className="text-xl block mb-0.5">🔄</span><span className="text-[10px] font-medium text-purple-700">Sync</span></button></div></div>
+            {drafts.length>0&&(<div className="bg-white rounded-xl p-3 shadow-sm border border-yellow-200"><h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2 text-sm"><span className="text-yellow-500">📝</span>Drafts<span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-auto">{drafts.length}</span></h3><div className="space-y-2">{drafts.slice().reverse().slice(0,3).map(draft=>{const pd=getDraftProgress(draft.id);return(<div key={draft.id} className="p-2.5 bg-yellow-50 rounded-lg"><div className="flex items-center justify-between mb-1.5"><p className="font-medium text-xs truncate flex-1 mr-2">{draft.inspectors?.join(', ')||draft.inspector}</p><span className="text-[10px] text-yellow-700">{pd?.progress||0}%</span></div><div className="w-full bg-yellow-200 rounded-full h-1.5 mb-2"><div className="bg-yellow-500 h-1.5 rounded-full" style={{width:(pd?.progress||0)+'%'}}></div></div><div className="flex gap-2"><button onClick={()=>loadDraft(draft)} className="flex-1 py-1.5 bg-yellow-500 text-white rounded-lg text-xs font-medium">Continue</button><button onClick={async()=>{if(window.confirm('Delete draft?')){const nl=drafts.filter(x=>x.id!==draft.id);setDrafts(nl);await saveDraftsToStorage(nl);}}} className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs">Del</button></div></div>);})}</div></div>)}
+            <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-3"><h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm"><FileText className="w-4 h-4 text-gray-500"/>All Inspections<span className="text-[10px] text-gray-400">({filteredInspections.length}/{inspections.length})</span></h3></div>
+              <div className="space-y-2 mb-3"><input type="text" value={searchInspector} onChange={e=>setSearchInspector(e.target.value)} placeholder="🔍 Search inspector..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400"/><div className="flex gap-2"><div className="flex gap-1 flex-1">{['all','OK','NG'].map(s=>(<button key={s} onClick={()=>setFilterStatus(s)} className={'flex-1 py-1.5 rounded-lg text-[10px] font-bold '+(filterStatus===s?(s==='OK'?'bg-emerald-600 text-white':s==='NG'?'bg-red-600 text-white':'bg-blue-600 text-white'):'bg-gray-100 text-gray-600')}>{s==='all'?'All':s}</button>))}</div><input type="month" value={filterMonth} onChange={e=>setFilterMonth(e.target.value)} className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-[10px] focus:outline-none"/>{(filterStatus!=='all'||filterMonth||searchInspector)&&<button onClick={()=>{setFilterStatus('all');setFilterMonth('');setSearchInspector('');}} className="px-2 py-1.5 bg-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">✕</button>}</div></div>
+              {inspections.length===0?(<div className="text-center py-8"><span className="text-3xl block mb-2">📋</span><p className="text-gray-500 text-xs">No inspections yet</p><button onClick={()=>setCurrentView('new')} className="mt-3 px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs">Start First</button></div>):filteredInspections.length===0?(<div className="text-center py-6"><span className="text-2xl block mb-2">🔍</span><p className="text-gray-500 text-xs">No match</p></div>):(
+                <><div className="space-y-2">{pagedInspections.map(insp=>(<InspectionCard key={insp.id} insp={insp} currentUser={currentUser} correctiveActions={correctiveActions} onView={setViewingReport} onViewNC={setViewingNCReport} onVerify={handleVerify} onUnverify={handleUnverify} onDelete={deleteInspection} onPhotoGallery={setShowPhotoGallery}/>))}</div>
+                {totalPages>1&&(<div className="flex items-center justify-between mt-4 pt-3 border-t"><button onClick={()=>setDashPage(p=>Math.max(1,p-1))} disabled={dashPage===1} className={'flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold '+(dashPage===1?'bg-gray-100 text-gray-400 cursor-not-allowed':'bg-emerald-600 text-white')}><ChevronLeft className="w-3 h-3"/>Prev</button><div className="flex gap-1">{Array.from({length:Math.min(5,totalPages)},(_,i)=>{let page;if(totalPages<=5) page=i+1;else if(dashPage<=3) page=i+1;else if(dashPage>=totalPages-2) page=totalPages-4+i;else page=dashPage-2+i;return(<button key={page} onClick={()=>setDashPage(page)} className={'w-7 h-7 rounded-lg text-xs font-bold '+(dashPage===page?'bg-emerald-600 text-white':'bg-gray-100 text-gray-600')}>{page}</button>);})}</div><button onClick={()=>setDashPage(p=>Math.min(totalPages,p+1))} disabled={dashPage===totalPages} className={'flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold '+(dashPage===totalPages?'bg-gray-100 text-gray-400 cursor-not-allowed':'bg-emerald-600 text-white')}>Next<ChevronRight className="w-3 h-3"/></button></div>)}
+                <p className="text-center text-[10px] text-gray-400 mt-2">Page {dashPage} of {totalPages} · {filteredInspections.length}</p></>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ SCHEDULE ═══ */}
+        {currentView==='schedule'&&(
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-emerald-500 to-green-700 text-white rounded-xl p-3"><h2 className="text-lg font-bold">📅 Schedule</h2></div>
+            <div className="bg-white rounded-xl shadow p-3">
+              <div className="flex items-center justify-between mb-3"><button onClick={()=>{const c=new Date(currentCalendarMonth);c.setMonth(c.getMonth()-1);setCurrentCalendarMonth(c.toISOString().slice(0,7));}} className="px-3 py-2 bg-emerald-600 text-white rounded-lg font-bold">←</button><input type="month" value={currentCalendarMonth} onChange={e=>setCurrentCalendarMonth(e.target.value)} className="px-3 py-2 border-2 border-gray-300 rounded-lg font-bold text-sm"/><button onClick={()=>{const c=new Date(currentCalendarMonth);c.setMonth(c.getMonth()+1);setCurrentCalendarMonth(c.toISOString().slice(0,7));}} className="px-3 py-2 bg-emerald-600 text-white rounded-lg font-bold">→</button></div>
+              {(()=>{const [y,m]=currentCalendarMonth.split('-').map(Number);const firstDay=new Date(y,m-1,1).getDay();const daysInMonth=new Date(y,m,0).getDate();const weeks=[];let week=Array(firstDay).fill(null);for(let d=1;d<=daysInMonth;d++){week.push(d);if(week.length===7){weeks.push(week);week=[];}}while(week.length>0&&week.length<7) week.push(null);if(week.length) weeks.push(week);const today=new Date();return(<div className="overflow-x-auto"><div className="min-w-[420px]"><div className="grid grid-cols-7 bg-green-700 text-white rounded-t-lg">{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=><div key={d} className="p-2 text-center text-xs font-bold">{d}</div>)}</div>{weeks.map((week,wi)=>(<div key={wi} className="grid grid-cols-7 border-b border-gray-200">{week.map((day,di)=>{if(!day) return <div key={di} className="min-h-[80px] bg-gray-50 border-r border-gray-200"></div>;const dateStr=`${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`;const daySched=schedules.filter(s=>s.date===dateStr);const isToday=today.getFullYear()===y&&today.getMonth()===m-1&&today.getDate()===day;return(<div key={di} className={'min-h-[80px] p-1 border-r border-gray-200 '+(isToday?'bg-green-50':'bg-white')}><div className={'text-xs font-bold mb-1 '+(isToday?'text-green-600':'text-gray-700')}>{day}</div>{daySched.map(sc=>(<div key={sc.id} className="bg-green-100 border border-green-400 rounded p-0.5 mb-0.5">{sc.inspectors.map((n,ni)=><p key={ni} className="text-[9px] font-medium text-green-800 leading-tight">{n}</p>)}<button onClick={()=>{if(window.confirm('Delete?')){const u=schedules.filter(s=>s.id!==sc.id);setSchedules(u);saveSchedules(u);}}} className="text-[8px] text-red-600 font-bold">🗑️</button></div>))}</div>);})}</div>))}</div></div>);})()} 
+            </div>
+            <div className="bg-white rounded-xl shadow p-3"><h3 className="font-bold text-sm mb-3">➕ Add Schedule</h3><div className="space-y-2"><input type="date" id="sched-date" className="w-full p-2 border-2 border-gray-300 rounded-lg text-sm"/><select id="sched-i1" className="w-full p-2 border-2 border-gray-300 rounded-lg text-sm"><option value="">Inspector 1 *</option>{users.filter(u=>u.role!=='visitor').map(u=><option key={u.id} value={u.name}>{u.name}</option>)}</select><select id="sched-i2" className="w-full p-2 border-2 border-gray-300 rounded-lg text-sm"><option value="">Inspector 2 (optional)</option>{users.filter(u=>u.role!=='visitor').map(u=><option key={u.id} value={u.name}>{u.name}</option>)}</select><button onClick={()=>{const date=document.getElementById('sched-date').value;const i1=document.getElementById('sched-i1').value;const i2=document.getElementById('sched-i2').value;if(!date||!i1){alert('Select date & Inspector 1');return;}const ns={id:Date.now().toString(),date,inspectors:i2?[i1,i2]:[i1],createdAt:new Date().toISOString()};const u=[...schedules,ns];setSchedules(u);saveSchedules(u);setCurrentCalendarMonth(date.slice(0,7));alert('✅ Added!');}} className="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-bold text-sm">✅ Add</button></div></div>
+          </div>
+        )}
+
+        {/* ═══ NEW INSPECTION ═══ */}
+        {currentView==='new'&&!currentInspection&&(
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-emerald-500 to-green-700 text-white rounded-xl p-3"><h2 className="text-lg font-bold">➕ New Inspection</h2></div>
+            <div className="bg-white rounded-xl shadow p-4">
+              <h3 className="font-bold text-sm mb-3">👥 Select Inspectors</h3>
+              {currentUser&&(<div className="bg-emerald-50 border-2 border-emerald-400 rounded-xl p-3 mb-3 flex items-center gap-3"><span className="text-3xl">{currentUser.avatar}</span><div><p className="text-xs text-emerald-700 font-bold">Auto-selected (you)</p><p className="font-bold text-emerald-900">{currentUser.name}</p></div></div>)}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                {users.filter(u=>u.role!=='visitor').map(u=>{ const isMe=currentUser&&currentUser.id===u.id; return (<label key={u.id} className="cursor-pointer"><input type="checkbox" className="inspector-checkbox hidden" value={u.name} defaultChecked={isMe} disabled={isMe}/><div className={'inspector-card border-2 rounded-xl p-2.5 text-center transition-all '+(isMe?'border-emerald-400 bg-emerald-50 cursor-not-allowed':'border-gray-300 hover:border-emerald-400')}><div className="text-2xl mb-1">{u.avatar}</div><p className="text-xs font-medium truncate">{u.name}</p>{isMe&&<p className="text-[9px] text-emerald-600 font-bold">✓ You</p>}</div></label>); })}
+              </div>
+              <style>{`.inspector-checkbox:checked + .inspector-card { border-color: #059669; background-color: #d1fae5; }`}</style>
+              <h3 className="font-bold text-sm mb-2">📋 Document Type</h3>
+              {[
+                {group:'🧹 HACCP',types:[{v:'all',l:'All HACCP',icon:'📋',sub:'02.1 + 13.1 + 01.1'},{v:'cleaning',l:'IR-PP-02.1',icon:'🧹',sub:'Cleaning'},{v:'glass',l:'IR-PP-13.1',icon:'📦',sub:'Glass/Metal'},{v:'hygiene',l:'IR-PP-01.1',icon:'⭐',sub:'Hygiene'},{v:'building',l:'IR-PP-14.1',icon:'🏢',sub:'Buildings'}]},
+                {group:'🦺 Safety',types:[{v:'safety',l:'OSHP-06.02',icon:'🦺',sub:'Workplace Safety Inspection'}]},
+                {group:'🌍 Environmental',types:[{v:'environment',l:'ISO 14001',icon:'🌍',sub:'Environmental Walkthrough'}]},
+              ].map(g=>(
+                <div key={g.group} className="mb-3">
+                  <p className="text-[11px] font-bold text-gray-600 mb-1">{g.group}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {g.types.map(dt=>(<label key={dt.v} className="cursor-pointer"><input type="radio" name="documentType" value={dt.v} defaultChecked={dt.v==='all'} className="hidden document-type-radio"/><div className="document-type-card border-2 border-gray-300 rounded-xl p-2.5 text-center hover:border-emerald-400 transition-all"><div className="text-xl mb-1">{dt.icon}</div><p className="text-xs font-bold">{dt.l}</p><p className="text-[10px] text-gray-500">{dt.sub}</p></div></label>))}
+                  </div>
+                </div>
+              ))}
+              <style>{`.document-type-radio:checked + .document-type-card { border-color: #059669; background-color: #d1fae5; }`}</style>
+              <h3 className="font-bold text-sm mb-2">📅 Date</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={()=>{ const sel=Array.from(document.querySelectorAll('.inspector-checkbox:checked')).map(c=>c.value); if(currentUser&&!sel.includes(currentUser.name)) sel.unshift(currentUser.name); if(!sel.length){alert('Select inspector');return;} const dt=document.querySelector('input[name="documentType"]:checked')?.value||'all'; startInspection(sel,dt); }} className="py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700">📝 Today<br/><span className="text-[10px] font-normal">{new Date().toLocaleDateString()}</span></button>
+                <div><input type="date" id="backdateInput" max={new Date().toISOString().split('T')[0]} className="w-full p-2 border-2 border-gray-300 rounded-lg text-xs mb-1.5"/><input type="time" id="backdateTimeInput" defaultValue="12:00" className="w-full p-2 border-2 border-gray-300 rounded-lg text-xs mb-1.5"/><button onClick={()=>{ const sel=Array.from(document.querySelectorAll('.inspector-checkbox:checked')).map(c=>c.value); if(currentUser&&!sel.includes(currentUser.name)) sel.unshift(currentUser.name); if(!sel.length){alert('Select inspector');return;} const dv=document.getElementById('backdateInput').value;const tv=document.getElementById('backdateTimeInput').value; if(!dv||!tv){alert('Select date & time');return;} const sd=new Date(dv+'T'+tv+':00'); if(sd>new Date()){alert('Future date not allowed');return;} const dt=document.querySelector('input[name="documentType"]:checked')?.value||'all'; setCurrentInspection({id:Date.now().toString(),dateTime:sd.toISOString(),inspector:sel[0],inspectors:sel,areas:createChecklistItems(dt),notes:'',isBackdated:true,documentType:dt}); setActiveAreaTab('extrusion');setCurrentView('inspection'); }} className="w-full py-2 bg-orange-500 text-white rounded-xl font-bold text-xs">⏮️ Backdate</button></div>
+              </div>
+            </div>
+            {drafts.length>0&&(<div className="bg-white rounded-xl shadow p-3"><h3 className="font-bold text-sm text-yellow-600 mb-2">📝 Continue Draft</h3>{drafts.slice().reverse().map(draft=>{const pd=getDraftProgress(draft.id);return(<div key={draft.id} className="p-3 bg-yellow-50 border border-yellow-300 rounded-xl mb-2"><p className="font-medium text-sm">{draft.inspectors?.join(', ')||draft.inspector}</p><p className="text-xs text-gray-500 mb-2">{pd?.progress||0}%</p><div className="w-full bg-yellow-200 rounded-full h-1.5 mb-2"><div className="bg-yellow-500 h-1.5 rounded-full" style={{width:(pd?.progress||0)+'%'}}></div></div><button onClick={()=>loadDraft(draft)} className="w-full py-2 bg-yellow-500 text-white rounded-lg text-sm font-bold">Continue</button></div>);})}</div>)}
+          </div>
+        )}
+
+        {/* ═══ ACTIVE INSPECTION ═══ */}
+        {currentView==='inspection'&&currentInspection&&(
+          <div className="bg-white rounded-xl shadow">
+            <div className="bg-gradient-to-r from-emerald-600 to-green-800 text-white p-2.5 rounded-t-xl">
+              <div className="flex justify-between items-center"><div className="flex-1"><h2 className="text-sm font-bold">🌿 Inspection</h2><p className="text-[10px] opacity-90">{new Date(currentInspection.dateTime).toLocaleString()} {currentInspection.isBackdated&&'⏮️'}</p>{currentInspection.inspectors?.length>0&&<p className="text-[10px] opacity-90">👥 {currentInspection.inspectors.join(', ')}</p>}</div>{lastAutoSave&&<div className="bg-white bg-opacity-20 rounded px-2 py-1 text-[9px]">💾 {lastAutoSave.toLocaleTimeString()}</div>}</div>
+              {(()=>{let total=0,done=0;Object.values(currentInspection.areas).forEach(items=>{total+=items.length;done+=items.filter(i=>i.status).length;});const pct=total>0?Math.round((done/total)*100):0;return(<div className="mt-1.5"><div className="flex justify-between text-[9px] mb-0.5"><span>Progress</span><span>{done}/{total} ({pct}%)</span></div><div className="w-full bg-white bg-opacity-30 rounded-full h-2"><div className={'h-2 rounded-full '+(pct===100?'bg-green-300':'bg-yellow-300')} style={{width:pct+'%'}}></div></div></div>);})()} 
+            </div>
+            {WHOLE_FACTORY_TYPES[currentInspection.documentType] && (()=>{
+              const areaId=WHOLE_FACTORY_TYPES[currentInspection.documentType];
+              const label=currentInspection.documentType==='safety'?'All Baik':currentInspection.documentType==='environment'?'All ✔':'All OK';
+              return (
+                <div className="p-2 border-b">
+                  <button onPointerDown={()=>{const items=currentInspection.areas[areaId]||[];setCurrentInspection({...currentInspection,areas:{...currentInspection.areas,[areaId]:items.map(item=>({...item,status:'OK',remarks:'',photos:[]}))}});alert('✅ '+items.length+' OK!');}} className="px-2 py-1 bg-green-600 text-white rounded text-[10px] font-bold">✅ {label}</button>
+                </div>
+              );
+            })()}
+            {!WHOLE_FACTORY_TYPES[currentInspection.documentType] && (
+            <div className="p-2 border-b">
+              <div className="flex gap-1 mb-1.5">
+                <button onPointerDown={()=>{const na={};let t=0;AREAS.forEach(area=>{if(currentInspection.areas[area.id]){na[area.id]=currentInspection.areas[area.id].map(item=>{t++;return{...item,status:'OK',remarks:'',photos:[]};});}});if(t>0){setCurrentInspection({...currentInspection,areas:na});alert('✅ '+t+' OK!');}}} className="px-2 py-1 bg-green-600 text-white rounded text-[10px] font-bold">✅ All OK</button>
+                <button onPointerDown={()=>{const na={};let cnt=0;AREAS.forEach(area=>{if(currentInspection.areas[area.id]){na[area.id]=currentInspection.areas[area.id].map(item=>{if(item.section?.includes('[IR-PP-01.1]')){cnt++;return{...item,status:'5',remarks:''};}return item;});}});if(cnt>0){setCurrentInspection({...currentInspection,areas:na});alert('⭐ '+cnt+' hygiene=5!');}}} className="px-2 py-1 bg-purple-600 text-white rounded text-[10px] font-bold">⭐ Hygiene 5</button>
+              </div>
+              <div className="flex gap-1 overflow-x-auto pb-1">
+                {AREAS.map(area=>{const items=currentInspection.areas[area.id]||[];const done=items.filter(i=>i.status).length;const total=items.length;const isComplete=done===total;const areaErrors=submitErrors.filter(e=>e.areaId===area.id).length;return(<button key={area.id} onPointerDown={()=>setActiveAreaTab(area.id)} className={'px-3 py-2 rounded-lg font-bold whitespace-nowrap text-xs flex-shrink-0 shadow transition-all relative '+(activeAreaTab===area.id?'bg-emerald-600 text-white scale-105':'bg-gray-200 hover:bg-gray-300')}><span>{area.icon}</span> {area.name.split(' ')[0]}<div className={'text-[9px] mt-0.5 '+(isComplete?(activeAreaTab===area.id?'text-green-200':'text-green-600'):(activeAreaTab===area.id?'text-yellow-200':'text-red-500'))}>{done}/{total}</div>{areaErrors>0&&<div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold ring-2 ring-white">{areaErrors}</div>}</button>);})}
+              </div>
+            </div>
+            )}
+            <div className="p-2">
+              {currentInspection.documentType==='safety' ? (
+                <SafetyChecklistTable
+                  items={currentInspection.areas['safety']||[]}
+                  notes={currentInspection.notes}
+                  onNotes={(v)=>setCurrentInspection(prev=>({...prev,notes:v}))}
+                  inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                  dateTime={currentInspection.dateTime}
+                  verifiedBy={null}
+                  docNumber={`Form ${editableDocDetails.safety.number} ${editableDocDetails.safety.rev}`}
+                  onUpdate={(itemId,field,value)=>updateItem('safety',itemId,field,value)}
+                  onPhoto={(itemId,e)=>handlePhoto('safety',itemId,e)}
+                  onRemovePhoto={(itemId,pi)=>removePhoto('safety',itemId,pi)}
+                  submitErrors={submitErrors}
+                />
+              ) : currentInspection.documentType==='environment' ? (
+                <EnvironmentChecklistTable
+                  items={currentInspection.areas['environment']||[]}
+                  notes={currentInspection.notes}
+                  onNotes={(v)=>setCurrentInspection(prev=>({...prev,notes:v}))}
+                  personInCharge={currentInspection.personInCharge}
+                  onPersonInCharge={(v)=>setCurrentInspection(prev=>({...prev,personInCharge:v}))}
+                  inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                  dateTime={currentInspection.dateTime}
+                  verifiedBy={null}
+                  docNumber={`${editableDocDetails.environment.number} ${editableDocDetails.environment.rev}`.trim()}
+                  onUpdate={(itemId,field,value)=>updateItem('environment',itemId,field,value)}
+                  onPhoto={(itemId,e)=>handlePhoto('environment',itemId,e)}
+                  onRemovePhoto={(itemId,pi)=>removePhoto('environment',itemId,pi)}
+                  submitErrors={submitErrors}
+                />
+              ) : currentInspection.documentType==='building' ? (
+                <BuildingChecklistTable
+                  items={currentInspection.areas['buildings-fabrication']||[]}
+                  inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                  verifiedByBuilding={null}
+                  verifierSignatureBuilding={null}
+                  docNumber={`${editableDocDetails.building.number} ${editableDocDetails.building.rev}`}
+                  onUpdate={(itemId,field,value)=>updateItem('buildings-fabrication',itemId,field,value)}
+                  onPhoto={(itemId,e)=>handlePhoto('buildings-fabrication',itemId,e)}
+                  onRemovePhoto={(itemId,pi)=>removePhoto('buildings-fabrication',itemId,pi)}
+                  submitErrors={submitErrors}
+                />
+              ) : (
+              (() => {
+                const allSectionKeys = Object.keys(editableChecklist[activeAreaTab]||{});
+                const cleaningSectionKeys = allSectionKeys.filter(s=>!s.includes('[IR-PP-13.1]')&&!s.includes('[IR-PP-01.1]'));
+                const otherSectionKeys = allSectionKeys.filter(s=>s.includes('[IR-PP-01.1]'));
+                const cleaningItems = currentInspection.areas[activeAreaTab].filter(i=>cleaningSectionKeys.includes(i.section));
+                const glassSourceTab = activeAreaTab==='mixing' ? 'extrusion' : activeAreaTab;
+                const glassSectionKeys = Object.keys(editableChecklist[glassSourceTab]||{}).filter(s=>s.includes('[IR-PP-13.1]'));
+                const glassItems = (currentInspection.areas[glassSourceTab]||[]).filter(i=>glassSectionKeys.includes(i.section));
+                const areaMetaObj = AREAS.find(a=>a.id===activeAreaTab) || { name: activeAreaTab };
+                return (
+                  <>
+                    {cleaningItems.length>0 && (
+                      <CleaningChecklistTable
+                        items={cleaningItems}
+                        areaName={areaMetaObj.name}
+                        dateTime={currentInspection.dateTime}
+                        inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                        docNumber={`${editableDocDetails.cleaning.number} ${editableDocDetails.cleaning.rev}`}
+                        onUpdate={(itemId,field,value)=>updateItem(activeAreaTab,itemId,field,value)}
+                        onPhoto={(itemId,e)=>handlePhoto(activeAreaTab,itemId,e)}
+                        onRemovePhoto={(itemId,pi)=>removePhoto(activeAreaTab,itemId,pi)}
+                        submitErrors={submitErrors}
+                      />
+                    )}
+                    {glassItems.length>0 && (
+                      <>
+                        {activeAreaTab==='mixing' && (
+                          <p className="text-[9px] text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1 mb-1">
+                            🔗 Shared with Extrusion — this register is filled once and applies to both tabs.
+                          </p>
+                        )}
+                        <GlassChecklistTable
+                          items={glassItems}
+                          departmentName={GLASS_DEPARTMENT_LABEL[activeAreaTab] || areaMetaObj.name}
+                          docNumber={`${editableDocDetails.glass.number} ${editableDocDetails.glass.rev}`}
+                          inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                          onUpdate={(itemId,field,value)=>updateItem(glassSourceTab,itemId,field,value)}
+                          onPhoto={(itemId,e)=>handlePhoto(glassSourceTab,itemId,e)}
+                          onRemovePhoto={(itemId,pi)=>removePhoto(glassSourceTab,itemId,pi)}
+                          submitErrors={submitErrors}
+                        />
+                      </>
+                    )}
+                    {otherSectionKeys.map(section=>{
+                const items=currentInspection.areas[activeAreaTab].filter(i=>i.section===section);
+                const allOK=items.every(i=>i.status==='OK');
+                const done=items.filter(i=>i.status).length;
+                const isHygiene=section.includes('[IR-PP-01.1]');
+                return(
+                <div key={section} className="mb-3">
+                  {!isHygiene&&(
+                  <div className={'flex justify-between items-center mb-1 p-1.5 rounded text-[10px] '+(done<items.length?'bg-red-50 border border-red-300':'bg-gray-100')}>
+                    <div>
+                      <span className="font-bold">{section.replace(' [IR-PP-13.1]','').replace(' [IR-PP-01.1]','')}</span>
+                      {section.includes('[IR-PP-13.1]')&&<span className="ml-1 bg-blue-500 text-white px-1 py-0.5 rounded text-[8px]">13.1</span>}
+                      <span className={' ml-1 font-bold '+(done<items.length?'text-red-600':'text-green-600')}>{done}/{items.length}</span>
+                    </div>
+                    <button onPointerDown={()=>markSectionOK(activeAreaTab,section)} className={'px-2 py-0.5 rounded text-[10px] font-medium '+(allOK?'bg-green-500 text-white':'bg-white border border-green-500 text-green-600')}>{allOK?'✓':'All OK'}</button>
+                  </div>
+                  )}
+                  {isHygiene?(
+                    <HygieneChecklistTable
+                      items={items}
+                      dateTime={currentInspection.dateTime}
+                      inspectorNames={currentInspection.inspectors?.join(', ')||currentInspection.inspector}
+                      docNumber={`${editableDocDetails.hygiene.number} ${editableDocDetails.hygiene.rev}`}
+                      onUpdate={(itemId,field,value)=>updateItem(activeAreaTab,itemId,field,value)}
+                    />
+                  ):items.map(item=>{
+                    const incomplete=!item.status;
+                    const ngNoInfo=item.status==='NG'&&(!item.remarks.trim()||!item.photos?.length);
+                    const hasError=submitErrors.some(e=>e.itemId===item.id);
+                    return(
+                    <div key={item.id} id={'item-'+item.id} className={'border rounded p-1.5 mb-1 '+(incomplete?'border-2 border-red-400 bg-red-50':ngNoInfo?'border-2 border-orange-400 bg-orange-50':hasError?'border-2 border-red-300':'border-gray-200')}>
+                      <div className="flex justify-between items-start gap-1.5">
+                        <p className="text-[11px] flex-1 leading-tight">{item.itemText}</p>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button onPointerDown={()=>updateItem(activeAreaTab,item.id,'status','OK')} className={'px-2 py-1 rounded text-xs font-bold '+(item.status==='OK'?'bg-green-500 text-white':'bg-gray-200')}>OK</button>
+                          <button onPointerDown={()=>updateItem(activeAreaTab,item.id,'status','NG')} className={'px-2 py-1 rounded text-xs font-bold '+(item.status==='NG'?'bg-red-500 text-white':'bg-gray-200')}>NG</button>
+                        </div>
+                      </div>
+                      {item.status==='NG'&&(
+                        <div className="mt-1.5 space-y-1.5">
+                          <textarea value={item.remarks} onChange={e=>updateItem(activeAreaTab,item.id,'remarks',e.target.value)} placeholder="Remarks *" className={'w-full p-1.5 border rounded text-xs '+(!item.remarks.trim()?'border-2 border-orange-400 bg-orange-50':'border-gray-300')} rows="2"/>
+                          <label className={'block cursor-pointer text-center py-1.5 rounded font-bold text-xs '+(!item.photos?.length?'bg-orange-500 text-white':'bg-blue-500 text-white')}>
+                            📷 {item.photos?.length?'Add ('+item.photos.length+')':'Photos *'}
+                            <input type="file" accept="image/*" multiple onChange={e=>handlePhoto(activeAreaTab,item.id,e)} className="hidden"/>
+                          </label>
+                          {item.photos?.length>0&&(
+                            <div className="grid grid-cols-3 gap-1">
+                              {item.photos.map((ph,pi)=>(
+                                <div key={pi} className="relative border border-gray-300 rounded overflow-hidden">
+                                  <img src={ph} alt="" className="w-full h-16 object-cover" loading="lazy"/>
+                                  <button onClick={()=>removePhoto(activeAreaTab,item.id,pi)} className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">✕</button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+                );
+                    })}
+                  </>
+                );
+              })()
+              )}
+              <div className="border-t pt-3 mt-3">
+                {/* Live incomplete summary — always visible when there are unfilled items */}
+                {(()=>{
+                  const live=[];
+                  Object.entries(currentInspection.areas).forEach(([areaId,items])=>{
+                    items.forEach(item=>{
+                      if(!item.status) live.push({areaId,itemId:item.id,areaName:item.areaName,type:'missing'});
+                      else if(item.status==='NG'&&!item.remarks.trim()) live.push({areaId,itemId:item.id,areaName:item.areaName,type:'no_remarks'});
+                      else if(item.status==='NG'&&!item.photos?.length) live.push({areaId,itemId:item.id,areaName:item.areaName,type:'no_photo'});
+                    });
+                  });
+                  if(!live.length) return(
+                    <div className="mb-3 bg-emerald-50 border-2 border-emerald-400 rounded-xl px-3 py-2.5 flex items-center gap-2">
+                      <span className="text-lg">✅</span>
+                      <p className="text-xs font-bold text-emerald-700">All items completed — ready to submit!</p>
+                    </div>
+                  );
+                  const grouped={};
+                  live.forEach(e=>{if(!grouped[e.areaId]) grouped[e.areaId]={areaName:e.areaName,items:[]};grouped[e.areaId].items.push(e);});
+                  return(
+                    <div className="mb-3 border-2 border-red-400 rounded-xl overflow-hidden">
+                      <div className="bg-red-500 text-white px-3 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🚨</span>
+                          <div>
+                            <p className="font-bold text-xs">{live.length} item{live.length!==1?'s':''} need attention</p>
+                            <p className="text-[10px] opacity-90">Tap an area to jump there</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 text-[9px] font-bold">
+                          {live.filter(e=>e.type==='missing').length>0&&<span className="bg-white text-red-600 px-1.5 py-0.5 rounded-full">⬜ {live.filter(e=>e.type==='missing').length}</span>}
+                          {live.filter(e=>e.type==='no_remarks').length>0&&<span className="bg-white text-orange-600 px-1.5 py-0.5 rounded-full">📝 {live.filter(e=>e.type==='no_remarks').length}</span>}
+                          {live.filter(e=>e.type==='no_photo').length>0&&<span className="bg-white text-yellow-600 px-1.5 py-0.5 rounded-full">📷 {live.filter(e=>e.type==='no_photo').length}</span>}
+                        </div>
+                      </div>
+                      <div className="bg-white divide-y divide-red-100">
+                        {Object.entries(grouped).map(([areaId,group])=>{
+                          const area=getAreaMetaSafe(areaId);
+                          const isActive=activeAreaTab===areaId;
+                          return(
+                            <button key={areaId} className={'w-full flex items-center gap-2 px-3 py-2 text-left transition '+(isActive?'bg-red-50':'hover:bg-red-50')}
+                              onClick={()=>{
+                                setActiveAreaTab(areaId);
+                                setTimeout(()=>{
+                                  const el=document.getElementById('item-'+group.items[0].itemId);
+                                  if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+                                },100);
+                              }}>
+                              <span className="text-base flex-shrink-0">{area?.icon}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className={'text-xs font-bold '+(isActive?'text-red-700':'text-gray-700')}>{group.areaName}</p>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {group.items.map((e,i)=>(
+                                    <span key={i} className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${e.type==='missing'?'bg-red-100 text-red-700':e.type==='no_remarks'?'bg-orange-100 text-orange-700':'bg-yellow-100 text-yellow-700'}`}>
+                                      {e.type==='missing'?'⬜ Not filled':e.type==='no_remarks'?'📝 No remarks':'📷 No photo'}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex-shrink-0 flex items-center gap-1">
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive?'bg-red-500 text-white':'bg-red-100 text-red-600'}`}>{group.items.length}</span>
+                                <span className="text-gray-400 text-sm">→</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+                {showSubmitErrorPanel&&submitErrors.length>0&&(
+                  <div className="mb-3 border-2 border-red-400 rounded-xl overflow-hidden">
+                    <div className="bg-red-500 text-white px-3 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2"><span className="text-lg">🚨</span><div><p className="font-bold text-sm">Cannot Submit — {submitErrors.length} Issue{submitErrors.length!==1?'s':''}</p><p className="text-[10px] opacity-90">Tap to jump to area</p></div></div>
+                      <button onClick={()=>setShowSubmitErrorPanel(false)} className="w-7 h-7 bg-white bg-opacity-20 rounded-lg font-bold text-sm">✕</button>
+                    </div>
+                    {(()=>{
+                      const grouped={};
+                      submitErrors.forEach(e=>{if(!grouped[e.areaId]) grouped[e.areaId]={areaName:e.areaName,items:[]};grouped[e.areaId].items.push(e);});
+                      return Object.entries(grouped).map(([areaId,group])=>{
+                        const area=getAreaMetaSafe(areaId);
+                        return(
+                          <div key={areaId} className={'border-b border-red-200 last:border-0 '+(activeAreaTab===areaId?'bg-red-50':'bg-white')}>
+                            <button className="w-full flex items-center gap-2 px-3 py-2 hover:bg-red-50 text-left" onClick={()=>{setActiveAreaTab(areaId);setShowSubmitErrorPanel(false);setTimeout(()=>{const el=document.getElementById('item-'+group.items[0].itemId);if(el) el.scrollIntoView({behavior:'smooth',block:'center'});},100);}}>
+                              <span className="text-base">{area?.icon}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-red-700">{group.areaName}</p>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {group.items.map((e,i)=>(<span key={i} className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${e.type==='missing'?'bg-red-100 text-red-700':e.type==='no_remarks'?'bg-orange-100 text-orange-700':'bg-yellow-100 text-yellow-700'}`}>{e.type==='missing'?'⬜ Not filled':e.type==='no_remarks'?'📝 No remarks':'📷 No photo'}</span>))}
+                                </div>
+                              </div>
+                              <span className="text-red-400 text-sm">→</span>
+                            </button>
+                          </div>
+                        );
+                      });
+                    })()}
+                    <div className="bg-red-50 px-3 py-2 flex gap-1 flex-wrap">
+                      {[...new Set(submitErrors.map(e=>e.areaId))].map(areaId=>{
+                        const area=getAreaMetaSafe(areaId);
+                        const count=submitErrors.filter(e=>e.areaId===areaId).length;
+                        return(<button key={areaId} onClick={()=>{setActiveAreaTab(areaId);setShowSubmitErrorPanel(false);setTimeout(()=>{const first=submitErrors.find(e=>e.areaId===areaId);if(first){const el=document.getElementById('item-'+first.itemId);if(el) el.scrollIntoView({behavior:'smooth',block:'center'});}},100);}} className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-lg text-[10px] font-bold hover:bg-red-600">{area?.icon} {area?.name.split(' ')[0]} <span className="bg-white text-red-600 rounded-full w-4 h-4 flex items-center justify-center text-[9px]">{count}</span></button>);
+                      })}
+                    </div>
+                  </div>
+                )}
+                <textarea value={currentInspection.notes} onChange={e=>setCurrentInspection({...currentInspection,notes:e.target.value})} placeholder="Notes (optional)" className="w-full p-1.5 border rounded mb-2 text-xs" rows="1"/>
+                <div className="grid grid-cols-3 gap-2">
+                  <button onClick={saveDraft} className="py-3 bg-yellow-500 text-white rounded-lg font-bold text-xs hover:bg-yellow-600">💾 Draft</button>
+                  <button onClick={submitInspection} className="py-3 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700">✅ Submit</button>
+                  <button onClick={()=>{setCurrentView('dashboard');setCurrentInspection(null);}} className="py-3 bg-gray-500 text-white rounded-lg font-bold text-xs hover:bg-gray-600">← Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ CAR ═══ */}
+        {currentView==='corrective'&&(
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-emerald-500 to-green-700 text-white rounded-xl p-3"><h2 className="text-lg font-bold">🔧 Corrective Actions</h2></div>
+            {(()=>{
+              // One list per section: HACCP CARs, Safety CSARs (OSHP-06.03), Environmental findings.
+              const kind=SECTION_KINDS.find(k=>k.key===caKind);
+              const kindCAs=correctiveActions.filter(c=>(c.kind||'haccp')===caKind);
+              const ngCount=(k)=>inspections.reduce((n,i)=>n+Object.values(i.areas).flat().filter(it=>it.status==='NG'&&itemKind(it)===k).length,0);
+              return (<>
+              <div className="grid grid-cols-3 gap-1.5">{SECTION_KINDS.map(k=>(<button key={k.key} onClick={()=>{setCaKind(k.key);setShowCAForm(null);}} className={'rounded-xl p-2 text-center font-bold text-xs border-2 '+(caKind===k.key?'bg-emerald-600 text-white border-emerald-600':'bg-white border-gray-200 text-gray-700')}><div className="text-lg">{k.icon}</div>{k.label} {k.caShort}<div className={'text-[10px] font-normal '+(caKind===k.key?'text-emerald-100':'text-gray-500')}>{ngCount(k.key)} NG</div></button>))}</div>
+            <div className="bg-white rounded-xl shadow p-3">
+              <p className="font-bold text-sm mb-2">{kind.icon} {kind.caTitle}</p>
+              <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                <div className="bg-gray-100 rounded-xl p-3"><p className="text-2xl font-bold">{kindCAs.length}</p><p className="text-xs text-gray-600">Total</p></div>
+                <div className="bg-yellow-100 rounded-xl p-3"><p className="text-2xl font-bold text-yellow-700">{kindCAs.filter(c=>c.status==='pending').length}</p><p className="text-xs text-yellow-700">Pending</p></div>
+                <div className="bg-green-100 rounded-xl p-3"><p className="text-2xl font-bold text-green-700">{kindCAs.filter(c=>c.status==='completed').length}</p><p className="text-xs text-green-700">Done</p></div>
+              </div>
+              {ngCount(caKind)===0&&kindCAs.length===0?(
+                <div className="text-center py-8"><div className="text-5xl mb-3">✅</div><p className="text-green-600 font-bold">No Non-Conformities!</p></div>
+              ):(
+                inspections.slice().reverse().map(insp=>{
+                  let ngItems=[];
+                  Object.values(insp.areas).forEach(items=>{items.forEach(item=>{if(item.status==='NG'&&itemKind(item)===caKind) ngItems.push({...item,inspectionId:insp.id});});});
+                  if(!ngItems.length) return null;
+                  return(
+                    <div key={insp.id} className="border border-orange-300 rounded-xl p-2.5 mb-3 bg-orange-50">
+                      <div className="bg-orange-500 text-white rounded-lg p-2 mb-2"><p className="font-bold text-xs">{insp.inspectors?.join(', ')||insp.inspector}</p><p className="text-[10px]">{new Date(insp.dateTime).toLocaleDateString()} · {ngItems.length} NG</p></div>
+                      {ngItems.map(ngItem=>{
+                        const existing=correctiveActions.find(ca=>ca.inspectionId===insp.id&&ca.itemId===ngItem.id);
+                        return(
+                          <div key={ngItem.id} className="bg-white border border-red-300 rounded-xl p-2 mb-2">
+                            <span className="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px] font-bold">NC – {ngItem.areaName}</span>
+                            <p className="text-xs mt-1 mb-1">{ngItem.itemText}</p>
+                            <p className="text-[10px] bg-gray-50 rounded p-1 mb-2">Issue: {ngItem.remarks}</p>
+                            {existing?(
+                              <div className="bg-green-50 border border-green-300 rounded-lg p-2">
+                                <div className="flex justify-between items-center mb-1"><span className="text-[10px] font-bold text-green-700">✅ {kind.caShort} Recorded</span><span className={'text-[9px] px-1.5 py-0.5 rounded-full font-bold '+(existing.status==='completed'?'bg-green-500 text-white':'bg-yellow-400 text-gray-800')}>{existing.status}</span></div>
+                                <p className="text-xs">{existing.description}</p>
+                                <button onClick={()=>{const u=correctiveActions.filter(c=>c.id!==existing.id);setCorrectiveActions(u);saveCorrectiveActions(u);}} className="mt-1.5 text-[10px] text-red-600 font-bold">🗑️ Delete</button>
+                              </div>
+                            ):showCAForm&&showCAForm.inspectionId===insp.id&&showCAForm.itemId===ngItem.id?(
+                              <div className="bg-white border border-orange-400 rounded-xl p-2 space-y-1.5">
+                                <textarea id={`ca-desc-${ngItem.id}`} placeholder={(caKind==='environment'?'Finding / action':'Corrective action')+' *'} className="w-full p-1.5 border border-gray-300 rounded text-xs" rows="2"/>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  <input type="date" id={`ca-date-${ngItem.id}`} defaultValue={new Date().toISOString().split('T')[0]} className="p-1.5 border border-gray-300 rounded text-xs"/>
+                                  <select id={`ca-status-${ngItem.id}`} className="p-1.5 border border-gray-300 rounded text-xs" defaultValue="pending"><option value="pending">⏳ Pending</option><option value="completed">✅ Done</option></select>
+                                </div>
+                                <input type="file" id={`ca-photos-${ngItem.id}`} accept="image/*" multiple className="w-full p-1 border border-gray-300 rounded text-[10px]"/>
+                                <div className="flex gap-1.5">
+                                  <button onClick={()=>{
+                                    const desc=document.getElementById(`ca-desc-${ngItem.id}`).value;
+                                    const date=document.getElementById(`ca-date-${ngItem.id}`).value;
+                                    const status=document.getElementById(`ca-status-${ngItem.id}`).value;
+                                    const photoInput=document.getElementById(`ca-photos-${ngItem.id}`);
+                                    if(!desc.trim()){alert('Description required');return;}
+                                    if(!date){alert('Date required');return;}
+                                    const files=Array.from(photoInput?.files||[]);
+                                    const save=(photos)=>{const newCA={id:Date.now().toString(),kind:caKind,inspectionId:insp.id,itemId:ngItem.id,areaName:ngItem.areaName,itemText:ngItem.itemText,originalRemarks:ngItem.remarks,description:desc.trim(),date,status,photos,createdBy:currentUser.name,createdAt:new Date().toISOString()};const u=[...correctiveActions,newCA];setCorrectiveActions(u);saveCorrectiveActions(u);setShowCAForm(null);alert('✅ '+kind.caShort+' saved!');};
+                                    if(files.length){Promise.all(files.map(f=>new Promise(r=>{const rd=new FileReader();rd.onloadend=()=>r(rd.result);rd.readAsDataURL(f);}))).then(save);}else{save([]);}
+                                  }} className="flex-1 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold">✅ Save</button>
+                                  <button onClick={()=>setShowCAForm(null)} className="px-3 py-1.5 bg-gray-300 text-gray-800 rounded-lg text-xs font-bold">Cancel</button>
+                                </div>
+                              </div>
+                            ):(
+                              <button onClick={()=>setShowCAForm({inspectionId:insp.id,itemId:ngItem.id})} className="w-full py-2 bg-orange-500 text-white rounded-lg font-bold text-xs mt-1">➕ Add {kind.caShort}</button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+              </>);
+            })()}
+          </div>
+        )}
+
+        {/* ═══ BACKUP ═══ */}
+        {currentView==='backup'&&(
+          <div className="space-y-3">
+            <div className="bg-gradient-to-r from-emerald-500 to-green-700 text-white rounded-xl p-3"><h2 className="text-lg font-bold">📦 Backup & Import</h2></div>
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl p-3">
+              <div className="flex items-center gap-3 mb-3"><span className="text-4xl">☁️</span><div><h3 className="font-bold">Cloud Sync</h3><p className="text-xs opacity-90">{lastGlobalSync?.toLocaleTimeString()}</p></div></div>
+              <div className="grid grid-cols-5 gap-1.5 mb-3">{[['Insp',inspections.length],['Sched',schedules.length],['Draft',drafts.length],['CAR',correctiveActions.length],['Users',users.length]].map(([l,v])=>(<div key={l} className="bg-white bg-opacity-20 rounded-lg p-2 text-center"><p className="text-lg font-bold">{v}</p><p className="text-[10px]">{l}</p></div>))}</div>
+              <button onClick={manualSync} className="w-full py-2.5 bg-white text-blue-600 rounded-xl font-bold text-sm">🔄 Sync Now</button>
+            </div>
+            <div className="bg-white rounded-xl shadow p-4 border-2 border-blue-200">
+              <h3 className="font-bold text-base mb-1">📥 Upload HTML Inspection</h3>
+              <p className="text-xs text-gray-600 mb-3">Upload an exported HTML report to restore it.</p>
+              {htmlImportError&&<div className="bg-red-50 border border-red-300 rounded-xl p-3 mb-3 text-xs text-red-700">{htmlImportError}</div>}
+              <label className="block cursor-pointer">
+                <div className="border-2 border-dashed border-blue-400 rounded-xl p-5 text-center hover:bg-blue-50">
+                  <div className="text-4xl mb-2">📄</div>
+                  <p className="font-bold text-blue-700 mb-1">Choose HTML File</p>
+                  <p className="text-xs text-gray-500">Select an exported inspection report</p>
+                </div>
+                <input type="file" accept=".html,text/html" onChange={handleHTMLUpload} className="hidden"/>
+              </label>
+            </div>
+            <div className="bg-white rounded-xl shadow p-3">
+              <h3 className="font-bold text-sm mb-3">💾 JSON Backup</h3>
+              <p className="text-[10px] text-gray-500 mb-3">Portable format — inspections, schedules, drafts, corrective actions, and users. Import merges in anything new; it never overwrites or duplicates what you already have, so a backup from another HACCP Workplace Inspection instance (or an older version of this app) can be brought in safely.</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={exportAllData} className="py-3 bg-emerald-600 text-white rounded-xl font-bold text-sm">📥 Download</button>
+                <label className="block cursor-pointer"><div className="py-3 bg-blue-600 text-white rounded-xl font-bold text-sm text-center">📤 Restore</div><input type="file" accept=".json" onChange={importData} className="hidden"/></label>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
