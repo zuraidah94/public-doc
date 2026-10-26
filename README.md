@@ -23,6 +23,10 @@ Impact Rank's HACCP, workplace safety (OSHP-06.02) and ISO 14001 environmental i
 - [Try the demo](https://zuraidah94.github.io/public-doc/inspection-app/): the same app with example users (log in as `admin`, password `123`). It saves only in your own browser.
 - [How it works](inspection-app/README.md): the forms it covers, where records are saved and how to set it up.
 
+<img src="inspection-app/qr-code.png" alt="QR code that opens the Workplace Inspection app" width="200">
+
+Scan to open the live app. Print [`qr-code.png`](inspection-app/qr-code.png) or [`qr-code.svg`](inspection-app/qr-code.svg) for the shop floor.
+
 ## Contents
 
 | Folder | What's inside |

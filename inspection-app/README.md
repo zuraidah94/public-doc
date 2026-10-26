@@ -6,6 +6,11 @@ web app: everyone opens one link, signs in with Google, and all records are save
 
 **Open the app:** https://script.google.com/macros/s/AKfycbytx5uxMD3vGso1nbUTJF_AyhCjzks9WrDYaASZtYm28EQXDnzZxfOFKYJcoKPZxHJs/exec
 
+<img src="qr-code.png" alt="QR code that opens the Workplace Inspection app" width="200">
+
+Scan to open the app. For printing, use [`qr-code.png`](qr-code.png) (1200 × 1200) or
+[`qr-code.svg`](qr-code.svg), which stays sharp at any size.
+
 | Section | Form | Title | Rev in app | Rated |
 |---|---|---|---|---|
 | HACCP | IR-PP-02.1 | Cleaning and Sanitation Inspection Checksheet | Rev 05 (Issue 05, 12-10-2026) | OK / NG, per area |
@@ -135,6 +140,7 @@ Restore adds anything new and doesn't duplicate what is already there.
 - `apps-script/` — `Code.gs` and `appsscript.json` go into the Apps Script project; `Index.html` is
   uploaded to the app's Drive folder.
 - `index.html` — local copy that saves in the browser only. For trying changes, not for real records.
+- `qr-code.png`, `qr-code.svg` — QR code for the app link, to print for the shop floor.
 - `publish_public.py` — makes the public copy in zuraidah94/public-doc, with staff names, logins and
   passwords replaced by example users. Run `python3 publish_public.py ../../public-doc/inspection-app`.
 - `forms/` — word-for-word copies of the current IR-PP-02.1, OSHP-06.02 and ISO 14001 walkthrough forms,
