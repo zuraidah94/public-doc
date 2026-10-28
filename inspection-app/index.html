@@ -74,7 +74,7 @@
 </script>
 </head>
 <body>
-<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 217258d</small></p></div>
+<div id="root"><p style="font:16px sans-serif;padding:24px;color:#555">Loading the inspection app… <small id="boot">build 84fc15e</small></p></div>
 <script>document.getElementById('boot').textContent += ' · scripts running';</script>
 <script>
 if (!window.React || !window.ReactDOM || !window.LucideReact) window.__startError('React or lucide did not load. Check the internet connection, then reload.');
@@ -389,6 +389,7 @@ const normalizeImportedInspection = raw => {
   delete normalized.verifierSignature;
   return normalized;
 };
+const newId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
 const mergeById = (existing, incoming, idKey = 'id') => {
   const seen = new Set(existing.map(r => r[idKey]));
   const additions = incoming.filter(r => r && r[idKey] != null && !seen.has(r[idKey]));
@@ -2127,6 +2128,24 @@ function ImpactRankApp() {
     };
     load();
   }, []);
+  const liveLists = useRef({});
+  liveLists.current = {
+    inspections,
+    schedules,
+    drafts,
+    correctiveActions
+  };
+  const refreshShared = useCallback(async () => {
+    const lists = [['inspections-data', 'inspections', setInspections], ['inspection-schedules', 'schedules', setSchedules], ['inspection-drafts', 'drafts', setDrafts], ['corrective-actions', 'correctiveActions', setCorrectiveActions]];
+    const before = {
+      ...liveLists.current
+    };
+    const got = await Promise.all(lists.map(([key]) => window.storage.get(key, true).catch(() => null)));
+    lists.forEach(([, name, set], i) => {
+      if (got[i]?.value && liveLists.current[name] === before[name]) set(JSON.parse(got[i].value));
+    });
+    if (got.some(Boolean)) setLastGlobalSync(new Date());
+  }, []);
   useEffect(() => {
     const load = async () => {
       try {
@@ -2141,17 +2160,22 @@ function ImpactRankApp() {
           } else await window.storage.delete('active-inspection', false);
         }
       } catch {}
-      try {
-        const [ir, sr, dr, cr] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null)]);
-        if (ir?.value) setInspections(JSON.parse(ir.value));
-        if (sr?.value) setSchedules(JSON.parse(sr.value));
-        if (dr?.value) setDrafts(JSON.parse(dr.value));
-        if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
-        setLastGlobalSync(new Date());
-      } catch {}
+      await refreshShared();
     };
     load();
-  }, []);
+  }, [refreshShared]);
+  useEffect(() => {
+    if (!currentUser) return;
+    const again = () => {
+      if (document.visibilityState === 'visible') refreshShared();
+    };
+    const iv = setInterval(again, 30000);
+    document.addEventListener('visibilitychange', again);
+    return () => {
+      clearInterval(iv);
+      document.removeEventListener('visibilitychange', again);
+    };
+  }, [currentUser, refreshShared]);
   useEffect(() => {
     if (!currentInspection) return;
     const save = async () => {
@@ -2209,20 +2233,16 @@ function ImpactRankApp() {
   }, []);
   const manualSync = useCallback(async () => {
     try {
-      const [ir, sr, dr, cr, ur] = await Promise.all([window.storage.get('inspections-data', true).catch(() => null), window.storage.get('inspection-schedules', true).catch(() => null), window.storage.get('inspection-drafts', true).catch(() => null), window.storage.get('corrective-actions', true).catch(() => null), window.storage.get('app-users', true).catch(() => null)]);
-      if (ir?.value) setInspections(JSON.parse(ir.value));
-      if (sr?.value) setSchedules(JSON.parse(sr.value));
-      if (dr?.value) setDrafts(JSON.parse(dr.value));
-      if (cr?.value) setCorrectiveActions(JSON.parse(cr.value));
+      await refreshShared();
+      const ur = await window.storage.get('app-users', true).catch(() => null);
       if (ur?.value) setUsers(JSON.parse(ur.value));
-      setLastGlobalSync(new Date());
       const t = document.createElement('div');
       t.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg z-50 text-sm';
       t.textContent = '✅ Synced!';
       document.body.appendChild(t);
       setTimeout(() => t.remove(), 1500);
     } catch {}
-  }, []);
+  }, [refreshShared]);
   const handleLogin = useCallback(() => {
     setLoginError('');
     const normalize = s => (s || '').toLowerCase().replace(/\s+/g, '');
@@ -2465,7 +2485,7 @@ function ImpactRankApp() {
   const startInspection = useCallback((inspectorNames, documentType = 'all') => {
     if (currentInspection) return;
     setCurrentInspection({
-      id: Date.now().toString(),
+      id: newId(),
       dateTime: new Date().toISOString(),
       inspector: inspectorNames[0],
       inspectors: inspectorNames,
@@ -2595,6 +2615,7 @@ function ImpactRankApp() {
     }
     const completed = {
       ...currentInspection,
+      id: newId(),
       overallStatus: Object.values(currentInspection.areas).flat().some(i => i.status === 'NG') ? 'NG' : 'OK',
       submittedAt: new Date().toISOString(),
       status: 'pending_verification'
@@ -2611,7 +2632,8 @@ function ImpactRankApp() {
     setCurrentView('dashboard');
     setCurrentInspection(null);
     setTimeout(() => alert('✅ Submitted! Status: ' + completed.overallStatus), 100);
-  }, [currentInspection, inspections, drafts, saveData, saveDraftsToStorage]);
+    setTimeout(() => refreshShared(), 3000);
+  }, [currentInspection, inspections, drafts, saveData, saveDraftsToStorage, refreshShared]);
   const saveDraft = async () => {
     const draftData = {
       ...currentInspection,
@@ -4575,7 +4597,7 @@ function ImpactRankApp() {
         return;
       }
       const ns = {
-        id: Date.now().toString(),
+        id: newId(),
         date,
         inspectors: i2 ? [i1, i2] : [i1],
         createdAt: new Date().toISOString()
@@ -4746,7 +4768,7 @@ function ImpactRankApp() {
       }
       const dt = document.querySelector('input[name="documentType"]:checked')?.value || 'all';
       setCurrentInspection({
-        id: Date.now().toString(),
+        id: newId(),
         dateTime: sd.toISOString(),
         inspector: sel[0],
         inspectors: sel,
@@ -5423,7 +5445,7 @@ function ImpactRankApp() {
             const files = Array.from(photoInput?.files || []);
             const save = photos => {
               const newCA = {
-                id: Date.now().toString(),
+                id: newId(),
                 kind: caKind,
                 inspectionId: insp.id,
                 itemId: ngItem.id,

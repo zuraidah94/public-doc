@@ -1,6 +1,6 @@
 // End-to-end test of the Google Sheets version: the real apps-script/Code.gs runs on in-memory
 // fakes of Sheets and Drive (gas-fakes.mjs), and the real apps-script/Index.html runs in headless
-// Chromium, with google.script.run wired to it. Two inspectors use the app at the same time.
+// Chromium, with google.script.run wired to it. Two inspectors use the app at the same time, then three.
 //
 // Run: python3 build.py && node test/apps-script.test.mjs   (after npm install)
 import { createRequire } from 'node:module';
@@ -25,9 +25,11 @@ const json = (key) => records(key).map((r) => r.slice(3).filter((c) => c !== '')
 const browser = await chromium.launch();
 let offline = false;   // while true, every call to Google fails, as with no signal
 let failing = null;     // (fn, args) => true to make just some calls fail
-async function open(email) {
+async function open(email, clock) {
   const context = await browser.newContext({ viewport: { width: 420, height: 900 } });
   const page = await context.newPage();
+  // A stopped clock: every phone starts its inspection in the same millisecond.
+  if (clock) await page.addInitScript((t) => { Date.now = () => t; }, clock);
   page.errors = [];
   page.on('pageerror', (e) => page.errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') page.errors.push(m.text()); });
@@ -122,6 +124,55 @@ try {
   await a.locator('button', { hasText: 'Sync' }).first().click();
   await a.waitForTimeout(800);
   check(await shown(a) === '3', 'after Sync, A sees all 3 inspections');
+
+  // Three people each submit a different inspection at the same moment, with the same three names
+  // and the same backdated time. Each is its own record, and each phone shows all of them.
+  const team = await Promise.all(['verifier', 'inspector', 'inspector2'].map((u) => open(u + '@impactrank.com.my', Date.UTC(2026, 9, 27, 2))));
+  await Promise.all(team.map((p, i) => login(p, ['verifier', 'inspector', 'inspector2'][i])));
+  const teamBefore = records('inspections-data').length;
+  const backdated = async (p, form, all) => {
+    await p.locator('button', { hasText: 'New' }).first().click();
+    await p.locator('label', { hasText: form }).first().click();
+    for (let k = 0; k < 3; k++) await p.locator('.inspector-checkbox').nth(k).check();
+    await p.fill('#backdateInput', '2026-10-26');
+    await p.fill('#backdateTimeInput', '10:00');
+    await p.locator('button', { hasText: 'Backdate' }).first().click();
+    await p.waitForSelector('text=' + all);
+    await p.locator('button', { hasText: all }).first().dispatchEvent('pointerdown');
+    if (form === 'ISO 14001') await p.locator('label', { hasText: 'Person In Charge' }).locator('input').fill('Store keeper');
+    await p.locator('button', { hasText: 'Submit' }).first().click();
+    await p.waitForSelector('text=Quick Actions');
+  };
+  await Promise.all([backdated(team[0], 'IR-PP-02.1', 'All OK'), backdated(team[1], 'OSHP-06.02', 'All Baik'), backdated(team[2], 'ISO 14001', 'All ✔')]);
+  await team[0].waitForTimeout(1000);
+  const ids = json('inspections-data').map((j) => JSON.parse(j).id);
+  check(records('inspections-data').length === teamBefore + 3 && new Set(ids).size === ids.length,
+    `three inspections submitted in the same millisecond, same names and time, are three records (got ${records('inspections-data').length - teamBefore})`);
+  await team[0].waitForTimeout(3500);
+  const teamShown = await Promise.all(team.map(shown));
+  check(teamShown.every((n) => n === String(teamBefore + 3)), `each phone shows all of them without pressing Sync (${teamShown.join(', ')})`);
+
+  // Two people continue the same shared draft and both submit: two records, neither overwritten.
+  await team[0].locator('button', { hasText: 'New' }).first().click();
+  await team[0].locator('label', { hasText: 'IR-PP-02.1' }).first().click();
+  await team[0].locator('button', { hasText: 'Today' }).first().click();
+  await team[0].waitForSelector('text=All OK');
+  await team[0].locator('button', { hasText: '💾 Draft' }).first().click();
+  await team[0].waitForSelector('text=Quick Actions');
+  await team[0].waitForTimeout(500);
+  const draftBefore = records('inspections-data').length;
+  for (const p of team.slice(1)) {
+    await p.locator('button', { hasText: 'Sync' }).first().click();
+    await p.locator('button', { hasText: /^Continue$/ }).first().click();
+    await p.waitForSelector('text=All OK');
+    await p.locator('button', { hasText: 'All OK' }).first().dispatchEvent('pointerdown');
+  }
+  for (const p of team.slice(1)) {
+    await p.locator('button', { hasText: 'Submit' }).first().click();
+    await p.waitForSelector('text=Quick Actions');
+  }
+  await team[0].waitForTimeout(800);
+  check(records('inspections-data').length === draftBefore + 2, `a shared draft submitted from two phones makes two records (got ${records('inspections-data').length - draftBefore})`);
 
   // Direct storage calls from a page nobody is logged in to, so the app's own re-save stays out of it.
   const c = await open('verifier@impactrank.com.my');
@@ -259,10 +310,10 @@ try {
   check(json('corrective-actions').some((j) => j.includes('"c10"')) && !(await badgeText(c)),
     'once access is restored, the kept change uploads and the badge clears');
 
-  for (const [name, p] of [['A', a], ['B', b], ['C', c]]) check(!p.errors.length, `no page errors on ${name}` + (p.errors.length ? ': ' + p.errors.join(' | ') : ''));
+  for (const [name, p] of [['A', a], ['B', b], ['C', c], ...team.map((p, i) => ['team ' + (i + 1), p])]) check(!p.errors.length, `no page errors on ${name}` + (p.errors.length ? ': ' + p.errors.join(' | ') : ''));
 } catch (e) {
-  failures.push('step failed: ' + e.message.split('\n')[0]);
-  console.log('FAIL  ' + e.message.split('\n')[0]);
+  failures.push('step failed: ' + e.message.split('\n').slice(0, 3).join(' '));
+  console.log('FAIL  ' + e.message.split('\n').slice(0, 3).join(' '));
 }
 await browser.close();
 if (failures.length) { console.log(`\n${failures.length} problem(s).`); process.exit(1); }

@@ -53,8 +53,11 @@ files in the folder's **Photos and signatures** subfolder. GitHub only holds the
 Inspections and NG Items are rebuilt every time an inspection is saved, so edits there are overwritten.
 
 The app only sends the records that changed, and only deletes records the phone has seen. Two inspectors
-can work at the same time without overwriting each other's inspections. If two people change the
-**same** inspection at once, the last save wins. Press 🔄 Sync to see other people's latest records.
+can work at the same time without overwriting each other's inspections. Every inspection gets its own
+record number, so inspections started at the same moment, with the same names and time, stay separate,
+and so does each submission of a shared draft. If two people change the **same** submitted inspection at
+once (for example, both verify it), the last save wins. Each phone fetches everyone's records again every
+30 seconds and when the app comes back on screen; 🔄 Sync does it straight away.
 
 ### No signal, refreshes and closed tabs
 
