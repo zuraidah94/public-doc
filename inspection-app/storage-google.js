@@ -1,9 +1,10 @@
 // window.storage for the Apps Script web app. Shared keys are saved in the Google Sheet
 // through Code.gs; personal keys (the inspection in progress) stay in this browser.
 //
-// The app re-saves every list every few seconds, so this only sends records that changed
-// since they were last loaded or saved, and only deletes records this browser has seen.
-// A phone holding older data therefore can't overwrite records others saved since.
+// The app re-saves every list every few seconds, so this only sends records the app changed since
+// it last handed the list over, and only deletes records the app had in that list and then removed.
+// A phone holding older data therefore can't overwrite or remove records others saved since, even
+// when it has fetched them but not shown them yet.
 // Photos and signatures go up once each, as files, and travel as "file:<sha256>".
 //
 // Every change goes into an outbox in this browser before it is sent, and leaves it only once
@@ -17,6 +18,8 @@
 
   const synced = {};          // key -> Map(id -> record JSON with photo refs), as the server has it
   const lastValue = {};       // key -> the exact value string last loaded or saved
+  const lastList = {};        // key -> Map(id -> record JSON with photo refs) of the list the app last handed over
+  const fetched = {};         // key -> the same for the list last loaded; it counts once the app hands it back
   const queue = {};           // key -> promise chain, so loads, saves and resends of one key run in order
   const onServer = new Set(); // photo hashes the server already has
   const photoOf = new Map(), hashOf = new Map();
@@ -222,8 +225,10 @@
         try { raw = await call('apiGet', key); res = JSON.parse(raw); } catch (e) {
           const entry = readOutbox()[key];
           if (!entry) throw e;
-          const value = await fromRefs(withOutbox(key, []));
+          const list = withOutbox(key, []);
+          const value = await fromRefs(list);
           lastValue[key] = JSON.stringify(value);
+          fetched[key] = isRecordList(list) ? new Map(list.map((r) => [String(r.id), JSON.stringify(r)])) : null;
           return { key, value: lastValue[key], shared };
         }
         loaded[key] = true;
@@ -237,8 +242,10 @@
           if (!res && !readOutbox()[key]) return null;
           value = withOutbox(key, res?.records || []);
         }
+        const list = value;
         value = await fromRefs(value);
         lastValue[key] = JSON.stringify(value);
+        fetched[key] = isRecordList(list) ? new Map(list.map((r) => [String(r.id), JSON.stringify(r)])) : null;
         return { key, value: lastValue[key], shared };
       });
     },
@@ -252,7 +259,12 @@
         return { key, value, shared };
       }
       return inOrder(key, async () => {
-        if (lastValue[key] === value) return { key, value, shared };
+        if (lastValue[key] === value) {
+          // The app shows exactly what was loaded, so from now on it has those records.
+          if (fetched[key]) { lastList[key] = fetched[key]; fetched[key] = null; }
+          return { key, value, shared };
+        }
+        fetched[key] = null;
         const refd = await toRefs(JSON.parse(value));
         const box = readOutbox();
         const entry = box[key] || { upserts: {}, deletes: [] };
@@ -262,22 +274,28 @@
           box[key] = { replace: JSON.stringify(refd), upserts: {}, deletes: [], ...(blind ? { blind: true } : {}) };
         } else {
           delete entry.replace;
+          // "had" is the list the app last handed over or was given. A record it shows unchanged is
+          // left alone, even if the server has a newer version (someone else's edit stays); a record
+          // missing from "now" is deleted only if the app had it, so one fetched but not yet shown stays.
           const known = synced[key] || new Map();
+          const had = lastList[key] || new Map();
           const now = new Map(refd.map((r) => [String(r.id), JSON.stringify(r)]));
           const blind = new Set(entry.blindIds || []);
           now.forEach((j, id) => {
-            if (known.get(id) === j) { delete entry.upserts[id]; return; }
-            if (!loaded[key] && !known.has(id) && !(id in entry.upserts)) blind.add(id);
+            if (id in entry.upserts) { entry.upserts[id] = j; return; }
+            if (known.get(id) === j || had.get(id) === j) return;
+            if (!loaded[key] && !known.has(id)) blind.add(id);
             entry.upserts[id] = j;
           });
           Object.keys(entry.upserts).forEach((id) => { if (!now.has(id)) delete entry.upserts[id]; });
           entry.blindIds = [...blind].filter((id) => id in entry.upserts);
           if (!entry.blindIds.length) delete entry.blindIds;
-          entry.deletes = [...new Set([...(entry.deletes || []), ...known.keys()])].filter((id) => !now.has(id));
+          entry.deletes = [...new Set([...(entry.deletes || []), ...had.keys()])].filter((id) => !now.has(id));
           if (Object.keys(entry.upserts).length || entry.deletes.length) box[key] = entry; else delete box[key];
         }
         writeOutbox(box);            // kept on this device first; throws only if that fails
         lastValue[key] = value;
+        lastList[key] = isRecordList(refd) ? new Map(refd.map((r) => [String(r.id), JSON.stringify(r)])) : null;
         try { await send(key); } catch (e) { failed(e); /* stays in the outbox and is sent again later */ }
         return { key, value, shared };
       });
@@ -292,7 +310,7 @@
       return inOrder(key, async () => {
         await call('apiDelete', key);
         const box = readOutbox(); delete box[key]; writeOutbox(box);
-        delete synced[key]; delete lastValue[key];
+        delete synced[key]; delete lastValue[key]; delete lastList[key]; delete fetched[key];
         return { key, deleted: true, shared };
       });
     },

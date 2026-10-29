@@ -48,12 +48,15 @@ files in the folder's **Photos and signatures** subfolder. GitHub only holds the
 | NG Items | One row per failed item: system (HACCP / Safety / Environmental), area, item, remarks, links to the photos. Use this for audits |
 | Access | Optional list of who may open the app (see below) |
 | Files | Index of the photo and signature files |
+| Deleted | A copy of every record removed from the app's lists, with who removed it and when. To put one back, copy its id and json cells into the list's tab |
 | app-users, inspections-data, inspection-schedules, inspection-drafts, corrective-actions | The app's own data, one record per row. Don't edit these by hand |
 
 Inspections and NG Items are rebuilt every time an inspection is saved, so edits there are overwritten.
 
-The app only sends the records that changed, and only deletes records the phone has seen. Two inspectors
-can work at the same time without overwriting each other's inspections. Every inspection gets its own
+The app only sends the records changed on that phone, and only deletes a record the phone showed and the
+user then deleted. Records from every phone are combined: two inspectors can work at the same time
+without overwriting or removing each other's inspections, even when a phone has fetched the other's
+records but not shown them yet. Every inspection gets its own
 record number, so inspections started at the same moment, with the same names and time, stay separate,
 and so does each submission of a shared draft. If two people change the **same** submitted inspection at
 once (for example, both verify it), the last save wins. Each phone fetches everyone's records again every

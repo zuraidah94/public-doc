@@ -215,7 +215,30 @@ try {
   check(sNg && sNg[1] === 'Safety' && sNg[4] === 'Alat elektrik dalam keadaan baik\nElectrical equipment is in good condition',
     'NG Items tab marks the Safety NG and shows the BM and English text');
 
+  // A phone fetches the list while it is busy changing it, so it doesn't show what it fetched. Its next
+  // save must not remove the records it fetched but never had: only records it had and removed.
+  const idsOn = async (p) => JSON.parse((await p.evaluate(() => window.storage.get('inspections-data', true))).value).map((i) => i.id);
+  const listOn = JSON.parse((await c.evaluate(() => window.storage.get('inspections-data', true))).value);
+  await c.evaluate(([v]) => window.storage.set('inspections-data', v, true), [JSON.stringify(listOn)]);
+  const other = { ...listOn[0], id: 'other-phone-1' };
+  gas.state.user = 'inspector@impactrank.com.my';
+  gas.ctx.apiSave('inspections-data', JSON.stringify({ upserts: [JSON.stringify({ ...other, photos: undefined })], deletes: [] }));
+  await c.evaluate(() => window.storage.get('inspections-data', true));   // fetched, not shown
+  await c.evaluate(([v]) => window.storage.set('inspections-data', v, true), [JSON.stringify([...listOn, { ...listOn[0], id: 'this-phone-1' }])]);
+  const after = await idsOn(b);
+  check(after.includes('other-phone-1') && after.includes('this-phone-1'),
+    `a phone saving its list does not remove another phone's inspection it never showed (${after.includes('other-phone-1') ? 'kept' : 'REMOVED'})`);
+  // Shown, then removed on purpose: that is a real delete.
+  const shownList = JSON.parse((await c.evaluate(() => window.storage.get('inspections-data', true))).value);
+  await c.evaluate(([v]) => window.storage.set('inspections-data', v, true), [JSON.stringify(shownList)]);
+  await c.evaluate(([v]) => window.storage.set('inspections-data', v, true), [JSON.stringify(shownList.filter((i) => i.id !== 'other-phone-1'))]);
+  check(!(await idsOn(b)).includes('other-phone-1'), 'an inspection the phone showed and the user deleted is deleted from the Sheet');
+  const binned = records('Deleted').find((r) => r[0] === 'other-phone-1');
+  check(binned && binned[3] === 'inspections-data' && JSON.parse(binned.slice(4).map((x) => String(x).slice(1)).join('')).id === 'other-phone-1',
+    'a copy of the deleted inspection is kept in the Deleted tab');
+
   const long = 'x'.repeat(100000);
+
   await c.evaluate(([v]) => window.storage.set('inspection-schedules', v, true), [JSON.stringify([{ id: 's1', note: long }])]);
   const cells = records('inspection-schedules')[0].slice(3).filter((x) => x !== '').length;
   const sched = JSON.parse((await b.evaluate(() => window.storage.get('inspection-schedules', true))).value);

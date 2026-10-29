@@ -161,8 +161,9 @@ function apiSave(key, payload) {
         if (!rowOf[id]) rowOf[id] = Math.max(sh.getLastRow(), 1) + 1;
         writeRow_(sh, rowOf[id], id, json, who);
       });
-      (p.deletes || []).map(String).filter(function (id) { return rowOf[id]; })
-        .map(function (id) { return rowOf[id]; })
+      const gone = (p.deletes || []).map(String).filter(function (id) { return rowOf[id]; });
+      keepDeleted_(key, sh, gone.map(function (id) { return rowOf[id]; }), who);
+      gone.map(function (id) { return rowOf[id]; })
         .sort(function (a, b) { return b - a; })
         .forEach(function (row) { sh.deleteRow(row); });
     }
@@ -293,6 +294,28 @@ function writeRow_(sh, row, id, json, who) {
 // A new tab has 1,000 rows and writing past the last one fails, so add rows as the data grows.
 function ensureRows_(sh, lastRow) {
   if (sh.getMaxRows() < lastRow) sh.insertRowsAfter(sh.getMaxRows(), lastRow - sh.getMaxRows());
+}
+
+// A copy of every record removed from a list goes to the Deleted tab first, so a record removed
+// by mistake can be put back: copy its id and json cells back into the list's tab.
+function keepDeleted_(key, sh, rows, who) {
+  if (!rows.length) return;
+  const ss = store_().ss;
+  let bin = ss.getSheetByName('Deleted');
+  if (!bin) {
+    bin = ss.insertSheet('Deleted');
+    bin.getRange(1, 1, 1, 5).setValues([['id', 'deleted', 'deletedBy', 'list', 'json']]);
+    bin.setFrozenRows(1);
+  }
+  const width = sh.getLastColumn();
+  rows.forEach(function (row) {
+    const r = sh.getRange(row, 1, 1, width).getValues()[0];
+    const cells = [r[0], new Date(), who, key].concat(r.slice(3).filter(function (c) { return c !== ''; }));
+    const at = bin.getLastRow() + 1;
+    if (bin.getMaxColumns() < cells.length) bin.insertColumnsAfter(bin.getMaxColumns(), cells.length - bin.getMaxColumns());
+    ensureRows_(bin, at);
+    bin.getRange(at, 1, 1, cells.length).setValues([cells]);
+  });
 }
 
 // Clears rather than deletes: Sheets refuses to delete every unfrozen row.
