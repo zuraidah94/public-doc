@@ -1,0 +1,26 @@
+{
+ "name": "Rumah Kita — Edisi Lukisan Tangan",
+ "short_name": "Rumah Kita",
+ "lang": "ms",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#efe5cf",
+ "theme_color": "#2c6b5a",
+ "description": "Permainan keluarga Malaysia yang dilukis tangan.",
+ "icons": [
+  {
+   "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%23f3e4c6%22/%3E%3Cpath%20d%3D%22M96%20260L256%20120L416%20260%22%20fill%3D%22none%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%2234%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M136%20236V400H376V236%22%20fill%3D%22%23e9c27a%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%2222%22%20stroke-linejoin%3D%22round%22/%3E%3Crect%20x%3D%22226%22%20y%3D%22300%22%20width%3D%2260%22%20height%3D%22100%22%20rx%3D%228%22%20fill%3D%22%232c6b5a%22/%3E%3Crect%20x%3D%22166%22%20y%3D%22276%22%20width%3D%2244%22%20height%3D%2244%22%20rx%3D%226%22%20fill%3D%22%23bfe3f2%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%228%22/%3E%3Crect%20x%3D%22302%22%20y%3D%22276%22%20width%3D%2244%22%20height%3D%2244%22%20rx%3D%226%22%20fill%3D%22%23bfe3f2%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%228%22/%3E%3Ccircle%20cx%3D%22392%22%20cy%3D%22128%22%20r%3D%2230%22%20fill%3D%22%23f2b51e%22/%3E%3C/svg%3E",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  },
+  {
+   "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%23f3e4c6%22/%3E%3Cpath%20d%3D%22M96%20260L256%20120L416%20260%22%20fill%3D%22none%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%2234%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M136%20236V400H376V236%22%20fill%3D%22%23e9c27a%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%2222%22%20stroke-linejoin%3D%22round%22/%3E%3Crect%20x%3D%22226%22%20y%3D%22300%22%20width%3D%2260%22%20height%3D%22100%22%20rx%3D%228%22%20fill%3D%22%232c6b5a%22/%3E%3Crect%20x%3D%22166%22%20y%3D%22276%22%20width%3D%2244%22%20height%3D%2244%22%20rx%3D%226%22%20fill%3D%22%23bfe3f2%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%228%22/%3E%3Crect%20x%3D%22302%22%20y%3D%22276%22%20width%3D%2244%22%20height%3D%2244%22%20rx%3D%226%22%20fill%3D%22%23bfe3f2%22%20stroke%3D%22%238a4b2a%22%20stroke-width%3D%228%22/%3E%3Ccircle%20cx%3D%22392%22%20cy%3D%22128%22%20r%3D%2230%22%20fill%3D%22%23f2b51e%22/%3E%3C/svg%3E",
+   "sizes": "512x512",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  }
+ ]
+}
