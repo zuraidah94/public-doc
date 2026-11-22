@@ -22534,6 +22534,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf128", "22 Nov 2026", ["🧺 Rumah kampung: Sidai kain di ampaian kini siap betul-betul — Teman tidak lagi terus naik ke rumah, dan permainan Angkat kain sebelum hujan terbuka", "📋 Menu Teman di skrin lebar tidak lagi terlindung oleh butang zum di bawah", "🏭 Pilih permainan untuk Teman yang baru pergi kerja kini memberitahu dia di tempat kerja"]],
    ["hf127", "22 Nov 2026", ["🗓️ Matlamat mingguan: setiap minggu tiga matlamat baharu dalam 🎯 Matlamat (masak, ziarah jiran, main congkak atau gasing, berniaga, sidai kain, beribadat, majlis, simpan dalam tabung dan lain-lain) dengan bar kemajuan", "🎁 Setiap matlamat +RM 40 dan mata hidup; ketiga-tiga tercapai: +RM 100 dan keluarga gembira"]],
    ["hf126", "22 Nov 2026", ["🧖‍♀️ Rawatan Spa baharu di Salun Ratu Cantik (Peta Dunia, 10:00–20:00): Facial Berseri, Inai Tangan dan Spa Kaki — langkah demi langkah dengan alat dari dulang, gosok, sentuh dan tekan-tahan pada lukisan tangan", "🪞 Cermin sebelum ⇔ selepas di akhir rawatan; keperluan dan mood naik, dengan moodlet Muka berseri, Berinai atau Kaki ringan", "⏭ Boleh langkau satu langkah atau semua; jam permainan berhenti sementara di spa"]],
    ["hf125", "22 Nov 2026", ["🧕 Galeri tudung di Ubah rupa kini menunjukkan muka Teman anda sendiri dalam gaya lukisan yang sama seperti dalam permainan — bukan lagi muka orang lain", "✂️ Gaya tudung yang tidak berubah pada lukisan Teman berlukisan tangan (Bawal sulam mutiara, Renda bunga ros dan lain-lain) dibuang dari galeri — tinggal Tak bertudung, Shawl chiffon, Sifon renda dan Sifon sulaman; warna renda dan sulaman masih boleh dipilih di bawahnya"]],
@@ -40078,5 +40079,61 @@ ${lf ? `<p class="sub">🏠 Matlamat keluarga <span class="hint">· setiap satu 
   document.head.appendChild(st) }
  HF.mingguan = { POOL, week, poll, html, pick3, RM1, LP1, RMALL, LPALL };
 } catch (e) { try { console.warn("RKHF §136", e); window.RKHF && (RKHF.err = (RKHF.err || 0) + 1) } catch (e2) { } }
+/* ---------- §138. hf128 diorama bugs (QA of the dioramas, 22 Nov) ----------
+   (1) On a wide screen the zoom bar (#zoomctl) sits inside the house frame at its bottom right, at the same z-index as a tap menu
+   and later in the page, so the last entries of a long person menu (e.g. "🌀 Main gasing di halaman", "Tukar penampilan") lay
+   under it and a tap on them hit the zoom bar. A menu that would reach the zoom bar now stops above it (moved up, or shorter and
+   scrolling when the frame is too low). Phones keep the zoom bar under the frame, so nothing changes there.
+   (2) A person menu built while the Teman was at home kept its diorama entries (gasing, congkak, wau …) after she left for work;
+   their open() then returned false and the tap did nothing. Now such a tap says where she is ("Nadia di tempat kerja").
+   (3) Rumah kampung: a yard chore (Sidai kain, beri ayam makan, petik kelapa) walked to the spot, its "do" phase started and the
+   yard watchdog (base, every 500 ms: a Teman in the yard whose action is not a yard walk is sent back up) took it away at once:
+   "Naik ke rumah", the chore never finished, Sidai Kain (§117) never opened. The chore started by the yard walk now carries the
+   yard-walk mark (goact) the watchdog spares, with its own icon and label for the action list. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };   /* (outside the first block: HF/fail made here) */
+ const wrapEl = () => $("#cvwrap"), inHouse = () => !!(S && isHouseV(S.view));
+ /* (1) */
+ { const om = openMenu; openMenu = function () {
+   const r = om.apply(this, arguments);
+   try {
+    const Z = document.getElementById("zoomctl");
+    if (!menu.hidden && Z && !Z.hidden && Z.offsetParent && /^(absolute|fixed)$/.test(getComputedStyle(Z).position)) {
+     const z = Z.getBoundingClientRect(), b = menu.getBoundingClientRect(), lim = z.top - 6;
+     if (z.height > 0 && b.right > z.left && b.left < z.right && b.bottom > lim) {
+      const wr = wrapEl(), w = wr && inHouse() ? wr.getBoundingClientRect() : (menu.offsetParent || document.body).getBoundingClientRect();
+      const top0 = parseFloat(menu.style.top) || 0, minTop = top0 - (b.top - (w.top + 4));
+      let t = top0 - (b.bottom - lim);
+      if (t < minTop) { t = minTop; menu.style.maxHeight = Math.max(120, Math.floor(lim - (w.top + 4))) + "px" }
+      menu.style.top = t + "px"
+     }
+    }
+   } catch (e) { fail(e) }
+   return r
+  } }
+ /* (2) */
+ const where = s2 => { const a = s2.away; return a === "school" ? "di sekolah" : a === "hospital" ? "di hospital" : a === "asrama" ? "di asrama" : a === "uni" ? "di universiti" : a === "trip" ? "sedang bercuti" : a === "out" || a === "kedai" ? "sedang keluar" : a === "work" ? "di tempat kerja" : "tiada di rumah" };
+ { const om = openMenu; openMenu = function (sx, sy, title, sub, items) {
+   try {
+    const me = Array.isArray(items) && items.some(i => i && /Tukar penampilan$/.test(String(i.label || ""))) ? (S.sims || []).find(x => x && x.name === title) : null;
+    if (me && !me.away) for (const it of items) if (it && it.__go && typeof it.fn === "function" && !it.__h138) {
+     const f = it.fn; it.__h138 = 1;
+     it.fn = function () { try { if (me.away) { toast(`${me.name} ${where(me)} — cuba lagi bila dia pulang.`); return } } catch (e) { fail(e) } return f.apply(this, arguments) }
+    }
+   } catch (e) { fail(e) }
+   return om.apply(this, arguments)
+  } }
+ /* (3) */
+ if (typeof kyStart === "function") { const ks = kyStart; kyStart = function (s2, q) {
+   try {
+    if (s2 && q && typeof q.then === "function") { const th = q.then; q = Object.assign({}, q, { then: function () {
+     const r = th.apply(this, arguments);
+     try { const c = s2.cur; if (c && c.type === "yard" && c.phase !== "walk" && !c.goact && YARD[c.act]) { c.goact = 1; c.icon = YARD[c.act].icon; c.label = YARD[c.act].label } } catch (e) { fail(e) }
+     return r } }) }
+   } catch (e) { fail(e) }
+   return ks.call(this, s2, q)
+  } }
+ HF.h138 = { where };
+} catch (e) { try { fail(e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
