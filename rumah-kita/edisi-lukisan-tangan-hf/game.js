@@ -22534,6 +22534,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf129", "22 Nov 2026", ["🛏️ Katil dijual atau dialihkan semasa Teman tidur: dia kini terjaga dan mencari tempat tidur lain, bukan terus tidur di lantai tanpa katil"]],
    ["hf128", "22 Nov 2026", ["🧺 Rumah kampung: Sidai kain di ampaian kini siap betul-betul — Teman tidak lagi terus naik ke rumah, dan permainan Angkat kain sebelum hujan terbuka", "📋 Menu Teman di skrin lebar tidak lagi terlindung oleh butang zum di bawah", "🏭 Pilih permainan untuk Teman yang baru pergi kerja kini memberitahu dia di tempat kerja"]],
    ["hf127", "22 Nov 2026", ["🗓️ Matlamat mingguan: setiap minggu tiga matlamat baharu dalam 🎯 Matlamat (masak, ziarah jiran, main congkak atau gasing, berniaga, sidai kain, beribadat, majlis, simpan dalam tabung dan lain-lain) dengan bar kemajuan", "🎁 Setiap matlamat +RM 40 dan mata hidup; ketiga-tiga tercapai: +RM 100 dan keluarga gembira"]],
    ["hf126", "22 Nov 2026", ["🧖‍♀️ Rawatan Spa baharu di Salun Ratu Cantik (Peta Dunia, 10:00–20:00): Facial Berseri, Inai Tangan dan Spa Kaki — langkah demi langkah dengan alat dari dulang, gosok, sentuh dan tekan-tahan pada lukisan tangan", "🪞 Cermin sebelum ⇔ selepas di akhir rawatan; keperluan dan mood naik, dengan moodlet Muka berseri, Berinai atau Kaki ringan", "⏭ Boleh langkau satu langkah atau semua; jam permainan berhenti sementara di spa"]],
@@ -40134,6 +40135,31 @@ try {
    return ks.call(this, s2, q)
   } }
  HF.h138 = { where };
+} catch (e) { try { fail(e) } catch (e2) { } }
+
+/* ---------- §139. hf129 Katil diambil semasa tidur (owner screenshot 22 Nov: "Tidur tanpa katil???") ----------
+   Sell or move a bed while someone sleeps in it and she kept "sleeping" on the bare floor with no bed. Now, each game minute,
+   a sleeper (or napper) whose bed piece is gone wakes up with a short note. The need is kept, so autonomy sends her to
+   another bed (or the sofa) next. No save data. ---------- */
+try {
+ if (typeof step === "function" && typeof cancelCur === "function") {
+  const sp = step;
+  step = function () {
+   const r = sp.apply(this, arguments);
+   try {
+    for (const s2 of (S.sims || [])) {
+     const c = s2 && s2.cur;
+     if (!c || c.type !== "obj" || c.phase !== "do" || s2.away) continue;
+     if (!(c.act === "sleep" || c.act === "nap")) continue;
+     if (c.obj != null && !(S.objs || []).some(o => o.id === c.obj)) {
+      cancelCur(s2);
+      toast(`🛏️ Katil sudah tiada — ${s2.name} terjaga.`)
+     }
+    }
+   } catch (e) { try { fail(e) } catch (e2) { } }
+   return r
+  }
+ }
 } catch (e) { try { fail(e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
