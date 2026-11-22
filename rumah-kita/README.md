@@ -8,7 +8,7 @@ This folder collects every version of the game, plus the art tools and design do
 
 - [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
 - [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
-- [Edisi Lukisan Tangan HF (Sims-style test copy)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/)
+- [Edisi Lukisan Tangan HF (versi rasmi, hf127)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/)
 - [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
 
 ## How to play
@@ -118,7 +118,7 @@ This copy keeps the whole game and adds a live mode in the spirit of The Sims 4 
 
 **3D people (prototype)**
 
-The copy also has an unfinished 3D people mode (`rk3d.js`, built on [three.js](https://threejs.org), with the free CC0 [Quaternius](https://quaternius.com) *Universal Base Characters*, hair and *Universal Animation Library* in `edisi-lukisan-tangan-hf/3d/`). It is **switched off for now**: the game uses its painted 2D people. To try it, restore the two commented-out script lines near the end of `edisi-lukisan-tangan-hf/index.html`. A **🧍 3D / 2D** button then appears on the camera bar.
+Nota: mod orang 3D lama sudah dibuang dari salinan ini; permainan guna orang 2D lukisan tangan.
 
 **Art:** backdrops, cut-ins, house paintings, drama cards, family portraits and maps were sharpened with the open [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) model (`realesr-general-x4v3`). Painted portraits were cut out with [BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) for the live card.
 

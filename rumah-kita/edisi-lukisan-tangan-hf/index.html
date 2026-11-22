@@ -1,56 +1,43 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf3" as="script">
-<div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
+<!doctype html>
+<html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rumah Kita</title>
+<link rel="preload" href="game.js?v=hf127" as="script">
+<script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
+<div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
 <defs>
-<filter id="lwc" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>
-<filter id="lgr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
 <radialGradient id="lsk" cx=".5" cy=".75" r=".8"><stop offset="0" stop-color="#ffe2b0"/><stop offset=".45" stop-color="#f6c7a0"/><stop offset="1" stop-color="#9fc4d6"/></radialGradient>
 <clipPath id="lcl"><path d="M14 104C12 52 60 14 130 12S250 48 248 104 236 188 130 190 16 160 14 104Z"/></clipPath>
 </defs>
-<g filter="url(#lwc)">
+<!-- (aduan 10, 8 Nov: no old drawings) the painted title scene in the oval; the sky colour shows until it has loaded -->
 <g clip-path="url(#lcl)">
 <rect width="260" height="200" fill="url(#lsk)"/>
-<circle cx="168" cy="92" r="20" fill="#fff1cf" opacity=".95"/><circle cx="168" cy="92" r="34" fill="#fff1cf" opacity=".3"/>
-<path d="M30 60c8-12 26-12 32-2 8-6 22-2 22 8H28c-4 0-4-4 2-6Z" fill="#fff8ec" opacity=".85"/>
-<path d="M178 46c6-9 20-9 25-1 6-5 17-1 17 6h-44c-3 0-3-3 2-5Z" fill="#fff8ec" opacity=".75"/>
-<path d="M0 124C40 98 70 106 100 114S170 92 210 102 250 110 260 112V200H0Z" fill="#8fae9b" opacity=".8"/>
-<path d="M0 138C50 120 90 130 130 132S210 118 260 130V200H0Z" fill="#6f9a5c"/>
-<path d="M0 160C60 150 120 154 180 150S240 156 260 154V200H0Z" fill="#a9c26a"/>
-<g stroke="#5f8a3e" stroke-width="1.2" opacity=".7"><path d="M20 170v-7M26 172v-8M150 168v-6M156 170v-8M206 172v-7M212 170v-6M64 176v-7M70 178v-8"/></g>
-<!-- coconut palm -->
-<path d="M196 152c2-22 4-36 10-52" stroke="#7a5a3a" stroke-width="3" fill="none"/>
-<g fill="#4f7d3c"><path d="M206 100c-12-6-24-2-30 6 10-4 20-5 30-6Z"/><path d="M206 100c10-8 24-8 30 0-10-2-20-2-30 0Z"/><path d="M206 100c-4-10-2-20 6-26-2 10-4 18-6 26Z"/><path d="M206 100c8 2 18 10 20 20-6-8-12-14-20-20Z"/><path d="M206 100c-10 2-18 10-20 20 6-8 12-14 20-20Z"/></g>
-<!-- stilt house -->
-<g>
-<path d="M78 150v-18M92 152v-18M138 150v-18M152 152v-18" stroke="#6b4a2c" stroke-width="3"/>
-<rect x="74" y="112" width="82" height="24" fill="#b9814e"/>
-<rect x="74" y="112" width="82" height="24" filter="url(#lgr)"/>
-<path d="M74 118h82M74 124h82M74 130h82" stroke="#9a6638" stroke-width=".8" opacity=".7"/>
-<rect x="86" y="117" width="12" height="11" fill="#5d3b24"/><rect x="132" y="117" width="12" height="11" fill="#5d3b24"/>
-<path d="M88 117v11M142 117v11" stroke="#d9b07a" stroke-width="1"/>
-<rect x="109" y="116" width="12" height="20" fill="#6b4329"/>
-<path d="M66 114L115 84 164 114Z" fill="#9aa3a6"/><path d="M66 114L115 84 164 114Z" fill="#8a5a3a" opacity=".25"/>
-<path d="M78 107l14-9M96 103l12-8M120 96l14 8M140 100l14 9" stroke="#b07a52" stroke-width="1.1" opacity=".6"/>
-<path d="M66 114L115 84 164 114" stroke="#5a4a40" stroke-width="1.5" fill="none"/>
-<path d="M103 136h24l4 14h-32Z" fill="#c4c9c4"/><path d="M104 140h22M102 145h26" stroke="#5f8fa8" stroke-width="1.6"/>
-</g>
-<!-- jemuran -->
-<path d="M30 132c14 4 28 4 40 0" stroke="#6b4a2c" stroke-width=".8" fill="none"/>
-<rect x="36" y="133" width="7" height="9" fill="#c9566c"/><rect x="48" y="134" width="8" height="10" fill="#f0d27a"/><rect x="60" y="133" width="6" height="8" fill="#6aa0c0"/>
-<!-- bunga raya -->
-<g transform="translate(46 168)"><circle r="4" fill="#cf3f4f"/><circle r="1.4" fill="#f3c45a"/></g>
-<g transform="translate(176 172)"><circle r="3.4" fill="#cf3f4f"/><circle r="1.2" fill="#f3c45a"/></g>
+<image href="img/pv/skrin_tajuk.webp" x="0" y="0" width="260" height="200" preserveAspectRatio="xMidYMid slice"/>
 </g>
 <path d="M14 104C12 52 60 14 130 12S250 48 248 104 236 188 130 190 16 160 14 104Z" fill="none" stroke="#8a6a44" stroke-opacity=".35" stroke-width="3"/>
-</g>
 </svg></div><div style="font:750 26px Fraunces,Georgia,serif;font-variation-settings:'SOFT' 100;line-height:1">Rumah Kita</div><div style="font:700 11px system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9d7419;margin-top:-6px">Edisi Lukisan Tangan</div>
-<div style="width:200px;height:8px;border-radius:6px 9px 7px 10px;background:#dccaa4;overflow:hidden;box-shadow:inset 0 1px 2px rgba(70,45,20,.25)"><div id="rkbar" style="height:100%;width:8%;background:linear-gradient(180deg,#5e9468,#3d7650);border-radius:6px 9px 7px 10px;transition:width .4s"></div></div><div id="rkmsg" style="font-size:13px;color:#6c5d4a">Memuatkan kampung…</div></div>
-<style>@keyframes rkb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@media (prefers-color-scheme:dark){#rkload{background:#1c1812!important;color:#f0e6d1!important}}</style>
-<script>(function(){var w=8,M=['Memuatkan kampung…','Menyusun rumah & perabot…','Memanggil jiran-jiran…','Hampir siap…'],i=0;var t=setInterval(function(){w=Math.min(92,w+(92-w)*.12);var b=document.getElementById('rkbar');if(b)b.style.width=w+'%';if(w>30*(i+1)&&i<3){i++;var m=document.getElementById('rkmsg');if(m)m.textContent=M[i]}},120);
-window.rkLoaded=function(){clearInterval(t);var b=document.getElementById('rkbar');if(b)b.style.width='100%';var l=document.getElementById('rkload');if(l){setTimeout(function(){l.style.opacity='0';setTimeout(function(){l.remove()},380)},120)}};
-window.addEventListener('error',function(e){var m=document.getElementById('rkmsg');if(m&&document.getElementById('rkload'))m.textContent='Ralat memuat — cuba muat semula halaman.'})})();</script>
+<div style="width:min(260px,72vw);height:10px;border-radius:6px 9px 7px 10px;background:#dccaa4;overflow:hidden;box-shadow:inset 0 1px 2px rgba(70,45,20,.25)"><div id="rkbar" style="height:100%;width:2%;background:linear-gradient(180deg,#5e9468,#3d7650);border-radius:6px 9px 7px 10px;transition:width .35s"></div></div><div style="display:flex;gap:10px;align-items:baseline;justify-content:center;font-size:13px;color:#6c5d4a;margin-top:-4px"><span id="rkmsg">Memuatkan kampung…</span><b id="rkpct" style="font:800 14px system-ui,sans-serif;color:#3d7650;font-variant-numeric:tabular-nums">0%</b></div><div id="rkn" style="font:500 11px system-ui,sans-serif;color:#9a8a70;min-height:13px;margin-top:-8px;font-variant-numeric:tabular-nums"></div><div id="rktip" style="box-sizing:border-box;width:min(310px,84vw);min-height:4.6em;margin-top:4px;padding:9px 13px;border-radius:12px 15px 11px 16px;background:rgba(255,250,236,.72);border:1.5px dashed #c9b083;font:500 13px/1.45 system-ui,sans-serif;color:#5a4a36;text-align:center;transition:opacity .35s"><b style="display:block;font:800 10px system-ui,sans-serif;letter-spacing:.14em;color:#9d7419;margin-bottom:2px">💡 PETUA</b><span id="rktipt"></span></div></div>
+<style>@keyframes rkb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@media (prefers-color-scheme:dark){#rkload{background:#1c1812!important;color:#f0e6d1!important}#rktip{background:rgba(60,48,32,.6)!important;color:#e8dcc4!important}}</style>
+<script>(function(){
+/* the loading screen (rk-sims C8 §75): a real progress bar. Until the game script has run the bar creeps to 15 %; then
+   the game's own picture loader (section 75 of tools/rk-hf-layer.js) reports rkProg(loaded, total) while it brings in
+   what the first scene needs. rkLoaded waits for it (window.rkPrep) but never more than 20 s without progress.
+   rkShow(msg) / rkHide() bring the same screen back for a short while on a trip to a place not loaded yet. */
+var w=0,real=0,last=Date.now(),hid=0,pd=-1,pn=-1,E=function(i){return document.getElementById(i)};
+var T=['Ketik ahli keluarga untuk memilih dia, kemudian ketik perabot atau tempat untuk suruh dia buat sesuatu.','Guna dua jari untuk zum masuk dan keluar, dan seret untuk mengalihkan pandangan rumah.','Lapar? Masak di dapur. Makan semeja bersama keluarga buat semua orang lebih ceria.','Butang 🗺️ Kampung membawa anda ke rumah jiran dan tempat-tempat menarik di sekitar kampung.','Rajin bertegur sapa dan melawat jiran — lama-lama mereka jadi kawan rapat.','Buka 🧺 Stok untuk tengok barang dapur, dompet keluarga dan niaga dari rumah.','Simpan sedikit demi sedikit dalam tabung percutian. Bila cukup, boleh bercuti sekeluarga!','Tidur yang cukup buat esok lebih bertenaga. Jangan biar si kecil berjaga sampai lewat malam.','Setiap ahli keluarga ada keperluan sendiri — lapar, mengantuk, bosan. Jaga semuanya supaya hati mereka senang.'];
+var k=Math.floor(Math.random()*T.length);
+function set(p){w=Math.max(0,Math.min(100,p));var b=E('rkbar');if(b)b.style.width=w.toFixed(1)+'%';var c=E('rkpct');if(c)c.textContent=Math.floor(w)+'%'}
+function tip(f){var s=E('rktipt'),b=E('rktip');if(!s)return;if(f){s.textContent=T[k];return}if(b)b.style.opacity='0';setTimeout(function(){k=(k+1)%T.length;s.textContent=T[k];if(b)b.style.opacity='1'},350)}
+tip(1);set(2);
+var t=setInterval(function(){if(!real)set(w+(15-w)*.05)},200),tt=setInterval(tip,5500);
+window.rkProg=function(d,n,msg,p){if(hid)return;real=1;if(d!==pd||n!==pn){pd=d;pn=n;last=Date.now()}var q=p!=null?p:(n>0?15+80*d/n:15);if(q>w)set(q);var x=E('rkn');if(x)x.textContent=n?d+' / '+n+' gambar':'';if(msg){var m=E('rkmsg');if(m)m.textContent=msg}};
+function hide(){if(hid)return;hid=1;clearInterval(t);clearInterval(tt);set(100);var l=E('rkload');if(l)setTimeout(function(){if(!hid)return;l.style.opacity='0';setTimeout(function(){if(hid)l.style.display='none'},380)},150)}
+window.rkHide=hide;
+window.rkShow=function(msg){var l=E('rkload');if(!l)return;hid=0;real=1;pd=pn=-1;last=Date.now();set(0);var x=E('rkn');if(x)x.textContent='';var m=E('rkmsg');if(m)m.textContent=msg||'Memuatkan…';tip(1);clearInterval(tt);tt=setInterval(tip,5500);l.style.display='flex';l.style.opacity='1';var g=setInterval(function(){if(hid){clearInterval(g);return}if(Date.now()-last>20000){clearInterval(g);hide()}},1000)};
+window.rkLoaded=function(){var ok=0,go=function(){if(!ok){ok=1;hide()}};last=Date.now();
+ var s=setInterval(function(){if(ok||hid){clearInterval(s);return}if(Date.now()-last>20000){clearInterval(s);go()}},1000);
+ try{if(window.rkPrep){window.rkPrep(go);return}}catch(e){}go()};
+window.addEventListener('error',function(e){var m=E('rkmsg');if(m&&E('rkload')&&!hid)m.textContent='Ralat memuat — cuba muat semula halaman.'})})();</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -476,13 +463,7 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 .lt-mapban:focus-visible{outline:2px solid #c9672e;outline-offset:2px}
 .lt-appic{background:none!important;box-shadow:0 2px 5px rgba(0,0,0,.28)!important;overflow:hidden}
 .lt-appic img{display:block;width:100%;height:100%;border-radius:12px}
-#klbtn.btn,#kcbtn.btn,#nsfbtn.btn,#bnbtn.btn,#bdbtn.btn,#tjbtn.btn,#tshbtn.btn{background-size:cover;background-position:50% 45%;color:#fffaf0;text-shadow:0 1px 3px rgba(20,12,4,.9),0 0 8px rgba(20,12,4,.6);border-color:#3b2a20}
-#klbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/kl.webp)}
-#kcbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/kuching.webp)}
-#nsfbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/pusaka.webp)}
-#bnbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/bunian.webp)}
-#bdbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/bukit-diraja.webp)}
-#tjbtn.btn,#tshbtn.btn{background-image:linear-gradient(rgba(30,20,8,.25),rgba(30,20,8,.45)),url(img/peta/taman.webp)}
+/* the old map shortcut buttons (#klbtn, #kcbtn, #nsfbtn, #bnbtn, #bdbtn, #tjbtn, #tshbtn) are always hidden now: the map draws its own destination strip; their old map-painting backgrounds were deleted in a60e890, so no rules for them here */
 @media (prefers-reduced-motion:reduce){.lt-home .lt-home-fam{animation:none}.lt-mapban{transition:none}}
 
 .lt-st{display:inline-block;vertical-align:-4px;margin-right:4px;border-radius:50%;box-shadow:0 0 0 1px rgba(59,42,32,.35)}
@@ -570,11 +551,6 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf3"></script>
-<!-- 3D people (rk3d.js) are switched off for now: the game uses its painted 2D people.
-     To try them again, restore:
-<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-<script type="module" src="rk3d.js?v=11"></script>
--->
-
-</body></html>
+<script src="game.js?v=hf127"></script>
+</body>
+</html>
