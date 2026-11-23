@@ -13427,11 +13427,13 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
    const A = P(0, 0, 0), B = P(1, 0, 0), C = P(0, 1, 0), D = P(1, 1, 0), T = P(0, 0, 1.7);
    const x0 = Math.min(A[0], B[0], C[0], D[0]), x1 = Math.max(A[0], B[0], C[0], D[0]), y0 = T[1], y1 = Math.max(A[1], B[1], C[1], D[1]);
    const k = Math.min(108 / (x1 - x0), 112 / (y1 - y0));
+   HF.thbG = { tw: (x1 - x0) * k, th: (y1 - Math.min(A[1], B[1], C[1], D[1])) * k };   /* §160: the tile size inside the thumbnail */
    g.setTransform(k, 0, 0, k, 60 - (x0 + x1) / 2 * k, 116 - y1 * k);
    const real = ctx; ctx = g; try { drawItem({ id: -900, type, x: 0, y: 0, f: S.view || 0, rot: 0 }, 0) } finally { ctx = real }
   } catch (e) { c = null }
   return THB[type] = c
  }
+ HF.itemThumb = itemThumb;
  function decorateBuy() {
   const box = $("#p-buy"); if (!box || box.hidden) return;
   buildTools();
@@ -22535,6 +22537,9 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf135", "23 Nov 2026", ["🛋️ Perabot bilik sewa kini model 3D yang dirender dengan satu kamera isometrik tetap (sudut sama, tapak tepat pada petak, empat arah putar) dan saiz bilik ikut pakej: Murah 5 x 5 (Retro Malaysia: dinding hijau pudina, lantai kayu oren, tilam lantai, almari, kipas berdiri, meja lipat, bangku), Sederhana 6 x 6 (Japandi: dinding krim, lantai kayu cerah, katil kayu cadar sage, dapur kecil dengan kabinet, sinki dan hob, meja tulis dan kerusi) dan Mewah 6 x 6 (Butik Moden: dinding biru laut, lantai kayu gelap, dapur mewah dengan peti sejuk, hob dan sinki dengan meja makan dan dua kerusi di sebelahnya, TV dengan sofa L berjarak dua petak, meja komputer dengan kerusi pejabat di zon lain, katil besar, aircond dinding)", "🚶 Penyewa duduk di kerusi (siang) atau tidur di katil (malam); laluan ke katil, kerusi dan meja sentiasa lapang (editor menolak perabot yang menghalang); kipas siling tergantung di atas dan aircond di dinding tanpa ambil petak lantai; bilik air satu unit di sudut kanan belakang; bilik lama dipindah ke grid pakejnya tanpa kehilangan perabot"]],
+   ["hf134", "23 Nov 2026", ["🚪 Masuk ke setiap bilik sewa (butang Masuk bilik, atau ketik bilik kecil di panel bangunan): nampak lantai, dinding, perabot dan penyewa dalam bilik; bangunan lelaki dan perempuan berlainan warna dinding", "🛋️ Tiga pakej bilik dengan satu ketik: Simple (RM 340), Sederhana (RM 1,120) dan Mewah (RM 4,070); kemudian susun sendiri: tambah, alih, putar, jual (separuh harga) dan buat asal. Mutu bilik kini dikira daripada perabot sebenar dan kebersihan: bilik mewah menyokong sewa Mahal, bilik kosong hanya sewa Murah", "🏢 Setiap bangunan kini empat tingkat, 16 bilik (101-404); tingkat 2, 3 dan 4 dibuka dengan RM 4,000, RM 5,000 dan RM 6,000; bilik rosak atau berhabuk ditanda dalam bilik dan mesti dibaiki sebelum menyusun perabot; lantai dan dinding bilik dilukis dengan Hugging Face"]],
+   ["hf133", "23 Nov 2026", ["🏘️ Dua bangunan bilik sewa di timur Pekan: Bilik Sewa Seri Murni (Lelaki) dan Bilik Sewa Seri Melur (Perempuan), setiap satu dua tingkat, 8 bilik (101-104, 201-204); penyewa hanya lelaki atau hanya perempuan; tingkat 2 dibuka dengan RM 4,000; anda atau jiran boleh membeli satu atau kedua-duanya", "👥 Penyewa lebih pelbagai (lebih banyak nama, muka dan warna tidak berulang); panel bilik ada tab tingkat; pintu peta hijau (berpenghuni), kelabu dengan ＋ (kosong), jingga dengan ! (masalah); label pin dipendekkan"]],
    ["hf132", "23 Nov 2026", ["🏘️ Pilihan baharu: Bilik Sewa Seri Murni di timur Pekan (peta): beli bangunan empat bilik (101-104) dan jadi tuan rumah, atau jika jiran sudah membelinya, sewa satu bilik untuk keluarga anda", "🔑 Tiga kadar sewa seminggu (RM 90, RM 180, RM 320; sewa tinggi hanya untuk bilik yang baik: perabot dan kebersihan), tanda ＋ untuk cari penyewa dan pilih satu daripada tiga calon, setiap penyewa ada satu sifat dan bajet", "⏳ Cabaran: tunggakan sewa (beri tempoh, ingatkan atau halau) dan kerosakan bilik (bayar baiki); bilik kosong ada kos seminggu"]],
    ["hf131", "23 Nov 2026", ["🗺️ Peta disusun semula: Pekan Harmoni di barat sungai (lapan kedai, dua baris), Bandar Diraja dan Istana Harmoni di atas kanan, tiada rumah, lot atau tempat atas jalan, jalan raya berturap di setiap kawasan", "📚 Kedai baharu di Jalan Pekan: Kedai Buku Pustaka Harmoni (baca percuma sekali sehari), Kafe Kopi Senja dan Mamak 24 Jam; semua pin sama saiz", "🎮 Permainan tradisi (gasing, sepak raga, congkak, batu seremban, galah panjang, wau) kini dibuka dari Padang Kampung di peta; kebun rumah dari Kebun Buah Harmoni", "📦 Barang disimpan ikut berpindah rumah atau boleh dijual; panel Bina tidak lagi dilukis semula setiap dua saat", "💾 Simpanan lama tidak berubah"]],
    ["hf130", "22 Nov 2026", ["🏡 Permainan baru: rumah kampung kini kemas dan tersusun ikut bilik — satu katil sebilik, bilik air bersama, dapur sebaris, ruang tamu menghadap TV, sejadah di sudut yang tenang dan serambi lapang di tangga", "🪑 Almari, almari kaca, rak buku, kerusi rotan, meja kopi, kerusi panjang, meja makan dan meja belajar permulaan dilukis semula dengan tangan: kayu asli, rotan dan kain polos (model 3D Poly Haven, CC0)", "🟫 Permaidani, cadar katil dan lantai dapur serta bilik air kini polos, warna lembut", "🏢 Flat Pak Zul kini kemas — Adam dapat bilik dan katil sendiri; rumah bandar juga dapat perabot kayu polos", "🎨 Mod beli: pilih gaya almari, almari kaca, rak buku, kerusi, meja dan kerusi panjang — Biasa, Kayu asli, Kayu terang, Kayu gelap atau Putih / krim", "🗺️ Peta lebih luas: Pekan Harmoni di utara peta, dengan Jalan Pekan dan deretan kedai baharu berikon lukisan tangan — Kedai Perabot Jati Harmoni (set gaya bilik), Kedai Hiasan Seri Laman, Butik Kain & Tudung, Kedai Bayi Comel dan Kedai Elektrik Cahaya (peralatan berbintang, jimat bil mingguan); Nurseri Bunga Raya di tepi dusun", "📦 Simpan barang: dalam Mod bina, perabot, hiasan, pokok dan barang bayi boleh disimpan dan diletak semula percuma dari \"Barang disimpan\"; lampu LED dan tong air hujan boleh ditanggalkan dan dipasang semula", "🌺 Hiasan dan pokok baharu: kerusi goyang, pasu, tanglung, bakul, pokok bunga raya, bunga kertas, limau kasturi, kotak herba dan banyak lagi", "💾 Simpanan lama tidak berubah"]],
@@ -41582,7 +41587,9 @@ try {
  if (typeof renderMap === "function") { const rm = renderMap; renderMap = function () { const r = rm.apply(this, arguments); try { add() } catch (x) { fail(x) } return r } }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
-/* ---------- §159. hf132: Rumah Bilik Sewa v1 (owner 23 Nov: pilihan BARU, bukan ganti rumah sewa sedia ada).
+/* hf133: TWO buildings (owner 23 Nov): Bilik Sewa Seri Murni (Lelaki) and Bilik Sewa Seri Melur (Perempuan), 2 floors x 4 rooms each (101-104, 201-204),
+   tenants of the building's sex only; S.bs is the men's (an old save stays), S.bsP the women's; floor 2 opens for RM 4,000.
+   /* ---------- §159. hf132: Rumah Bilik Sewa v1 (owner 23 Nov: pilihan BARU, bukan ganti rumah sewa sedia ada).
    A new building on the empty green east of the river below Jalan Pekan: Bilik Sewa Seri Murni, units 101-104, drawn in code on the
    Peta (no painting; the doors show who lives there) with a pin in WMPL / PLACES / WMN / ERR. State in S.bs (made lazily: an old save
    has none): { owner: home key | null, units: [{ n, furn, clean, lv, t, brk, self, pl, cands }] }.
@@ -41596,27 +41603,39 @@ try {
  const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
  const B = HF.h159 = { opened: 0, weeks: 0, days: 0 };
  const RATES = { murah: { t: "Murah", amt: 90, need: 0 }, biasa: { t: "Biasa", amt: 180, need: 40 }, mahal: { t: "Mahal", amt: 320, need: 75 } };
- const PRICE = 16000, ADV = 15, VAC = 12, CLEANC = 25, FURNC = [300, 600], FURNN = ["Kosong", "Asas: katil & almari", "Selesa: katil, kipas & meja"], NAME = "Bilik Sewa Seri Murni";
+ const PRICE = 12000, ADV = 15, VAC = 12, CLEANC = 25, FURNC = [300, 600], FURNN = ["Kosong", "Asas: katil & almari", "Selesa: katil, kipas & meja"], BD = { L: { id: "bilik", key: "bs", name: "Bilik Sewa Seri Murni (Lelaki)", short: "Seri Murni · Lelaki", fem: false, cx: 1122, ico: "🏘️" }, P: { id: "melur", key: "bsP", name: "Bilik Sewa Seri Melur (Perempuan)", short: "Seri Melur · Perempuan", fem: true, cx: 1570, ico: "🏡" } };
  const TRS = { rajin: ["💪", "Rajin", "Cuci dan baiki benda kecil sendiri; jarang merosakkan bilik."], bising: ["🔊", "Bising", "Muzik kuat sampai lewat malam; bilik cepat sepah dan rosak."], pembersih: ["🧼", "Pembersih", "Bilik sentiasa berkilat."], kawan: ["🤝", "Suka berkawan", "Membawa kawan yang mahu menyewa."], lewat: ["⏰", "Lewat bayar", "Selalu minta tempoh."] };
  const BRK = [["Paip sinki bocor", 80], ["Kipas siling rosak", 60], ["Kunci pintu tersangkut", 50], ["Wayar & suis bermasalah", 120], ["Penghawa dingin tidak sejuk", 150]];
  const BUD = [85, 100, 130, 170, 200, 240, 300, 340, 380];
+ const XF = ["Nurul", "Puteri", "Zarina", "Hui Min", "Priya", "Shalini", "Aliya", "Sofea", "Mariam", "Cheng Li", "Kamala", "Liyana", "Nabila", "Syafiqah", "Wan Ting", "Thilaga", "Roshni", "Ain", "Hidayah", "Amirah"], XM = ["Aiman", "Syafiq", "Ikmal", "Chong Wei", "Arjun", "Kamal", "Haziq", "Jun Hao", "Suresh", "Iskandar", "Danish", "Mohan", "Zikri", "Wei Liang", "Rizal", "Naim", "Prakash", "Amirul", "Thaqif", "Adli"];
  const rnd = Math.random, cl = (v, a, z) => Math.max(a, Math.min(z, v)), pk = a => a[Math.floor(rnd() * a.length)], rm = n => "RM " + Math.round(n).toLocaleString();
- const mkB = () => ({ v: 1, owner: null, nid: 1, wk: -1, dy: -1, units: [101, 102, 103, 104].map(n => ({ n, furn: 0, clean: 60, lv: "murah", t: null, brk: null, self: 0, pl: null, cands: null, cd: 0 })) });
- const bs = () => { if (!S.bs || !Array.isArray(S.bs.units)) S.bs = mkB(); return S.bs };
+ B.cur = "L"; const nm = () => BD[B.cur].name;
+ const mkB = () => ({ v: 1, owner: null, nid: 1, wk: -1, dy: -1, fl: 1, units: [] });
+ const mkU = n => ({ n, furn: 0, clean: 60, lv: "murah", t: null, brk: null, self: 0, pl: null, cands: null, cd: 0 });
+ const FLC = [0, 4000, 5000, 6000], NF = 4, flOf = u => Math.floor(u.n / 100), ou = b => b.units.filter(u => flOf(u) <= (b.fl || 1));
+ const bs = () => {   /* 16 units (4 floors x 4); a save with the first four gets the others lazily, the floors above closed */
+  const k = BD[B.cur].key; if (!S[k] || !Array.isArray(S[k].units)) S[k] = mkB(); const b = S[k]; if (!b.fl) b.fl = 1; b.fem = BD[B.cur].fem;
+  if (b.units.length < NF * 4) { for (let f = 1; f <= NF; f++) for (let i = 1; i <= 4; i++) { const n = f * 100 + i; if (!b.units.some(u => u.n === n)) b.units.push(mkU(n)) } b.units.sort((a, c) => a.n - c.n) }
+  return b
+ };
  const mine = b => !!(b && b.owner && b.owner === S.home);
- const Q = u => Math.round(u.furn * 25 + cl(u.clean, 0, 100) * .5 - (u.brk ? 15 : 0));
+ const Q0 = u => Math.round(u.furn * 25 + cl(u.clean, 0, 100) * .5 - (u.brk ? 15 : 0));   /* the old measure: a room never arranged keeps it */
+ const Q = u => { try { if (B.Qf) { const v = B.Qf(u); if (v != null) return v } } catch (e) { fail(e) } return Q0(u) };
  const qTxt = q => q >= 75 ? "Mewah" : q >= 40 ? "Selesa" : "Sederhana";
  const dd = () => dayIdx();
  /* (1) tenants: an existing character, recoloured */
  const tenant = b => {
   let pool = []; try { for (const x of S.sims) if (x && x.ap && x.stage !== "child" && x.stage !== "baby") pool.push(x.ap) } catch (e) { }
   try { if (typeof NBAP !== "undefined") for (const k in NBAP) pool.push(NBAP[k]) } catch (e) { }
-  if (!pool.length) pool = [defAp({})];
+  const wf = !!b.fem; pool = pool.filter(a => isFemAp(a) === wf);   /* the building's sex only (a tudung stays with the woman it came from) */
+  if (!pool.length) pool = [defAp({ shape: wf ? .15 : .85, hair: wf ? "long" : "short", hijab: "none" })];
   const ap = defAp(JSON.parse(JSON.stringify(pk(pool)))); ap.photo = null; ap.photoSrc = null; ap.crop = null; ap.wear = "casual";
-  ap.skin = pk(PAL.skin); ap.hairColor = pk(PAL.hair.slice(0, 9)); if (ap.hijab && ap.hijab !== "none") ap.hijabColor = pk(PAL.cloth);
-  ap.casual = Object.assign({}, ap.casual, { topC: pk(PAL.cloth), botC: pk(PAL.cloth) });
-  const fem = isFemAp(ap), used = new Set(); for (const u of b.units) { if (u.t) used.add(u.t.name); for (const c of u.cands || []) used.add(c.name) }
-  let name = pk(fem ? NAMES_F : NAMES_M); for (let i = 0; i < 8 && used.has(name); i++) name = pk(fem ? NAMES_F : NAMES_M);
+  const fem = wf, used = new Set(), looks = new Set(); for (const u of b.units) for (const c of [u.t].concat(u.cands || [])) if (c) { used.add(c.name); looks.add(c.ap.skin + c.ap.hairColor + c.ap.casual.topC) }
+  for (let i = 0; i < 12; i++) {   /* 16 tenants stay varied: no name and no skin + hair + top the same as another */
+   ap.skin = pk(PAL.skin); ap.hairColor = pk(PAL.hair.slice(0, 9)); if (ap.hijab && ap.hijab !== "none") ap.hijabColor = pk(PAL.cloth);
+   ap.casual = Object.assign({}, ap.casual, { topC: pk(PAL.cloth), botC: pk(PAL.cloth) }); if (!looks.has(ap.skin + ap.hairColor + ap.casual.topC)) break
+  }
+  const NP = (fem ? NAMES_F.concat(XF) : NAMES_M.concat(XM)); let name = pk(NP); for (let i = 0; i < 40 && used.has(name); i++) name = pk(NP);
   return { id: "t" + (b.nid++), name, fem, ap, tr: pk(Object.keys(TRS)), bud: pk(BUD), amt: 0, stay: 0, owe: 0 }
  };
  B.tenant = () => tenant(bs());
@@ -41627,25 +41646,25 @@ try {
  /* (2) the week and the day */
  const npcBuy = b => {
   let ks = []; try { ks = townIds().filter(k => k !== S.home) } catch (e) { }
-  if (!ks.length) return; const k = pk(ks); b.owner = k; const open = Math.floor(rnd() * 4);
-  b.units.forEach((u, i) => { u.furn = 1; u.clean = 65; u.lv = pk(["murah", "biasa", "biasa"]); if (i !== open) { u.t = tenant(b); u.t.amt = Math.min(RATES[u.lv].amt, u.t.bud); u.t.stay = Math.floor(rnd() * 10) } });
-  const m = `🏘️ Keluarga ${wmShort(homeName(k), 22)} membeli ${NAME} di Pekan dan menyewakan bilik. Ada satu bilik kosong untuk disewa.`; toast(m); diary(m)
+  if (!ks.length) return; const k = pk(ks); b.owner = k; b.fl = 1 + Math.floor(rnd() * 2); const ouu = ou(b), open = Math.floor(rnd() * ouu.length);
+  ouu.forEach((u, i) => { u.furn = 1; u.clean = 65; u.lv = pk(["murah", "biasa", "biasa"]); if (i !== open) { u.t = tenant(b); u.t.amt = Math.min(RATES[u.lv].amt, u.t.bud); u.t.stay = Math.floor(rnd() * 10) } });
+  const m = `🏘️ Keluarga ${wmShort(homeName(k), 22)} membeli ${nm()} di Pekan dan menyewakan bilik. Ada satu bilik kosong untuk disewa.`; toast(m); diary(m)
  };
  const npcWeek = (b, d) => {
-  for (const u of b.units) {
+  for (const u of ou(b)) {
    if (u.pl) { const a = u.pl.amt, o = u.pl.owe || 0; if (S.money >= a + o) { S.money -= a + o; homeMoneyAdd(b.owner, a + o); u.pl.owe = 0; u.pl.weeks = (u.pl.weeks || 0) + 1 } else { u.pl.owe = o + a; toast(`⚠️ Duit tidak cukup untuk sewa bilik ${u.n}: tunggakan ${rm(u.pl.owe)}.`); if (u.pl.owe >= a * 3) { toast(`🚪 Tuan rumah menamatkan sewa bilik ${u.n} kerana tunggakan.`); u.pl = null } } continue }
    if (u.t && rnd() < .08) leave(b, u, "") ; else if (!u.t && rnd() < .25) { u.t = tenant(b); u.t.amt = Math.min(RATES[u.lv].amt, u.t.bud) }
   }
  };
  const day = (b, d) => {
   B.days++;
-  for (const u of b.units) {
+  for (const u of ou(b)) {
    if (u.self) { u.clean = Math.max(u.clean, 80); u.brk = null; continue }
    const t = u.t; if (!t) continue; const tr = t.tr;
    u.clean = cl(u.clean + (tr === "pembersih" ? 2 : tr === "rajin" ? -1 : tr === "bising" ? -4 : -2.5), 0, tr === "pembersih" ? 95 : 100); t.stay = (t.stay || 0) + 1;
    if (!u.brk && rnd() < (tr === "bising" ? .05 : tr === "rajin" ? .015 : .03)) {
     const [w, c] = pk(BRK);
-    if (tr === "rajin" && c <= 80 && rnd() < .5) { const m = `💪 ${t.name} membaiki sendiri: ${w.toLowerCase()} (bilik ${u.n}).`; toast(m) } else { u.brk = { w, c, d }; toast(`🔧 Bilik ${u.n}: ${w.toLowerCase()}. Baiki di ${NAME}.`) }
+    if (tr === "rajin" && c <= 80 && rnd() < .5) { const m = `💪 ${t.name} membaiki sendiri: ${w.toLowerCase()} (bilik ${u.n}).`; toast(m) } else { u.brk = { w, c, d }; toast(`🔧 Bilik ${u.n}: ${w.toLowerCase()}. Baiki di ${nm()}.`) }
    }
    if (u.brk && d - u.brk.d >= 6) { leave(b, u, "bilik rosak terlalu lama"); continue }
    if (t.owe) {
@@ -41657,29 +41676,30 @@ try {
  };
  const week = (b, d) => {
   B.weeks++; let inc = 0, cost = 0, n = 0, late = 0;
-  for (const u of b.units) {
+  for (const u of ou(b)) {
    if (u.self) continue; const t = u.t; if (!t) { cost += VAC; continue } if (t.owe) continue;
    const low = Q(u) < RATES[u.lv].need; if (low && t.stay > 14 && rnd() < .2) { leave(b, u, "bilik tidak setaraf sewa"); continue }
    const p = (t.tr === "lewat" ? .4 : .08) + (low ? .15 : 0) + (u.clean < 30 ? .08 : 0);
-   if (rnd() < p) { t.owe = t.amt; t.oweSince = d; t.oweD = 0; t.grace = 0; late++; toast(`⏳ ${t.name} (bilik ${u.n}) belum bayar sewa ${rm(t.amt)}. Lihat ${NAME}.`) } else { inc += t.amt; n++; t.weeks = (t.weeks || 0) + 1 }
+   if (rnd() < p) { t.owe = t.amt; t.oweSince = d; t.oweD = 0; t.grace = 0; late++; toast(`⏳ ${t.name} (bilik ${u.n}) belum bayar sewa ${rm(t.amt)}. Lihat ${nm()}.`) } else { inc += t.amt; n++; t.weeks = (t.weeks || 0) + 1 }
   }
   S.money = Math.max(0, S.money + inc - cost);
-  const m = `🏘️ ${NAME}: sewa ${rm(inc)} dari ${n} penyewa${cost ? ", kos bilik kosong " + rm(cost) : ""}${late ? ", " + late + " tertunggak" : ""}.`; toast(m); diary(m)
+  const m = `🏘️ ${nm()}: sewa ${rm(inc)} dari ${n} penyewa${cost ? ", kos bilik kosong " + rm(cost) : ""}${late ? ", " + late + " tertunggak" : ""}.`; toast(m); diary(m)
  };
- const tick = () => {
-  const d = dd(); let b = S.bs; if (!b && d >= 14) b = bs(); if (!b || !Array.isArray(b.units) || b.dy === d) return; b.dy = d;
+ const tick1 = () => {
+  const d = dd(); let b = S[BD[B.cur].key]; if (!b && d >= 14) b = bs(); else if (b && Array.isArray(b.units)) b = bs(); if (!b || !Array.isArray(b.units) || b.dy === d) return; b.dy = d;
   if (!b.owner) { if (d >= 14 && d % 7 === 0 && rnd() < .15) npcBuy(b); return }
   if (!mine(b)) { if (d % 7 === 0) npcWeek(b, d); return }
   day(b, d); if (d % 7 === 0 && b.wk !== d) { b.wk = d; week(b, d) }
  };
+ const tick = () => { const o = B.cur; try { for (const w of ["L", "P"]) { B.cur = w; tick1() } } finally { B.cur = o } };
  B.tick = tick; B.npcBuy = npcBuy; B.npcWeek = npcWeek;
  if (typeof HOURX !== "undefined") HOURX.push(h => { try { if (h === 9) tick() } catch (e) { fail(e) } });
  /* (3) the actions */
  const spend = n => { if (S.money < n) { toast(`Duit tidak cukup: perlu ${rm(n)}.`); return false } S.money -= n; return true };
  const U = n => { const b = bs(); return b.units.find(u => u.n === +n) };
  const A = {
-  buy() { const b = bs(); if (b.owner) return; if (!spend(PRICE)) return; b.owner = S.home; const m = `🏘️ Beli ${NAME} (4 bilik, 101-104) untuk disewakan: ${rm(PRICE)}.`; toast(m); diary(m) },
-  find(n) { const b = bs(), u = U(n); if (!u || u.t || !mine(b)) return; if (!spend(ADV)) return; const c = [tenant(b), tenant(b), tenant(b)]; u.cands = c; try { if (b.units.some(x => x.t && x.t.tr === "kawan")) { u.cands.push(tenant(b)); u.cands[3].tr = "kawan"; u.cands[3].friend = 1 } } catch (e) { } u.cd = dd(); toast(`📣 Iklan bilik ${n}: ${u.cands.length} calon datang melihat.`) },
+  buy() { const b = bs(); if (b.owner) return; if (!spend(PRICE)) return; b.owner = S.home; const m = `🏘️ Beli ${nm()} (16 bilik, empat tingkat; tingkat 1 dibuka dahulu) untuk disewakan: ${rm(PRICE)}.`; toast(m); diary(m) },
+  find(n) { const b = bs(), u = U(n); if (!u || u.t || !mine(b)) return; if (!spend(ADV)) return; u.cands = []; for (let i = 0; i < 3; i++) u.cands.push(tenant(b)); try { if (b.units.some(x => x.t && x.t.tr === "kawan")) { u.cands.push(tenant(b)); u.cands[3].tr = "kawan"; u.cands[3].friend = 1 } } catch (e) { } u.cd = dd(); toast(`📣 Iklan bilik ${n}: ${u.cands.length} calon datang melihat.`) },
   take(n, i) {
    const b = bs(), u = U(n); if (!u || u.t || !u.cands) return; const c = u.cands[i], a = RATES[u.lv].amt; if (!c) return;
    if (Q(u) < RATES[u.lv].need) { toast(`Bilik ${n} belum cukup bagus untuk sewa ${RATES[u.lv].t.toLowerCase()}.`); return }
@@ -41702,7 +41722,9 @@ try {
   },
   evict(n) { const b = bs(), u = U(n); if (!u || !u.t) return; leave(b, u, "dihalau kerana tunggakan") },
   self(n) { const b = bs(), u = U(n); if (!u || u.t) return; if (u.self) { u.self = 0; toast(`Bilik ${n} kembali disewakan.`); return } for (const x of b.units) x.self = 0; u.self = 1; u.cands = null; toast(`🏠 Anda tinggal di bilik ${n} (tiada sewa, bilik sentiasa bersih).`) },
-  rent(n) { const b = bs(), u = U(n); if (!u || u.t || u.pl || b.owner === S.home || !b.owner) return; if (b.units.some(x => x.pl)) { toast("Keluarga anda sudah menyewa satu bilik."); return } const a = RATES[u.lv].amt; if (!spend(a)) return; homeMoneyAdd(b.owner, a); u.pl = { amt: a, since: dd(), weeks: 0, owe: 0 }; u.cands = null; const m = `🔑 Keluarga anda menyewa bilik ${n} di ${NAME}: ${rm(a)} seminggu (minggu pertama dibayar).`; toast(m); diary(m) },
+  floor(f) { const b = bs(); f = +f; if (!mine(b) || f !== (b.fl || 1) + 1 || f > NF) return; if (!spend(FLC[f - 1])) return; b.fl = f; B.tab = f; const m = `🏗️ Tingkat ${f} dibuka di ${nm()}: 4 bilik baharu (${f}01-${f}04).`; toast(m); diary(m) },
+  tab(f) { B.tab = cl(+f, 1, NF) },
+  rent(n) { const b = bs(), u = U(n); if (!u || u.t || u.pl || b.owner === S.home || !b.owner) return; if (b.units.some(x => x.pl)) { toast("Keluarga anda sudah menyewa satu bilik."); return } const a = RATES[u.lv].amt; if (!spend(a)) return; homeMoneyAdd(b.owner, a); u.pl = { amt: a, since: dd(), weeks: 0, owe: 0 }; u.cands = null; const m = `🔑 Keluarga anda menyewa bilik ${n} di ${nm()}: ${rm(a)} seminggu (minggu pertama dibayar).`; toast(m); diary(m) },
   quit(n) { const u = U(n); if (!u || !u.pl) return; u.pl = null; toast(`Anda berhenti menyewa bilik ${n}.`) }
  };
  B.A = A;
@@ -41722,11 +41744,11 @@ try {
 #hfbilik .tg{display:inline-block;font:700 .62rem system-ui;border-radius:999px;padding:1px 6px;background:#e6efe0;color:#2c5a3a}`;
   document.head.appendChild(st)
  };
- const el = () => { let e = document.getElementById("hfbilik"); if (!e) { e = document.createElement("div"); e.id = "hfbilik"; e.hidden = true; e.setAttribute("role", "dialog"); e.setAttribute("aria-label", NAME); document.body.appendChild(e) } return e };
+ const el = () => { let e = document.getElementById("hfbilik"); if (!e) { e = document.createElement("div"); e.id = "hfbilik"; e.hidden = true; e.setAttribute("role", "dialog"); e.setAttribute("aria-label", nm()); document.body.appendChild(e) } return e };
  const trTag = t => `<span class="tg" title="${esc(TRS[t.tr][2])}">${TRS[t.tr][0]} ${TRS[t.tr][1]}</span>`;
  const unitHTML = (b, u, own) => {
-  const q = Q(u), t = u.t, r = RATES[u.lv]; let h = `<div class="u${u.self ? " me" : ""}" data-u="${u.n}"><div class="uh"><span>Bilik ${u.n}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span>${q} · ${qTxt(q)}</span></div>
-<div class="sm">Perabot: ${FURNN[u.furn]} · Kebersihan ${Math.round(u.clean)}%${u.brk ? ` · <b style="color:#a8402e">rosak</b>` : ""}</div>`;
+  const q = Q(u), t = u.t, r = RATES[u.lv]; let h = `<div class="u${u.self ? " me" : ""}" data-u="${u.n}"><div class="uh"><span>Bilik ${u.n}${!own ? ' <button type="button" class="b o" data-a="enter" data-n="${u.n}">🚪 Lihat</button>' : ""}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span>${q} · ${qTxt(q)}</span></div>
+<div class="sm">Perabot: ${u.fur ? u.fur.length + " buah" : FURNN[u.furn]} · Kebersihan ${Math.round(u.clean)}%${u.brk ? ` · <b style="color:#a8402e">rosak</b>` : ""}</div>`;
   if (!own) {
    if (t) h += `<div class="t">${face(t)}<div><b>${esc(t.name)}</b> ${trTag(t)}<div class="sm">Sewa ${rm(t.amt)} seminggu · ${t.stay || 0} hari tinggal</div></div></div>`;
    else if (u.pl) h += `<p class="sm">🔑 Keluarga anda menyewa bilik ini: ${rm(u.pl.amt)} seminggu${u.pl.owe ? ` · tunggakan ${rm(u.pl.owe)}` : ""}.</p><button class="b o" data-a="quit" data-n="${u.n}">Berhenti menyewa</button>`;
@@ -41745,23 +41767,27 @@ try {
    h += `<p class="sm">Bilik kosong: kos ${rm(VAC)} seminggu.</p>`
   }
   if (u.brk) h += `<div class="al">🔧 ${esc(u.brk.w)} · kos baiki ${rm(u.brk.c)}<div class="row"><button class="b" data-a="fix" data-n="${u.n}">🔧 Baiki ${rm(u.brk.c)}</button></div></div>`;
-  h += `<div class="row"><button class="b g" data-a="clean" data-n="${u.n}" ${u.clean >= 100 ? "disabled" : ""}>🧹 Bersihkan ${rm(CLEANC)}</button><button class="b g" data-a="furn" data-n="${u.n}" ${u.furn >= 2 ? "disabled" : ""}>🛋️ ${u.furn >= 2 ? "Perabot penuh" : "Naik taraf " + rm(FURNC[u.furn])}</button>${!t ? `<button class="b o" data-a="self" data-n="${u.n}" aria-pressed="${!!u.self}">🏠 ${u.self ? "Saya tinggal di sini" : "Tinggal di sini"}</button>` : ""}</div></div>`;
+  h += `<div class="row"><button class="b g" data-a="clean" data-n="${u.n}" ${u.clean >= 100 ? "disabled" : ""}>🧹 Bersihkan ${rm(CLEANC)}</button><button class="b g" data-a="enter" data-n="${u.n}">🚪 Masuk bilik</button>${!t ? `<button class="b o" data-a="self" data-n="${u.n}" aria-pressed="${!!u.self}">🏠 ${u.self ? "Saya tinggal di sini" : "Tinggal di sini"}</button>` : ""}</div></div>`;
   return h
  };
  const draw = () => {
-  const e = el(), b = bs(), own = mine(b), keep = e.querySelector(".pk") ? e.querySelector(".pk").scrollTop : 0; let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><h2>🏘️ ${NAME}</h2>`;
-  if (!b.owner) h += `<p class="nt">Bangunan empat bilik (101–104) di timur Pekan, belum berpenghuni dan sedang dijual.</p><div class="u"><b>Harga ${rm(PRICE)}</b><p class="sm">Anda jadi tuan rumah: cari penyewa, tetapkan sewa seminggu (${rm(RATES.murah.amt)} / ${rm(RATES.biasa.amt)} / ${rm(RATES.mahal.amt)}), jaga mutu bilik, uruskan tunggakan dan kerosakan. Jika lambat, mungkin keluarga jiran yang membelinya dahulu, dan anda boleh menyewa satu bilik.</p><button class="b" data-a="buy" ${S.money < PRICE ? "disabled" : ""}>🏠 Beli bangunan · ${rm(PRICE)}</button>${S.money < PRICE ? `<p class="sm">Duit anda ${rm(S.money)}: belum cukup.</p>` : ""}</div>` + b.units.map(u => `<div class="u"><div class="uh"><span>Bilik ${u.n}</span><span class="sm">Kosong</span></div></div>`).join("");
+  if (B.room && B.rdraw) { try { B.rdraw(el(), bs()); return } catch (x) { fail(x); B.room = null } }
+  const e = el(), b = bs(), own = mine(b), keep = e.querySelector(".pk") ? e.querySelector(".pk").scrollTop : 0; let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><h2>${BD[B.cur].ico} ${nm()}</h2>`;
+  if (!b.owner) h += `<p class="nt">Bangunan empat tingkat (16 bilik: 101–104, 201–204, 301–304, 401–404) khas untuk penyewa ${BD[B.cur].fem ? "perempuan" : "lelaki"}, di timur Pekan, belum berpenghuni dan sedang dijual. Tingkat 1 terbuka dahulu; tingkat 2–4 dibuka kemudian dengan kos kecil.</p><div class="u"><b>Harga ${rm(PRICE)}</b><p class="sm">Anda jadi tuan rumah: cari penyewa, tetapkan sewa seminggu (${rm(RATES.murah.amt)} / ${rm(RATES.biasa.amt)} / ${rm(RATES.mahal.amt)}), jaga mutu bilik, uruskan tunggakan dan kerosakan. Jika lambat, mungkin keluarga jiran yang membelinya dahulu, dan anda boleh menyewa satu bilik.</p><button class="b" data-a="buy" ${S.money < PRICE ? "disabled" : ""}>🏠 Beli bangunan · ${rm(PRICE)}</button>${S.money < PRICE ? `<p class="sm">Duit anda ${rm(S.money)}: belum cukup.</p>` : ""}</div>` + ou(b).map(u => `<div class="u"><div class="uh"><span>Bilik ${u.n}</span><span class="sm">Kosong</span></div></div>`).join("");
   else {
-   if (own) { let inc = 0, nt = 0, ve = 0; for (const u of b.units) { if (u.self) continue; if (u.t) { nt++; if (!u.t.owe) inc += u.t.amt } else ve++ } h += `<p class="nt">Anda tuan rumah. Anggaran seminggu: sewa ${rm(inc)} − bilik kosong ${rm(ve * VAC)}. Penyewa ${nt}/4. Duit: ${rm(S.money)}.</p>` }
+   if (own) { let inc = 0, nt = 0, ve = 0; for (const u of ou(b)) { if (u.self) continue; if (u.t) { nt++; if (!u.t.owe) inc += u.t.amt } else ve++ } h += `<p class="nt">Anda tuan rumah. Anggaran seminggu: sewa ${rm(inc)} − bilik kosong ${rm(ve * VAC)}. Penyewa ${nt}/${ou(b).length}. Duit: ${rm(S.money)}.</p>` }
    else h += `<p class="nt">Milik keluarga ${esc(wmShort(homeName(b.owner), 24))}. Anda boleh menyewa satu bilik kosong.</p>`;
-   h += b.units.map(u => unitHTML(b, u, own)).join("")
+   const fl = b.fl || 1, tab = B.tab = cl(B.tab || 1, 1, NF);
+   h += `<div class="row" role="tablist">${[1, 2, 3, 4].map(f => { const us = b.units.filter(u => flOf(u) === f), pr = f <= fl ? us.filter(u => u.brk || (u.t && u.t.owe)).length : 0, va = f <= fl ? us.filter(u => !u.t && !u.self && !u.pl).length : 0; return `<button type="button" class="b o" role="tab" data-a="tab" data-n="${f}" aria-pressed="${tab === f}">${f <= fl ? "" : "🔒 "}Tingkat ${f}${pr ? " ❗" : va ? " ＋" + va : ""}</button>` }).join("")}</div>`;
+   if (tab > fl) h += `<div class="u"><b>Tingkat ${tab} belum dibuka</b><p class="sm">${own ? tab === fl + 1 ? `Buka empat bilik baharu (${tab}01–${tab}04) untuk disewakan.` : "Buka tingkat di bawahnya dahulu." : "Tuan rumah belum membuka tingkat ini."}</p>${own && tab === fl + 1 ? `<button class="b" data-a="floor" data-n="${tab}" ${S.money < FLC[tab - 1] ? "disabled" : ""}>🏗️ Buka tingkat ${tab} · ${rm(FLC[tab - 1])}</button>` : ""}</div>`;
+   else h += (B.grid ? B.grid(b, tab, own) : "") + b.units.filter(u => flOf(u) === tab).map(u => unitHTML(b, u, own)).join("")
   }
   e.innerHTML = h + "</div>"; const p = e.querySelector(".pk"); if (p) p.scrollTop = keep
  };
- B.draw = draw;
- const open = () => { try { css(); bs(); const e = el(); draw(); e.hidden = false; HF.bilikOn = true; B.opened++; try { const m = document.getElementById("kmap"); if (m) m.hidden = true } catch (x) { } return true } catch (x) { fail(x); return false } };
- const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.bilikOn = false; try { renderAll() } catch (x) { } };
- B.open = open; B.close = close; HF.bilikOpen = open;
+ B.draw = draw; B.Q = Q; B.face = face; B.RATES = RATES; B.U = U; B.nm = nm; B.rm = rm; B.qTxt = qTxt; B.BD = BD; B.bs = bs; B.mine = mine; B.dd = dd; B.FURNN = FURNN; B.NF = NF;
+ const open = w => { try { if (w === "L" || w === "P") B.cur = w; css(); bs(); const e = el(); draw(); e.hidden = false; HF.bilikOn = true; B.opened++; try { const m = document.getElementById("kmap"); if (m) m.hidden = true } catch (x) { } return true } catch (x) { fail(x); return false } };
+ const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.bilikOn = false; B.room = null; B.pk = null; try { renderAll() } catch (x) { } };
+ B.open = open; HF.bilikOpenP = () => open("P"); B.A_ = A; B.close = close; HF.bilikOpen = open;
  document.addEventListener("click", ev => {
   try {
    const t = ev.target; if (!t || !t.closest || !HF.bilikOn || !t.closest("#hfbilik")) return; ev.stopPropagation();
@@ -41773,38 +41799,420 @@ try {
  document.addEventListener("keydown", ev => { try { if (HF.bilikOn && ev.key === "Escape") { ev.stopPropagation(); close() } } catch (x) { fail(x) } }, true);
  /* (5) the place on the map: PLACES, ERR, WMPL, WMN, and the errand opens the card */
  try {
-  PLACES.bilik = { area: "bandar", name: NAME, icon: "🏘️", acts: ["hf_bilik"], note: "Bangunan empat bilik sewa (101–104) di timur Pekan: beli untuk disewakan, atau sewa satu bilik. Buka 8:00–22:00." };
-  ERR.hf_bilik = { label: "Ke Bilik Sewa Seri Murni: urus bilik sewa", icon: "🏘️", dur: 25, ages: ["teen", "adult", "elder"], eff: { fun: .1 }, place: "bilik", when: (d2, h) => h >= 8 && h < 22, whenTxt: "8:00–22:00" };
-  if (typeof WMPL !== "undefined") WMPL.bilik = [1120, 24];
-  if (typeof WMN !== "undefined") WMN.bilik = NAME;
-  if (typeof WMCAT !== "undefined") WMCAT.bilik = "civic"
+  for (const w of ["L", "P"]) {
+   const D = BD[w];
+   PLACES[D.id] = { area: "bandar", name: D.name, icon: D.ico, acts: ["hf_" + D.id], note: `Bangunan empat tingkat, 16 bilik sewa untuk ${D.fem ? "perempuan" : "lelaki"}, di timur Pekan: beli untuk disewakan, atau sewa satu bilik. Buka 8:00–22:00.` };
+   ERR["hf_" + D.id] = { label: `Ke ${D.name}: urus bilik sewa`, icon: D.ico, dur: 25, ages: ["teen", "adult", "elder"], eff: { fun: .1 }, place: D.id, when: (d2, h) => h >= 8 && h < 22, whenTxt: "8:00–22:00" };
+   if (typeof WMPL !== "undefined") WMPL[D.id] = [D.cx, 8];
+   if (typeof WMN !== "undefined") WMN[D.id] = D.short;
+   if (typeof WMCAT !== "undefined") WMCAT[D.id] = "civic"
+  }
  } catch (e) { fail(e) }
  if (typeof errandReturn === "function") {
   const er = errandReturn;
-  errandReturn = function (s2) { const e = s2 && s2.errand, r = er.apply(this, arguments); try { if (e === "hf_bilik" && s2 && S.sims.includes(s2) && !s2.visitFrom) setTimeout(() => open(), 350) } catch (x) { fail(x) } return r }
+  errandReturn = function (s2) { const e = s2 && s2.errand, r = er.apply(this, arguments); try { if ((e === "hf_bilik" || e === "hf_melur") && s2 && S.sims.includes(s2) && !s2.visitFrom) setTimeout(() => open(e === "hf_melur" ? "P" : "L"), 350) } catch (x) { fail(x) } return r }
  }
  /* (6) the building drawn on the Peta in code (the doors show who lives there), and a button in the pin's panel */
- const art = () => {
-  const b = S.bs, X = 1038, Y = -128, W = 164; let s = `<g class="hf159b" pointer-events="none"><ellipse cx="1120" cy="-44" rx="104" ry="9" fill="rgba(60,40,20,.22)"/><rect x="${X}" y="${Y + 28}" width="${W}" height="78" rx="3" fill="#ecdcbc" stroke="#8a6a44" stroke-width="2"/><path d="M${X - 10} ${Y + 30}L1120 ${Y - 6}L${X + W + 10} ${Y + 30}Z" fill="#b5523b" stroke="#7a3624" stroke-width="2"/><rect x="${X}" y="${Y + 66}" width="${W}" height="4" fill="#c9b48a"/>`;
-  for (let i = 0; i < 4; i++) {
-   const u = b && b.units ? b.units[i] : null, x = X + 8 + i * 39, st = !u ? 0 : u.brk || (u.t && u.t.owe) ? 3 : u.t || u.pl || u.self ? 1 : 2;
-   s += `<rect x="${x}" y="${Y + 36}" width="26" height="20" rx="2" fill="#a9cfdf" stroke="#6a5a48" stroke-width="1.5"/><rect x="${x + 2}" y="${Y + 74}" width="22" height="30" rx="2" fill="${st === 1 ? "#4f8a5a" : st === 3 ? "#c9743a" : "#a89a82"}" stroke="#5a4a38" stroke-width="1.5"/><text x="${x + 13}" y="${Y + 69}" text-anchor="middle" font-size="9" font-weight="800" fill="#4a3a28">${101 + i}</text>${st === 2 ? `<text x="${x + 13}" y="${Y + 95}" text-anchor="middle" font-size="18" font-weight="800" fill="#fffaf0">+</text>` : ""}${st === 3 ? `<text x="${x + 13}" y="${Y + 95}" text-anchor="middle" font-size="16" font-weight="800" fill="#fffaf0">!</text>` : ""}`
+ const art = w => {   /* four floors of four doors, a gable roof; y -144..-44, clear of Jalan Pekan (-150), the lanes (890, 1355, 1780) and the civic row (120) */
+  const D = BD[w], b = S[D.key], W = 250, X = D.cx - W / 2, FH = 21, Y = -44 - FH * 4, fl = b && b.fl || 1, rf = D.fem ? "#a3466b" : "#b5523b", rs = D.fem ? "#6e2a45" : "#7a3624";
+  let s = `<g class="hf159b" pointer-events="none"><ellipse cx="${D.cx}" cy="-41" rx="${W / 2 + 14}" ry="7" fill="rgba(60,40,20,.22)"/><rect x="${X}" y="${Y}" width="${W}" height="${FH * 4}" fill="${D.fem ? "#f1dfe0" : "#ecdcbc"}" stroke="#8a6a44" stroke-width="2"/><path d="M${X - 10} ${Y + 2}L${D.cx} ${Y - 14}L${X + W + 10} ${Y + 2}Z" fill="${rf}" stroke="${rs}" stroke-width="2"/>`;
+  for (let f = 4; f >= 1; f--) {
+   const y = Y + (4 - f) * FH; s += `<rect x="${X}" y="${y + FH - 1.5}" width="${W}" height="1.5" fill="#c9b48a"/>`;
+   for (let i = 0; i < 4; i++) {
+    const u = b && b.units ? b.units.find(q => q.n === f * 100 + i + 1) : null, x = X + 5 + i * 61, open = f <= fl;
+    const st = !open ? 0 : !u ? 2 : u.brk || (u.t && u.t.owe) ? 3 : u.t || u.pl || u.self ? 1 : 2, col = st === 1 ? "#4f8a5a" : st === 3 ? "#c9743a" : st === 2 ? "#a89a82" : "#8f8a80";
+    s += `<rect x="${x}" y="${y + 3}" width="51" height="${FH - 6}" rx="2.5" fill="${open ? "#a9cfdf" : "#bdb6a6"}" stroke="#6a5a48" stroke-width="1.2"/><rect x="${x + 3}" y="${y + 5}" width="13" height="${FH - 10}" fill="${col}" stroke="#5a4a38" stroke-width=".9"/><text x="${x + 35}" y="${y + FH - 7}" text-anchor="middle" font-size="9" font-weight="800" fill="#4a3a28">${f * 100 + i + 1}</text>${st === 2 ? `<text x="${x + 9.5}" y="${y + FH - 6}" text-anchor="middle" font-size="10" font-weight="800" fill="#fffaf0">+</text>` : st === 3 ? `<text x="${x + 9.5}" y="${y + FH - 6}" text-anchor="middle" font-size="10" font-weight="800" fill="#fffaf0">!</text>` : ""}`
+   }
   }
   return s + "</g>"
  };
  if (typeof worldMapSVG === "function") {
   const ws = worldMapSVG;
-  worldMapSVG = function () { const s2 = ws.apply(this, arguments); try { const i = s2.indexOf('<g class="wmp" data-wm-place="bilik"'); return i < 0 ? s2 : s2.slice(0, i) + art() + s2.slice(i) } catch (x) { fail(x); return s2 } }
+  worldMapSVG = function () { const s2 = ws.apply(this, arguments); try { let o = s2; for (const w of ["P", "L"]) { const i = o.indexOf(`<g class="wmp" data-wm-place="${BD[w].id}"`); if (i >= 0) o = o.slice(0, i) + art(w) + o.slice(i) } return o } catch (x) { fail(x); return s2 } }
  }
  const add = () => {
   try {
-   const k = document.querySelector("#kmap"), inf = k && k.querySelector(".wminfo"); if (!inf || inf.querySelector(".hf159") || wmSel !== "pl:bilik") return;
-   const b = S.bs, txt = !b || !b.owner ? "Dijual " + rm(PRICE) : mine(b) ? "Anda tuan rumah" : "Milik keluarga " + wmShort(homeName(b.owner), 18);
-   inf.insertAdjacentHTML("beforeend", `<div class="hf159"><p class="sm"><b>🏘️ ${txt}</b></p><div class="acts"><button type="button" class="btn pri" data-b159="1">🔑 Buka ${NAME}</button></div></div>`);
-   inf.querySelectorAll("[data-b159]").forEach(x => x.onclick = () => { open() })
+   const k = document.querySelector("#kmap"), inf = k && k.querySelector(".wminfo"); if (!inf || inf.querySelector(".hf159") || wmSel !== "pl:bilik" && wmSel !== "pl:melur") return;
+   const w = wmSel === "pl:melur" ? "P" : "L", D = BD[w], b = S[D.key], txt = !b || !b.owner ? "Dijual " + rm(PRICE) : mine(b) ? "Anda tuan rumah" : "Milik keluarga " + wmShort(homeName(b.owner), 18);
+   inf.insertAdjacentHTML("beforeend", `<div class="hf159"><p class="sm"><b>${D.ico} ${txt}</b></p><div class="acts"><button type="button" class="btn pri" data-b159="1">🔑 Buka ${D.name}</button></div></div>`);
+   inf.querySelectorAll("[data-b159]").forEach(x => x.onclick = () => { open(w) })
   } catch (e) { fail(e) }
  };
  if (typeof renderMap === "function") { const rm0 = renderMap; renderMap = function () { const r = rm0.apply(this, arguments); try { add() } catch (x) { fail(x) } return r } }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §160. hf134: Masuk bilik sewa dan susun perabot (owner 23 Nov: "masuk dalam bilik sewa dan susun perabot ... simple, tengah2 dan
+   mewah dan boleh sendiri edit perabot"; Rent Please! as the picture). The house-building engine is tied to ONE house (S.objs, N x N, the
+   camera), so the rooms get a light editor of their own: a 4 x 4 isometric room drawn in an SVG, every piece the game's own furniture art
+   (HF.itemThumb, the same picture the Beli catalogue shows) laid with <use> from one hidden set of <image> (cached, no per-frame work).
+   Data (lazy, old saves have none): unit.fur = [{ t: ITEMS type, x, y, r: 0|1 (1 = mirrored) }], unit.pk = "s"|"m"|"l". A room with no
+   .fur keeps the old furn 0..2 measure of §159 (Q0) and shows that furniture as a virtual set; the first edit makes .fur from it.
+   Quality (Qf) now reads the pieces: sum of the pieces' points (the 2nd of a kind half, the 3rd nothing, capped at 80) x 0.8 + cleanliness
+   x 0.2, minus 15 when something is broken. So a bare room (<= 20) can only be rented Murah (need 0), Biasa needs 40, Mahal 75.
+   Three packages (Simple / Sederhana / Mewah) are bought with one tap (old pieces sold at half), then edited piece by piece. A piece can
+   only be placed, moved, turned or sold by the landlord, never by the tenant; a room with something broken is locked until repaired. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const B = HF.h159, A = B && B.A; if (!A) throw new Error("h159 missing");
+ const H = HF.h160 = { opened: 0 };
+ const cl = (v, a, z) => Math.max(a, Math.min(z, v)), rm = n => B.rm(n);
+ /* [category, price in a room, points of quality] */
+ const CATL = {
+  tilam: ["tidur", 60, 5], bed: ["tidur", 190, 10], kingbed: ["tidur", 1100, 22],
+  rakkasut: ["simpan", 40, 3], gerobok: ["simpan", 110, 5], rehal: ["simpan", 90, 4], almari: ["simpan", 170, 9], almarikaca: ["simpan", 260, 13],
+  bangku: ["meja", 30, 3], mejalipat: ["meja", 40, 4], mejakopi: ["meja", 80, 5], kerusirotan: ["meja", 90, 5], kerusimalas: ["meja", 120, 7], sofa: ["meja", 150, 8], computer: ["meja", 280, 10], vanity: ["meja", 450, 11], luxsofa: ["meja", 800, 16],
+  bilikair: ["air", 450, 14], bilikairl: ["air", 1100, 20], bathtub: ["air", 800, 15], shower: ["air", 170, 8], toilet: ["air", 380, 8],
+  penyidai: ["elektrik", 40, 3], kipas: ["elektrik", 80, 6], kipassiling: ["elektrik", 120, 8], tvlama: ["elektrik", 120, 5], tv: ["elektrik", 200, 8], fridge: ["elektrik", 190, 8], mesinbasuh: ["elektrik", 340, 6], tvwall: ["elektrik", 900, 14],
+  tikar: ["hias", 30, 3], sejadah: ["hias", 35, 2], pasubunga: ["hias", 40, 3], plant: ["hias", 40, 4], anthurium: ["hias", 40, 3], lamp: ["hias", 60, 4], batik: ["hias", 60, 4], jamdinding: ["hias", 60, 4], bingkai: ["hias", 70, 4], mirror: ["hias", 70, 5]
+ };
+/* hf135: the pieces offered are the painted sprites of the owner's reference (tools/hf/bilik_perabot.py, img/dalaman/bilik-perabot.webp, one sheet of 17 cells of 120 px,
+    6 per row, loaded only when a room is opened): Murah (r_) = Retro Malaysia, Sederhana (j_) = Japandi, Mewah (b_) = Butik Moden. Older pieces stay in CATL
+    (rooms saved with them still show and sell them) but are no longer offered. [category, price, points, name] */
+ const SPRN = ["r_tilam", "r_almari", "r_kipas", "r_meja", "r_bangku", "r_bilikair", "j_katil", "j_almari", "j_meja", "j_kerusi", "j_kipasdingin", "j_bilikair", "b_katil", "b_sofa", "b_peti", "b_tv", "b_bilikair", "a_aircond", "j_dapur", "b_dapur", "b_makan", "b_kerusi", "b_pc", "b_kerusipc"];
+ const NEWC = {
+  r_tilam: ["tidur", 60, 5, "Tilam lantai"], j_katil: ["tidur", 220, 12, "Katil kayu (Japandi)"], b_katil: ["tidur", 1100, 22, "Katil besar bingkai kayu"],
+  r_almari: ["simpan", 130, 5, "Almari kayu"], j_almari: ["simpan", 200, 10, "Almari kayu cerah"],
+  r_meja: ["meja", 45, 4, "Meja lipat"], r_bangku: ["meja", 25, 3, "Bangku plastik merah"], j_meja: ["meja", 260, 11, "Meja tulis + monitor"], j_kerusi: ["meja", 70, 5, "Kerusi putih"], b_sofa: ["meja", 800, 16, "Sofa L kulit"],
+  r_bilikair: ["air", 300, 7, "Bilik air sudut (jubin putih)"], j_bilikair: ["air", 450, 15, "Bilik air sudut (Japandi)"], b_bilikair: ["air", 1100, 20, "Bilik air mewah (tab mandi)"],
+  a_aircond: ["elektrik", 650, 10, "Aircond dinding (split)"], b_makan: ["meja", 900, 8, "Meja makan marmar"], b_kerusi: ["meja", 150, 3, "Kerusi makan"], b_pc: ["meja", 700, 10, "Meja komputer (PC + monitor)"], b_kerusipc: ["meja", 220, 4, "Kerusi pejabat"], j_dapur: ["dapur", 380, 5, "Dapur kecil (kabinet, sinki, hob)"], b_dapur: ["dapur", 1500, 14, "Dapur mewah (peti sejuk, hob, sinki)"], r_kipas: ["elektrik", 70, 6, "Kipas berdiri"], j_kipasdingin: ["elektrik", 150, 8, "Kipas siling + rasuk"], b_peti: ["elektrik", 500, 8, "Peti sejuk keluli"], b_tv: ["elektrik", 900, 14, "TV besar + kabinet"]
+ };
+ /* footprint (cells along i, along j; r = 1 mirrors the picture and swaps them), 0 = hangs above (a ceiling or wall piece takes no floor cell) */
+ const FP = { r_tilam: [1, 2], r_almari: [1, 1], r_kipas: [1, 1], r_meja: [1, 1], r_bangku: [1, 1], r_bilikair: [2, 2], j_katil: [1, 2], j_almari: [2, 1], j_meja: [2, 1], j_kerusi: [1, 1], j_kipasdingin: [0, 0], j_bilikair: [2, 2], b_katil: [2, 2], b_sofa: [2, 2], b_peti: [1, 1], b_tv: [2, 1], b_bilikair: [2, 2], a_aircond: [0, 0], j_dapur: [2, 1], b_dapur: [2, 1], b_makan: [2, 1], b_kerusi: [1, 1], b_pc: [2, 1], b_kerusipc: [1, 1] };
+ /* the pieces are 3D models rendered with one fixed isometric camera (tools/hf/bilik_3d.mjs, packed by tools/hf/bilik_3d_pek.py): sprite table { cell, w, h, s: { "type|k": [x, y, w, h, ax, ay] } },
+    k = quarter-turns of the front (0 +Z, 1 +X, 2 -Z, 3 -X); (ax, ay) = the footprint's front-bottom corner in the sprite. The footprint is fx along i and fz along j at k = 0; odd k swaps. */
+ const SPT = /*SPR3D*/{"cell":80,"w":1024,"h":1685,"s":{"r_bilikair|0":[0,0,170,200,84.8,196.5],"r_bilikair|1":[172,0,170,200,84.8,196.5],"r_bilikair|3":[344,0,170,200,84.8,196.5],"j_bilikair|0":[516,0,170,200,84.8,196.5],"j_bilikair|1":[688,0,170,200,84.8,196.5],"j_bilikair|3":[0,202,170,200,84.8,196.5],"b_bilikair|0":[172,202,170,200,84.8,196.5],"b_bilikair|1":[344,202,170,200,84.8,196.5],"b_bilikair|3":[516,202,170,200,84.8,196.5],"j_almari|0":[688,202,130,165,84.8,161.7],"j_almari|1":[820,202,130,165,44.8,161.7],"j_almari|2":[0,404,130,165,84.8,161.7],"j_almari|3":[132,404,130,165,44.8,161.7],"b_dapur|0":[264,404,130,164,84.8,160.5],"b_dapur|3":[396,404,130,164,44.8,160.5],"j_dapur|0":[528,404,130,162,84.8,158.5],"j_dapur|1":[660,404,130,162,44.8,158.5],"b_dapur|1":[792,404,130,162,44.8,158.1],"b_dapur|2":[0,571,130,158,84.8,154.1],"b_katil|0":[132,571,170,156,84.8,152.1],"b_katil|1":[304,571,170,156,84.8,152.1],"b_sofa|0":[476,571,170,154,84.8,150.1],"b_sofa|1":[648,571,170,154,84.8,150.1],"j_dapur|2":[820,571,130,152,84.8,148.1],"j_dapur|3":[0,731,130,152,44.8,148.1],"r_bilikair|2":[132,731,170,148,84.8,144.9],"j_bilikair|2":[304,731,170,148,84.8,144.9],"b_bilikair|2":[476,731,170,148,84.8,144.9],"b_sofa|3":[648,731,170,143,84.8,139.7],"b_peti|0":[820,731,90,136,44.8,132.5],"b_peti|1":[912,731,90,136,44.8,132.5],"b_peti|2":[0,885,90,136,44.8,132.5],"b_peti|3":[92,885,90,136,44.8,132.5],"b_katil|2":[184,885,170,135,84.8,131.7],"b_katil|3":[356,885,170,135,84.8,131.7],"r_almari|0":[528,885,90,134,44.8,130.1],"r_almari|1":[620,885,90,134,44.8,130.1],"r_almari|2":[712,885,90,134,44.8,130.1],"r_almari|3":[804,885,90,134,44.8,130.1],"b_tv|0":[0,1023,130,131,84.8,127.3],"b_tv|1":[132,1023,130,131,44.8,127.3],"b_tv|2":[264,1023,130,127,84.8,123.3],"b_tv|3":[396,1023,130,127,44.8,123.3],"b_pc|0":[528,1023,130,122,84.8,118.5],"b_pc|1":[660,1023,130,119,44.8,115.7],"b_pc|2":[792,1023,130,119,84.8,115.7],"b_pc|3":[0,1156,130,119,44.8,115.7],"j_katil|0":[132,1156,130,118,44.8,114.5],"j_katil|1":[264,1156,130,118,84.8,114.5],"b_makan|0":[396,1156,130,118,84.8,114.5],"b_makan|1":[528,1156,130,118,44.8,114.5],"b_makan|2":[660,1156,130,118,84.8,114.5],"b_makan|3":[792,1156,130,118,44.8,114.5],"j_meja|0":[0,1277,130,116,84.8,112.9],"j_meja|1":[132,1277,130,116,44.8,112.9],"j_meja|2":[264,1277,130,116,84.8,112.9],"j_meja|3":[396,1277,130,116,44.8,112.9],"b_sofa|2":[528,1277,170,116,84.8,112.5],"r_kipas|2":[700,1277,90,115,44.8,111.7],"r_kipas|3":[792,1277,90,115,44.8,111.7],"r_kipas|0":[884,1277,90,111,44.8,107.7],"r_kipas|1":[0,1395,90,111,44.8,107.7],"j_katil|2":[92,1395,130,105,44.8,101.3],"j_katil|3":[224,1395,130,105,84.8,101.3],"b_kerusipc|0":[356,1395,90,99,44.8,95.7],"b_kerusipc|1":[448,1395,90,99,44.8,95.7],"b_kerusi|0":[540,1395,90,94,44.8,90.1],"b_kerusi|1":[632,1395,90,94,44.8,90.1],"j_kerusi|0":[724,1395,90,91,44.8,87.3],"j_kerusi|1":[816,1395,90,91,44.8,87.3],"r_tilam|0":[0,1508,130,90,44.8,86.5],"r_tilam|1":[132,1508,130,90,84.8,86.5],"r_tilam|2":[264,1508,130,90,44.8,86.5],"r_tilam|3":[396,1508,130,90,84.8,86.5],"r_meja|0":[528,1508,90,88,44.8,84.1],"r_meja|1":[620,1508,90,88,44.8,84.1],"r_meja|2":[712,1508,90,88,44.8,84.1],"r_meja|3":[804,1508,90,88,44.8,84.1],"j_kipasdingin|0":[896,1508,103,83,53.2,28.9],"b_kerusipc|2":[0,1600,90,83,44.8,79.3],"b_kerusipc|3":[92,1600,90,83,44.8,79.3],"b_kerusi|2":[184,1600,90,77,44.8,73.7],"b_kerusi|3":[276,1600,90,77,44.8,73.7],"j_kerusi|2":[368,1600,90,76,44.8,72.5],"j_kerusi|3":[460,1600,90,76,44.8,72.5],"r_bangku|0":[552,1600,90,62,44.8,58.1],"r_bangku|1":[644,1600,90,62,44.8,58.1],"r_bangku|2":[736,1600,90,62,44.8,58.1],"r_bangku|3":[828,1600,90,62,44.8,58.1],"a_aircond|1":[920,1600,64,58,26.8,25.7]}}/*END:SPR3D*/;
+ const CEIL = { j_kipasdingin: "siling", a_aircond: "dinding" };
+ /* the room's size goes with its package (the smallest that holds it with a way through): Murah 5 x 5, Sederhana 6 x 6, Mewah 6 x 6; i = cells along the right wall, j = along the left wall */
+ const DIMS = { s: [5, 5], m: [6, 6], l: [6, 6] }, DEF = [6, 6];
+ const dimsOf = u => u && u.gx && u.gy ? [u.gx, u.gy] : u && u.pk && DIMS[u.pk] ? DIMS[u.pk] : DEF;   /* the room: 6 cells along the right wall (i) by 5 along the left wall (j): the smallest that holds the three packages with a way through */
+ const fp = (t, r) => { const a = FP[t] || [1, 1]; return (r & 1) && a[0] ? [a[1], a[0]] : a };
+
+ for (const t in NEWC) CATL[t] = NEWC[t].slice(0, 3);
+ const CATS = [["tidur", "🛏️ Tidur"], ["simpan", "🗄️ Simpan"], ["meja", "🪑 Meja"], ["air", "🚿 Air"], ["elektrik", "🔌 Elektrik"], ["dapur", "🍳 Dapur"], ["hias", "🪴 Hias"]];
+ /* hf135: the bathroom is ONE piece (a small tiled cube in the corner: shower head, toilet, glass door), drawn in code as an SVG (no ITEMS entry, no painting);
+    the loose shower and toilet (and the batik hanging: no batik motif anywhere) are no longer offered, but a room saved with them still shows and sells them */
+ const CUSTOM = { bilikair: "Bilik air kecil", bilikairl: "Bilik air mewah" }, HIDE = { shower: 1, toilet: 1, batik: 1 };
+ const tname = t => { if (NEWC[t]) return NEWC[t][3]; if (CUSTOM[t]) return CUSTOM[t]; try { return ITEMS[t].name } catch (e) { return t } };
+ const okT = t => { try { return (!!ITEMS[t] || !!CUSTOM[t] || !!NEWC[t]) && !!CATL[t] } catch (e) { return false } };
+ const bathSVG = lux => {
+  const g = thG(), tw = g.tw, th = g.th, H = 60, cx = 60, by = 116, L = [cx - tw / 2, by - th / 2], T = [cx, by - th], R = [cx + tw / 2, by - th / 2], Bt = [cx, by];
+  const pp = a => a.map(v => v[0].toFixed(1) + "," + v[1].toFixed(1)).join(" "), up = (v, z) => [v[0], v[1] - z], lerp = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+  const wl = lux ? "#3f7f86" : "#bfe0ea", wr = lux ? "#4f939a" : "#d3edf4", fl = lux ? "#f2ece0" : "#e6eef0", gr = lux ? "#c9a441" : "#ffffff", ink = lux ? "#2b4a4e" : "#7aa4b4";
+  let o = `<polygon points="${pp([L, T, R, Bt])}" fill="${fl}" stroke="${ink}" stroke-width="1.5"/>`;
+  o += `<polygon points="${pp([L, T, up(T, H), up(L, H)])}" fill="${wl}" stroke="${ink}" stroke-width="1.5"/><polygon points="${pp([T, R, up(R, H), up(T, H)])}" fill="${wr}" stroke="${ink}" stroke-width="1.5"/>`;
+  for (let k = 1; k < 4; k++) { const a = lerp(L, T, k / 4), b = lerp(T, R, k / 4); o += `<line x1="${a[0]}" y1="${a[1]}" x2="${a[0]}" y2="${a[1] - H}" stroke="${gr}" stroke-width="1" opacity=".8"/><line x1="${b[0]}" y1="${b[1]}" x2="${b[0]}" y2="${b[1] - H}" stroke="${gr}" stroke-width="1" opacity=".8"/>` }
+  for (let z = 15; z < H; z += 15) o += `<polyline points="${pp([up(L, z), up(T, z), up(R, z)])}" fill="none" stroke="${gr}" stroke-width="1" opacity=".8"/>`;
+  if (lux) o += `<polyline points="${pp([up(L, H - 4), up(T, H - 4), up(R, H - 4)])}" fill="none" stroke="#c9a441" stroke-width="2.5"/>`;
+  const sp = lerp(T, R, .42), sx = sp[0], sy = sp[1];   /* shower: pipe and head on the right wall, a little spray */
+  o += `<line x1="${sx}" y1="${sy - 8}" x2="${sx}" y2="${sy - H + 8}" stroke="#8a949a" stroke-width="2.4"/><ellipse cx="${sx + 6}" cy="${sy - H + 9}" rx="9" ry="4" fill="${lux ? "#d9b84c" : "#aab4ba"}" stroke="#5a666c" stroke-width="1.2"/>`;
+  for (const d of [[2, 0], [6, 4], [10, 1], [4, 8], [9, 9]]) o += `<circle cx="${sx + d[0] + 1}" cy="${sy - H + 16 + d[1]}" r="1.4" fill="#5fb4e6"/>`;
+  const tp = lerp(L, T, .5), tx = tp[0] + 9, ty = tp[1] + 12;   /* toilet: tank and bowl by the left wall */
+  o += `<rect x="${tx - 10}" y="${ty - 25}" width="14" height="14" rx="2" fill="#fbfbfb" stroke="#8a949a" stroke-width="1.2"/><ellipse cx="${tx}" cy="${ty - 4}" rx="12" ry="6.5" fill="#fff" stroke="#8a949a" stroke-width="1.4"/><ellipse cx="${tx}" cy="${ty - 5}" rx="7" ry="3.4" fill="#cfe4ee"/>`;
+  if (lux) o += `<rect x="${tx - 6}" y="${ty - 27}" width="6" height="2.4" rx="1" fill="#c9a441"/>`;
+  o += `<polygon points="${pp([L, Bt, up(Bt, H), up(L, H)])}" fill="#d9f0f7" opacity=".28" stroke="${ink}" stroke-width="1.2"/><polygon points="${pp([Bt, R, up(R, H), up(Bt, H)])}" fill="#d9f0f7" opacity=".22" stroke="${ink}" stroke-width="1.2"/>`;   /* the glass door */
+  const hd = lerp(Bt, R, .22); o += `<line x1="${hd[0]}" y1="${hd[1] - 22}" x2="${hd[0]}" y2="${hd[1] - 36}" stroke="${lux ? "#c9a441" : "#7a8a92"}" stroke-width="2.4"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">${o}</svg>`
+ };
+
+ const PK = {   /* laid as in the owner's reference "Rumah Kita - Bilik 101" (grid i = along the right wall, j = along the left wall; the bathroom in the right-back corner) */
+  s: { n: "Murah", sub: "Retro Malaysia", ico: "🪵", d: "Dinding hijau pudina, lantai kayu oren: tilam lantai di tepi dinding, almari kayu, kipas berdiri, meja lipat dengan bangku dan bilik air sudut. Sewa Murah.", it: [["r_almari", 0, 0, 0], ["r_kipas", 2, 2, 0], ["r_bilikair", 3, 0, 0], ["r_tilam", 0, 2, 0], ["r_meja", 4, 3, 0], ["r_bangku", 3, 3, 0]] },
+  m: { n: "Sederhana", sub: "Japandi", ico: "🛋️", d: "Bilik 6 x 6, dinding krim, lantai kayu cerah: katil kayu cadar sage di sudut, almari dan dapur kecil (kabinet, sinki, hob) di dinding kiri, meja tulis + monitor dengan kerusi di dinding kanan (jauh dari dapur), kipas siling tergantung di atas dan bilik air sudut; tengah bilik lapang untuk berjalan. Sewa Biasa.", it: [["j_katil", 0, 0, 0], ["j_almari", 0, 2, 1], ["j_dapur", 0, 4, 1], ["j_meja", 1, 0, 0], ["j_kerusi", 2, 1, 2], ["j_bilikair", 4, 0, 0], ["j_kipasdingin", 3, 3, 0]] },
+  l: { n: "Mewah", sub: "Butik Moden", ico: "👑", d: "Bilik 6 x 6 dalam empat zon: tidur (katil besar di sudut), tonton (TV di dinding kiri, sofa L dengan jarak tonton dua petak), dapur mewah dengan meja makan dan dua kerusi di sebelahnya, dan kerja (meja komputer dengan kerusi pejabat, jauh dari dapur); aircond dinding dan bilik air mewah dengan tab mandi. Layak sewa Mahal.", it: [["b_katil", 0, 0, 0], ["b_pc", 2, 0, 0], ["b_kerusipc", 3, 1, 2], ["b_bilikair", 4, 0, 0], ["b_tv", 0, 2, 1], ["b_dapur", 0, 4, 1], ["b_sofa", 3, 2, 3], ["b_makan", 2, 4, 1], ["b_kerusi", 3, 4, 3], ["b_kerusi", 3, 5, 3], ["a_aircond", 0, 2, 1]] }
+ };
+ const price = f => (f || []).reduce((a, o) => a + (CATL[o.t] ? CATL[o.t][1] : 0), 0);
+ const pkItems = k => PK[k].it.filter(a => okT(a[0])).map(a => ({ t: a[0], x: a[1], y: a[2], r: a[3] || 0 }));
+ const pkCost = k => Math.round(price(pkItems(k)) * .8 / 10) * 10;
+ H.PK = PK; H.pkCost = pkCost; H.CATL = CATL;
+ const qsum = f => { const seen = {}; let sm = 0; for (const o of f) { const d = CATL[o.t]; if (!d) continue; const n = seen[o.t] = (seen[o.t] || 0) + 1; sm += d[2] * (n === 1 ? 1 : n === 2 ? .5 : 0) } return sm };
+ B.Qf = u => Array.isArray(u.fur) ? Math.round(Math.min(80, qsum(u.fur)) * .8 + cl(u.clean, 0, 100) * .2 - (u.brk ? 15 : 0)) : null;
+ const legacy = u => u.furn >= 2 ? [{ t: "bed", x: 2, y: 0, r: 0 }, { t: "almari", x: 0, y: 0, r: 0 }, { t: "kipas", x: 0, y: 2, r: 0 }, { t: "mejalipat", x: 3, y: 1, r: 0 }] : u.furn === 1 ? [{ t: "bed", x: 2, y: 0, r: 0 }, { t: "almari", x: 0, y: 0, r: 0 }] : [];
+ const fitsIn = (list, t, r, x, y, ig, dm) => { const [NX, NY] = dm || DEF; const d = fp(t, r); if (!d[0]) return true; if (x < 0 || y < 0 || x + d[0] > NX || y + d[1] > NY) return false; return !list.some((o, i) => { if (i === ig) return false; const e = fp(o.t, o.r); return e[0] && x < o.x + e[0] && o.x < x + d[0] && y < o.y + e[1] && o.y < y + d[1] }) };
+ /* a person must be able to walk in: from the open front edges (i = N-1 or j = N-1) to a free cell beside every bed, mattress, seat, table and desk */
+ const pathOk = (list, dm) => {
+  const [NX, NY] = dm || DEF;
+  const blk = new Set(); for (const o of list) { const e = fp(o.t, o.r); if (e[0]) for (let i = 0; i < e[0]; i++) for (let j = 0; j < e[1]; j++) blk.add((o.x + i) + "," + (o.y + j)) }
+  const seen = new Set(), q = []; for (const c of [...Array(NY).keys()].map(k => [NX - 1, k]).concat([...Array(NX).keys()].map(k => [k, NY - 1]))) { const key = c[0] + "," + c[1]; if (!blk.has(key) && !seen.has(key)) { seen.add(key); q.push(c) } }
+  while (q.length) { const c = q.pop(); for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = c[0] + d[0], ny = c[1] + d[1], key = nx + "," + ny; if (nx < 0 || ny < 0 || nx >= NX || ny >= NY || blk.has(key) || seen.has(key)) continue; seen.add(key); q.push([nx, ny]) } }
+  for (const o of list) { if (!/katil|tilam|kerusi|bangku|sofa|meja/.test(o.t)) continue; const e = fp(o.t, o.r); if (!e[0]) continue; let ok = false; for (let i = -1; i <= e[0] && !ok; i++) for (let j = -1; j <= e[1]; j++) { if (i >= 0 && i < e[0] && j >= 0 && j < e[1]) continue; if ((i < 0 || i >= e[0]) && (j < 0 || j >= e[1])) continue; if (seen.has((o.x + i) + "," + (o.y + j))) { ok = true; break } } if (!ok) return false }
+  return true
+ };
+ /* how open the room is: free cells, free cells a person can reach from the open front edges (all of them: no shut-off pockets), and the share of the floor left free */
+ const pathStats = (list, dm) => {
+  const [NX, NY] = dm || DEF, blk = new Set(); for (const o of list) { const e = fp(o.t, o.r); if (e[0]) for (let i = 0; i < e[0]; i++) for (let j = 0; j < e[1]; j++) blk.add((o.x + i) + "," + (o.y + j)) }
+  const seen = new Set(), q = []; for (const c of [...Array(NY).keys()].map(k => [NX - 1, k]).concat([...Array(NX).keys()].map(k => [k, NY - 1]))) { const key = c[0] + "," + c[1]; if (!blk.has(key) && !seen.has(key)) { seen.add(key); q.push(c) } }
+  while (q.length) { const c = q.pop(); for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = c[0] + d[0], ny = c[1] + d[1], key = nx + "," + ny; if (nx < 0 || ny < 0 || nx >= NX || ny >= NY || blk.has(key) || seen.has(key)) continue; seen.add(key); q.push([nx, ny]) } }
+  const free = NX * NY - blk.size; return { free, reach: seen.size, ratio: free / (NX * NY) }
+ };
+ const spot = (list, t, r, ig, dm) => { const [NX, NY] = dm || DEF; for (let y = 0; y < NY; y++) for (let x = 0; x < NX; x++) if (fitsIn(list, t, r, x, y, ig, dm)) return [x, y]; return null };
+ /* a room saved on the old 4 x 4 grid (hf134 / first hf135) is settled once onto the 6 x 6 grid: the pieces of its package go to the package's roomy places, any other piece keeps its cell or takes the first free place; nothing is lost */
+ const migr = u => {
+  if (!Array.isArray(u.fur) || u.g8) return; u.g8 = 1;
+  try {
+   if (!u.fur.some(f => NEWC[f.t])) return; const pk = u.pk && PK[u.pk], lay = {}; if (pk) for (const a of pk.it) lay[a[0]] = a;
+   const dm = pk ? DIMS[u.pk] : DEF; u.gx = dm[0]; u.gy = dm[1];
+   const done = []; for (const f of u.fur) { const a = lay[f.t]; if (a) { f.x = a[1]; f.y = a[2]; f.r = a[3] || 0 } }
+   for (const f of u.fur) { if (!fitsIn(done, f.t, f.r, f.x, f.y, -1, dm)) { const q = spot(done, f.t, f.r, -1, dm); if (q) { f.x = q[0]; f.y = q[1] } } done.push(f) }
+  } catch (e) { fail(e) }
+ };
+ const itemsOf = u => { if (Array.isArray(u.fur)) { if (!u.g8) migr(u); return u.fur } return legacy(u).filter(o => okT(o.t)) };
+ H.pathOk = pathOk; H.pathStats = pathStats; H.itemsOf = itemsOf; H.fp = fp; H.fits = (u, t, r, x, y) => fitsIn(itemsOf(u), t, r, x, y, -1, dimsOf(u)); H.DIMS = DIMS; H.dimsOf = dimsOf;
+ const unit = () => B.room ? B.U(B.room) : null;
+ const spend = n => { if (S.money < n) { toast(`Duit tidak cukup: perlu ${rm(n)}.`); return false } S.money -= n; return true };
+ /* (1) thumbnails: one <image> per type in a hidden SVG (data URL made once), the rooms only <use> them */
+ const DU = {};
+ const SPR = { img: null, ready: false };
+ const sprInit = () => { if (SPR.img) return; const im = SPR.img = new Image(); im.onload = () => { SPR.ready = true; try { if (HF.bilikOn) B.draw() } catch (e) { fail(e) } }; im.src = "img/dalaman/bilik-perabot.webp?v=hf135e" };
+ const defsSvg = () => { let sv = document.getElementById("h160defs"); if (!sv) { sv = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sv.id = "h160defs"; sv.setAttribute("width", "0"); sv.setAttribute("height", "0"); sv.style.cssText = "position:absolute;width:0;height:0;overflow:hidden"; document.body.appendChild(sv) } return sv };
+ const defs = ts => {
+  const sv = defsSvg(); let add = "";
+  for (const t of ts) {
+   if (DU[t] !== undefined) continue; let u = null;
+   if (NEWC[t]) continue;
+   else    try { if (CUSTOM[t]) u = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(bathSVG(t === "bilikairl")); else { const c = HF.itemThumb && HF.itemThumb(t); if (c) u = c.toDataURL("image/webp", .9) } } catch (e) { fail(e) }
+   DU[t] = u || ""; add += u ? `<image id="h160-${t}" width="${NEWC[t] ? 128 : 120}" height="${NEWC[t] ? 128 : 120}" href="${u}"/>` : `<g id="h160-${t}"><rect x="34" y="60" width="52" height="52" rx="8" fill="#b8956a" stroke="#6a4a2a" stroke-width="3"/></g>`
+  }
+  if (add) sv.insertAdjacentHTML("beforeend", add)
+ };
+ const thG = () => { try { if (!HF.thbG) HF.itemThumb("bed") } catch (e) { } return HF.thbG || { tw: 100, th: 50 } };
+ /* (2) the room drawn: walls (the man's building greenish, the woman's pinkish), floor by tier, pieces, dust, breakage */
+  const WALL = [["#a7d3bb", "#b9e0c9"], ["#ecdcbc", "#f5e9d2"], ["#3f5a78", "#4c6a8a"]];   /* the reference: mint, cream, navy (plain walls; the man's / woman's building differs by the skirting and trim colour) */
+ const TRIM = { L: "#6f93ad", P: "#d98fa7" };
+ const FLOOR = [["#d98a3a", "#b86f28"], ["#e5c895", "#c9a96f"], ["#6b4430", "#503022"]];
+ /* painted floors and walls (img/dalaman/bilik.webp, 6 swatches of 128 px painted with Hugging Face, tools/hf/bilik_tekstur.py): cut once into
+    data URLs and laid as SVG patterns; until it has loaded the rooms keep their flat colours */
+ const TEX = { img: null, ready: false };
+ const texInit = () => {
+  if (TEX.img) return; const im = TEX.img = new Image();
+  im.onload = () => {
+   try {
+    const sv = defsSvg(); let add = "";
+    const cut = k => { const c = document.createElement("canvas"); c.width = c.height = 128; c.getContext("2d").drawImage(im, (k % 3) * 128, Math.floor(k / 3) * 128, 128, 128, 0, 0, 128, 128); return c.toDataURL("image/webp", .85) };
+    for (let t = 0; t < 3; t++) {
+     const f = cut(t), w = cut(3 + t), m = a => a.join(" ");
+     add += `<pattern id="h160-pf${t}" patternUnits="userSpaceOnUse" width="2" height="2"><image width="2" height="2" href="${f}" preserveAspectRatio="none"/></pattern>`;
+     add += `<pattern id="h160-pr${t}" patternUnits="userSpaceOnUse" width="2" height="1"><image width="2" height="1" href="${w}" preserveAspectRatio="none"/></pattern>`;
+     add += `<pattern id="h160-pl${t}" patternUnits="userSpaceOnUse" width="2" height="1"><image width="2" height="1" href="${w}" preserveAspectRatio="none"/></pattern>`
+    }
+    sv.insertAdjacentHTML("beforeend", add); TEX.ready = true; if (HF.bilikOn) B.draw()
+   } catch (e) { fail(e) }
+  };
+  im.src = "img/dalaman/bilik.webp?v=hf135"
+ };
+ const tierOf = q => q >= 75 ? 2 : q >= 40 ? 1 : 0;
+ const lookOf = (u, q) => u.pk && PK[u.pk] ? { s: 0, m: 1, l: 2 }[u.pk] : tierOf(q);   /* a room that has had a package keeps its look; otherwise it follows the quality */
+ const TIERN = ["Asas", "Selesa", "Mewah"];
+ const VW = 340;   /* a room is drawn in a 340 wide box; its cell (TW) and wall (WH) follow its size, the wall is 2.6 world units like the 3D renders */
+ const roomSVG = (o) => {
+  const NX = o.nx || DEF[0], NY = o.ny || DEF[1], TW = Math.floor(296 / ((NX + NY) / 2)), WH = Math.round(1.348 * TW), OX = VW / 2, OY = WH + 16;
+  const g = thG(), r = g.th / g.tw, TH = TW * r, VH = Math.round(OY + (NX + NY) * TH / 2 + 14), s = TW / g.tw;
+  const P = (i, j, z) => [OX + (i - j) * TW / 2, OY + (i + j) * TH / 2 - (z || 0)], pt = (i, j, z) => P(i, j, z).map(v => Math.round(v * 10) / 10).join(",");
+  const poly = (pts, fill, ex) => `<polygon points="${pts.map(a => pt(...a)).join(" ")}" fill="${fill}" ${ex || ""}/>`;
+  const tier = o.tier, W = WALL[tier], F = FLOOR[tier], mini = !!o.mini;
+  let h = `<svg viewBox="0 0 ${VW} ${VH}" class="rmsv${mini ? " mini" : ""}" role="img" aria-label="${o.label || "Bilik"}" preserveAspectRatio="xMidYMid meet">`;
+  h += poly([[0, 0, 0], [0, NY, 0], [0, NY, WH], [0, 0, WH]], W[0], 'stroke="#7a6650" stroke-width="1.2"') + poly([[0, 0, 0], [NX, 0, 0], [NX, 0, WH], [0, 0, WH]], W[1], 'stroke="#7a6650" stroke-width="1.2"');
+  h += poly([[0, 0, 0], [NX, 0, 0], [NX, NY, 0], [0, NY, 0]], F[0], 'stroke="#6a5a48" stroke-width="1.5"');
+  if (TEX.ready) h += `<g transform="matrix(${[TW / 2, TH / 2, -TW / 2, TH / 2, OX, OY].join(" ")})"><polygon points="0,0 ${NX},0 ${NX},${NY} 0,${NY}" fill="url(#h160-pf${tier})" opacity=".92"/></g>`;
+  else for (let k = 1; k < NX; k++) h += `<line x1="${P(k, 0)[0]}" y1="${P(k, 0)[1]}" x2="${P(k, NY)[0]}" y2="${P(k, NY)[1]}" stroke="${F[1]}" stroke-width=".8" opacity=".6"/>`;
+  if (TEX.ready) h += `<g transform="matrix(${[-TW / 2, TH / 2, 0, WH, OX, OY - WH].join(" ")})"><polygon points="0,0 ${NY},0 ${NY},1 0,1" fill="url(#h160-pl${tier})" opacity=".85"/></g>` + poly([[0, 0, 0], [0, NY, 0], [0, NY, WH], [0, 0, WH]], "#3b2a20", 'opacity=".1"') + `<g transform="matrix(${[TW / 2, TH / 2, 0, WH, OX, OY - WH].join(" ")})"><polygon points="0,0 ${NX},0 ${NX},1 0,1" fill="url(#h160-pr${tier})" opacity=".85"/></g>`;
+  h += `<line x1="${P(0, 0)[0]}" y1="${P(0, 0)[1]}" x2="${P(0, 0, WH)[0]}" y2="${P(0, 0, WH)[1]}" stroke="#7a6650" stroke-width="1.4"/>`;
+  if (!mini) {
+   h += poly([[0, .6, 30], [0, 1.9, 30], [0, 1.9, 58], [0, .6, 58]], "#bfe3f0", 'stroke="#6a5a48" stroke-width="1.6"') + poly([[0, 1.25, 30], [0, 1.25, 58]], "none", 'stroke="#6a5a48" stroke-width="1"');   /* window, left wall, towards the back */
+  }
+  const tr = TRIM[o.fem ? "P" : "L"]; h += poly([[0, 0, 6], [0, NY, 6], [0, NY, 0], [0, 0, 0]], tr, 'opacity=".9"') + poly([[0, 0, 6], [NX, 0, 6], [NX, 0, 0], [0, 0, 0]], tr, 'opacity=".9"');   /* skirting in the building's colour */
+  /* dust and cobweb: the room's own look of cleanliness (the unit number seeds where it lies) */
+  let sd = (o.n || 1) * 9301 + 49297; const rn = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
+  const dirt = o.clean < 60 ? Math.round((60 - o.clean) / 5) : 0;
+  const bits = [];
+  for (let k = 0; k < dirt; k++) { const i = rn() * (NX - .4) + .2, j = rn() * (NY - .4) + .2, p = P(i, j); bits.push(`<ellipse cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" rx="${(2.5 + rn() * 3).toFixed(1)}" ry="${(1.2 + rn() * 1.6).toFixed(1)}" fill="#5a4630" opacity="${(.2 + rn() * .2).toFixed(2)}"/>`) }
+  h += bits.join("");
+  const key = f => { const d = fp(f.t, f.r); return CEIL[f.t] ? 99 : f.x + f.y + d[0] + d[1] };
+  const fur = o.items.map((f, i) => Object.assign({ i }, f)).sort((a, c) => key(a) - key(c) || a.x - c.x), pos = {};
+  const ks = TW / SPT.cell;   /* sheet px -> room px: the 3D renders share the room's projection, so the anchor (the footprint's front-bottom corner) sits exactly on the grid corner */
+  for (const f of fur) {
+   if (NEWC[f.t]) {
+    const kind = CEIL[f.t], d = fp(f.t, f.r), rk = f.t === "a_aircond" ? 1 : f.t === "j_kipasdingin" ? 0 : (f.r | 0) & 3, e = SPT.s[f.t + "|" + rk]; if (!e) continue;   /* the sheet is not loaded yet: the room is drawn again when it is */
+    const A = kind === "siling" ? P(NX * .2, NY * .2, WH + 2) : kind === "dinding" ? P(0, NY * .62, WH - 40) : P(f.x + d[0], f.y + d[1]);
+    const kk = kind === "siling" ? ks * .72 : ks, x = A[0] - e[4] * kk, y = A[1] - e[5] * kk, sw = e[2] * kk, sh = e[3] * kk;   /* the hanging fan a little smaller: it sits high on the back walls, clear of the furniture */
+    h += `<svg x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${e[0]} ${e[1]} ${e[2]} ${e[3]}" overflow="hidden"><image href="img/dalaman/bilik-perabot.webp?v=hf135e" width="${SPT.w}" height="${SPT.h}"/></svg>`;
+    pos[f.i] = [x + sw / 2, y + sh / 2, sw / 2 + 3, sh / 2 + 3]; continue
+   }
+   const b2 = P(f.x + 1, f.y + 1), s1 = TW / g.tw * .9, x = b2[0] - 60 * s1, y = b2[1] - 116 * s1;   /* an older piece (the game's own picture): one cell */
+   h += `<use href="#h160-${f.t}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s1})"/>`
+  }
+  if (o.clean < 35 && !mini) { const c = P(0.15, 0.15, WH - 2); h += `<text x="${c[0] + 8}" y="${c[1] + 14}" font-size="22">🕸️</text>` }
+  const brkHit = w => f => { const t = f.t; return (w.indexOf("Paip") === 0 && (/bilikair|shower|toilet|bathtub/.test(t))) || ((w.indexOf("Kipas") === 0 || w.indexOf("Penghawa") === 0) && (/kipas|aircond/.test(t))) || (w.indexOf("Wayar") === 0 && (/b_tv|j_meja|b_peti|tv|computer|lamp|fridge/.test(t))) };
+  if (o.brk && !mini) {
+   const hit = fur.find(brkHit(o.brk.w)); let c;
+   if (hit && pos[hit.i]) { c = [pos[hit.i][0], pos[hit.i][1] - pos[hit.i][3] + 6]; const d = fp(hit.t, hit.r); if (d[0]) h += `<polygon points="${[[hit.x, hit.y], [hit.x + d[0], hit.y], [hit.x + d[0], hit.y + d[1]], [hit.x, hit.y + d[1]]].map(a => pt(...a)).join(" ")}" fill="rgba(200,60,40,.18)" stroke="#c0392b" stroke-width="2" stroke-dasharray="4 3"/>` }
+   else if (hit) { const q = P(hit.x + .5, hit.y + .5, 14); c = q } else c = P(4.5, 0, 36);
+   h += `<g><circle cx="${c[0]}" cy="${c[1] - 6}" r="10" fill="#c0392b" stroke="#fff" stroke-width="2"/><text x="${c[0]}" y="${c[1] - 1.5}" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">!</text></g>`
+  }
+  if (o.sel != null && o.items[o.sel]) { const f = o.items[o.sel], d = fp(f.t, f.r); if (d[0]) h += `<polygon points="${[[f.x, f.y], [f.x + d[0], f.y], [f.x + d[0], f.y + d[1]], [f.x, f.y + d[1]]].map(a => pt(...a)).join(" ")}" fill="rgba(255,221,80,.28)" stroke="#e0a800" stroke-width="2.5"/>`; else if (pos[o.sel]) { const q = pos[o.sel]; h += `<rect x="${(q[0] - q[2]).toFixed(1)}" y="${(q[1] - q[3]).toFixed(1)}" width="${(q[2] * 2).toFixed(1)}" height="${(q[3] * 2).toFixed(1)}" rx="6" fill="rgba(255,221,80,.2)" stroke="#e0a800" stroke-width="2.5"/>` } }
+  if (o.grid) for (let i = 0; i < NX; i++) for (let j = 0; j < NY; j++) h += `<polygon class="rc" data-a="rcell" data-n="${i},${j}" points="${[[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]].map(a => pt(...a)).join(" ")}" fill="transparent" stroke="${o.pick || o.mv ? "rgba(44,107,74,.55)" : "none"}" stroke-width="1" ${o.pick || o.mv ? 'stroke-dasharray="3 3"' : ""}/>`;
+  return { svg: h + "</svg>", P, VW, VH }
+ };
+ const hourNow = () => { try { return Math.floor((S.t % 1440) / 60) } catch (e) { return 12 } };
+ /* where the tenant is: asleep on the bed / mattress at night, sitting on a chair, stool or sofa by day, else standing on a free cell in front */
+ const tSpot = (items, dm) => {
+  const ctr = o => { const d = fp(o.t, o.r); return [o.x + d[0] / 2, o.y + d[1] / 2] }, hr = hourNow(), seat = items.find(o => /kerusi|bangku|sofa/.test(o.t)), bed = items.find(o => /katil|tilam/.test(o.t));
+  if ((hr >= 22 || hr < 6) && bed) return { c: ctr(bed), z: 16, txt: "tidur 💤" }; if (seat) return { c: ctr(seat), z: 20, txt: "duduk" };
+  const c = whoCell(items, dm); return { c: [c[0] + .5, c[1] + .5], z: 0, txt: "" }
+ };
+ const whoCell = (items, dm) => {   /* a free cell near the front of the room */
+  const [NX, NY] = dm || DEF, cov = (x, y) => items.some(o => { const e = fp(o.t, o.r); return e[0] && x >= o.x && x < o.x + e[0] && y >= o.y && y < o.y + e[1] });
+  for (let y = NY - 2; y >= 1; y--) for (const dx of [0, 1, -1, 2, -2, 3, -3]) { const x = Math.floor(NX / 2) + dx; if (x >= 1 && x < NX && !cov(x, y)) return [x, y] }
+  return [Math.floor(NX / 2), NY - 1]
+ };
+ const mkOpts = (b, u, extra) => Object.assign({ tier: lookOf(u, B.Q(u)), fem: !!b.fem, n: u.n, clean: u.clean, brk: u.brk, items: itemsOf(u), nx: dimsOf(u)[0], ny: dimsOf(u)[1], label: "Bilik " + u.n }, extra || {});
+ /* (3) the floor overview in the building panel: 4 rooms of the floor side by side (as the cutaway of the owner's picture) */
+ B.grid = (b, f, own) => {
+  const us = b.units.filter(u => Math.floor(u.n / 100) === f); if (!us.length || f > (b.fl || 1)) return "";
+  try {
+   css(); texInit(); sprInit(); defs(us.reduce((a, u) => a.concat(itemsOf(u).map(o => o.t)), []));
+   let h = `<div class="rgrid">`;
+   for (const u of us) {
+    const t = u.t, st = u.brk || (t && t.owe) ? "#c9743a" : t || u.pl || u.self ? "#4f8a5a" : "#a89a82";
+    const R = roomSVG(mkOpts(b, u, { mini: true })), sp0 = tSpot(itemsOf(u), dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 6 + sp0.z * .5);
+    const who = t ? `<g><circle cx="${p[0]}" cy="${p[1] - 6}" r="9" fill="${t.ap.skin || "#d9a77a"}" stroke="#3b2a20" stroke-width="2"/><path d="M${p[0] - 9} ${p[1] - 8}a9 9 0 0 1 18 0z" fill="${t.ap.hairColor || "#2a1a10"}"/></g>` : u.self ? `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" font-size="20">🏠</text>` : "";
+    h += `<button type="button" class="rmini" data-a="enter" data-n="${u.n}" aria-label="Masuk bilik ${u.n}">${R.svg.replace("</svg>", who + "</svg>")}<span class="lb" style="background:${st}">${u.n}${u.brk ? " 🔧" : ""}</span></button>`
+   }
+   return h + `</div><p class="sm">Ketik sebuah bilik untuk masuk dan susun perabot.</p>`
+  } catch (e) { fail(e); return "" }
+ };
+ /* (4) the room card */
+ const css = () => {
+  if (document.getElementById("hf160css")) return; const st = document.createElement("style"); st.id = "hf160css";
+  st.textContent = `#hfbilik .rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:6px 0}#hfbilik .rmini{position:relative;border:1px solid #e3d6bd;border-radius:10px;background:#fff;padding:2px;cursor:pointer;min-height:62px}#hfbilik .rmini .lb{position:absolute;left:3px;bottom:3px;color:#fff;font:800 .62rem system-ui;border-radius:6px;padding:0 5px}
+#hfbilik .rmsv{display:block;width:100%;height:auto}#hfbilik .rc{cursor:pointer}
+#hfbilik .rm{position:sticky;top:-2px;z-index:3;box-shadow:0 4px 8px rgba(60,40,20,.15);margin:4px 0;border-radius:14px;background:linear-gradient(#f6eedb,#efe4cb);border:1px solid #e3d6bd}#hfbilik .rm .tn{position:absolute;transform:translate(-50%,-86%);text-align:center;pointer-events:none}#hfbilik .rm .tn .av{width:40px;height:40px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}#hfbilik .rm .tn small{display:block;font:800 .6rem system-ui;background:rgba(255,250,240,.92);border-radius:6px;padding:0 4px;margin-top:1px;white-space:nowrap}
+#hfbilik .pal{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:5px 0}#hfbilik .pal button{border:1px solid #d9c9a6;border-radius:10px;background:#fff;padding:3px 2px;font:700 .64rem system-ui;color:#3b2a20;cursor:pointer;min-height:76px}#hfbilik .pal button[aria-pressed=true]{border:2px solid #2c6b4a;background:#eaf6f1}#hfbilik .pal img{width:42px;height:42px;display:block;margin:0 auto}#hfbilik .pal button:disabled{opacity:.5}
+#hfbilik .pkc{border:1px solid #e3d6bd;border-radius:14px;padding:8px;margin:8px 0;background:#fff}#hfbilik .pkc .rmsv{width:100%}#hfbilik .pkc h3{margin:0 0 2px;font:800 1rem Georgia,serif}#hfbilik .pkc .b{margin-top:6px}`;
+  document.head.appendChild(st)
+ };
+ const adj = u => {   /* after an edit: a rate the room no longer reaches is lowered to the best it can (the tenant's rent follows) */
+  const q = B.Q(u), order = ["mahal", "biasa", "murah"];
+  if (q >= B.RATES[u.lv].need) return;
+  for (const k of order) if (q >= B.RATES[k].need && (!u.t || u.t.bud >= B.RATES[k].amt)) { u.lv = k; if (u.t) u.t.amt = B.RATES[k].amt; toast(`Mutu bilik ${u.n} turun ke ${q}: sewa jadi ${B.RATES[k].t.toLowerCase()}.`); return }
+  u.lv = "murah"; if (u.t) u.t.amt = B.RATES.murah.amt
+ };
+ const hist = {};
+ const snap = u => { const h = hist[u.n] || (hist[u.n] = []); h.push({ fur: JSON.stringify(Array.isArray(u.fur) ? u.fur : null), pk: u.pk || null, m: S.money }); if (h.length > 12) h.shift() };
+ const mat = u => { if (!Array.isArray(u.fur)) { u.fur = legacy(u).filter(o => okT(o.t)).map(o => Object.assign({}, o)); u.g8 = 1 } return u.fur };
+ const gate = () => {
+  const b = B.bs(), u = unit(); if (!u || !B.mine(b)) return null;
+  if (u.brk) { toast(`Bilik ${u.n} ada kerosakan: baiki dahulu sebelum menyusun perabot.`); return null }
+  return u
+ };
+ const rf = n => Math.round(n * .5);
+ Object.assign(A, {
+  enter(n) { const b = B.bs(), u = B.U(n); if (!u || Math.floor(u.n / 100) > (b.fl || 1)) return; B.room = u.n; B.rsel = null; B.pick = null; B.mv = false; B.pk = null; B.cf = null; B.cat = B.cat || "tidur"; H.opened++ },
+  rback() { B.room = null; B.pk = null; B.pick = null; B.rsel = null; B.mv = false; B.cf = null },
+  rcat(c) { B.cat = c },
+  rpick(t) { B.cf = null; B.mv = false; B.rsel = null; B.pick = B.pick === t ? null : t },
+  rsel(i) { B.cf = null; B.pick = null; B.mv = false; B.rsel = B.rsel === +i ? null : +i },
+  rpk() { B.pk = B.pk ? null : 1; B.cf = null },
+  rcell(c) {
+   const u = unit(); if (!u) return; const [x, y] = String(c).split(",").map(Number), its = itemsOf(u), cov = o => { const e = fp(o.t, o.r); return e[0] && x >= o.x && x < o.x + e[0] && y >= o.y && y < o.y + e[1] }, at = its.findIndex(cov); B.cf = null;
+   const own = B.mine(B.bs());
+   if (!own) { B.rsel = at >= 0 ? at : null; return }
+   const dm = dimsOf(u), NX = dm[0], NY = dm[1], put = (t, r, ig) => { const d = fp(t, r); let px = Math.min(x, NX - d[0]), py = Math.min(y, NY - d[1]); if (fitsIn(its, t, r, px, py, ig, dm)) return [px, py]; toast(`Tiada ruang di sini: ${tname(t)} perlukan ${d[0]} x ${d[1]} petak kosong (ketik petak sudut belakang).`); return null };
+   if (B.pick) {
+    if (at >= 0) { B.pick = null; B.rsel = at; return }
+    const u2 = gate(); if (!u2) return; const d = CATL[B.pick]; if (!d || S.money < d[1]) { toast(d ? `Duit tidak cukup: perlu ${rm(d[1])}.` : ""); return }
+    const q = put(B.pick, 0, -1); if (!q) return;
+    if (pathOk(its, dm) && !pathOk(its.concat({ t: B.pick, x: q[0], y: q[1], r: 0 }), dm)) { toast("Perabot ini menghalang laluan penyewa: sisakan jalan satu petak ke katil, kerusi dan meja."); return }
+    snap(u2); S.money -= d[1]; mat(u2).push({ t: B.pick, x: q[0], y: q[1], r: 0 }); toast(`${tname(B.pick)} diletakkan (${rm(d[1])}).`); adj(u2); return
+   }
+   if (B.mv && B.rsel != null) {
+    if (at >= 0 && at !== B.rsel) { B.mv = false; B.rsel = at; return }
+    const u2 = gate(); if (!u2) return; const f0 = its[B.rsel]; if (!f0) return; const q = put(f0.t, f0.r, B.rsel); if (!q) return;
+    if (pathOk(its, dm) && !pathOk(its.map((o, i) => i === B.rsel ? Object.assign({}, o, { x: q[0], y: q[1] }) : o), dm)) { toast("Perabot ini menghalang laluan penyewa: sisakan jalan satu petak."); return }
+    snap(u2); const f = mat(u2)[B.rsel]; if (f) { f.x = q[0]; f.y = q[1] } B.mv = false; return
+   }
+   B.rsel = at >= 0 ? at : null
+  },
+  rrot() {
+   const u = gate(); if (!u || B.rsel == null) return; const f0 = itemsOf(u)[B.rsel]; if (!f0) return;
+   if (!fp(f0.t, 0)[0]) { toast(`${tname(f0.t)} tergantung di ${CEIL[f0.t] || "atas"}: tidak perlu diputar.`); return }
+   const r2 = ((f0.r | 0) + 1) & 3, d = fp(f0.t, r2), [NX, NY] = dimsOf(u); let nx = Math.min(f0.x, NX - d[0]), ny = Math.min(f0.y, NY - d[1]);
+   if (!fitsIn(itemsOf(u), f0.t, r2, nx, ny, B.rsel, dimsOf(u))) { toast("Tiada ruang untuk memutar perabot ini di sini."); return }
+   if (pathOk(itemsOf(u), dimsOf(u)) && !pathOk(itemsOf(u).map((o, i) => i === B.rsel ? Object.assign({}, o, { r: r2, x: nx, y: ny }) : o), dimsOf(u))) { toast("Memutar perabot ini akan menghalang laluan penyewa."); return }
+   snap(u); const f = mat(u)[B.rsel]; f.r = r2; f.x = nx; f.y = ny; B.cf = null
+  },
+  rmv() { const u = gate(); if (!u || B.rsel == null) return; const f0 = itemsOf(u)[B.rsel]; if (f0 && !fp(f0.t, 0)[0]) { toast(`${tname(f0.t)} tergantung di tempat tetap.`); return } B.mv = !B.mv; B.pick = null; B.cf = null; if (B.mv) toast("Ketik petak kosong untuk alih perabot (petak sudut belakang).") },
+  rceil(t) {   /* a ceiling / wall piece: one tap puts it up (pays), one tap takes it down (half back); it takes no floor cell */
+   const u = gate(); if (!u || !CEIL[t] || !CATL[t]) return; const its = itemsOf(u), at = its.findIndex(o => o.t === t); B.cf = null; B.pick = null;
+   if (at >= 0) { snap(u); const v = rf(CATL[t][1]); mat(u).splice(at, 1); S.money += v; toast(`${tname(t)} dibuang: ${rm(v)}.`); B.rsel = null; adj(u); return }
+   if (S.money < CATL[t][1]) { toast(`Duit tidak cukup: perlu ${rm(CATL[t][1])}.`); return }
+   snap(u); S.money -= CATL[t][1]; mat(u).push({ t, x: 3, y: 3, r: 0 }); toast(`${tname(t)} dipasang (${rm(CATL[t][1])}).`); adj(u)
+  },
+  rsell() {
+   const u = gate(); if (!u || B.rsel == null) return; snap(u); const f = mat(u)[B.rsel]; if (!f) return; const v = rf(CATL[f.t] ? CATL[f.t][1] : 0);
+   u.fur.splice(B.rsel, 1); S.money += v; toast(`${tname(f.t)} dijual: ${rm(v)}.`); B.rsel = null; B.mv = false; adj(u)
+  },
+  rundo() {
+   const u = gate(); if (!u) return; const h = hist[u.n]; if (!h || !h.length) { toast("Tiada langkah untuk dibuat asal."); return }
+   const z = h.pop(), f = JSON.parse(z.fur); u.fur = f; u.pk = z.pk; S.money = z.m; B.rsel = null; B.mv = false; toast("Langkah terakhir dibuat asal."); adj(u)
+  },
+  rclr() {
+   const u = gate(); if (!u) return; const its = itemsOf(u); if (!its.length) return;
+   if (B.cf !== "clr") { B.cf = "clr"; toast("Ketik sekali lagi untuk jual semua perabot (separuh harga)."); return }
+   snap(u); const v = rf(price(its)); u.fur = []; u.pk = null; S.money += v; B.cf = null; B.rsel = null; toast(`Bilik dikosongkan: ${rm(v)} diterima.`); adj(u)
+  },
+  rpkgo(k) {
+   const u = gate(); if (!u || !PK[k]) return; const its = itemsOf(u), refund = rf(price(its)), cost = pkCost(k);
+   if (its.length && B.cf !== k) { B.cf = k; toast("Perabot lama dijual separuh harga. Ketik Pasang sekali lagi untuk sahkan."); return }
+   if (S.money + refund < cost) { toast(`Duit tidak cukup: perlu ${rm(cost)}.`); return }
+   snap(u); S.money += refund - cost; u.fur = pkItems(k); u.g8 = 1; u.gx = DIMS[k][0]; u.gy = DIMS[k][1]; u.pk = k; B.cf = null; B.pk = null; B.rsel = null; B.pick = null;
+   toast(`${PK[k].ico} Pakej ${PK[k].n} dipasang di bilik ${u.n} (${rm(cost)}). Sekarang boleh diedit.`); adj(u)
+  }
+ });
+ const thImg = t => {
+  if (NEWC[t]) { const e = SPT.s[t + "|" + (t === "a_aircond" ? 1 : 0)]; return e ? `<svg viewBox="${e[0]} ${e[1]} ${e[2]} ${e[3]}" width="48" height="44" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto"><image href="img/dalaman/bilik-perabot.webp?v=hf135e" width="${SPT.w}" height="${SPT.h}"/></svg>` : "" }
+  defs([t]); return DU[t] ? `<img alt="" src="${DU[t]}">` : ""
+ };
+ B.rdraw = (e, b) => {
+  const u = unit(); if (!u) { B.room = null; return B.draw() }
+  css(); texInit(); sprInit(); const own = B.mine(b), q = B.Q(u), tier = lookOf(u, q), its = itemsOf(u), keep = e.querySelector(".pk") ? e.querySelector(".pk").scrollTop : 0;
+  if (B.rsel != null && !its[B.rsel]) { B.rsel = null; B.mv = false }
+  defs(its.map(o => o.t).concat(B.pk ? [] : []));
+  let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><div class="row" style="margin:0 0 4px"><button type="button" class="b o" data-a="rback">← ${B.BD[B.cur].short}</button></div><h2>🚪 Bilik ${u.n}</h2>`;
+  if (B.pk) {
+   h += `<p class="nt">Pilih pakej untuk dipasang dalam bilik ${u.n} dengan satu ketik. ${its.length ? "Perabot lama dijual separuh harga." : "Bilik ini masih kosong."} Selepas itu anda boleh alih, putar, buang atau tambah perabot satu demi satu.</p>`;
+   for (const k of ["s", "m", "l"]) {
+    const its2 = pkItems(k), cost = pkCost(k), clean = u.clean, est = Math.round(Math.min(80, qsum(its2)) * .8 + clean * .2 - (u.brk ? 15 : 0)), R = roomSVG({ nx: DIMS[k][0], ny: DIMS[k][1], tier: { s: 0, m: 1, l: 2 }[k], fem: !!b.fem, n: u.n, clean: 100, items: its2, mini: true, label: "Pakej " + PK[k].n });
+    defs(its2.map(o => o.t));
+    h += `<div class="pkc"><h3>${PK[k].ico} ${PK[k].n} <span class="sm">${PK[k].sub}</span></h3>${R.svg}<div class="sm">${PK[k].d}</div><div class="sm"><b>${its2.length} perabot</b> · mutu ≈ ${est} (${est >= 75 ? "boleh sewa Mahal" : est >= 40 ? "boleh sewa Biasa" : "sewa Murah"})</div><button type="button" class="b${B.cf === k ? " r" : ""}" data-a="rpkgo" data-n="${k}" ${S.money + rf(price(its)) < cost ? "disabled" : ""}>${B.cf === k ? "Sahkan: ganti perabot lama" : "Pasang · " + rm(cost)}</button></div>`
+   }
+   h += `<div class="row"><button type="button" class="b o" data-a="rpk">← Kembali ke bilik</button></div></div>`;
+   e.innerHTML = h; const p2 = e.querySelector(".pk"); if (p2) p2.scrollTop = keep; return
+  }
+  const R = roomSVG(mkOpts(b, u, { tier, grid: own, pick: !!B.pick, mv: !!B.mv, sel: B.rsel }));
+  let who = "";
+  if (u.t) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%">${B.face(u.t)}<small>${esc(u.t.name)}${u.t.owe ? " ⏳" : ""}${sp0.txt ? " · " + sp0.txt : ""}</small></div>` }
+  else if (u.self) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%"><small>🏠 Anda tinggal di sini</small></div>` }
+  const nx = q < B.RATES.biasa.need ? `Sewa Biasa perlu mutu ${B.RATES.biasa.need}+` : q < B.RATES.mahal.need ? `Sewa Mahal perlu mutu ${B.RATES.mahal.need}+` : "Layak sewa Mahal";
+  h += `<div class="uh" style="margin:2px 0"><span class="sm">${u.pk ? PK[u.pk].ico + " Pakej " + PK[u.pk].n + " (" + PK[u.pk].sub + ") · " : ""}Gaya ${TIERN[tier]} · ${b.fem ? "bangunan perempuan" : "bangunan lelaki"}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span><b>${q}</b></span></div><div class="sm">${nx} · Perabot ${its.length} · Kebersihan ${Math.round(u.clean)}%</div>`;
+  h += `<div class="rm">${R.svg}${who}</div>`;
+  if (u.t) h += `<div class="sm">${esc(u.t.name)} tinggal di sini (${B.rm(u.t.amt)} seminggu). Perabot milik tuan rumah: penyewa tidak boleh mengambil atau menjualnya.</div>`;
+  else if (u.pl) h += `<div class="sm">🔑 Keluarga anda menyewa bilik ini. Perabot milik tuan rumah.</div>`;
+  else if (!u.self) h += `<div class="sm">Tiada penyewa. Susun perabot supaya sewa lebih tinggi.</div>`;
+  if (u.brk) h += `<div class="al">🔧 ${esc(u.brk.w)}: baiki dahulu sebelum menyusun perabot (kos ${B.rm(u.brk.c)}).<div class="row"><button class="b" data-a="fix" data-n="${u.n}">🔧 Baiki ${B.rm(u.brk.c)}</button></div></div>`;
+  if (u.clean < 60) h += `<div class="sm">🧹 Bilik berhabuk${u.clean < 35 ? " dan bersawang" : ""}: bersihkan untuk menaikkan mutu.</div>`;
+  h += `<div class="row">${Object.entries(B.RATES).map(([k, v]) => `<button type="button" class="b o" data-a="lv" data-n="${u.n}" data-v="${k}" aria-pressed="${u.lv === k}">${v.t} ${B.rm(v.amt)}${q < v.need ? " 🔒" : ""}</button>`).join("")}</div>`;
+  if (!own) h += `<p class="sm">Anda hanya boleh melihat bilik ini; tuan rumah yang menyusun perabot.</p>`;
+  else if (!u.brk) {
+   h += `<div class="row"><button type="button" class="b" data-a="rpk">✨ Pakej bilik</button><button type="button" class="b o" data-a="rundo">↶ Buat asal</button><button type="button" class="b g" data-a="clean" data-n="${u.n}" ${u.clean >= 100 ? "disabled" : ""}>🧹 Bersihkan ${B.rm(25)}</button><button type="button" class="b o" data-a="rclr">${B.cf === "clr" ? "Sahkan kosongkan" : "Kosongkan"}</button></div>`;
+   if (B.rsel != null && its[B.rsel]) { const f = its[B.rsel]; h += `<div class="al" style="background:#f3ead7"><b>${esc(tname(f.t))}</b> · jual ${B.rm(rf(CATL[f.t] ? CATL[f.t][1] : 0))}<div class="row"><button type="button" class="b" data-a="rrot">🔄 Putar</button><button type="button" class="b" data-a="rmv" aria-pressed="${!!B.mv}">${B.mv ? "Ketik petak..." : "✋ Alih"}</button><button type="button" class="b r" data-a="rsell">🗑️ Jual</button></div></div>` }
+   h += `<div class="row" role="tablist">${CATS.filter(c => Object.keys(NEWC).some(t => NEWC[t][0] === c[0])).map(c => `<button type="button" class="b o" role="tab" data-a="rcat" data-n="${c[0]}" aria-pressed="${B.cat === c[0]}">${c[1]}</button>`).join("")}</div><div class="sm">${B.pick ? "Ketik petak kosong (sudut belakang) untuk meletakkan " + esc(tname(B.pick)) + " (" + fp(B.pick, 0)[0] + " x " + fp(B.pick, 0)[1] + " petak)." : "Pilih perabot, kemudian ketik petak kosong."}</div><div class="pal">`;
+   for (const t of Object.keys(CATL)) { if (!NEWC[t] || CATL[t][0] !== B.cat) continue; const d = CATL[t]; if (CEIL[t]) { const on = its.some(o => o.t === t); h += `<button type="button" data-a="rceil" data-n="${t}" aria-pressed="${on}" ${!on && S.money < d[1] ? "disabled" : ""}>${thImg(t)}${esc(tname(t))}<br>${on ? "Buang · +" + B.rm(rf(d[1])) : "Pasang " + B.rm(d[1])} · +${d[2]}<br><small>${CEIL[t] === "siling" ? "tergantung di siling" : "di dinding"}, tiada petak lantai</small></button>`; continue }
+    h += `<button type="button" data-a="rpick" data-n="${t}" aria-pressed="${B.pick === t}" ${S.money < d[1] ? "disabled" : ""}>${thImg(t)}${esc(tname(t))}<br>${B.rm(d[1])} · +${d[2]}</button>` }
+   h += `</div>`;
+   if (its.length) h += `<p class="sm">Perabot dalam bilik (ketik untuk pilih):</p><div class="row">${its.map((o, i) => `<button type="button" class="b o" data-a="rsel" data-n="${i}" aria-pressed="${B.rsel === i}">${esc(tname(o.t))}</button>`).join("")}</div>`
+  }
+  e.innerHTML = h + `</div>`; const p = e.querySelector(".pk"); if (p) p.scrollTop = keep
+ };
+ H.roomSVG = roomSVG; H.qsum = qsum;
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
