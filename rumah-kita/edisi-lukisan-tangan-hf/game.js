@@ -22537,6 +22537,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf136", "23 Nov 2026", ["🧍 Penyewa dalam bilik sewa kini Sim sebenar (badan penuh, watak lukisan tangan yang sama dengan dalam rumah), bukan bulatan avatar: tidur di katil, mandi di bilik air, makan di meja makan, memasak di dapur, bekerja di meja tulis atau komputer, menonton TV di sofa atau duduk; aktiviti mengikut waktu dan perabot bilik, dengan label aktiviti di atas kepala", "🛋️ Susunan Mewah diperbaiki sedikit (sofa lebih jauh dari TV, kerusi pejabat tidak tersembunyi di sebalik bilik air); penyewa duduk betul-betul di atas kusyen sofa, kerusi makan, kerusi pejabat dan bangku (model 3D duduk yang dirender bersama perabot dalam satu gambar, kedalaman tepat, warna kulit/rambut/tudung/baju ikut penyewa); penyewa mandi lebih kecil dan berdiri dalam ruang pancuran"]],
    ["hf135", "23 Nov 2026", ["🛋️ Perabot bilik sewa kini model 3D yang dirender dengan satu kamera isometrik tetap (sudut sama, tapak tepat pada petak, empat arah putar) dan saiz bilik ikut pakej: Murah 5 x 5 (Retro Malaysia: dinding hijau pudina, lantai kayu oren, tilam lantai, almari, kipas berdiri, meja lipat, bangku), Sederhana 6 x 6 (Japandi: dinding krim, lantai kayu cerah, katil kayu cadar sage, dapur kecil dengan kabinet, sinki dan hob, meja tulis dan kerusi) dan Mewah 6 x 6 (Butik Moden: dinding biru laut, lantai kayu gelap, dapur mewah dengan peti sejuk, hob dan sinki dengan meja makan dan dua kerusi di sebelahnya, TV dengan sofa L berjarak dua petak, meja komputer dengan kerusi pejabat di zon lain, katil besar, aircond dinding)", "🚶 Penyewa duduk di kerusi (siang) atau tidur di katil (malam); laluan ke katil, kerusi dan meja sentiasa lapang (editor menolak perabot yang menghalang); kipas siling tergantung di atas dan aircond di dinding tanpa ambil petak lantai; bilik air satu unit di sudut kanan belakang; bilik lama dipindah ke grid pakejnya tanpa kehilangan perabot"]],
    ["hf134", "23 Nov 2026", ["🚪 Masuk ke setiap bilik sewa (butang Masuk bilik, atau ketik bilik kecil di panel bangunan): nampak lantai, dinding, perabot dan penyewa dalam bilik; bangunan lelaki dan perempuan berlainan warna dinding", "🛋️ Tiga pakej bilik dengan satu ketik: Simple (RM 340), Sederhana (RM 1,120) dan Mewah (RM 4,070); kemudian susun sendiri: tambah, alih, putar, jual (separuh harga) dan buat asal. Mutu bilik kini dikira daripada perabot sebenar dan kebersihan: bilik mewah menyokong sewa Mahal, bilik kosong hanya sewa Murah", "🏢 Setiap bangunan kini empat tingkat, 16 bilik (101-404); tingkat 2, 3 dan 4 dibuka dengan RM 4,000, RM 5,000 dan RM 6,000; bilik rosak atau berhabuk ditanda dalam bilik dan mesti dibaiki sebelum menyusun perabot; lantai dan dinding bilik dilukis dengan Hugging Face"]],
    ["hf133", "23 Nov 2026", ["🏘️ Dua bangunan bilik sewa di timur Pekan: Bilik Sewa Seri Murni (Lelaki) dan Bilik Sewa Seri Melur (Perempuan), setiap satu dua tingkat, 8 bilik (101-104, 201-204); penyewa hanya lelaki atau hanya perempuan; tingkat 2 dibuka dengan RM 4,000; anda atau jiran boleh membeli satu atau kedua-duanya", "👥 Penyewa lebih pelbagai (lebih banyak nama, muka dan warna tidak berulang); panel bilik ada tab tingkat; pintu peta hijau (berpenghuni), kelabu dengan ＋ (kosong), jingga dengan ! (masalah); label pin dipendekkan"]],
@@ -40074,7 +40075,7 @@ ${lf ? `<p class="sub">🏠 Matlamat keluarga <span class="hint">· setiap satu 
    } catch (e) { fail(e) }
    return r
  } }
- { const st = document.createElement("style"); st.id = "hf136css";
+ { const st = document.createElement("style"); st.id = "hf136dss";
   st.textContent = `#p-goals .hfmg{display:grid;gap:6px}
 #p-goals .hfmg .cap{margin:0}
 #p-goals .hfmg .hxm li{align-items:start}
@@ -41880,7 +41881,7 @@ try {
  const FP = { r_tilam: [1, 2], r_almari: [1, 1], r_kipas: [1, 1], r_meja: [1, 1], r_bangku: [1, 1], r_bilikair: [2, 2], j_katil: [1, 2], j_almari: [2, 1], j_meja: [2, 1], j_kerusi: [1, 1], j_kipasdingin: [0, 0], j_bilikair: [2, 2], b_katil: [2, 2], b_sofa: [2, 2], b_peti: [1, 1], b_tv: [2, 1], b_bilikair: [2, 2], a_aircond: [0, 0], j_dapur: [2, 1], b_dapur: [2, 1], b_makan: [2, 1], b_kerusi: [1, 1], b_pc: [2, 1], b_kerusipc: [1, 1] };
  /* the pieces are 3D models rendered with one fixed isometric camera (tools/hf/bilik_3d.mjs, packed by tools/hf/bilik_3d_pek.py): sprite table { cell, w, h, s: { "type|k": [x, y, w, h, ax, ay] } },
     k = quarter-turns of the front (0 +Z, 1 +X, 2 -Z, 3 -X); (ax, ay) = the footprint's front-bottom corner in the sprite. The footprint is fx along i and fz along j at k = 0; odd k swaps. */
- const SPT = /*SPR3D*/{"cell":80,"w":1024,"h":1685,"s":{"r_bilikair|0":[0,0,170,200,84.8,196.5],"r_bilikair|1":[172,0,170,200,84.8,196.5],"r_bilikair|3":[344,0,170,200,84.8,196.5],"j_bilikair|0":[516,0,170,200,84.8,196.5],"j_bilikair|1":[688,0,170,200,84.8,196.5],"j_bilikair|3":[0,202,170,200,84.8,196.5],"b_bilikair|0":[172,202,170,200,84.8,196.5],"b_bilikair|1":[344,202,170,200,84.8,196.5],"b_bilikair|3":[516,202,170,200,84.8,196.5],"j_almari|0":[688,202,130,165,84.8,161.7],"j_almari|1":[820,202,130,165,44.8,161.7],"j_almari|2":[0,404,130,165,84.8,161.7],"j_almari|3":[132,404,130,165,44.8,161.7],"b_dapur|0":[264,404,130,164,84.8,160.5],"b_dapur|3":[396,404,130,164,44.8,160.5],"j_dapur|0":[528,404,130,162,84.8,158.5],"j_dapur|1":[660,404,130,162,44.8,158.5],"b_dapur|1":[792,404,130,162,44.8,158.1],"b_dapur|2":[0,571,130,158,84.8,154.1],"b_katil|0":[132,571,170,156,84.8,152.1],"b_katil|1":[304,571,170,156,84.8,152.1],"b_sofa|0":[476,571,170,154,84.8,150.1],"b_sofa|1":[648,571,170,154,84.8,150.1],"j_dapur|2":[820,571,130,152,84.8,148.1],"j_dapur|3":[0,731,130,152,44.8,148.1],"r_bilikair|2":[132,731,170,148,84.8,144.9],"j_bilikair|2":[304,731,170,148,84.8,144.9],"b_bilikair|2":[476,731,170,148,84.8,144.9],"b_sofa|3":[648,731,170,143,84.8,139.7],"b_peti|0":[820,731,90,136,44.8,132.5],"b_peti|1":[912,731,90,136,44.8,132.5],"b_peti|2":[0,885,90,136,44.8,132.5],"b_peti|3":[92,885,90,136,44.8,132.5],"b_katil|2":[184,885,170,135,84.8,131.7],"b_katil|3":[356,885,170,135,84.8,131.7],"r_almari|0":[528,885,90,134,44.8,130.1],"r_almari|1":[620,885,90,134,44.8,130.1],"r_almari|2":[712,885,90,134,44.8,130.1],"r_almari|3":[804,885,90,134,44.8,130.1],"b_tv|0":[0,1023,130,131,84.8,127.3],"b_tv|1":[132,1023,130,131,44.8,127.3],"b_tv|2":[264,1023,130,127,84.8,123.3],"b_tv|3":[396,1023,130,127,44.8,123.3],"b_pc|0":[528,1023,130,122,84.8,118.5],"b_pc|1":[660,1023,130,119,44.8,115.7],"b_pc|2":[792,1023,130,119,84.8,115.7],"b_pc|3":[0,1156,130,119,44.8,115.7],"j_katil|0":[132,1156,130,118,44.8,114.5],"j_katil|1":[264,1156,130,118,84.8,114.5],"b_makan|0":[396,1156,130,118,84.8,114.5],"b_makan|1":[528,1156,130,118,44.8,114.5],"b_makan|2":[660,1156,130,118,84.8,114.5],"b_makan|3":[792,1156,130,118,44.8,114.5],"j_meja|0":[0,1277,130,116,84.8,112.9],"j_meja|1":[132,1277,130,116,44.8,112.9],"j_meja|2":[264,1277,130,116,84.8,112.9],"j_meja|3":[396,1277,130,116,44.8,112.9],"b_sofa|2":[528,1277,170,116,84.8,112.5],"r_kipas|2":[700,1277,90,115,44.8,111.7],"r_kipas|3":[792,1277,90,115,44.8,111.7],"r_kipas|0":[884,1277,90,111,44.8,107.7],"r_kipas|1":[0,1395,90,111,44.8,107.7],"j_katil|2":[92,1395,130,105,44.8,101.3],"j_katil|3":[224,1395,130,105,84.8,101.3],"b_kerusipc|0":[356,1395,90,99,44.8,95.7],"b_kerusipc|1":[448,1395,90,99,44.8,95.7],"b_kerusi|0":[540,1395,90,94,44.8,90.1],"b_kerusi|1":[632,1395,90,94,44.8,90.1],"j_kerusi|0":[724,1395,90,91,44.8,87.3],"j_kerusi|1":[816,1395,90,91,44.8,87.3],"r_tilam|0":[0,1508,130,90,44.8,86.5],"r_tilam|1":[132,1508,130,90,84.8,86.5],"r_tilam|2":[264,1508,130,90,44.8,86.5],"r_tilam|3":[396,1508,130,90,84.8,86.5],"r_meja|0":[528,1508,90,88,44.8,84.1],"r_meja|1":[620,1508,90,88,44.8,84.1],"r_meja|2":[712,1508,90,88,44.8,84.1],"r_meja|3":[804,1508,90,88,44.8,84.1],"j_kipasdingin|0":[896,1508,103,83,53.2,28.9],"b_kerusipc|2":[0,1600,90,83,44.8,79.3],"b_kerusipc|3":[92,1600,90,83,44.8,79.3],"b_kerusi|2":[184,1600,90,77,44.8,73.7],"b_kerusi|3":[276,1600,90,77,44.8,73.7],"j_kerusi|2":[368,1600,90,76,44.8,72.5],"j_kerusi|3":[460,1600,90,76,44.8,72.5],"r_bangku|0":[552,1600,90,62,44.8,58.1],"r_bangku|1":[644,1600,90,62,44.8,58.1],"r_bangku|2":[736,1600,90,62,44.8,58.1],"r_bangku|3":[828,1600,90,62,44.8,58.1],"a_aircond|1":[920,1600,64,58,26.8,25.7]}}/*END:SPR3D*/;
+ const SPT = /*SPR3D*/{"cell":80,"w":1024,"h":2561,"s":{"r_bilikair|0":[0,0,170,200,84.8,196.5],"r_bilikair|1":[172,0,170,200,84.8,196.5],"r_bilikair|3":[344,0,170,200,84.8,196.5],"j_bilikair|0":[516,0,170,200,84.8,196.5],"j_bilikair|1":[688,0,170,200,84.8,196.5],"j_bilikair|3":[0,202,170,200,84.8,196.5],"b_bilikair|0":[172,202,170,200,84.8,196.5],"b_bilikair|1":[344,202,170,200,84.8,196.5],"b_bilikair|3":[516,202,170,200,84.8,196.5],"j_almari|0":[688,202,130,165,84.8,161.7],"j_almari|1":[820,202,130,165,44.8,161.7],"j_almari|2":[0,404,130,165,84.8,161.7],"j_almari|3":[132,404,130,165,44.8,161.7],"b_dapur|0":[264,404,130,164,84.8,160.5],"b_dapur|3":[396,404,130,164,44.8,160.5],"j_dapur|0":[528,404,130,162,84.8,158.5],"j_dapur|1":[660,404,130,162,44.8,158.5],"b_dapur|1":[792,404,130,162,44.8,158.1],"b_dapur|2":[0,571,130,158,84.8,154.1],"b_katil|0":[132,571,170,156,84.8,152.1],"b_katil|1":[304,571,170,156,84.8,152.1],"b_sofa|0":[476,571,170,154,84.8,150.1],"b_sofa|1":[648,571,170,154,84.8,150.1],"b_sofa~l|0":[820,571,170,154,84.8,150.1],"b_sofa~l|1":[0,731,170,154,84.8,150.1],"b_sofa~s|0":[172,731,170,154,84.8,150.1],"b_sofa~s|1":[344,731,170,154,84.8,150.1],"b_sofa_bk|0":[516,731,170,154,84.8,150.1],"b_sofa_bk|1":[688,731,170,154,84.8,150.1],"j_dapur|2":[860,731,130,152,84.8,148.1],"j_dapur|3":[0,887,130,152,44.8,148.1],"r_bilikair|2":[132,887,170,148,84.8,144.9],"j_bilikair|2":[304,887,170,148,84.8,144.9],"b_bilikair|2":[476,887,170,148,84.8,144.9],"b_sofa|3":[648,887,170,143,84.8,139.7],"b_sofa~l|3":[820,887,170,143,84.8,139.7],"b_sofa~s|3":[0,1041,170,143,84.8,139.7],"b_sofa_nb|3":[172,1041,170,143,84.8,139.7],"b_peti|0":[344,1041,90,136,44.8,132.5],"b_peti|1":[436,1041,90,136,44.8,132.5],"b_peti|2":[528,1041,90,136,44.8,132.5],"b_peti|3":[620,1041,90,136,44.8,132.5],"b_katil|2":[712,1041,170,135,84.8,131.7],"b_katil|3":[0,1186,170,135,84.8,131.7],"b_sofa_nb|0":[172,1186,170,135,84.8,131.7],"b_sofa_nb|1":[344,1186,170,135,84.8,131.7],"r_almari|0":[516,1186,90,134,44.8,130.1],"r_almari|1":[608,1186,90,134,44.8,130.1],"r_almari|2":[700,1186,90,134,44.8,130.1],"r_almari|3":[792,1186,90,134,44.8,130.1],"b_tv|0":[884,1186,130,131,84.8,127.3],"b_tv|1":[0,1323,130,131,44.8,127.3],"b_tv|2":[132,1323,130,127,84.8,123.3],"b_tv|3":[264,1323,130,127,44.8,123.3],"b_pc|0":[396,1323,130,122,84.8,118.5],"b_sofa~l|2":[528,1323,170,121,84.8,117.3],"b_sofa~s|2":[700,1323,170,120,84.8,116.9],"b_pc|1":[872,1323,130,119,44.8,115.7],"b_pc|2":[0,1456,130,119,84.8,115.7],"b_pc|3":[132,1456,130,119,44.8,115.7],"j_katil|0":[264,1456,130,118,44.8,114.5],"j_katil|1":[396,1456,130,118,84.8,114.5],"b_makan|0":[528,1456,130,118,84.8,114.5],"b_makan|1":[660,1456,130,118,44.8,114.5],"b_makan|2":[792,1456,130,118,84.8,114.5],"b_makan|3":[0,1577,130,118,44.8,114.5],"j_meja|0":[132,1577,130,116,84.8,112.9],"j_meja|1":[264,1577,130,116,44.8,112.9],"j_meja|2":[396,1577,130,116,84.8,112.9],"j_meja|3":[528,1577,130,116,44.8,112.9],"b_sofa|2":[660,1577,170,116,84.8,112.5],"b_sofa_nb|2":[832,1577,170,116,84.8,112.5],"b_sofa_bk|2":[0,1697,170,116,84.8,112.5],"b_sofa_bk|3":[172,1697,170,116,84.8,112.5],"r_kipas|2":[344,1697,90,115,44.8,111.7],"r_kipas|3":[436,1697,90,115,44.8,111.7],"r_kipas|0":[528,1697,90,111,44.8,107.7],"r_kipas|1":[620,1697,90,111,44.8,107.7],"j_katil|2":[712,1697,130,105,44.8,101.3],"j_katil|3":[844,1697,130,105,84.8,101.3],"j_kerusi~l|0":[0,1815,90,105,44.8,101.3],"j_kerusi~l|1":[92,1815,90,105,44.8,101.3],"b_kerusi~s|0":[184,1815,90,104,44.8,100.5],"b_kerusi~s|1":[276,1815,90,104,44.8,100.5],"b_kerusi~l|0":[368,1815,90,104,44.8,100.9],"b_kerusi~l|1":[460,1815,90,104,44.8,100.9],"b_kerusi~l|2":[552,1815,90,104,44.8,100.1],"b_kerusi~l|3":[644,1815,90,104,44.8,100.1],"b_kerusipc~s|0":[736,1815,90,104,44.8,100.1],"b_kerusipc~s|1":[828,1815,90,104,44.8,100.1],"b_kerusipc~l|0":[920,1815,90,104,44.8,100.5],"b_kerusipc~l|1":[0,1922,90,104,44.8,100.5],"j_kerusi~s|0":[92,1922,90,104,44.8,100.9],"j_kerusi~s|1":[184,1922,90,104,44.8,100.9],"j_kerusi~s|2":[276,1922,90,104,44.8,100.1],"j_kerusi~s|3":[368,1922,90,104,44.8,100.1],"j_kerusi~l|2":[460,1922,90,104,44.8,100.5],"j_kerusi~l|3":[552,1922,90,104,44.8,100.5],"b_kerusi~s|2":[644,1922,90,103,44.8,99.7],"b_kerusi~s|3":[736,1922,90,103,44.8,99.7],"b_kerusipc~s|2":[828,1922,90,103,44.8,99.3],"b_kerusipc~s|3":[920,1922,90,103,44.8,99.3],"b_kerusipc~l|2":[0,2028,90,103,44.8,99.7],"b_kerusipc~l|3":[92,2028,90,103,44.8,99.7],"r_bangku~l|0":[184,2028,90,102,44.8,98.1],"r_bangku~l|1":[276,2028,90,102,44.8,98.1],"r_bangku~s|0":[368,2028,90,101,44.8,97.3],"r_bangku~s|1":[460,2028,90,101,44.8,97.3],"r_bangku~l|2":[552,2028,90,101,44.8,97.3],"r_bangku~l|3":[644,2028,90,101,44.8,97.3],"r_bangku~s|2":[736,2028,90,100,44.8,96.9],"r_bangku~s|3":[828,2028,90,100,44.8,96.9],"b_kerusipc|0":[920,2028,90,99,44.8,95.7],"b_kerusipc|1":[0,2133,90,99,44.8,95.7],"b_kerusipc_bk|0":[92,2133,90,99,44.8,95.7],"b_kerusipc_bk|1":[184,2133,90,99,44.8,95.7],"b_kerusi|0":[276,2133,90,94,44.8,90.1],"b_kerusi|1":[368,2133,90,94,44.8,90.1],"b_kerusi_bk|0":[460,2133,90,94,44.8,90.1],"b_kerusi_bk|1":[552,2133,90,94,44.8,90.1],"j_kerusi|0":[644,2133,90,91,44.8,87.3],"j_kerusi|1":[736,2133,90,91,44.8,87.3],"j_kerusi_bk|0":[828,2133,90,91,44.8,87.3],"j_kerusi_bk|1":[920,2133,90,91,44.8,87.3],"r_tilam|0":[0,2234,130,90,44.8,86.5],"r_tilam|1":[132,2234,130,90,84.8,86.5],"r_tilam|2":[264,2234,130,90,44.8,86.5],"r_tilam|3":[396,2234,130,90,84.8,86.5],"r_meja|0":[528,2234,90,88,44.8,84.1],"r_meja|1":[620,2234,90,88,44.8,84.1],"r_meja|2":[712,2234,90,88,44.8,84.1],"r_meja|3":[804,2234,90,88,44.8,84.1],"j_kipasdingin|0":[896,2234,103,83,53.2,28.9],"b_kerusipc|2":[0,2326,90,83,44.8,79.3],"b_kerusipc|3":[92,2326,90,83,44.8,79.3],"b_kerusipc_bk|2":[184,2326,90,83,44.8,79.3],"b_kerusipc_bk|3":[276,2326,90,83,44.8,79.3],"b_kerusi|2":[368,2326,90,77,44.8,73.7],"b_kerusi|3":[460,2326,90,77,44.8,73.7],"b_kerusi_bk|2":[552,2326,90,77,44.8,73.7],"b_kerusi_bk|3":[644,2326,90,77,44.8,73.7],"j_kerusi|2":[736,2326,90,76,44.8,72.5],"j_kerusi|3":[828,2326,90,76,44.8,72.5],"j_kerusi_bk|2":[920,2326,90,76,44.8,72.5],"j_kerusi_bk|3":[0,2411,90,76,44.8,72.5],"b_kerusipc_nb|0":[92,2411,90,75,44.8,71.3],"b_kerusipc_nb|1":[184,2411,90,75,44.8,71.3],"b_kerusipc_nb|2":[276,2411,90,73,44.8,69.7],"b_kerusipc_nb|3":[368,2411,90,73,44.8,69.7],"b_kerusi_nb|0":[460,2411,90,70,44.8,66.5],"b_kerusi_nb|1":[552,2411,90,70,44.8,66.5],"b_kerusi_nb|2":[644,2411,90,70,44.8,66.5],"b_kerusi_nb|3":[736,2411,90,70,44.8,66.5],"j_kerusi_nb|0":[828,2411,90,70,44.8,66.1],"j_kerusi_nb|1":[920,2411,90,70,44.8,66.1],"j_kerusi_nb|2":[0,2489,90,70,44.8,66.1],"j_kerusi_nb|3":[92,2489,90,70,44.8,66.1],"r_bangku|0":[184,2489,90,62,44.8,58.1],"r_bangku|1":[276,2489,90,62,44.8,58.1],"r_bangku|2":[368,2489,90,62,44.8,58.1],"r_bangku|3":[460,2489,90,62,44.8,58.1],"a_aircond|1":[552,2489,64,58,26.8,25.7]}}/*END:SPR3D*/;
  const CEIL = { j_kipasdingin: "siling", a_aircond: "dinding" };
  /* the room's size goes with its package (the smallest that holds it with a way through): Murah 5 x 5, Sederhana 6 x 6, Mewah 6 x 6; i = cells along the right wall, j = along the left wall */
  const DIMS = { s: [5, 5], m: [6, 6], l: [6, 6] }, DEF = [6, 6];
@@ -41917,7 +41918,7 @@ try {
  const PK = {   /* laid as in the owner's reference "Rumah Kita - Bilik 101" (grid i = along the right wall, j = along the left wall; the bathroom in the right-back corner) */
   s: { n: "Murah", sub: "Retro Malaysia", ico: "🪵", d: "Dinding hijau pudina, lantai kayu oren: tilam lantai di tepi dinding, almari kayu, kipas berdiri, meja lipat dengan bangku dan bilik air sudut. Sewa Murah.", it: [["r_almari", 0, 0, 0], ["r_kipas", 2, 2, 0], ["r_bilikair", 3, 0, 0], ["r_tilam", 0, 2, 0], ["r_meja", 4, 3, 0], ["r_bangku", 3, 3, 0]] },
   m: { n: "Sederhana", sub: "Japandi", ico: "🛋️", d: "Bilik 6 x 6, dinding krim, lantai kayu cerah: katil kayu cadar sage di sudut, almari dan dapur kecil (kabinet, sinki, hob) di dinding kiri, meja tulis + monitor dengan kerusi di dinding kanan (jauh dari dapur), kipas siling tergantung di atas dan bilik air sudut; tengah bilik lapang untuk berjalan. Sewa Biasa.", it: [["j_katil", 0, 0, 0], ["j_almari", 0, 2, 1], ["j_dapur", 0, 4, 1], ["j_meja", 1, 0, 0], ["j_kerusi", 2, 1, 2], ["j_bilikair", 4, 0, 0], ["j_kipasdingin", 3, 3, 0]] },
-  l: { n: "Mewah", sub: "Butik Moden", ico: "👑", d: "Bilik 6 x 6 dalam empat zon: tidur (katil besar di sudut), tonton (TV di dinding kiri, sofa L dengan jarak tonton dua petak), dapur mewah dengan meja makan dan dua kerusi di sebelahnya, dan kerja (meja komputer dengan kerusi pejabat, jauh dari dapur); aircond dinding dan bilik air mewah dengan tab mandi. Layak sewa Mahal.", it: [["b_katil", 0, 0, 0], ["b_pc", 2, 0, 0], ["b_kerusipc", 3, 1, 2], ["b_bilikair", 4, 0, 0], ["b_tv", 0, 2, 1], ["b_dapur", 0, 4, 1], ["b_sofa", 3, 2, 3], ["b_makan", 2, 4, 1], ["b_kerusi", 3, 4, 3], ["b_kerusi", 3, 5, 3], ["a_aircond", 0, 2, 1]] }
+  l: { n: "Mewah", sub: "Butik Moden", ico: "👑", d: "Bilik 6 x 6 dalam empat zon: tidur (katil besar di sudut), tonton (TV di dinding kiri, sofa L dengan jarak tonton dua petak), dapur mewah dengan meja makan dan dua kerusi di sebelahnya, dan kerja (meja komputer dengan kerusi pejabat, jauh dari dapur); aircond dinding dan bilik air mewah dengan tab mandi. Layak sewa Mahal.", it: [["b_katil", 0, 0, 0], ["b_pc", 2, 0, 0], ["b_kerusipc", 2, 1, 2], ["b_bilikair", 4, 0, 0], ["b_tv", 0, 2, 1], ["b_dapur", 0, 4, 1], ["b_sofa", 4, 2, 3], ["b_makan", 2, 4, 1], ["b_kerusi", 3, 4, 3], ["b_kerusi", 3, 5, 3], ["a_aircond", 0, 2, 1]] }
  };
  const price = f => (f || []).reduce((a, o) => a + (CATL[o.t] ? CATL[o.t][1] : 0), 0);
  const pkItems = k => PK[k].it.filter(a => okT(a[0])).map(a => ({ t: a[0], x: a[1], y: a[2], r: a[3] || 0 }));
@@ -41955,13 +41956,13 @@ try {
   } catch (e) { fail(e) }
  };
  const itemsOf = u => { if (Array.isArray(u.fur)) { if (!u.g8) migr(u); return u.fur } return legacy(u).filter(o => okT(o.t)) };
- H.pathOk = pathOk; H.pathStats = pathStats; H.itemsOf = itemsOf; H.fp = fp; H.fits = (u, t, r, x, y) => fitsIn(itemsOf(u), t, r, x, y, -1, dimsOf(u)); H.DIMS = DIMS; H.dimsOf = dimsOf;
+ H.pathOk = pathOk; H.pathStats = pathStats; H.SPT = SPT; H.itemsOf = itemsOf; H.fp = fp; H.fits = (u, t, r, x, y) => fitsIn(itemsOf(u), t, r, x, y, -1, dimsOf(u)); H.DIMS = DIMS; H.dimsOf = dimsOf;
  const unit = () => B.room ? B.U(B.room) : null;
  const spend = n => { if (S.money < n) { toast(`Duit tidak cukup: perlu ${rm(n)}.`); return false } S.money -= n; return true };
  /* (1) thumbnails: one <image> per type in a hidden SVG (data URL made once), the rooms only <use> them */
  const DU = {};
  const SPR = { img: null, ready: false };
- const sprInit = () => { if (SPR.img) return; const im = SPR.img = new Image(); im.onload = () => { SPR.ready = true; try { if (HF.bilikOn) B.draw() } catch (e) { fail(e) } }; im.src = "img/dalaman/bilik-perabot.webp?v=hf135e" };
+ const sprInit = () => { if (SPR.img) return; const im = SPR.img = new Image(); im.onload = () => { SPR.ready = true; try { if (HF.bilikOn) B.draw() } catch (e) { fail(e) } }; im.src = "img/dalaman/bilik-perabot.webp?v=hf136d" };
  const defsSvg = () => { let sv = document.getElementById("h160defs"); if (!sv) { sv = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sv.id = "h160defs"; sv.setAttribute("width", "0"); sv.setAttribute("height", "0"); sv.style.cssText = "position:absolute;width:0;height:0;overflow:hidden"; document.body.appendChild(sv) } return sv };
  const defs = ts => {
   const sv = defsSvg(); let add = "";
@@ -42027,18 +42028,26 @@ try {
   h += bits.join("");
   const key = f => { const d = fp(f.t, f.r); return CEIL[f.t] ? 99 : f.x + f.y + d[0] + d[1] };
   const fur = o.items.map((f, i) => Object.assign({ i }, f)).sort((a, c) => key(a) - key(c) || a.x - c.x), pos = {};
+  const PRS = o.tenant && !mini && H.personFrag ? H.personFrag(o.tenant, o.items, [NX, NY], TW, P, TH) : null;   /* §161: the tenant as the painted Sim (null until the painted frames are in) */
   const ks = TW / SPT.cell;   /* sheet px -> room px: the 3D renders share the room's projection, so the anchor (the footprint's front-bottom corner) sits exactly on the grid corner */
   for (const f of fur) {
+   if (PRS && !PRS.done && !PRS.comp && !PRS.split && PRS.key <= key(f)) { h += PRS.frag; PRS.done = 1 }
    if (NEWC[f.t]) {
     const kind = CEIL[f.t], d = fp(f.t, f.r), rk = f.t === "a_aircond" ? 1 : f.t === "j_kipasdingin" ? 0 : (f.r | 0) & 3, e = SPT.s[f.t + "|" + rk]; if (!e) continue;   /* the sheet is not loaded yet: the room is drawn again when it is */
     const A = kind === "siling" ? P(NX * .2, NY * .2, WH + 2) : kind === "dinding" ? P(0, NY * .62, WH - 40) : P(f.x + d[0], f.y + d[1]);
     const kk = kind === "siling" ? ks * .72 : ks, x = A[0] - e[4] * kk, y = A[1] - e[5] * kk, sw = e[2] * kk, sh = e[3] * kk;   /* the hanging fan a little smaller: it sits high on the back walls, clear of the furniture */
-    h += `<svg x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sw.toFixed(1)}" height="${sh.toFixed(1)}" viewBox="${e[0]} ${e[1]} ${e[2]} ${e[3]}" overflow="hidden"><image href="img/dalaman/bilik-perabot.webp?v=hf135e" width="${SPT.w}" height="${SPT.h}"/></svg>`;
+    const em = tp => { const e2 = SPT.s[tp + "|" + rk]; if (!e2) return ""; const x2 = A[0] - e2[4] * kk, y2 = A[1] - e2[5] * kk; return `<svg x="${x2.toFixed(1)}" y="${y2.toFixed(1)}" width="${(e2[2] * kk).toFixed(1)}" height="${(e2[3] * kk).toFixed(1)}" viewBox="${e2[0]} ${e2[1]} ${e2[2]} ${e2[3]}" overflow="hidden"><image href="img/dalaman/bilik-perabot.webp?v=hf136d" width="${SPT.w}" height="${SPT.h}"/></svg>` };
+    if (PRS && PRS.split && f.i === PRS.split.idx) { h += em(f.t + "_nb") + PRS.frag + em(f.t + "_bk"); PRS.done = 1 }   /* a painted sitter facing away from the camera: the seat without its back, the sitter, then the back over the sitter */
+    else if (PRS && PRS.comp && f.i === PRS.comp.idx) {   /* §161: the seat drawn WITH its sitter (the 3D render has the depth between them right), the sitter recoloured from the tenant */
+     const e2 = PRS.comp.e, x2 = A[0] - e2[4] * kk, y2 = A[1] - e2[5] * kk, w2 = e2[2] * kk;
+     h += `<image href="${PRS.comp.url}" x="${x2.toFixed(1)}" y="${y2.toFixed(1)}" width="${w2.toFixed(1)}" height="${(e2[3] * kk).toFixed(1)}"/>`; PRS.done = 1; PRS.lab.x = x2 + w2 / 2; PRS.lab.y = y2 + 4
+    } else h += em(f.t);
     pos[f.i] = [x + sw / 2, y + sh / 2, sw / 2 + 3, sh / 2 + 3]; continue
    }
    const b2 = P(f.x + 1, f.y + 1), s1 = TW / g.tw * .9, x = b2[0] - 60 * s1, y = b2[1] - 116 * s1;   /* an older piece (the game's own picture): one cell */
    h += `<use href="#h160-${f.t}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s1})"/>`
   }
+  if (PRS && !PRS.done) { h += PRS.frag; PRS.done = 1 }
   if (o.clean < 35 && !mini) { const c = P(0.15, 0.15, WH - 2); h += `<text x="${c[0] + 8}" y="${c[1] + 14}" font-size="22">🕸️</text>` }
   const brkHit = w => f => { const t = f.t; return (w.indexOf("Paip") === 0 && (/bilikair|shower|toilet|bathtub/.test(t))) || ((w.indexOf("Kipas") === 0 || w.indexOf("Penghawa") === 0) && (/kipas|aircond/.test(t))) || (w.indexOf("Wayar") === 0 && (/b_tv|j_meja|b_peti|tv|computer|lamp|fridge/.test(t))) };
   if (o.brk && !mini) {
@@ -42049,7 +42058,7 @@ try {
   }
   if (o.sel != null && o.items[o.sel]) { const f = o.items[o.sel], d = fp(f.t, f.r); if (d[0]) h += `<polygon points="${[[f.x, f.y], [f.x + d[0], f.y], [f.x + d[0], f.y + d[1]], [f.x, f.y + d[1]]].map(a => pt(...a)).join(" ")}" fill="rgba(255,221,80,.28)" stroke="#e0a800" stroke-width="2.5"/>`; else if (pos[o.sel]) { const q = pos[o.sel]; h += `<rect x="${(q[0] - q[2]).toFixed(1)}" y="${(q[1] - q[3]).toFixed(1)}" width="${(q[2] * 2).toFixed(1)}" height="${(q[3] * 2).toFixed(1)}" rx="6" fill="rgba(255,221,80,.2)" stroke="#e0a800" stroke-width="2.5"/>` } }
   if (o.grid) for (let i = 0; i < NX; i++) for (let j = 0; j < NY; j++) h += `<polygon class="rc" data-a="rcell" data-n="${i},${j}" points="${[[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]].map(a => pt(...a)).join(" ")}" fill="transparent" stroke="${o.pick || o.mv ? "rgba(44,107,74,.55)" : "none"}" stroke-width="1" ${o.pick || o.mv ? 'stroke-dasharray="3 3"' : ""}/>`;
-  return { svg: h + "</svg>", P, VW, VH }
+  return { svg: h + "</svg>", P, VW, VH, lab: PRS ? PRS.lab : null }
  };
  const hourNow = () => { try { return Math.floor((S.t % 1440) / 60) } catch (e) { return 12 } };
  /* where the tenant is: asleep on the bed / mattress at night, sitting on a chair, stool or sofa by day, else standing on a free cell in front */
@@ -42105,7 +42114,7 @@ try {
  };
  const rf = n => Math.round(n * .5);
  Object.assign(A, {
-  enter(n) { const b = B.bs(), u = B.U(n); if (!u || Math.floor(u.n / 100) > (b.fl || 1)) return; B.room = u.n; B.rsel = null; B.pick = null; B.mv = false; B.pk = null; B.cf = null; B.cat = B.cat || "tidur"; H.opened++ },
+  enter(n) { const b = B.bs(), u = B.U(n); if (!u || Math.floor(u.n / 100) > (b.fl || 1)) return; B.room = u.n; B.rtry = 0; B.rsel = null; B.pick = null; B.mv = false; B.pk = null; B.cf = null; B.cat = B.cat || "tidur"; H.opened++ },
   rback() { B.room = null; B.pk = null; B.pick = null; B.rsel = null; B.mv = false; B.cf = null },
   rcat(c) { B.cat = c },
   rpick(t) { B.cf = null; B.mv = false; B.rsel = null; B.pick = B.pick === t ? null : t },
@@ -42168,7 +42177,7 @@ try {
   }
  });
  const thImg = t => {
-  if (NEWC[t]) { const e = SPT.s[t + "|" + (t === "a_aircond" ? 1 : 0)]; return e ? `<svg viewBox="${e[0]} ${e[1]} ${e[2]} ${e[3]}" width="48" height="44" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto"><image href="img/dalaman/bilik-perabot.webp?v=hf135e" width="${SPT.w}" height="${SPT.h}"/></svg>` : "" }
+  if (NEWC[t]) { const e = SPT.s[t + "|" + (t === "a_aircond" ? 1 : 0)]; return e ? `<svg viewBox="${e[0]} ${e[1]} ${e[2]} ${e[3]}" width="48" height="44" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto"><image href="img/dalaman/bilik-perabot.webp?v=hf136d" width="${SPT.w}" height="${SPT.h}"/></svg>` : "" }
   defs([t]); return DU[t] ? `<img alt="" src="${DU[t]}">` : ""
  };
  B.rdraw = (e, b) => {
@@ -42187,9 +42196,11 @@ try {
    h += `<div class="row"><button type="button" class="b o" data-a="rpk">← Kembali ke bilik</button></div></div>`;
    e.innerHTML = h; const p2 = e.querySelector(".pk"); if (p2) p2.scrollTop = keep; return
   }
-  const R = roomSVG(mkOpts(b, u, { tier, grid: own, pick: !!B.pick, mv: !!B.mv, sel: B.rsel }));
+  const R = roomSVG(mkOpts(b, u, { tier, grid: own, pick: !!B.pick, mv: !!B.mv, sel: B.rsel, tenant: u.t }));
+  if (u.t && !R.lab && (B.rtry | 0) < 10) { B.rtry = (B.rtry | 0) + 1; setTimeout(() => { try { if (HF.bilikOn && B.room === u.n && !B.pk) B.draw() } catch (e3) { fail(e3) } }, 700) } else if (R.lab) B.rtry = 0;   /* the painted frames load on the first draw: draw again */
   let who = "";
-  if (u.t) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%">${B.face(u.t)}<small>${esc(u.t.name)}${u.t.owe ? " ⏳" : ""}${sp0.txt ? " · " + sp0.txt : ""}</small></div>` }
+  if (u.t && R.lab) { const L2 = R.lab; who = `<div class="tn tl" style="left:${(L2.x / R.VW * 100).toFixed(1)}%;top:${(L2.y / R.VH * 100).toFixed(1)}%"><small>${esc(u.t.name)}${u.t.owe ? " ⏳" : ""}${L2.txt ? " · " + L2.txt : ""}</small></div>`; if (!HF.h161_retry) HF.h161_retry = 0 }
+  else if (u.t) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%">${B.face(u.t)}<small>${esc(u.t.name)}${u.t.owe ? " ⏳" : ""}${sp0.txt ? " · " + sp0.txt : ""}</small></div>` }
   else if (u.self) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%"><small>🏠 Anda tinggal di sini</small></div>` }
   const nx = q < B.RATES.biasa.need ? `Sewa Biasa perlu mutu ${B.RATES.biasa.need}+` : q < B.RATES.mahal.need ? `Sewa Mahal perlu mutu ${B.RATES.mahal.need}+` : "Layak sewa Mahal";
   h += `<div class="uh" style="margin:2px 0"><span class="sm">${u.pk ? PK[u.pk].ico + " Pakej " + PK[u.pk].n + " (" + PK[u.pk].sub + ") · " : ""}Gaya ${TIERN[tier]} · ${b.fem ? "bangunan perempuan" : "bangunan lelaki"}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span><b>${q}</b></span></div><div class="sm">${nx} · Perabot ${its.length} · Kebersihan ${Math.round(u.clean)}%</div>`;
@@ -42213,6 +42224,145 @@ try {
   e.innerHTML = h + `</div>`; const p = e.querySelector(".pk"); if (p) p.scrollTop = keep
  };
  H.roomSVG = roomSVG; H.qsum = qsum;
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §161. hf136: the tenant as a real painted Sim in the room (owner 23 Nov: "tunjuk Sim penyewa SEBENAR (badan penuh, watak lukisan tangan HF)
+   ... duduk, tidur, mandi, makan, masak"). The room (§160) draws the person with the game's own person pipeline: drawPerson into an offscreen canvas
+   (the way itemThumb draws a piece), with HF._any set so the painted sheets are used outside the house canvas; the same painted frames the Sim has in
+   the house (idle / sit / talk for cooking, the lying frames of img/orang-hf/baring.webp for sleep). Each figure is cut to its pixels and kept (per tenant,
+   pose and facing) as a data URL; the room only places an <image> on the grid corner, in depth order with the furniture. The activity follows the hour
+   and the furniture the room has: asleep on the bed 22:00-06:00, bathing in the bathroom 06:00-07:00, eating at the table 07:00-08:00, 12:00-13:00 and
+   19:00-20:00 (a chair by the dining table or the folding table), working at the desk by day, cooking at the kitchen 17:00-19:00, watching TV on the sofa
+   20:00-22:00; what the room does not have falls back to sitting on any seat, else standing. Until the painted frames are loaded (or if they never are)
+   the round bust of §159 stays. Nothing here runs per frame: one draw per tenant / pose, then cached. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const B = HF.h159, H = HF.h160; if (!B || !H || !H.fp) throw new Error("h160 missing");
+ const GK = 2.2, FV = [[0, 1], [1, 0], [0, -1], [-1, 0]];   /* the front of a piece after k quarter-turns: +j, +i, -j, -i */
+ const CACHE = new Map(), hash = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 997; return h + 1 };
+ const SEATH = { b_sofa: .5, r_bangku: .4, b_kerusi: .5, j_kerusi: .5, b_kerusipc: .5 }, SEATLOC = { b_sofa: [1.0, .62] };   /* seat height (world units) and the middle of the seat cushion in the piece's own frame (the L sofa: its main cushion, between the arms, not the middle of the footprint) */
+ const rotLocal = (f, lx, lz) => { const d0 = H.fp(f.t, 0), d = H.fp(f.t, f.r), th = ((f.r | 0) & 3) * Math.PI / 2, x = lx - d0[0] / 2, z = lz - d0[1] / 2; return [f.x + d[0] / 2 + x * Math.cos(th) + z * Math.sin(th), f.y + d[1] / 2 - x * Math.sin(th) + z * Math.cos(th)] };
+ const kind = t => /kerusi|bangku|sofa/.test(t) ? "seat" : /katil|tilam/.test(t) ? "bed" : /bilikair/.test(t) ? "bath" : /dapur/.test(t) ? "kitchen" : /makan|r_meja/.test(t) ? "dine" : /j_meja|b_pc/.test(t) ? "desk" : "";
+ const hourNow = () => { try { return Math.floor((S.t % 1440) / 60) } catch (e) { return 12 } };
+ const COMBO = { b_sofa: 1, b_kerusi: 1, b_kerusipc: 1, j_kerusi: 1, r_bangku: 1 };   /* seats rendered with a seated mannequin (tools/hf/bilik_3d.mjs, `~s` short hair, `~l` long hair / headscarf) */
+ const ctrOf = f => { const d = H.fp(f.t, f.r); return [f.x + d[0] / 2, f.y + d[1] / 2] };
+ /* what the tenant does now, and with which piece: a list tried in order */
+ const wants = hr => hr >= 22 || hr < 6 ? ["tidur"] : hr < 7 ? ["mandi", "duduk"] : hr < 8 || hr === 12 || hr === 19 ? ["makan", "duduk"] : hr >= 17 && hr < 19 ? ["masak", "duduk"] : hr >= 20 ? ["tonton", "duduk"] : ["kerja", "duduk"];
+ const actFor = (items, hr, force) => {
+  const by = k => items.filter(f => kind(f.t) === k), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  const seatNear = tabs => { const S2 = by("seat").filter(f => f.t !== "b_sofa"); let best = null, bd = 99; for (const s of S2) for (const t of tabs) { const d = dist(ctrOf(s), ctrOf(t)); if (d < bd) { bd = d; best = s } } return bd <= 3 ? best : null };
+  if (force === "berdiri") return { mode: "stand", f: null, txt: "berdiri" };   /* (a test / comparison: the painted standing figure) */
+  for (const w of force ? [force, "duduk"] : wants(hr)) {
+   if (w === "tidur" && by("bed")[0]) return { mode: "lie", f: by("bed")[0], txt: "tidur 💤" };
+   if (w === "mandi" && by("bath")[0]) return { mode: "wash", f: by("bath")[0], txt: "mandi 🚿" };
+   if (w === "masak" && by("kitchen")[0]) return { mode: "cook", f: by("kitchen")[0], txt: "memasak 🍳" };
+   if (w === "makan") { const s = seatNear(by("dine")); if (s) return { mode: "sit", f: s, txt: "makan 🍚" } }
+   if (w === "kerja") { const s = seatNear(by("desk")); if (s) return { mode: "sit", f: s, txt: "kerja 💻" } }
+   if (w === "tonton" && items.find(f => f.t === "b_sofa")) return { mode: "sit", f: items.find(f => f.t === "b_sofa"), txt: "tonton TV 📺" }
+   if (w === "duduk") { const s = by("seat")[0]; if (s) return { mode: "sit", f: s, txt: "duduk" } }
+  }
+  return { mode: "stand", f: null, txt: "" }
+ };
+ H.actFor = actFor;
+ const gTW = () => P(1, 0, 0)[0] - P(0, 1, 0)[0], zpx0 = () => P(.5, .5, 0)[1] - P(.5, .5, 1)[1];
+
+ /* the sitter recoloured: the seat+sitter sprite from the sheet (the sitter lit grey) and its mask sheet (skin red, hair green, top blue, bottom yellow) -> a canvas where the
+    sitter wears this tenant's skin, hair (or headscarf), top and bottom colours; kept per tenant and seat */
+ const IM = { base: null, mask: null }, hex = c => { const m = /^#?([0-9a-f]{6})$/i.exec(String(c || "")); const v = m ? parseInt(m[1], 16) : 0x888888; return [v >> 16 & 255, v >> 8 & 255, v & 255] };
+ const loadIm = k => { if (!IM[k]) { const im = IM[k] = new Image(); im.src = k === "base" ? "img/dalaman/bilik-perabot.webp?v=hf136d" : "img/dalaman/bilik-orang-mask.webp?v=hf136d" } return IM[k] && IM[k].complete && IM[k].naturalWidth ? IM[k] : null };
+ const composeSit = (t, f) => {
+  const ap = t.ap || {}, hj = ap.hijab && ap.hijab !== "none", v = t.fem || hj || (typeof isFemAp === "function" && isFemAp(ap)) ? "l" : "s", rk = (f.r | 0) & 3, key = f.t + "~" + v + "|" + rk, e = H.SPT.s[key];
+  if (!e) return null; const bi = loadIm("base"), mi = loadIm("mask"); if (!bi || !mi) return null;
+  const col = { skin: hex(ap.skin || "#d9a77a"), hair: hex(hj ? ap.hijabColor : ap.hairColor), top: hex(ap.casual && ap.casual.topC), bottom: hex(ap.casual && ap.casual.botC) }, ck = [key, col.skin, col.hair, col.top, col.bottom].join("|");
+  let c = CACHE.get(ck); if (c) return c;
+  const w = e[2], h = e[3], A = document.createElement("canvas"), B = document.createElement("canvas"); A.width = B.width = w; A.height = B.height = h;
+  const a = A.getContext("2d", { willReadFrequently: true }), b = B.getContext("2d", { willReadFrequently: true }); a.drawImage(bi, e[0], e[1], w, h, 0, 0, w, h); b.drawImage(mi, e[0], e[1], w, h, 0, 0, w, h);
+  const da = a.getImageData(0, 0, w, h), db = b.getImageData(0, 0, w, h), X = da.data, Y = db.data;
+  for (let i = 0; i < X.length; i += 4) {
+   if (Y[i + 3] < 60 || X[i + 3] < 10) continue; const r = Y[i], g = Y[i + 1], bl = Y[i + 2]; let reg = null;
+   if (r > 150 && g > 150 && bl < 130) reg = "bottom"; else if (r > 150 && g < 120 && bl < 120) reg = "skin"; else if (g > 150 && r < 120 && bl < 120) reg = "hair"; else if (bl > 150 && r < 120 && g < 120) reg = "top"; if (!reg) continue;
+   const L = Math.min(1.12, (.299 * X[i] + .587 * X[i + 1] + .114 * X[i + 2]) / 235), q = col[reg]; X[i] = Math.min(255, q[0] * L); X[i + 1] = Math.min(255, q[1] * L); X[i + 2] = Math.min(255, q[2] * L)
+  }
+  a.putImageData(da, 0, 0); c = { url: A.toDataURL("image/webp", .9), e }; CACHE.set(ck, c); return c
+ };
+ /* draw one figure into a canvas: { url, ax, ay } (the anchor inside the cropped image: the foot, the hip on the seat, or the corner of the bed) */
+ const render = (t, spec) => {
+  const key = [t.name, t.ap && t.ap.skin, t.ap && t.ap.hairColor, spec.mode, spec.face.join(","), spec.hipZ || 0, spec.hl || 0, spec.rot || 0].join("|"), now = performance.now();
+  let c = CACHE.get(key); if (c && (c.ok || now - c.t < 600)) return c;
+  c = { ok: false, t: now }; CACHE.set(key, c);
+  try {
+   const cv2 = document.createElement("canvas"); cv2.width = 340; cv2.height = 340; const g = cv2.getContext("2d", { willReadFrequently: true });
+   const o = spec.mode === "lie" ? [170, 90] : [170, 290], p0 = P(spec.mode === "lie" ? 0 : .5, spec.mode === "lie" ? 0 : .5, 0);
+   g.setTransform(GK, 0, 0, GK, o[0] - p0[0] * GK, o[1] - p0[1] * GK);
+   const a = { id: hash(t.name), name: t.name, ap: t.ap, stage: "adult", x: .5, y: .5, face: spec.face.slice(), cur: null, queue: [], path: [], sitPose: null, _floor: 0, _pAnim: null, needs: {}, away: false };
+   const real = ctx, hany = HF._any, sd = SEATDRAW; ctx = g; HF._any = true; SEATDRAW = true;
+   try {
+    if (spec.mode === "lie") {
+     const F = HF.lyingFrame && HF.lyingFrame(a); if (!F) return c;   /* the lying sheet is still loading: try again */
+     const r = F.r, fl = (x, y) => [x / 2 + y, y - x / 2], px = (u, v) => [u - v, (u + v) / 2];
+     const h0 = fl(r[4], r[5]), f0 = fl(r[6], r[7]), ln = Math.hypot(f0[0] - h0[0], f0[1] - h0[1]), eu = (f0[0] - h0[0]) / ln, ev = (f0[1] - h0[1]) / ln, n0 = px(h0[0] - ev * ln * .3, h0[1] + eu * ln * .3);
+     const Wh = spec.wh, Wf = spec.wf, dx = (Wf[0] - Wh[0]) / spec.hl, dy = (Wf[1] - Wh[1]) / spec.hl, Wn = [Wh[0] - dy * spec.hl * .3, Wh[1] + dx * spec.hl * .3];
+     const src = [[r[4], r[5]], [r[6], r[7]], n0], dst = [P(...Wh, 0), P(...Wf, 0), P(...Wn, 0)];
+     const [x0, y0] = src[0], [x1, y1] = src[1], [x2, y2] = src[2], det = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0); if (Math.abs(det) < 1e-6) throw new Error("det");
+     const ia = (y2 - y0) / det, ib = -(x2 - x0) / det, ic = -(y1 - y0) / det, id = (x1 - x0) / det, ux = [dst[1][0] - dst[0][0], dst[2][0] - dst[0][0]], uy = [dst[1][1] - dst[0][1], dst[2][1] - dst[0][1]];
+     const aa = ux[0] * ia + ux[1] * ic, cc = ux[0] * ib + ux[1] * id, bb = uy[0] * ia + uy[1] * ic, dd = uy[0] * ib + uy[1] * id;
+     g.transform(aa, bb, cc, dd, dst[0][0] - aa * x0 - cc * y0, dst[0][1] - bb * x0 - dd * y0); g.drawImage(F.im, r[0], r[1], r[2], r[3], 0, 0, r[2], r[3]); a._pf = true
+    } else {
+     if (spec.mode === "sit") { a.sitPose = "kerusi"; a._hipZ = spec.hipZ }
+     if (spec.mode === "cook") a._pAnim = "talk";
+     drawPerson(a, a.ap, 1000, "adult", null, "casual")
+    }
+   } finally { ctx = real; HF._any = hany; SEATDRAW = sd }
+   if (!a._pf) return c;   /* the painted frames are not in yet: try again later */
+   const d = g.getImageData(0, 0, 340, 340).data; let x0 = 340, x1 = -1, y0 = 340, y1 = -1;
+   for (let y = 0; y < 340; y++) for (let x = 0; x < 340; x++) if (d[(y * 340 + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
+   if (x1 < 0) return c;
+   const o2 = document.createElement("canvas"); o2.width = x1 - x0 + 1; o2.height = y1 - y0 + 1; o2.getContext("2d").drawImage(cv2, x0, y0, o2.width, o2.height, 0, 0, o2.width, o2.height);
+   const anc = spec.mode === "sit" ? [o[0], o[1] - (p0[1] - P(.5, .5, spec.hipZ)[1]) * GK] : o;
+   Object.assign(c, { ok: true, url: o2.toDataURL("image/webp", .9), w: o2.width, h: o2.height, ax: anc[0] - x0, ay: anc[1] - y0 })
+  } catch (e) { fail(e) }
+  return c
+ };
+ /* the room's piece: placed in the room's own projection P_r (cell px TW) */
+ H.personFrag = (t, items, dm, TW, Pr, TH) => {
+  try {
+   const act = actFor(items, hourNow(), H.force), f = act.f, gt = gTW(), ps = TW / (gt * GK), zr = .5185 * TW;   /* a world height unit in room px */
+   const fvec = k => FV[(k | 0) & 3];
+   let spec, F, key, lift = 0, extra = "";
+   if (act.mode === "lie") {
+    const d = H.fp(f.t, f.r), k = (f.r | 0) & 3, back = [-FV[k][0], -FV[k][1]], L = Math.abs(back[0]) ? d[0] : d[1], hl = Math.min(1.8, L - .3);   /* head at the back of the bed, feet toward the front */
+    const c = [d[0] / 2, d[1] / 2], wh = [c[0] + back[0] * (L / 2 - .2) + (back[0] ? 0 : 0), c[1] + back[1] * (L / 2 - .2)], wf = [wh[0] - back[0] * hl, wh[1] - back[1] * hl];
+    spec = { mode: "lie", face: [1, 1], wh, wf, hl, rot: k }; F = Pr(f.x, f.y); lift = .55 * zr; key = f.x + f.y + d[0] + d[1] + .1
+   } else if (act.mode === "sit" && COMBO[f.t] && H.sitStyle === "manekin") {
+    const cs = composeSit(t, f); if (!cs) return null;
+    return { comp: { idx: items.indexOf(f), url: cs.url, e: cs.e }, key: 0, lab: { x: 0, y: 0, txt: act.txt, mode: "sit" } }
+   } else if (act.mode === "sit") {
+    const d = H.fp(f.t, f.r), k = (f.r | 0) & 3, fv = fvec(k), sh = SEATH[f.t] || .5, hipZ = sh * .5185 * gt / zpx0();
+    const cc = ctrOf(f), seat = SEATLOC[f.t] ? rotLocal(f, SEATLOC[f.t][0], SEATLOC[f.t][1]) : cc;
+    spec = { mode: "sit", face: fv, hipZ }; F = Pr(seat[0], seat[1]); lift = sh * zr; key = f.x + f.y + d[0] + d[1] + (fv[0] + fv[1] < 0 ? -.15 : .1)   /* facing away from the camera: the back of the seat is in front of the sitter, so the seat is drawn over the sitter's lower body and the head and shoulders show above it */
+   } else if (act.mode === "cook") {
+    const d = H.fp(f.t, f.r), k = (f.r | 0) & 3, fv = fvec(k), cc = ctrOf(f), half = fv[0] ? d[0] / 2 : d[1] / 2, pos = [cc[0] + fv[0] * (half + .5), cc[1] + fv[1] * (half + .5)];
+    spec = { mode: "cook", face: [-fv[0], -fv[1]] }; F = Pr(pos[0], pos[1]); key = Math.max(pos[0] + pos[1] + .3, f.x + f.y + d[0] + d[1] + .05)   /* in front of the counter: drawn after it */
+    const s = Pr(cc[0] + fv[0] * (half - .1), cc[1] + fv[1] * (half - .1)); extra = [0, 1, 2].map(i => `<circle cx="${(s[0] - 4 + i * 5).toFixed(1)}" cy="${(s[1] - zr * 1.1 - i * 4).toFixed(1)}" r="${(2.2 + i * .6).toFixed(1)}" fill="#fff" opacity="${(.5 - i * .12).toFixed(2)}"/>`).join("")
+   } else if (act.mode === "wash") {
+    const d = H.fp(f.t, f.r), k = (f.r | 0) & 3, pos = rotLocal(f, 1.45, .62);   /* under the shower head, inside the shower space */
+    spec = { mode: "stand", face: fvec(k) }; F = Pr(pos[0], pos[1]); key = f.x + f.y + d[0] + d[1] + .2
+    const hd = Pr(pos[0], pos[1]); extra = [0, 1, 2, 3, 4].map(i => `<line x1="${(hd[0] - 7 + i * 3.5).toFixed(1)}" y1="${(hd[1] - zr * 1.75).toFixed(1)}" x2="${(hd[0] - 8 + i * 3.5).toFixed(1)}" y2="${(hd[1] - zr * 1.0 - (i % 2) * 6).toFixed(1)}" stroke="#4fa8e0" stroke-width="1.3" opacity=".75"/>`).join("")
+   } else {
+    const w = items.length ? [[2, 4], [3, 4], [2, 3], [3, 3], [1, 4], [4, 4]].find(c => !items.some(o => { const e = H.fp(o.t, o.r); return e[0] && c[0] >= o.x && c[0] < o.x + e[0] && c[1] >= o.y && c[1] < o.y + e[1] })) || [2, 4] : [2, 4];
+    spec = { mode: "stand", face: [-1, 1] }; F = Pr(w[0] + .5, w[1] + .5); key = w[0] + w[1] + 1.3
+   }
+   const r = render(t, spec);
+   if ((!r || !r.ok) && act.mode === "sit" && COMBO[f.t]) { const cs = composeSit(t, f); if (cs) return { comp: { idx: items.indexOf(f), url: cs.url, e: cs.e }, key: 0, lab: { x: 0, y: 0, txt: act.txt, mode: "sit" } } }   /* no painted sit frame for this person: the 3D mannequin */
+   if (!r || !r.ok) return null;
+   const split = act.mode === "sit" && /^(b_sofa|b_kerusi|b_kerusipc|j_kerusi)$/.test(f.t) && spec.face[0] + spec.face[1] < 0 ? { idx: items.indexOf(f) } : null;
+   const sc = act.mode === "wash" ? .8 : 1, ps2 = ps * sc;   /* a bather is drawn a little smaller: the head stays under the top of the bathroom walls */
+   const x = F[0] - r.ax * ps2, y = F[1] - lift - r.ay * ps2, w2 = r.w * ps2, h2 = r.h * ps2;
+   const sh = act.mode === "sit" || act.mode === "lie" ? "" : `<ellipse cx="${F[0].toFixed(1)}" cy="${F[1].toFixed(1)}" rx="${(TW * .22).toFixed(1)}" ry="${(TW * .09).toFixed(1)}" fill="rgba(40,25,15,.18)"/>`;
+   return { key, split, frag: sh + `<image href="${r.url}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w2.toFixed(1)}" height="${h2.toFixed(1)}"/>` + extra, lab: { x: x + w2 / 2, y, txt: act.txt, mode: act.mode } }
+  } catch (e) { fail(e); return null }
+ };
+ HF.h161 = { GK, render, actFor, CACHE };
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
