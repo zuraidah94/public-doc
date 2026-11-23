@@ -13356,7 +13356,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
 </style>`);
  /* (1) undo / redo: every change made in build mode (place, move, sell, turn, walls, wall colour, floor) is one step */
  const UND = { st: [], rd: [], last: null, mute: false };
- const bState = () => JSON.stringify({ objs: S.objs, walls: S.walls, money: S.money, nextId: S.nextId, wallTint: S.wallTint || null, hfFloor: S.hfFloor || null, hfBuka: S.hfBuka || null, hfAtap: S.hfAtap || null, stair: S.stair || null });   /* + doors, windows, roof, stairs (sections 95–98) */
+ const bState = () => JSON.stringify({ objs: S.objs, walls: S.walls, money: S.money, nextId: S.nextId, wallTint: S.wallTint || null, hfFloor: S.hfFloor || null, hfBuka: S.hfBuka || null, hfAtap: S.hfAtap || null, stair: S.stair || null, hfSimpan: S.hfSimpan || null });   /* + doors, windows, roof, stairs (sections 95–98); + stored pieces (§153) */
  setInterval(() => {
   try {
    if (!S || mode !== "buy") { UND.st.length = 0; UND.rd.length = 0; UND.last = null; return }
@@ -13369,6 +13369,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
   const o = JSON.parse(js);
   S.objs = o.objs; S.walls = o.walls; S.money = o.money; S.nextId = o.nextId; S.wallTint = o.wallTint || undefined; S.hfFloor = o.hfFloor || undefined;
   S.hfBuka = o.hfBuka || undefined; S.hfAtap = o.hfAtap || undefined; if (o.stair && S.stair) S.stair = o.stair;   /* sections 95–98 */
+  if (o.hfSimpan || S.hfSimpan) S.hfSimpan = o.hfSimpan || [];   /* §153: the stored pieces go back with the house */
   UND.last = js; try { setPlacing(null) } catch (e) { } try { LCACHE.clear() } catch (e) { }
   try { renderAll(); renderTop() } catch (e) { } redrawNow(); syncUndo()
  }
@@ -22534,6 +22535,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf130", "22 Nov 2026", ["🏡 Permainan baru: rumah kampung kini kemas dan tersusun ikut bilik — satu katil sebilik, bilik air bersama, dapur sebaris, ruang tamu menghadap TV, sejadah di sudut yang tenang dan serambi lapang di tangga", "🪑 Almari, almari kaca, rak buku, kerusi rotan, meja kopi, kerusi panjang, meja makan dan meja belajar permulaan dilukis semula dengan tangan: kayu asli, rotan dan kain polos (model 3D Poly Haven, CC0)", "🟫 Permaidani, cadar katil dan lantai dapur serta bilik air kini polos, warna lembut", "🏢 Flat Pak Zul kini kemas — Adam dapat bilik dan katil sendiri; rumah bandar juga dapat perabot kayu polos", "🎨 Mod beli: pilih gaya almari, almari kaca, rak buku, kerusi, meja dan kerusi panjang — Biasa, Kayu asli, Kayu terang, Kayu gelap atau Putih / krim", "🗺️ Peta lebih luas: Pekan Harmoni di utara peta, dengan Jalan Pekan dan deretan kedai baharu berikon lukisan tangan — Kedai Perabot Jati Harmoni (set gaya bilik), Kedai Hiasan Seri Laman, Butik Kain & Tudung, Kedai Bayi Comel dan Kedai Elektrik Cahaya (peralatan berbintang, jimat bil mingguan); Nurseri Bunga Raya di tepi dusun", "📦 Simpan barang: dalam Mod bina, perabot, hiasan, pokok dan barang bayi boleh disimpan dan diletak semula percuma dari \"Barang disimpan\"; lampu LED dan tong air hujan boleh ditanggalkan dan dipasang semula", "🌺 Hiasan dan pokok baharu: kerusi goyang, pasu, tanglung, bakul, pokok bunga raya, bunga kertas, limau kasturi, kotak herba dan banyak lagi", "💾 Simpanan lama tidak berubah"]],
    ["hf129", "22 Nov 2026", ["🛏️ Katil dijual atau dialihkan semasa Teman tidur: dia kini terjaga dan mencari tempat tidur lain, bukan terus tidur di lantai tanpa katil"]],
    ["hf128", "22 Nov 2026", ["🧺 Rumah kampung: Sidai kain di ampaian kini siap betul-betul — Teman tidak lagi terus naik ke rumah, dan permainan Angkat kain sebelum hujan terbuka", "📋 Menu Teman di skrin lebar tidak lagi terlindung oleh butang zum di bawah", "🏭 Pilih permainan untuk Teman yang baru pergi kerja kini memberitahu dia di tempat kerja"]],
    ["hf127", "22 Nov 2026", ["🗓️ Matlamat mingguan: setiap minggu tiga matlamat baharu dalam 🎯 Matlamat (masak, ziarah jiran, main congkak atau gasing, berniaga, sidai kain, beribadat, majlis, simpan dalam tabung dan lain-lain) dengan bar kemajuan", "🎁 Setiap matlamat +RM 40 dan mata hidup; ketiga-tiga tercapai: +RM 100 dan keluarga gembira"]],
@@ -40161,5 +40163,1175 @@ try {
   }
  }
 } catch (e) { try { fail(e) } catch (e2) { } }
+
+/* ---------- §140. hf130 Rumah kampung disusun semula + perabot Poly Haven (owner 22 Nov: "interior design mmg pelik dan tak
+   teratur... perabot pon pelik", "start awal untuk rumah kampung", then "buat balik dari asal" with Poly Haven furniture,
+   repainted on Hugging Face). Report: laporan/2026-11-22-rk-rumah-kampung-susun.md.
+   (1) The STARTING layout of the own kampung house (RKDal.LAY.main, used only by a new game, game.js fresh() -> S.dalPend) is
+       replaced by one grouped by room: the parents' room (four-poster, dressing mirror, the small child's bed, fan), the bathroom
+       (kolah, toilet, tempayan together), bedrooms 2, 3 and 4 (one bed and a wardrobe each), the ruang tamu (glass cabinet and
+       bookshelf against the back wall, TV between the two doors, the family computer in the corner, two rattan chairs and the
+       settee round the coffee table facing the TV, a fan, the prayer mat with a plant in the quiet corner away from the TV), the
+       kitchen (stove and dish rack side by side on the back wall, fridge, a plant, dining table), the small room (child's bed,
+       study desk), and the serambi (chairs and coffee table, radio, mat, plants at the two ends; the stairs and the row along
+       the house wall left free). The door tiles and the house entrance stay clear, every
+       bed has the room at its foot it needs (RKBed), no free tile is shut off, so nothing is shuffled after (reachFix, bedFit).
+       Each piece gets its facing (o.kr) once the layout is laid (S.hf130 "pend" -> 1, set only by a new game).
+   (2) Eight pieces of that start (almari, almari kaca, rak buku, kerusi rotan, meja kopi, kerusi panjang, meja makan, meja
+       belajar) are painted anew from Poly Haven CC0 models (tools/hf/polyhaven_ambil.py, polyhaven_lukis.py; credits in
+       tools/SOURCES.md and in the setting below): o.ph = 1 on those starting pieces only. Drawn as they are, in the kampung top
+       camera they were painted in (TH = .68 TW, heights x .78); any other camera, the setting "Perabot lukisan" off, a piece in
+       use (not a seat with its sitter) or the sheet not loaded yet: the game's own drawing, as before. One sheet
+       img/perabot/polyhaven.webp, loaded only when such a piece is first drawn.
+   (2b) Owner, round 2 (22 Nov): "normal colours and patterns like a real kampung house": all eight repainted in plain natural
+       wood, rattan and plain cloth, no batik, no floral carving (polyhaven_lukis.py LOOKP); (3) plain rugs in that house.
+   Saves: two optional fields (S.hf130, o.ph); an old save has neither, so nothing in it moves or changes look. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const H140 = HF.h140 = { drawn: 0, laid: 0 };
+ /* (1) the layout: [type, x, y, facing] */
+ const LAY140 = [
+  /* (owner, round 2 on the hf130 picture: "beds crowded", "untidy by the stairs") one bed to a room (the parents' room: the
+     four-poster and the small child's bed, a free row between them), a free tile beside each wardrobe, the serambi round the
+     stairs left empty. A wardrobe (not a small piece RKBed's bedFit may push away) stands beside the beds that have one. */
+  ["kingbed", 0, 0, "y+"], ["mirror", 2, 0, "y+"], ["kidbed", 3, 0, "y+"], ["kipas", 3, 2, "y+"],
+  ["shower", 4, 0, "y+"], ["toilet", 5, 0, "y+"], ["tempayan", 5, 2, "y+"],
+  ["almari", 6, 0, "y+"], ["bed", 7, 0, "y+"],
+  ["almari", 8, 0, "y+"], ["bed", 9, 0, "y+"],   /* (the bed by the far wall, not side by side with bedroom 2's bed across the low wall; 2 tiles long: its door tile stays free) */
+  ["almarikaca", 0, 3, "y+"], ["bookshelf", 1, 3, "y+"], ["tv", 3, 3, "y+"], ["computer", 5, 3, "y+"],
+  ["kerusirotan", 2, 5, "x+"], ["mejakopi", 3, 5, "y+"], ["kerusirotan", 4, 5, "x-"], ["sofa", 3, 6, "y-"], ["kipas", 5, 6, "y+"],
+  ["sejadah", 0, 7, "y+"], ["plant", 1, 7, "y+"],
+  ["stove", 7, 3, "y+"], ["rakpinggan", 8, 3, "y+"], ["fridge", 6, 5, "x+"], ["plant", 7, 5, "y+"], ["dining", 8, 5, "y+"],
+  ["kidbed", 7, 6, "y+"], ["mejabelajar", 6, 6, "y+"],
+  ["bed", 8, 7, "y-"], ["almari", 9, 7, "y-"],   /* (8, 6, y+ left the tile at its foot shut in before the bed reached into it: RKBed then lengthened no bed at all) */
+  ["plant", 0, 8, "y+"], ["tikar", 0, 9, "y+"],
+  ["kerusirotan", 5, 9, "x+"], ["mejakopi", 6, 9, "y+"], ["kerusirotan", 7, 9, "x-"], ["radiokaset", 9, 8, "y+"], ["monstera", 9, 9, "y+"]
+ ];   /* checked: every free tile reachable from the door, every piece beside a reachable tile, every bed its full length */
+ H140.LAY = LAY140;
+ const PHT = H140.PHT = { almari: 1, almarikaca: 1, bookshelf: 1, kerusirotan: 1, mejakopi: 1, sofa: 1, dining: 1, mejabelajar: 1 };
+ try {
+  const L = window.RKDal && RKDal.LAY && RKDal.LAY.main;
+  if (L) { L.objs = LAY140.map(r => [r[0], r[1], r[2]]); L.setup = []; delete L.drop }
+ } catch (e) { fail(e) }
+ if (typeof fresh === "function") {
+  const fr = fresh;
+  fresh = function () { const s = fr.apply(this, arguments); try { if (s && typeof s === "object") s.hf130 = "pend" } catch (e) { fail(e) } return s }
+ }
+ /* once RKDal has laid the plan (main no longer pending): the facings, and the Poly Haven mark on the pieces painted for it */
+ const finish = () => {
+  try {
+   if (!S || S.hf130 !== "pend" || S.visiting || S.home !== "main") return;
+   if (Array.isArray(S.dalPend) && S.dalPend.includes("main")) return;
+   S.hf130 = 1;
+   if (!(typeof isKamp === "function" && isKamp())) return;
+   const used = new Set();
+   for (const [t, x, y, kr] of LAY140) {
+    const o = (S.objs || []).find(q => q.f === 0 && q.type === t && q.x === x && q.y === y && !used.has(q)); if (!o) continue;
+    used.add(o); o.kr = kr; if (PHT[t]) o.ph = 1
+   }
+   H140.laid++;
+   try { if (window.RKBed && RKBed.fit) RKBed.fit() } catch (e) { }
+   try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { }
+   try { renderAll() } catch (e) { }
+  } catch (e) { fail(e) }
+ };
+ H140.finish = finish;
+ setInterval(finish, 1000);
+ /* (2) the Poly Haven paintings */
+ const PH = H140.PH = {"cell":288.0,"TW":144.0,"OX":144.0,"OY":202.5,"r":0.68,"zs":0.78,"atlas":{"almari|x+":[0,0,105,219,75,55],"almari|y+":[107,0,105,219,108,55],"almarikaca|x+":[214,0,109,212,76,68],"almarikaca|y+":[325,0,109,212,103,68],"almari|x-":[436,0,105,211,108,77],"almari|y-":[543,0,105,211,75,77],"almarikaca|x-":[650,0,107,202,104,86],"almarikaca|y-":[759,0,107,202,77,86],"bookshelf|x-":[868,0,93,182,98,101],"bookshelf|x+":[963,0,93,182,98,101],"bookshelf|y-":[1058,0,93,182,98,101],"bookshelf|y+":[1153,0,93,182,98,101],"sofa|x+":[1248,0,122,150,83,138],"sofa|y+":[1372,0,122,150,83,138],"kerusirotan|x+":[1496,0,114,144,87,144],"kerusirotan|y+":[1612,0,114,144,87,144],"dining|x-":[1728,0,98,130,95,158],"dining|x+":[1828,0,98,130,95,158],"dining|y-":[1928,0,98,130,95,158],"dining|y+":[0,221,98,130,95,158],"sofa|x-":[100,221,122,130,83,158],"sofa|y-":[224,221,122,130,83,158],"kerusirotan|x-":[348,221,114,125,87,163],"kerusirotan|y-":[464,221,114,125,87,163],"mejabelajar|x-":[580,221,106,116,91,172],"mejabelajar|y-":[688,221,106,116,92,172],"mejabelajar|x+":[796,221,108,113,89,168],"mejabelajar|y+":[906,221,108,113,91,168],"mejakopi|x-":[1016,221,105,104,92,179],"mejakopi|x+":[1123,221,105,104,92,179],"mejakopi|y-":[1230,221,105,104,92,179],"mejakopi|y+":[1337,221,105,104,92,179]}};
+ let IMG = null;
+ const sheet = () => {
+  if (!IMG) {
+   IMG = new Image(); IMG.decoding = "async";
+   IMG.onload = () => { try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { } try { dirty = true } catch (e) { } };
+   IMG.onerror = () => { IMG._bad = true };
+   IMG.src = "img/perabot/polyhaven.webp?v=hf130b"
+  }
+  return IMG.complete && IMG.naturalWidth && !IMG._bad ? IMG : null
+ };
+ /* someone sitting on it (drawn on the painting by RKDal's chDraw), as RKDal's seatedOn */
+ const seated = (s2, o2) => { try { const st = typeof seatOf === "function" ? seatOf(s2, new Set()) : null; return !!(st && st.obj === o2 && st.kind !== "wash" && st.kind !== "toilet") } catch (e) { return false } };
+ const entry = o2 => {
+  if (!o2 || !o2.ph || !PHT[o2.type] || !window.RKDal || !RKDal.perabot) return null;
+  if (!(typeof isKamp === "function" && isKamp())) return null;
+  if (Math.abs(TH / TW - PH.r) > .01 || Math.abs(ZS - PH.zs) > .01) return null;   /* another camera: the old painting */
+  const e = PH.atlas[o2.type + "|" + (o2.kr || "y+")]; if (!e) return null;
+  if ((S.sims || []).some(s2 => s2.cur && s2.cur.obj === o2.id && !seated(s2, o2))) return null;   /* in use: the drawing with its moving parts */
+  return e
+ };
+ H140.entry = entry;
+ if (typeof drawItem === "function") {
+  const di = drawItem;
+  drawItem = function (o2, ts) {
+   try {
+    const e = entry(o2), A = e && sheet();
+    if (A) {
+     const b = P(o2.x, o2.y, 0), k = TW / PH.TW;
+     ctx.drawImage(A, e[0], e[1], e[2], e[3], b[0] + (e[4] - PH.OX) * k, b[1] + (e[5] - PH.OY) * k, e[2] * k, e[3] * k);
+     H140.drawn++; try { RKDal.pn = (RKDal.pn || 0) + 1 } catch (x) { }
+     return
+    }
+   } catch (x) { fail(x) }
+   return di.apply(this, arguments)
+  };
+  try { drawItem.toString = () => Function.prototype.toString.call(di) } catch (e) { }
+ }
+ /* (3) (owner, round 2: "carpets ... read as loud") in that new game's kampung house the rugs are plain: one muted woven colour
+    and a darker edge, no motif (the painted songket / Persian / flower rugs, and the drawn diamond rug, stay in every other
+    game and house) */
+ if (typeof krRug === "function") {
+  const kr = krRug, PLAIN = [["#b89f7c", "#9c8262"], ["#8f6c58", "#76574a"]];
+  krRug = function (x0, y0, x1, y1, pal) {
+   try {
+    if (S && S.hf130 === 1 && S.home === "main" && !S.visiting && typeof isKamp === "function" && isKamp()) {
+     const h = String(pal && pal[0] || "").split("").reduce((t, c) => t + c.charCodeAt(0), 0), [c1, c2] = PLAIN[h % 2], m = Math.min(x1 - x0, y1 - y0) * .07;
+     poly([P(x0, y0, .003), P(x1, y0, .003), P(x1, y1, .003), P(x0, y1, .003)], c2, "rgba(0,0,0,.18)");
+     poly([P(x0 + m, y0 + m, .004), P(x1 - m, y0 + m, .004), P(x1 - m, y1 - m, .004), P(x0 + m, y1 - m, .004)], c1);
+     return
+    }
+   } catch (e) { fail(e) }
+   return kr.apply(this, arguments)
+  }
+ }
+ /* ... and its kitchen and bathroom floors plain tiles in two close tones (the flowered mosaic and the blue-and-white
+    chequer of the nostalgia plan, kpnFloors, stay everywhere else) */
+ const calm = () => { try { return !!(S && S.hf130 === 1 && S.home === "main" && !S.visiting && isKamp()) } catch (e) { return false } };
+ H140.calm = calm;
+ if (typeof kpnFloors === "function" && typeof KPN_R !== "undefined") {
+  const kf = kpnFloors, TILE = { kitchen: [.5, "#e6d8bb", "#ddcdae", "rgba(120,95,60,.28)"], bath: [.5, "#d4e0e3", "#c9d7db", "rgba(255,255,255,.6)"] };
+  kpnFloors = function () {
+   if (!calm()) return kf.apply(this, arguments);
+   const own = KPN_R.filter(r => TILE[r.ft]), ft = own.map(r => r.ft);
+   let res;
+   try { own.forEach(r => { r.ft = "hf130" }); res = kf.apply(this, arguments) } finally { own.forEach((r, i) => { r.ft = ft[i] }) }
+   try {
+    for (const r of own) {
+     const [s, a, b, line] = TILE[r.ft];
+     for (let x = r.x0; x < r.x1; x += s) for (let y = r.y0; y < r.y1; y += s)
+      poly([P(x, y, .002), P(x + s, y, .002), P(x + s, y + s, .002), P(x, y + s, .002)], Math.round((x + y) / s) % 2 ? a : b, line)
+    }
+   } catch (e) { fail(e) }
+   return res
+  }
+ }
+ /* the credit, under the "Perabot lukisan" setting */
+ if (typeof renderFamily === "function") {
+  const rf = renderFamily;
+  renderFamily = function () {
+   const r = rf.apply(this, arguments);
+   try {
+    const el = document.getElementById("p-family"), at = el && el.querySelector("#perlukis");
+    if (at && !el.querySelector("#phkredit")) at.closest("label").insertAdjacentHTML("afterend", `<p class="hint" id="phkredit">Perabot permulaan rumah kampung dan rumah bandar (almari, almari kaca, rak buku, kerusi rotan, meja kopi, kerusi panjang, meja makan, meja belajar) dilukis semula daripada model 3D Poly Haven (polyhaven.com, CC0) oleh Kirill Sannikov, Rico Cilliers, Ulan Cabanilla, Aron Łyczek dan Ethan Place; hiasan kedai (kerusi goyang, meja sisi & lampu, pasu, bakul, kotak mainan, kusyen, tanglung) oleh Jorge Camacho, Yann Kervran, Kuutti Siitonen, James Ray Cock dan Serhii Khromov; tumbuhan nurseri oleh Rico Cilliers, James Ray Cock, Amal Kumar dan Rob Tuytel. Semua CC0.</p>`)
+   } catch (e) { fail(e) }
+   return r
+  }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §141. hf130 (bahagian 2) Flat PPR Pak Zul disusun semula (owner 22 Nov: the same tidying as the kampung house,
+   "one bed per room, clear paths"). The starting layout of the flat (RKDal.LAY["nb:kl_zul"], laid the first time that family
+   is played in a new game) had two TVs, two settees, three standing lamps in the middle of the floor, a mirror in the
+   bedroom doorway, and one bed for three people (Pak Zul, Mak Timah, Adam). Now: the kitchen along its back wall (fridge,
+   stove) with the table in the middle; the bathroom's toilet and shower at its far end; Pak Zul and Mak Timah's bed with the
+   mirror; the small back room is Adam's (a bed and a study desk, both added); the living room one settee and one TV, a lamp
+   and a plant in the corners; two plants on the balcony. Checked: every tile and piece reachable, both beds full length and
+   wide, so RKBed's bedFit and reachFix move nothing. Facings (o.rot) are set once it is laid (S.hf130f "pend" -> 1, a new game
+   only). An old save, or a flat already played, is not touched. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const KEY = "nb:kl_zul";
+ /* [type, x, y, rot] (rot 1: the front faces +x, as the game mirrors a town piece) */
+ const FLAT = [
+  ["fridge", 0, 0, 0], ["stove", 1, 0, 0], ["dining", 2, 1, 0],
+  ["toilet", 6, 0, 0], ["shower", 7, 0, 0],
+  ["bed", 6, 2, 0], ["mirror", 4, 4, 1],
+  ["bed", 7, 5, 0], ["mejabelajar", 4, 5, 1],
+  ["sofa", 0, 3, 1], ["tv", 2, 3, 0], ["lamp", 0, 7, 0], ["plant", 3, 7, 0],
+  ["plant", 9, 2, 0], ["plant", 9, 7, 0]
+ ];
+ const H141 = HF.h141 = { FLAT, laid: 0 };
+ try {
+  const L = window.RKDal && RKDal.LAY && RKDal.LAY[KEY];
+  if (L) { L.objs = FLAT.map(r => [r[0], r[1], r[2]]); L.drop = ["tv", "sofa", "lamp", "plant"] }   /* the extra TV, settee, lamps (and the plants, laid again) */
+ } catch (e) { fail(e) }
+ if (typeof fresh === "function") {
+  const fr = fresh;
+  fresh = function () { const s = fr.apply(this, arguments); try { if (s && typeof s === "object") s.hf130f = "pend" } catch (e) { fail(e) } return s }
+ }
+ const finish = () => {
+  try {
+   if (!S || S.hf130f !== "pend" || S.visiting || S.home !== KEY) return;
+   if (Array.isArray(S.dalPend) && S.dalPend.includes(KEY)) return;
+   S.hf130f = 1;
+   const used = new Set();
+   for (const [t, x, y, rot] of FLAT) {
+    const o = (S.objs || []).find(q => q.f === 0 && q.type === t && q.x === x && q.y === y && !used.has(q)); if (!o) continue;
+    used.add(o); if (rot) o.rot = rot; else delete o.rot
+   }
+   H141.laid++;
+   try { if (window.RKBed && RKBed.fit) RKBed.fit() } catch (e) { }
+   try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { }
+   try { renderAll() } catch (e) { }
+  } catch (e) { fail(e) }
+ };
+ H141.finish = finish;
+ setInterval(finish, 1000);
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §142. hf130 (bahagian 3) Katil polos dalam rumah kampung permainan baru (owner 22 Nov: "Ok" to plain beds in the
+   kampung sheet; "no batik, normal colours"). The long beds' paintings ("<type>|<facing>|P": katil, katil kelambu, katil budak)
+   were repainted from themselves with a plain cream sheet and pillow and plain wood (tools/hf/katil_polos.py), same outline,
+   and added under img/perabot/kampung.webp as "|Q" cells. In the calm house of §140 (HF.h140.calm: S.hf130, home "main", not
+   visiting) the "|P" entries of RKDal's atlas point at the "|Q" cells; anywhere else they point back. RKDal's warp cache
+   (keyed by the entry's name) is emptied at each change, so no house shows the other's bed. RKBed's sleepers and the blanket it
+   lifts over them come from the bed's own painting, so they follow. Nothing saved. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const QB = {"bed|y+|Q":[0,1960,277,208,-51.0,123.75],"bed|x+|Q":[279,1960,277,208,62.0,123.75],"bed|y-|Q":[558,1960,277,174,62.25,106.5],"bed|x-|Q":[837,1960,277,174,-51.25,106.5],"kingbed|y+|Q":[1116,1960,277,280,-51.0,56.25],"kingbed|x+|Q":[1395,1960,277,280,62.0,56.25],"kingbed|y-|Q":[1674,1960,277,284,62.25,-3.75],"kingbed|x-|Q":[0,2246,277,284,-51.25,-3.75],"kidbed|y+|Q":[279,2246,197,154,13.5,148.5],"kidbed|x+|Q":[478,2246,197,154,77.5,148.5],"kidbed|y-|Q":[677,2246,197,136,77.25,137.25],"kidbed|x-|Q":[876,2246,197,136,13.75,137.25]};
+ const ORIG = {}, H142 = HF.h142 = { on: false, swaps: 0, QB };
+ const want = () => { try { return !!(HF.h140 && HF.h140.calm && HF.h140.calm()) } catch (e) { return false } };
+ const set = w => {
+  if (w === H142.on) return;
+  const T = window.RKDal && RKDal.PB && RKDal.PB.atlas && RKDal.PB.atlas.kampung; if (!T) return;
+  try { if (RKDal.warpNow) RKDal.warpNow() } catch (e) { }   /* builds still queued with the other paintings: done first, then dropped below */
+  for (const k in QB) {
+   const p = k.slice(0, -1) + "P";
+   if (w) { if (!ORIG[p]) ORIG[p] = T[p]; T[p] = QB[k] } else if (ORIG[p]) T[p] = ORIG[p]
+  }
+  H142.on = w; H142.swaps++;
+  try { RKDal.WARP.clear(); RKDal.v++ } catch (e) { } try { LCACHE.clear() } catch (e) { }
+ };
+ H142.set = set;
+ if (typeof drawItem === "function") {
+  const di = drawItem;
+  drawItem = function (o2) {
+   try { if (o2 && window.RKBed && RKBed.beds[o2.type]) set(want()) } catch (e) { fail(e) }
+   return di.apply(this, arguments)
+  };
+  try { drawItem.toString = () => Function.prototype.toString.call(di) } catch (e) { }
+ }
+ setInterval(() => { try { set(want()) } catch (e) { fail(e) } }, 1000);
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §143. hf130 (bahagian 4) Perabot polos di rumah bandar (owner 22 Nov: "Ok" to the same plain Poly Haven furniture
+   in the other house types). The town homes are seen in the 2:1 camera, not the kampung top camera of §140, so the same models
+   (wooden_bookshelf_worn, chinese_sofa, dining_table + painted_wooden_chair_02, WoodenTable_01) were painted again in the town
+   studio (tools/qa/scenes/studio-bandar.mjs, polyhaven_lukis.py with RK_KAMERA=bandar): rak buku, kerusi panjang, meja makan,
+   meja belajar, facing "-" (rot 1 is drawn mirrored, as the game mirrors a town piece). One small sheet
+   img/perabot/polyhaven-bandar.webp, loaded when such a piece is first drawn. The starting pieces of these types in Pak Zul's
+   flat, the terrace, the apartment and the condo of a new game get o.ph once their home is laid (S.hf130t, a new game only);
+   bought pieces and old saves keep their own paintings. Another camera, the setting off, a piece in use (not a seat with its
+   sitter): the old drawing. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const HOMES = ["nb:kl_zul", "nb:kl_tan", "nb:kl_amirul", "nb:kl_sasha"];
+ const PHB = {"cell":288.0,"TW":144.0,"OX":144.0,"OY":202.5,"r":0.5,"zs":1.0,"atlas":{"bookshelf|-":[0,0,93,200,98,63],"sofa|-":[95,0,122,154,83,116],"dining|-":[219,0,105,129,92,139],"mejabelajar|-":[326,0,112,118,88,152]}};
+ const H143 = HF.h143 = { PHB, drawn: 0, marked: 0 };
+ if (typeof fresh === "function") {
+  const fr = fresh;
+  fresh = function () { const s = fr.apply(this, arguments); try { if (s && typeof s === "object") s.hf130t = HOMES.slice() } catch (e) { fail(e) } return s }
+ }
+ const mark = () => {
+  try {
+   if (!S || !Array.isArray(S.hf130t) || S.visiting) return;
+   const i = S.hf130t.indexOf(S.home); if (i < 0) return;
+   if (Array.isArray(S.dalPend) && S.dalPend.includes(S.home)) return;
+   S.hf130t.splice(i, 1);
+   for (const o of S.objs || []) if (o.f === 0 && PHB.atlas[o.type + "|-"]) { o.ph = 1; H143.marked++ }
+   try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { }
+  } catch (e) { fail(e) }
+ };
+ H143.mark = mark;
+ setInterval(mark, 1000);
+ let IMG = null;
+ const sheet = () => {
+  if (!IMG) {
+   IMG = new Image(); IMG.decoding = "async";
+   IMG.onload = () => { try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { } try { dirty = true } catch (e) { } };
+   IMG.onerror = () => { IMG._bad = true };
+   IMG.src = "img/perabot/polyhaven-bandar.webp?v=hf130"
+  }
+  return IMG.complete && IMG.naturalWidth && !IMG._bad ? IMG : null
+ };
+ const seated = (s2, o2) => { try { const st = typeof seatOf === "function" ? seatOf(s2, new Set()) : null; return !!(st && st.obj === o2 && st.kind !== "wash" && st.kind !== "toilet") } catch (e) { return false } };
+ const entry = o2 => {
+  if (!o2 || !o2.ph || !window.RKDal || !RKDal.perabot) return null;
+  if (typeof isKamp === "function" && isKamp()) return null;
+  if (Math.abs(TH / TW - PHB.r) > .01 || Math.abs(ZS - PHB.zs) > .01) return null;
+  const e = PHB.atlas[o2.type + "|-"]; if (!e) return null;
+  if ((S.sims || []).some(s2 => s2.cur && s2.cur.obj === o2.id && !seated(s2, o2))) return null;
+  return e
+ };
+ H143.entry = entry;
+ if (typeof drawItem === "function") {
+  const di = drawItem;
+  drawItem = function (o2, ts) {
+   try {
+    const e = entry(o2), A = e && sheet();
+    if (A) {
+     const b = P(o2.x, o2.y, 0), k = TW / PHB.TW, y = b[1] + (e[5] - PHB.OY) * k;
+     if (o2.rot) { ctx.save(); ctx.translate(b[0], 0); ctx.scale(-1, 1); ctx.drawImage(A, e[0], e[1], e[2], e[3], (e[4] - PHB.OX) * k, y, e[2] * k, e[3] * k); ctx.restore() }
+     else ctx.drawImage(A, e[0], e[1], e[2], e[3], b[0] + (e[4] - PHB.OX) * k, y, e[2] * k, e[3] * k);
+     H143.drawn++; try { RKDal.pn = (RKDal.pn || 0) + 1 } catch (x) { }
+     return
+    }
+   } catch (x) { fail(x) }
+   return di.apply(this, arguments)
+  };
+  try { drawItem.toString = () => Function.prototype.toString.call(di) } catch (e) { }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §144. hf130 (bahagian 5) Gaya perabot dalam Mod beli (owner 22 Nov: "Ok" to several styles of each plain piece,
+   chosen in the shop, in at most two sheets). Under the shop card of each of the eight plain pieces (almari, almari kaca, rak
+   buku, kerusi rotan, meja kopi, kerusi panjang, meja makan, meja belajar) a row of chips: Biasa (the game's own painting, as
+   before), Kayu asli (the plain Poly Haven painting of §140 / §143), Kayu terang, Kayu gelap, Putih / krim (tools/hf/perabot_gaya.py:
+   each plain painting repainted from itself on the free Space, all in ONE sheet img/perabot/polyhaven-gaya.webp, loaded when a
+   styled piece is first drawn). The row shows only the styles painted for the camera in use (the kampung top camera: all eight;
+   the town 2:1 camera: rak buku, kerusi panjang, meja makan, meja belajar). The piece bought takes the style chosen: o.ph = 1,
+   o.gv = "terang" | "gelap" | "krim" (Kayu asli: o.ph only). Pieces already placed and old saves keep their look; "Biasa"
+   buys as before. Another camera, the setting off, or a piece in use (not a seat with its sitter): the old drawing. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const GY = {"atas|almari|y+|gelap":[0,0,105,219,108,55],"atas|almari|x+|gelap":[107,0,105,219,75,55],"atas|almari|y+|krim":[214,0,105,219,108,55],"atas|almari|x+|krim":[321,0,105,219,75,55],"atas|almari|y+|terang":[428,0,105,219,108,55],"atas|almari|x+|terang":[535,0,105,219,75,55],"atas|almarikaca|y+|gelap":[642,0,109,212,103,68],"atas|almarikaca|x+|gelap":[753,0,109,212,76,68],"atas|almarikaca|y+|krim":[864,0,109,212,103,68],"atas|almarikaca|x+|krim":[975,0,109,212,76,68],"atas|almarikaca|y+|terang":[1086,0,109,212,103,68],"atas|almarikaca|x+|terang":[1197,0,109,212,76,68],"atas|almari|y-|gelap":[1308,0,105,211,75,77],"atas|almari|x-|gelap":[1415,0,105,211,108,77],"atas|almari|y-|krim":[1522,0,105,211,75,77],"atas|almari|x-|krim":[1629,0,105,211,108,77],"atas|almari|y-|terang":[1736,0,105,211,75,77],"atas|almari|x-|terang":[1843,0,105,211,108,77],"atas|almarikaca|y-|gelap":[0,221,106,202,78,86],"atas|almarikaca|x-|gelap":[108,221,106,202,104,86],"atas|almarikaca|y-|krim":[216,221,106,202,78,86],"atas|almarikaca|x-|krim":[324,221,106,202,104,86],"atas|almarikaca|y-|terang":[432,221,106,202,78,86],"atas|almarikaca|x-|terang":[540,221,106,202,104,86],"bandar|bookshelf|-|gelap":[648,221,93,200,98,63],"bandar|bookshelf|-|krim":[743,221,93,200,98,63],"bandar|bookshelf|-|terang":[838,221,93,200,98,63],"atas|bookshelf|y-|gelap":[933,221,93,182,98,101],"atas|bookshelf|x-|gelap":[1028,221,93,182,97,101],"atas|bookshelf|y-|krim":[1123,221,93,182,98,101],"atas|bookshelf|x-|krim":[1218,221,93,182,97,101],"atas|bookshelf|y-|terang":[1313,221,93,182,98,101],"atas|bookshelf|x-|terang":[1408,221,93,182,97,101],"atas|bookshelf|y+|gelap":[1503,221,93,182,98,101],"atas|bookshelf|x+|gelap":[1598,221,93,182,97,101],"atas|bookshelf|y+|krim":[1693,221,93,182,98,101],"atas|bookshelf|x+|krim":[1788,221,93,182,97,101],"atas|bookshelf|y+|terang":[1883,221,93,182,98,101],"atas|bookshelf|x+|terang":[0,425,93,182,97,101],"bandar|sofa|-|gelap":[95,425,122,154,83,116],"bandar|sofa|-|krim":[219,425,122,154,83,116],"bandar|sofa|-|terang":[343,425,122,154,83,116],"atas|sofa|y+|gelap":[467,425,122,150,83,138],"atas|sofa|x+|gelap":[591,425,122,150,83,138],"atas|sofa|y+|krim":[715,425,122,150,83,138],"atas|sofa|x+|krim":[839,425,122,150,83,138],"atas|sofa|y+|terang":[963,425,122,150,83,138],"atas|sofa|x+|terang":[1087,425,122,150,83,138],"atas|kerusirotan|y+|gelap":[1211,425,114,144,87,144],"atas|kerusirotan|x+|gelap":[1327,425,114,144,87,144],"atas|kerusirotan|y+|krim":[1443,425,114,144,87,144],"atas|kerusirotan|x+|krim":[1559,425,114,144,87,144],"atas|kerusirotan|y+|terang":[1675,425,114,144,87,144],"atas|kerusirotan|x+|terang":[1791,425,114,144,87,144],"atas|dining|y-|gelap":[1907,425,98,130,95,158],"atas|dining|x-|gelap":[0,609,98,130,95,158],"atas|dining|y-|krim":[100,609,98,130,95,158],"atas|dining|x-|krim":[200,609,98,130,95,158],"atas|dining|y-|terang":[300,609,98,130,95,158],"atas|dining|x-|terang":[400,609,98,130,95,158],"atas|dining|y+|gelap":[500,609,98,130,95,158],"atas|dining|x+|gelap":[600,609,98,130,95,158],"atas|dining|y+|krim":[700,609,98,130,95,158],"atas|dining|x+|krim":[800,609,98,130,95,158],"atas|dining|y+|terang":[900,609,98,130,95,158],"atas|dining|x+|terang":[1000,609,98,130,95,158],"atas|sofa|y-|gelap":[1100,609,122,130,83,158],"atas|sofa|x-|gelap":[1224,609,122,130,83,158],"atas|sofa|y-|krim":[1348,609,122,130,83,158],"atas|sofa|x-|krim":[1472,609,122,130,83,158],"atas|sofa|y-|terang":[1596,609,122,130,83,158],"atas|sofa|x-|terang":[1720,609,122,130,83,158],"bandar|dining|-|gelap":[1844,609,105,129,92,139],"bandar|dining|-|krim":[0,741,105,129,92,139],"bandar|dining|-|terang":[107,741,105,129,92,139],"atas|kerusirotan|y-|gelap":[214,741,114,125,87,163],"atas|kerusirotan|x-|gelap":[330,741,114,125,87,163],"atas|kerusirotan|y-|krim":[446,741,113,125,87,163],"atas|kerusirotan|x-|krim":[561,741,113,125,88,163],"atas|kerusirotan|y-|terang":[676,741,114,125,87,163],"atas|kerusirotan|x-|terang":[792,741,114,125,87,163],"bandar|mejabelajar|-|gelap":[908,741,112,118,88,152],"bandar|mejabelajar|-|krim":[1022,741,112,118,88,152],"bandar|mejabelajar|-|terang":[1136,741,112,118,88,152],"atas|mejabelajar|y+|gelap":[1250,741,104,112,92,168],"atas|mejabelajar|x+|gelap":[1356,741,104,112,92,168],"atas|mejabelajar|y+|krim":[1462,741,107,112,92,168],"atas|mejabelajar|x+|krim":[1571,741,107,112,89,168],"atas|mejabelajar|y+|terang":[1680,741,107,112,92,168],"atas|mejabelajar|x+|terang":[1789,741,107,112,89,168],"atas|mejabelajar|y-|gelap":[1898,741,106,106,92,182],"atas|mejabelajar|x-|gelap":[0,872,106,106,90,182],"atas|mejabelajar|y-|krim":[108,872,106,106,92,182],"atas|mejabelajar|x-|krim":[216,872,106,106,90,182],"atas|mejabelajar|y-|terang":[324,872,106,106,92,182],"atas|mejabelajar|x-|terang":[432,872,106,106,90,182],"atas|mejakopi|y-|gelap":[540,872,104,104,92,179],"atas|mejakopi|x-|gelap":[646,872,104,104,92,179],"atas|mejakopi|y-|krim":[752,872,104,104,92,179],"atas|mejakopi|x-|krim":[858,872,104,104,92,179],"atas|mejakopi|y-|terang":[964,872,104,104,92,179],"atas|mejakopi|x-|terang":[1070,872,104,104,92,179],"atas|mejakopi|y+|gelap":[1176,872,104,104,92,179],"atas|mejakopi|x+|gelap":[1282,872,104,104,92,179],"atas|mejakopi|y+|krim":[1388,872,104,104,92,179],"atas|mejakopi|x+|krim":[1494,872,104,104,92,179],"atas|mejakopi|y+|terang":[1600,872,104,104,92,179],"atas|mejakopi|x+|terang":[1706,872,104,104,92,179]};
+ const ST = [["", "Biasa"], ["asli", "Kayu asli"], ["terang", "Kayu terang"], ["gelap", "Kayu gelap"], ["krim", "Putih / krim"]];
+ const TYPES = { almari: 1, almarikaca: 1, bookshelf: 1, kerusirotan: 1, mejakopi: 1, sofa: 1, dining: 1, mejabelajar: 1 };
+ const H144 = HF.h144 = { GY, pick: {}, drawn: 0, bought: 0 };
+ const cam = () => {
+  try {
+   const r = TH / TW;
+   if (typeof isKamp === "function" && isKamp()) return Math.abs(r - .68) < .01 && Math.abs(ZS - .78) < .01 ? "atas" : "";
+   return Math.abs(r - .5) < .01 && Math.abs(ZS - 1) < .01 ? "bandar" : "";
+  } catch (e) { return "" }
+ };
+ const has = (c, t) => !!(c && GY[c + "|" + t + "|" + (c === "atas" ? "y+" : "-") + "|terang"]);
+ H144.cam = cam;
+ /* the shop: a row of chips under each card */
+ function rows() {
+  const box = document.getElementById("p-buy"); if (!box || box.hidden || typeof mode === "undefined" || mode !== "buy") return;
+  const c = cam();
+  for (const t of Object.keys(TYPES)) {
+   const it = box.querySelector('button.item[data-buy="' + t + '"]'); if (!it) continue;
+   let row = it.nextElementSibling && it.nextElementSibling.classList.contains("hfgy") ? it.nextElementSibling : null;
+   if (!has(c, t)) { if (row) row.remove(); continue }
+   const sig = c + "|" + (H144.pick[t] || "");
+   const vis = () => { try { row.style.display = getComputedStyle(it).display === "none" || it.hidden ? "none" : "" } catch (e) { } };
+   if (row && row.dataset.sig === sig) { vis(); continue }
+   if (row) row.remove();
+   row = document.createElement("div"); row.className = "hfkhat hfgy"; row.dataset.sig = sig; row.dataset.t = t;
+   row.setAttribute("role", "group"); row.setAttribute("aria-label", "Gaya " + (ITEMS[t] ? ITEMS[t].name : t));
+   row.innerHTML = '<span class="lb">Gaya:</span>' + ST.map(([k, n]) => `<button type="button" data-gy="${k}" aria-pressed="${(H144.pick[t] || "") === k}">${n}</button>`).join("");
+   it.after(row); vis();
+   row.addEventListener("click", ev => {
+    const b = ev.target.closest && ev.target.closest("[data-gy]"); if (!b) return; ev.stopPropagation();
+    H144.pick[t] = b.dataset.gy; rows();
+    try { if (typeof placing !== "undefined" && placing && placing.type === t && !placing.moveId) H144.pend = { t, id0: S.nextId, st: H144.pick[t] } } catch (e) { }
+   })
+  }
+ }
+ H144.rows = rows;
+ if (typeof renderBuy === "function") { const rb = renderBuy; renderBuy = function () { const r = rb.apply(this, arguments); try { rows() } catch (e) { fail(e) } return r } }
+ setInterval(() => { try { if (S && typeof mode !== "undefined" && mode === "buy") rows() } catch (e) { fail(e) } }, 700);
+ /* buying: the piece placed takes the style picked for its type */
+ const take = () => {
+  const p = H144.pend; if (!p || !S) return;
+  if (p.st) for (const o of S.objs || []) if (o.id >= p.id0 && o.type === p.t) { o.ph = 1; if (p.st !== "asli") o.gv = p.st; else delete o.gv; H144.bought++ }
+  p.id0 = S.nextId
+ };
+ if (typeof setPlacing === "function") {
+  const sp = setPlacing;
+  setPlacing = function (p) {
+   try { take() } catch (e) { fail(e) }
+   const r = sp.apply(this, arguments);
+   try { H144.pend = p && !p.moveId && TYPES[p.type] ? { t: p.type, id0: S.nextId, st: H144.pick[p.type] || "" } : null } catch (e) { fail(e) }
+   return r
+  }
+ }
+ /* drawing a styled piece */
+ let IMG = null;
+ const sheet = () => {
+  if (!IMG) {
+   IMG = new Image(); IMG.decoding = "async";
+   IMG.onload = () => { try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { } try { dirty = true } catch (e) { } };
+   IMG.onerror = () => { IMG._bad = true };
+   IMG.src = "img/perabot/polyhaven-gaya.webp?v=hf130"
+  }
+  return IMG.complete && IMG.naturalWidth && !IMG._bad ? IMG : null
+ };
+ const seated = (s2, o2) => { try { const st = typeof seatOf === "function" ? seatOf(s2, new Set()) : null; return !!(st && st.obj === o2 && st.kind !== "wash" && st.kind !== "toilet") } catch (e) { return false } };
+ const entry = o2 => {
+  if (!o2 || !o2.gv || !o2.ph || !window.RKDal || !RKDal.perabot) return null;
+  const c = cam(); if (!c) return null;
+  const e = GY[c + "|" + o2.type + "|" + (c === "atas" ? (o2.kr || "y+") : "-") + "|" + o2.gv]; if (!e) return null;
+  if ((S.sims || []).some(s2 => s2.cur && s2.cur.obj === o2.id && !seated(s2, o2))) return null;
+  return [e, c]
+ };
+ H144.entry = entry;
+ if (typeof drawItem === "function") {
+  const di = drawItem;
+  drawItem = function (o2, ts) {
+   try {
+    const r = entry(o2), A = r && sheet();
+    if (A) {
+     const [e, c] = r, b = P(o2.x, o2.y, 0), k = TW / 144, y = b[1] + (e[5] - 202.5) * k;
+     if (c === "bandar" && o2.rot) { ctx.save(); ctx.translate(b[0], 0); ctx.scale(-1, 1); ctx.drawImage(A, e[0], e[1], e[2], e[3], (e[4] - 144) * k, y, e[2] * k, e[3] * k); ctx.restore() }
+     else ctx.drawImage(A, e[0], e[1], e[2], e[3], b[0] + (e[4] - 144) * k, y, e[2] * k, e[3] * k);
+     H144.drawn++; try { RKDal.pn = (RKDal.pn || 0) + 1 } catch (x) { }
+     return
+    }
+   } catch (x) { fail(x) }
+   return di.apply(this, arguments)
+  };
+  try { drawItem.toString = () => Function.prototype.toString.call(di) } catch (e) { }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §145. hf130 (bahagian 6) Kedai Perabot Jati Harmoni di peta + set gaya (owner 22 Nov: "Okay" to the shop plan:
+   shops are places on the map, entering opens the shop's catalogue; "jadikan gaya sebagai set" with a package price).
+   A new place in the town (bandar) map, open 9:00-21:00: the errand "Ke kedai perabot" (ERR, as the bakery of §110) and, back
+   home, the shop's card: four room sets (Kayu asli, Kayu terang, Kayu gelap, Putih / krim of §144) that refinish every one of the
+   plain pieces of the home (those the style is painted for in this home's camera) at once, at half their shop price less 10% for
+   the set, and a button into the furniture catalogue (Mod beli). Saves: S.hf145 (sets bought, for the diary line); the pieces
+   take o.ph / o.gv as when bought styled. An old save simply has a new place on its map. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const H145 = HF.h145 = { opened: 0, sets: 0 };
+ const OPEN = (d, h) => h >= 9 && h < 21;
+ const NAME = "Kedai Perabot Jati Harmoni";
+ const SETS = [["asli", "Set Kayu Asli Kampung", "kayu asli sederhana, rotan dan kain krim"], ["terang", "Set Kayu Terang Moden", "kayu getah cerah, kain krim"], ["gelap", "Set Kayu Gelap Klasik", "kayu gelap seperti cengal lama, kain kuning air"], ["krim", "Set Putih Krim", "kayu bercat putih krim, kain kelabu muda"]];
+ try {
+  PLACES.perabot = { area: "bandar", name: NAME, icon: "🪑", acts: ["hf_perabot"], note: "Set gaya bilik (harga pakej) dan katalog perabot. Buka 9:00–21:00." };
+  ERR.hf_perabot = { label: "Ke kedai perabot: set gaya & katalog", icon: "🪑", dur: 25, ages: ["teen", "adult", "elder"], eff: { fun: .2 }, place: "perabot", when: OPEN, whenTxt: "9:00–21:00" };
+  if (typeof WMPL !== "undefined" && !WMPL.perabot) WMPL.perabot = [1300, 930];
+  if (typeof WMN !== "undefined") WMN.perabot = NAME;
+  if (typeof WMCAT !== "undefined") WMCAT.perabot = "food";
+ } catch (e) { fail(e) }
+ /* the pieces a set refinishes in this home */
+ const pieces = () => {
+  const c = HF.h144 && HF.h144.cam ? HF.h144.cam() : ""; if (!c) return [];
+  const GY = HF.h144.GY;
+  return (S.objs || []).filter(o => GY[c + "|" + o.type + "|" + (c === "atas" ? "y+" : "-") + "|terang"]);
+ };
+ const priceOf = (L, st) => Math.round(L.filter(o => !(o.ph && (o.gv || "asli") === st)).reduce((a, o) => a + (ITEMS[o.type] ? ITEMS[o.type].price : 0) * .5, 0) * .9);
+ H145.pieces = pieces; H145.priceOf = priceOf;
+ const css = () => {
+  if (document.getElementById("hf145css")) return;
+  const st = document.createElement("style"); st.id = "hf145css";
+  st.textContent = `#hfperabot{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(40,28,18,.45);padding:12px}
+#hfperabot[hidden]{display:none}#hfperabot .pk{max-width:460px;width:100%;max-height:92vh;overflow:auto;background:#fffaf0;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:14px 16px;font:14px system-ui;color:#3b2a20}
+#hfperabot h2{margin:0 0 4px;font:800 1.15rem Georgia,serif}#hfperabot .x{float:right;border:0;background:#f3ead7;border-radius:999px;width:34px;height:34px;font-size:16px;cursor:pointer}
+#hfperabot .st{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;border:1px solid #e3d6bd;border-radius:12px;padding:8px 10px;margin:8px 0;background:#fff}
+#hfperabot .st b{font-size:.92rem}#hfperabot .st small{grid-column:1;color:#7a6650;font-size:.74rem}
+#hfperabot .st button,#hfperabot .ct{min-height:40px;border:0;border-radius:12px;background:#2c6b4a;color:#fff;font:800 .8rem system-ui;padding:6px 12px;cursor:pointer}
+#hfperabot .st button:disabled{background:#cfc4b2;color:#6a5a48;cursor:default}#hfperabot .ct{width:100%;margin-top:6px;background:#7a4a2a}
+#hfperabot .nt{font-size:.78rem;color:#7a6650;margin:4px 0}`;
+  document.head.appendChild(st)
+ };
+ const el = () => { let e = document.getElementById("hfperabot"); if (!e) { e = document.createElement("div"); e.id = "hfperabot"; e.hidden = true; e.setAttribute("role", "dialog"); e.setAttribute("aria-label", NAME); document.body.appendChild(e) } return e };
+ const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.perabotOn = false; try { renderAll() } catch (x) { } };
+ const open = s2 => {
+  try {
+   css(); const e = el(); try { closeMenu() } catch (x) { }
+   const L = pieces(), n = L.length, have = L.length ? [...new Set(L.map(o => ITEMS[o.type] ? ITEMS[o.type].name.toLowerCase() : o.type))].slice(0, 6).join(", ") : "";
+   const rows = SETS.map(([k, nm, d]) => {
+    const p = priceOf(L, k), done = n && L.every(o => o.ph && (o.gv || "asli") === k), can = n && !done && (S.freeBuild || S.money >= p);
+    return `<div class="st"><b>${nm}</b><button type="button" data-set="${k}" ${can ? "" : "disabled"}>${done ? "Sedang guna" : !n ? "Tiada perabot" : "Tukar · RM " + p.toLocaleString("en-MY")}</button><small>${d}</small></div>`
+   }).join("");
+   e.innerHTML = `<div class="pk"><button type="button" class="x" data-px="1" aria-label="Tutup">✕</button><h2>🪑 ${NAME}</h2>
+<p class="nt">${n ? `Set gaya menukar rupa <b>${n}</b> perabot di rumah ini sekali gus (${esc(have)}). Harga pakej: separuh harga kedai setiap barang, kurang 10%.` : "Rumah ini belum ada perabot yang boleh ditukar gaya. Beli dahulu dari katalog."}</p>${rows}
+<button type="button" class="ct" data-pk="beli">🛋️ Buka katalog perabot (Mod beli)</button><p class="nt">Barang satu-satu: pilih gaya pada baris "Gaya" di bawah kad barang dalam katalog.</p></div>`;
+   e.hidden = false; HF.perabotOn = true; H145.opened++; return true
+  } catch (x) { fail(x); return false }
+ };
+ H145.open = open;
+ const buySet = k => {
+  const L = pieces(), p = priceOf(L, k); if (!L.length) return;
+  if (!S.freeBuild && S.money < p) { toast("Duit tidak cukup untuk set ini."); return }
+  if (!S.freeBuild) S.money -= p;
+  for (const o of L) { o.ph = 1; if (k === "asli") delete o.gv; else o.gv = k }
+  S.hf145 = (S.hf145 || 0) + 1; H145.sets++;
+  const nm = (SETS.find(s => s[0] === k) || [])[1] || k;
+  try { sfx("coin") } catch (x) { } toast(`🪑 ${nm}: ${L.length} perabot ditukar gayanya (RM ${p.toLocaleString("en-MY")}).`);
+  try { diary(`Tukar perabot rumah kepada ${nm.toLowerCase()}.`) } catch (x) { }
+  try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (x) { }
+  open()
+ };
+ H145.buySet = buySet;
+ document.addEventListener("click", ev => {
+  try {
+   const t = ev.target; if (!t || !t.closest || !HF.perabotOn || !t.closest("#hfperabot")) return;
+   ev.stopPropagation();
+   if (t.closest("[data-px]") || t === el()) { close(); return }
+   const b = t.closest("[data-set]"); if (b && !b.disabled) { buySet(b.dataset.set); return }
+   if (t.closest("[data-pk]")) { close(); try { setTab("buy"); renderBuy() } catch (x) { fail(x) } }
+  } catch (x) { fail(x) }
+ }, true);
+ document.addEventListener("keydown", ev => { try { if (HF.perabotOn && ev.key === "Escape") { ev.stopPropagation(); close() } } catch (x) { fail(x) } }, true);
+ if (typeof errandReturn === "function") {
+  const er = errandReturn;
+  errandReturn = function (s2) {
+   const e = s2 && s2.errand, r = er.apply(this, arguments);
+   try { if (s2 && e === "hf_perabot" && S.sims.includes(s2) && !s2.visitFrom) setTimeout(() => open(s2), 350) } catch (x) { fail(x) }
+   return r
+  }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §146. hf130 (bahagian 7) Kedai Hiasan Seri Laman + barang hiasan baharu, dan rangka kedai di peta (owner 22 Nov:
+   "Okay" to the shop plan: shops are places on the map; "tambah perabot macam dalam video ini", plain paintings, no batik).
+   (1) A small framework the later shop slices reuse: HF.h146.items(defs) registers new shop pieces (ITEMS, a shop category),
+       drawn from ONE sheet img/perabot/perabot-baru.webp (tools/hf/perabot_baru.py; keys "atas|type|facing" for the kampung top
+       camera, "bandar|type|-" for the town camera; rot 1 mirrored), a plain box while the sheet loads or in another camera;
+       HF.h146.shop(def) puts a shop on the map (PLACES, an errand with opening hours, a pin) whose card, back home, lists its
+       pieces ("Beli & letak" starts placing it, as the catalogue does) and opens the catalogue.
+   (2) Kedai Hiasan Seri Laman (town, 10:00-22:00) with eight new pieces painted from Poly Haven CC0 models: kerusi goyang kayu,
+       meja sisi & lampu, pasu bunga ros, pasu seramik besar, bakul anyaman & selimut, kotak mainan kayu, kusyen lantai, tanglung
+       kayu (models and authors: tools/SOURCES.md). Saves: only pieces bought, of the new types; an old save is unchanged. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const NB = {}, SHOPS = {}, H146 = HF.h146 = { NB, SHOPS, drawn: 0, opened: 0 };
+ const SB = {"bandar|pokokduit|-":[0,0,60,152,112,98],"bandar|mejasisi|-":[62,0,67,135,110,119],"atas|pokokduit|y+":[131,0,58,124,112,143],"atas|pokokduit|x+":[191,0,58,124,118,143],"bandar|bungaraya|-":[251,0,50,124,121,123],"atas|mejasisi|y+":[303,0,67,118,110,154],"atas|mejasisi|x+":[372,0,67,118,111,154],"bandar|kerusigoyang|-":[441,0,70,117,106,136],"atas|pokokduit|y-":[513,0,59,113,116,146],"atas|pokokduit|x-":[574,0,59,113,113,146],"atas|kerusigoyang|y+":[635,0,70,109,106,165],"atas|kerusigoyang|x+":[707,0,70,109,112,165],"bandar|limaukasturi|-":[779,0,40,109,119,137],"atas|bungaraya|y+":[821,0,55,104,117,159],"atas|bungaraya|x+":[878,0,55,104,116,159],"atas|mejasisi|y-":[935,0,67,100,112,171],"atas|mejasisi|x-":[1004,0,67,100,109,171],"atas|bungaraya|y-":[1073,0,55,93,116,170],"atas|bungaraya|x-":[1130,0,55,93,117,170],"atas|limaukasturi|y+":[1187,0,40,92,119,170],"atas|limaukasturi|x+":[1229,0,40,92,129,170],"bandar|paku|-":[1271,0,53,92,122,152],"bandar|pasuantik|-":[1326,0,44,91,122,155],"atas|kotaktanaman|y+":[1372,0,89,90,103,188],"atas|kotaktanaman|x+":[1463,0,89,90,96,188],"atas|bungakertas|y-":[1554,0,65,88,105,176],"atas|bungakertas|x-":[1621,0,65,88,118,176],"atas|kotaktanaman|y-":[1688,0,88,88,98,189],"atas|kotaktanaman|x-":[1778,0,88,88,102,189],"bandar|kotaktanaman|-":[1868,0,89,88,103,170],"atas|kerusigoyang|y-":[1959,0,70,83,112,181],"atas|kerusigoyang|x-":[0,154,70,83,106,181],"atas|kotakherba|y-":[72,154,80,82,104,196],"atas|kotakherba|x-":[154,154,80,82,104,196],"atas|kotakherba|y+":[236,154,80,82,104,195],"atas|kotakherba|x+":[318,154,80,82,104,195],"bandar|kotakherba|-":[400,154,80,82,104,176],"atas|pasuantik|y-":[482,154,44,80,122,182],"atas|pasuantik|x-":[528,154,44,80,122,182],"atas|pasuantik|y+":[574,154,44,80,122,182],"atas|pasuantik|x+":[620,154,44,80,122,182],"atas|paku|y+":[666,154,52,80,118,178],"atas|paku|x+":[720,154,52,80,118,178],"atas|paku|y-":[774,154,50,79,120,180],"atas|paku|x-":[826,154,50,79,118,180],"atas|kotakmainan|y-":[878,154,67,77,110,197],"atas|kotakmainan|x-":[947,154,67,77,111,197],"atas|limaukasturi|y-":[1016,154,40,77,129,176],"atas|limaukasturi|x-":[1058,154,40,77,119,176],"atas|kotakmainan|y+":[1100,154,67,76,111,196],"atas|kotakmainan|x+":[1169,154,67,76,110,196],"bandar|tanglungkayu|-":[1238,154,40,76,124,170],"atas|anthurium|y-":[1280,154,44,76,122,185],"atas|anthurium|x-":[1326,154,44,76,122,185],"bandar|anthurium|-":[1372,154,44,76,122,168],"bandar|bungakertas|-":[1418,154,65,76,118,165],"bandar|kotakmainan|-":[1485,154,67,74,111,180],"bandar|calathea|-":[1554,154,55,74,122,170],"atas|tanglungkayu|y+":[1611,154,40,67,124,196],"atas|tanglungkayu|x+":[1653,154,40,67,124,196],"atas|kusyenlantai|y-":[1695,154,62,66,110,206],"atas|kusyenlantai|x-":[1759,154,62,66,116,206],"atas|kusyenlantai|y+":[1823,154,61,66,116,203],"atas|kusyenlantai|x+":[1886,154,61,66,111,203],"atas|tanglungkayu|y-":[1949,154,40,66,123,198],"atas|tanglungkayu|x-":[1991,154,40,66,125,198],"atas|anthurium|y+":[0,239,44,66,122,194],"atas|anthurium|x+":[46,239,44,66,122,194],"atas|bungakertas|y+":[92,239,67,65,116,190],"atas|bungakertas|x+":[161,239,67,65,105,190],"bandar|kusyenlantai|-":[230,239,62,64,116,187],"bandar|pasubunga|-":[294,239,33,64,128,181],"atas|calathea|y+":[329,239,55,63,122,196],"atas|calathea|x+":[386,239,55,63,111,196],"atas|bakul|y+":[443,239,60,60,114,209],"atas|bakul|x+":[505,239,60,60,114,209],"atas|bakul|y-":[567,239,60,59,114,209],"atas|bakul|x-":[629,239,60,59,114,209],"atas|calathea|y-":[691,239,55,58,112,199],"atas|calathea|x-":[748,239,55,58,121,199],"atas|pasubunga|y-":[805,239,33,57,128,202],"atas|pasubunga|x-":[840,239,33,57,127,202],"atas|pasubunga|y+":[875,239,33,57,128,202],"atas|pasubunga|x+":[910,239,33,57,127,202],"bandar|bakul|-":[945,239,60,56,114,195]};
+ H146.SB = SB;
+ H146.setSheet = t => { for (const k in t) SB[k] = t[k] };
+ /* (1a) the pieces */
+ H146.items = defs => {
+  for (const k in defs) {
+   const d = defs[k]; NB[k] = d;
+   ITEMS[k] = { name: d.name, price: d.price, decor: d.decor || 0, acts: d.acts || [], h: d.h || .4, note: d.note || "" };
+   try { const c2 = BCAT.find(c => c[0] === d.cat); if (c2 && !c2[2].includes(k)) c2[2].push(k) } catch (e) { fail(e) }
+  }
+ };
+ let IMG = null;
+ const sheet = () => {
+  if (!IMG) {
+   IMG = new Image(); IMG.decoding = "async";
+   IMG.onload = () => { try { if (window.RKDal) RKDal.v++; LCACHE.clear() } catch (e) { } try { if (typeof THB !== "undefined") for (const k in NB) delete THB[k] } catch (e) { } try { dirty = true } catch (e) { } };
+   IMG.onerror = () => { IMG._bad = true };
+   IMG.src = "img/perabot/perabot-baru.webp?v=hf130n"
+  }
+  return IMG.complete && IMG.naturalWidth && !IMG._bad ? IMG : null
+ };
+ const cam = () => { try { return HF.h144 && HF.h144.cam ? HF.h144.cam() : "" } catch (e) { return "" } };
+ if (typeof drawItem === "function") {
+  const di = drawItem;
+  drawItem = function (o2, ts) {
+   try {
+    if (o2 && NB[o2.type]) {
+     const c = cam(), e = c && SB[c + "|" + o2.type + "|" + (c === "atas" ? (o2.kr || "y+") : "-")], A = e && (!window.RKDal || RKDal.perabot) && sheet();
+     if (A) {
+      const b = P(o2.x, o2.y, 0), k = TW / 144, y = b[1] + (e[5] - 202.5) * k;
+      if (c === "bandar" && o2.rot) { ctx.save(); ctx.translate(b[0], 0); ctx.scale(-1, 1); ctx.drawImage(A, e[0], e[1], e[2], e[3], (e[4] - 144) * k, y, e[2] * k, e[3] * k); ctx.restore() }
+      else ctx.drawImage(A, e[0], e[1], e[2], e[3], b[0] + (e[4] - 144) * k, y, e[2] * k, e[3] * k);
+      H146.drawn++; return
+     }
+     const d = NB[o2.type], i = o2.x, j = o2.y, w = Math.min(.42, (d.fp || .6) / 2);   /* not loaded / another camera: a plain box */
+     box(i + .5 - w, j + .5 - w, i + .5 + w, j + .5 + w, 0, d.h || .4, d.col || "#a07a52"); return
+    }
+   } catch (x) { fail(x) }
+   return di.apply(this, arguments)
+  };
+  try { drawItem.toString = () => Function.prototype.toString.call(di) } catch (e) { }
+ }
+ /* (1b) the shops on the map */
+ const css = () => {
+  if (document.getElementById("hf146css")) return;
+  const st = document.createElement("style"); st.id = "hf146css";
+  st.textContent = `#hfkedai2{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(40,28,18,.45);padding:12px}
+#hfkedai2[hidden]{display:none}#hfkedai2 .pk{max-width:480px;width:100%;max-height:92vh;overflow:auto;background:#fffaf0;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:14px 16px;font:14px system-ui;color:#3b2a20}
+#hfkedai2 h2{margin:0 0 4px;font:800 1.15rem Georgia,serif}#hfkedai2 .x{float:right;border:0;background:#f3ead7;border-radius:999px;width:34px;height:34px;font-size:16px;cursor:pointer}
+#hfkedai2 .gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:8px 0}
+#hfkedai2 .it{border:1px solid #e3d6bd;border-radius:12px;padding:6px;background:#fff;display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
+#hfkedai2 .it canvas{width:100%;height:84px}#hfkedai2 .it b{font-size:.78rem}#hfkedai2 .it small{color:#7a6650;font-size:.7rem}
+#hfkedai2 .it button,#hfkedai2 .ct{min-height:36px;border:0;border-radius:10px;background:#2c6b4a;color:#fff;font:800 .74rem system-ui;padding:5px 8px;cursor:pointer}
+#hfkedai2 .it button:disabled{background:#cfc4b2;color:#6a5a48}#hfkedai2 .ct{width:100%;margin-top:4px;background:#7a4a2a}#hfkedai2 .nt{font-size:.78rem;color:#7a6650;margin:4px 0}
+#hfkedai2 .tg{display:inline-block;font:700 .62rem system-ui;border-radius:999px;padding:1px 6px;background:#e6efe0;color:#2c5a3a}`;
+  document.head.appendChild(st)
+ };
+ const el = () => { let e = document.getElementById("hfkedai2"); if (!e) { e = document.createElement("div"); e.id = "hfkedai2"; e.hidden = true; e.setAttribute("role", "dialog"); document.body.appendChild(e) } return e };
+ const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.kedai2On = false; try { renderAll() } catch (x) { } };
+ /* a piece's picture for the card: its painting in the town camera at a fixed size */
+ const thumb = (cv, t) => {
+  try {
+   const A = sheet(), e = A && (SB["bandar|" + t + "|-"] || SB["atas|" + t + "|y+"]); const g = cv.getContext("2d"); g.clearRect(0, 0, cv.width, cv.height);
+   if (!e) {   /* a piece of the game's own: drawn by the game into the card, in a small studio camera (as the shop's own pictures) */
+    if (NB[t]) { g.fillStyle = NB[t].col || "#a07a52"; g.fillRect(cv.width / 2 - 18, cv.height - 46, 36, 36); return }
+    const sv = { ctx, TW, TH, OX, OY, ZS };
+    try { ctx = g; TW = 52; TH = 26; ZS = 1; OX = cv.width / 2; OY = cv.height - 36; drawItem({ id: 93000, type: t, x: 0, y: 0, f: 0, rot: 0 }, performance.now()) } catch (x) { } finally { ctx = sv.ctx; TW = sv.TW; TH = sv.TH; OX = sv.OX; OY = sv.OY; ZS = sv.ZS }
+    return
+   }
+   const s = Math.min((cv.width - 8) / e[2], (cv.height - 8) / e[3]); g.drawImage(A, e[0], e[1], e[2], e[3], (cv.width - e[2] * s) / 2, (cv.height - e[3] * s) / 2, e[2] * s, e[3] * s)
+  } catch (x) { fail(x) }
+ };
+ const open = (id, s2) => {
+  try {
+   const D = SHOPS[id]; if (!D) return false; css(); const e = el(); try { closeMenu() } catch (x) { }
+   if (D.card) {   /* a shop of its own kind (§148: the clothes shop opens the outfit editor) */
+    e.setAttribute("aria-label", D.name); e.innerHTML = `<div class="pk"><button type="button" class="x" data-kx="1" aria-label="Tutup">✕</button><h2>${D.icon} ${esc(D.name)}</h2>${D.card(s2)}</div>`;
+    e.hidden = false; HF.kedai2On = true; H146.opened++; e._id = id; return true
+   }
+   const L = D.items.filter(t => ITEMS[t]);
+   e.setAttribute("aria-label", D.name);
+   e.innerHTML = `<div class="pk"><button type="button" class="x" data-kx="1" aria-label="Tutup">✕</button><h2>${D.icon} ${esc(D.name)}</h2><p class="nt">${esc(D.intro || "")}</p>
+<div class="gl">${L.map(t => { const it = ITEMS[t], can = S.freeBuild || S.money >= it.price; return `<div class="it"><canvas width="150" height="84" data-th="${t}"></canvas><b>${esc(it.name)}</b>${NB[t] && NB[t].tag ? `<span class="tg">${esc(NB[t].tag)}</span>` : ""}<small>${esc(it.note || "")}</small><button type="button" data-kb="${t}" ${can ? "" : "disabled"}>Beli & letak · RM ${it.price}</button></div>` }).join("")}</div>
+<button type="button" class="ct" data-kc="1">🛋️ Buka katalog (Mod beli)</button><p class="nt">Barang dihantar ke rumah: ketik lantai untuk meletaknya.</p></div>`;
+   e.hidden = false; HF.kedai2On = true; H146.opened++; e._id = id;
+   e.querySelectorAll("canvas[data-th]").forEach(cv => thumb(cv, cv.dataset.th));
+   if (!sheet()) setTimeout(() => { try { if (HF.kedai2On) e.querySelectorAll("canvas[data-th]").forEach(cv => thumb(cv, cv.dataset.th)) } catch (x) { } }, 900);
+   return true
+  } catch (x) { fail(x); return false }
+ };
+ H146.open = open;
+ document.addEventListener("click", ev => {
+  try {
+   const t = ev.target; if (!t || !t.closest || !HF.kedai2On || !t.closest("#hfkedai2")) return;
+   ev.stopPropagation();
+   if (t.closest("[data-kx]") || t === el()) { close(); return }
+   const b = t.closest("[data-kb]");
+   if (b && !b.disabled) { const k = b.dataset.kb; close(); try { setTab("buy"); renderBuy(); setPlacing({ type: k }); toast(`${ITEMS[k].name}: ketik lantai untuk meletaknya.`) } catch (x) { fail(x) } return }
+   if (t.closest("[data-kc]")) { const D = SHOPS[el()._id]; close(); try { if (D && D.cat && typeof bcatSel !== "undefined") bcatSel = D.cat; setTab("buy"); renderBuy() } catch (x) { fail(x) } return }
+   const a = t.closest("[data-ka]"); if (a) { const D = SHOPS[el()._id]; if (D && D.act) { const v = a.dataset.ka; close(); try { D.act(v) } catch (x) { fail(x) } } }
+  } catch (x) { fail(x) }
+ }, true);
+ document.addEventListener("keydown", ev => { try { if (HF.kedai2On && ev.key === "Escape") { ev.stopPropagation(); close() } } catch (x) { fail(x) } }, true);
+ H146.shop = D => {
+  SHOPS[D.id] = D;
+  try {
+   PLACES[D.id] = { area: D.area, name: D.name, icon: D.icon, acts: ["hf_" + D.id], note: `${D.note} Buka ${D.whenTxt}.` };
+   ERR["hf_" + D.id] = { label: D.label, icon: D.icon, dur: 25, ages: ["teen", "adult", "elder"], eff: { fun: .2 }, place: D.id, when: D.when, whenTxt: D.whenTxt };
+   if (typeof WMPL !== "undefined" && !WMPL[D.id]) WMPL[D.id] = D.pin;
+   if (typeof WMN !== "undefined") WMN[D.id] = D.name;
+   if (typeof WMCAT !== "undefined") WMCAT[D.id] = "food";
+  } catch (e) { fail(e) }
+ };
+ if (typeof errandReturn === "function") {
+  const er = errandReturn;
+  errandReturn = function (s2) {
+   const e = s2 && s2.errand, r = er.apply(this, arguments);
+   try { const id = e && String(e).replace(/^hf_/, ""); if (s2 && SHOPS[id] && S.sims.includes(s2) && !s2.visitFrom) setTimeout(() => open(id, s2), 350) } catch (x) { fail(x) }
+   return r
+  }
+ }
+ /* (2) Kedai Hiasan Seri Laman */
+ H146.items({
+  kerusigoyang: { name: "Kerusi goyang kayu", price: 180, decor: 2, h: .62, fp: .62, cat: "rehat", col: "#8a6a4a", note: "Kerusi goyang beralas rotan, +2 bilik" },
+  mejasisi: { name: "Meja sisi & lampu", price: 120, decor: 2, h: .78, fp: .5, cat: "hias", col: "#8a6a4a", note: "Meja sisi kayu dengan lampu baca, +2 bilik" },
+  pasubunga: { name: "Pasu bunga ros", price: 60, decor: 1, h: .36, fp: .32, cat: "hias", col: "#e8dccb", note: "Pasu seramik dengan bunga ros, +1 bilik" },
+  pasuantik: { name: "Pasu seramik besar", price: 120, decor: 2, h: .52, fp: .42, cat: "hias", col: "#8fb8a0", note: "Pasu seramik hijau lembut, +2 bilik" },
+  bakul: { name: "Bakul anyaman & selimut", price: 45, decor: 1, h: .2, fp: .5, cat: "hias", col: "#b08a5a", note: "Bakul rotan berisi selimut, +1 bilik" },
+  kotakmainan: { name: "Kotak mainan kayu", price: 70, decor: 1, h: .3, fp: .7, cat: "bayi", col: "#9a6a42", note: "Bola, blok kayu dan anak patung, +1 bilik" },
+  kusyenlantai: { name: "Kusyen lantai", price: 50, decor: 1, h: .26, fp: .8, cat: "rehat", col: "#b8c4a8", note: "Dua kusyen lantai warna lembut, +1 bilik" },
+  tanglungkayu: { name: "Tanglung kayu", price: 85, decor: 1, h: .46, fp: .3, cat: "hias", col: "#8a6a4a", note: "Tanglung kayu berlilin, +1 bilik" }
+ });
+ H146.shop({
+  id: "hiasan", name: "Kedai Hiasan Seri Laman", icon: "🏮", area: "bandar", pin: [1300, 800], cat: "hias",
+  when: (d, h) => h >= 10 && h < 22, whenTxt: "10:00–22:00", label: "Ke kedai hiasan: pilih hiasan rumah",
+  note: "Hiasan rumah: kerusi goyang, pasu, tanglung, bakul dan banyak lagi.",
+  intro: "Hiasan polos warna lembut untuk setiap bilik. Pilih satu, kemudian ketik lantai di rumah untuk meletaknya.",
+  items: ["kerusigoyang", "mejasisi", "pasubunga", "pasuantik", "bakul", "kotakmainan", "kusyenlantai", "tanglungkayu", "lamp", "plant", "jamdinding", "bingkai"]
+ });
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §147. hf130 (bahagian 8) Nurseri Bunga Raya di peta + 9 tumbuhan (owner 22 Nov: plants with Dalam / Luar tags,
+   plain paintings). A kampung place (8:00-18:00) on §146's shop frame; nine pieces painted on the free Space from Poly Haven CC0
+   potted plants and planter boxes (the shapes; the plant itself as named): pokok duit, anthurium, calathea (Dalam), paku pakis,
+   bunga raya, bunga kertas, limau kasturi, kotak sayur, kotak herba dapur (Luar). Each card shows its tag. Saves: only pieces
+   bought; an old save is unchanged. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ if (HF.h146) {
+  HF.h146.items({
+   pokokduit: { name: "Pokok duit dalam pasu", price: 85, decor: 2, h: .95, fp: .6, cat: "hias", col: "#5a8a4a", tag: "Dalam", note: "Pokok pachira berbatang jalin, +2 bilik" },
+   anthurium: { name: "Pokok anthurium", price: 55, decor: 1, h: .5, fp: .45, cat: "hias", col: "#5a8a4a", tag: "Dalam", note: "Daun berkilat dan bunga merah, +1 bilik" },
+   calathea: { name: "Pokok calathea", price: 50, decor: 1, h: .45, fp: .5, cat: "hias", col: "#5a8a4a", tag: "Dalam", note: "Daun lebar berjalur lembut, +1 bilik" },
+   paku: { name: "Pokok paku pakis", price: 35, decor: 1, h: .55, fp: .5, cat: "hias", col: "#5a8a4a", tag: "Luar", note: "Paku pakis hijau dalam pasu tanah, +1 bilik" },
+   bungaraya: { name: "Pokok bunga raya", price: 45, decor: 2, h: .75, fp: .55, cat: "hias", col: "#5a8a4a", tag: "Luar", note: "Bunga raya merah dalam pasu, +2 bilik" },
+   bungakertas: { name: "Pokok bunga kertas", price: 45, decor: 2, h: .55, fp: .75, cat: "hias", col: "#5a8a4a", tag: "Luar", note: "Bunga kertas merah jambu, +2 bilik" },
+   limaukasturi: { name: "Pokok limau kasturi", price: 60, decor: 1, h: .72, fp: .45, cat: "hias", col: "#5a8a4a", tag: "Luar", note: "Limau kasturi berbuah dalam pasu, +1 bilik" },
+   kotaktanaman: { name: "Kotak sayur kayu", price: 70, decor: 1, h: .38, fp: .8, cat: "hias", col: "#8a6a4a", tag: "Luar", note: "Sawi dan kangkung dalam kotak kayu, +1 bilik" },
+   kotakherba: { name: "Kotak herba dapur", price: 65, decor: 1, h: .38, fp: .8, cat: "dapur", col: "#8a6a4a", tag: "Luar", note: "Serai, pudina dan daun kari, +1 bilik" }
+  });
+  HF.h146.shop({
+   id: "nurseri", name: "Nurseri Bunga Raya", icon: "🌺", area: "kampung", pin: [715, 790], cat: "hias",
+   when: (d, h) => h >= 8 && h < 18, whenTxt: "8:00–18:00", label: "Ke nurseri: beli pokok & bunga",
+   note: "Pokok dalam pasu untuk dalam rumah (Dalam) dan untuk laman atau serambi (Luar).",
+   intro: "Pokok hiasan polos dan sihat. Tanda Dalam: sesuai dalam rumah; Luar: laman, serambi atau balkoni.",
+   items: ["pokokduit", "anthurium", "calathea", "paku", "bungaraya", "bungakertas", "limaukasturi", "kotaktanaman", "kotakherba", "plant", "monstera"]
+  })
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §148. hf130 (bahagian 9) Butik Kain & Tudung dan Kedai Bayi Comel di peta (owner 22 Nov: clothes by season and
+   festival, using the outfit system already there; baby goods, linked to the baby system already there). Both on §146's frame.
+   - Butik Kain & Tudung (town, 10:00-22:00): back home its card lists the family (not babies, not away) with "Pilih pakaian", which
+     opens the game's own outfit editor (openCAC: everyday, work, traditional and Raya wear, tudung) for that person; a line points
+     to Kedai Jahit Mak Som in the kampung for sewing. Nothing new is saved.
+   - Kedai Bayi Comel (town, 10:00-21:00): the baby and child pieces the game already has (katil bayi, buaian, mainan bayi, almari
+     lampin & meja tukar, katil kanak-kanak, meja belajar kanak-kanak) and §146's kotak mainan kayu; buying places them as the
+     catalogue does, and the baby care that uses them (tidurkan, tukar lampin, main) is the game's own. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ if (HF.h146) {
+  const who = () => (S.sims || []).filter(s2 => s2 && !s2.away && !(typeof isBaby === "function" && isBaby(s2)));
+  HF.h146.shop({
+   id: "pakaian", name: "Butik Kain & Tudung", icon: "👗", area: "bandar", pin: [1170, 930], cat: "",
+   when: (d, h) => h >= 10 && h < 22, whenTxt: "10:00–22:00", label: "Ke butik: pakaian & tudung",
+   note: "Baju harian, baju kerja, baju tradisional dan baju Raya, tudung dan kasut.",
+   items: [],
+   card: () => `<p class="nt">Pilih pakaian untuk ahli keluarga: baju harian, kerja, tradisional dan Raya, tudung dan warna. Untuk jahitan baju kurung atau baju Melayu, singgah juga di Kedai Jahit Mak Som di kampung.</p>
+<div class="gl">${who().map(s2 => `<div class="it"><b>${esc(s2.name)}</b><small>${esc(typeof STAGEL !== "undefined" && STAGEL[s2.stage] || "")}</small><button type="button" data-ka="${s2.id}">👗 Pilih pakaian</button></div>`).join("") || '<p class="nt">Tiada sesiapa di rumah sekarang.</p>'}</div>`,
+   act: id => { try { openCAC(isNaN(+id) ? id : +id) } catch (x) { fail(x) } }
+  });
+  HF.h146.shop({
+   id: "bayi", name: "Kedai Bayi Comel", icon: "🍼", area: "bandar", pin: [1170, 800], cat: "bayi",
+   when: (d, h) => h >= 10 && h < 21, whenTxt: "10:00–21:00", label: "Ke kedai bayi: kelengkapan bayi & anak",
+   note: "Katil bayi, buaian, mainan, almari lampin dan kelengkapan anak.",
+   intro: "Kelengkapan bayi dan anak. Selepas diletak di rumah, penjagaan bayi (tidurkan, tukar lampin, bermain) memakainya seperti biasa.",
+   items: ["crib", "buaian", "babytoys", "lampin", "kidbed", "mejabelajar", "kotakmainan"]
+  })
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §149. hf130 (bahagian 10) Kedai Elektrik Cahaya di peta (owner 22 Nov: an appliance shop with star ratings, "jimat
+   ~RMx, pulang modal ~N", Sejuk & Selesa, Dapur, Dobi, Air & Laman, Lampu, "Tukar" for what the house already has and "Dah ada /
+   Sedang guna", tied to the bills the game already has). The game has one weekly utility bill (RM 60 + 3% of the house's worth +
+   RM 40 a floor), no separate electricity or water bill, so the savings come off that bill: when it is paid (the diary line
+   "Bayar bil utiliti RM x"), this week's saving is paid back with a note, at most 40% of the bill. Upgrades go on the pieces the
+   house has (o.bt: the fridge's stars; o.ind: induction hob on the stove; o.dp: front-loading washer; o.jimat: water-saving shower
+   head) or on the home (S.hfEl[home]: LED lights, outdoor motion lights, rain-water tank). New pieces (kipas siling, periuk nasi,
+   mesin basuh) are bought and placed as in the catalogue. No new paintings: the pieces look as before. An old save gets nothing
+   until something is bought here. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const H149 = HF.h149 = { refunds: 0 };
+ const objsOf = types => (S.objs || []).filter(o => types.includes(o.type));
+ const homeEl = () => { S.hfEl = S.hfEl || {}; return (S.hfEl[S.home] = S.hfEl[S.home] || {}) };
+ const FRIDGE = ["fridge", "luxfridge"], WASH = ["mesinbasuh", "mesinduatub"].filter(t => ITEMS[t]), SHOWER = ["shower", "bathtub"];
+ /* the week's saving (RM) of this home */
+ const saving = () => {
+  let s = 0;
+  for (const o of objsOf(FRIDGE)) s += o.bt === 5 ? 14 : o.bt === 4 ? 9 : 0;
+  for (const o of objsOf(["stove"])) if (o.ind) s += 8;
+  for (const o of objsOf(WASH)) if (o.dp) s += 12;
+  for (const o of objsOf(SHOWER)) if (o.jimat) s += 4;
+  const H = homeEl(); if (H.led) s += 8; if (H.sensor) s += 3; if (H.tong) s += 5;
+  return s
+ };
+ H149.saving = saving;
+ /* the offers: [id, section, name, stars, price, weekly saving, kind, target] */
+ const OFF = [
+  ["peti2", "❄️ Sejuk & Selesa", "Peti sejuk 2 bintang (biasa)", 2, 0, 0, "fridge", 2],
+  ["peti4", "❄️ Sejuk & Selesa", "Peti sejuk 4 bintang", 4, 300, 9, "fridge", 4],
+  ["peti5", "❄️ Sejuk & Selesa", "Peti sejuk 5 bintang inverter", 5, 420, 14, "fridge", 5],
+  ["kipassiling", "❄️ Sejuk & Selesa", "Kipas siling (lebih jimat daripada penyaman udara)", 4, null, 0, "buy", "kipassiling"],
+  ["induksi", "🍳 Dapur", "Dapur induksi (tukar dapur gas)", 4, 260, 8, "stove", 0],
+  ["periuknasi", "🍳 Dapur", "Periuk nasi elektrik", 3, null, 0, "buy", "periuknasi"],
+  ["dobi", "🧺 Dobi", "Mesin basuh pintu depan 5 bintang (tukar mesin sedia ada: jimat air & elektrik berbanding mesin dua tab)", 5, 480, 12, "wash", 0],
+  ["mesinbasuh", "🧺 Dobi", "Mesin basuh (beli baharu)", 3, null, 0, "buy", "mesinbasuh"],
+  ["pancuran", "🚿 Air & Laman", "Kepala pancuran jimat air", 4, 60, 4, "shower", 0],
+  ["tong", "🚿 Air & Laman", "Tong air hujan (siram laman & cuci)", 0, 150, 5, "home", "tong"],
+  ["led", "💡 Lampu", "Lampu LED seluruh rumah", 5, 120, 8, "home", "led"],
+  ["sensor", "💡 Lampu", "Lampu luar bersensor gerak", 0, 80, 3, "home", "sensor"]
+ ];
+ const stars = n => n ? "★".repeat(n) + "☆".repeat(5 - n) : "";
+ const state = O => {
+  const [id, , , , price, sv, kind, tgt] = O;
+  if (kind === "buy") return ITEMS[tgt] ? { can: S.freeBuild || S.money >= ITEMS[tgt].price, txt: `Beli & letak · RM ${ITEMS[tgt].price}`, kb: tgt } : null;
+  if (kind === "home") return homeEl()[tgt] ? { done: "Sedang guna" } : { can: S.freeBuild || S.money >= price, txt: `Pasang · RM ${price}` };
+  const L = kind === "fridge" ? objsOf(FRIDGE) : kind === "stove" ? objsOf(["stove"]) : kind === "wash" ? objsOf(WASH) : objsOf(SHOWER);
+  const need = { fridge: "peti sejuk", stove: "dapur gas", wash: "mesin basuh", shower: "pancuran mandi" }[kind];
+  if (!L.length) return { off: `Perlu ${need} dahulu` };
+  const have = o => kind === "fridge" ? (o.bt || 2) === tgt : kind === "stove" ? !!o.ind : kind === "wash" ? !!o.dp : !!o.jimat;
+  if (L.every(have)) return { done: kind === "fridge" && tgt === 2 ? "Dah ada" : "Sedang guna" };
+  if (kind === "fridge" && tgt === 2) return { off: "Model lama" };
+  return { can: S.freeBuild || S.money >= price, txt: `Tukar · RM ${price}` }
+ };
+ const card = () => {
+  const sv = saving(); let last = "", h = `<p class="nt">Jimat minggu ini di rumah ini: <b>RM ${sv}</b> (dibayar balik semasa bil mingguan, paling banyak 40% bil).</p>`;
+  for (const O of OFF) {
+   const [id, sec, nm, st, price, w] = O, S2 = state(O); if (!S2) continue;
+   if (sec !== last) { h += `<p class="nt" style="margin-top:10px"><b>${sec}</b></p>`; last = sec }
+   const pay = price && w ? ` · jimat ±RM ${w} seminggu · pulang modal ±${Math.ceil(price / w)} minggu` : w ? ` · jimat ±RM ${w} seminggu` : "";
+   const btn = S2.done ? `<button type="button" disabled>${S2.done}</button>` : S2.off ? `<button type="button" disabled>${S2.off}</button>` : S2.kb ? `<button type="button" data-kb="${S2.kb}" ${S2.can ? "" : "disabled"}>${S2.txt}</button>` : `<button type="button" data-ka="${id}" ${S2.can ? "" : "disabled"}>${S2.txt}</button>`;
+   h += `<div class="it" style="text-align:left"><b>${esc(nm)}</b><small>${stars(st)}${pay}</small>${btn}</div>`
+  }
+  return `<p class="nt">Peralatan cekap tenaga dan air untuk rumah anda. Pilihan "Tukar" menggantikan barang yang sudah ada (rupa kekal sama).</p>${h}`
+ };
+ const act = id => {
+  try {
+   const O = OFF.find(o => o[0] === id); if (!O) return; const [, , nm, , price, , kind, tgt] = O, S2 = state(O); if (!S2 || !S2.can) return;
+   if (!S.freeBuild) S.money -= price;
+   if (kind === "home") homeEl()[tgt] = 1;
+   else for (const o of kind === "fridge" ? objsOf(FRIDGE) : kind === "stove" ? objsOf(["stove"]) : kind === "wash" ? objsOf(WASH) : objsOf(SHOWER)) {
+    if (kind === "fridge") o.bt = tgt; else if (kind === "stove") o.ind = 1; else if (kind === "wash") o.dp = 1; else o.jimat = 1
+   }
+   try { sfx("coin") } catch (x) { } toast(`🔌 ${nm}: dipasang (RM ${price}). Jimat bil kini ±RM ${saving()} seminggu.`);
+   try { diary(`Pasang ${nm.toLowerCase()}.`) } catch (x) { }
+   setTimeout(() => { try { HF.h146.open("elektrik") } catch (x) { } }, 60)
+  } catch (x) { fail(x) }
+ };
+ H149.act = act; H149.state = state; H149.OFF = OFF;
+ if (HF.h146) HF.h146.shop({
+  id: "elektrik", name: "Kedai Elektrik Cahaya", icon: "🔌", area: "bandar", pin: [1300, 670], cat: "",
+  when: (d, h) => h >= 10 && h < 21, whenTxt: "10:00–21:00", label: "Ke kedai elektrik: peralatan jimat tenaga",
+  note: "Peti sejuk berbintang, dapur induksi, mesin basuh, kepala pancuran jimat air, lampu LED.",
+  items: [], card, act
+ });
+ /* the weekly bill: this week's saving paid back */
+ if (typeof diary === "function") {
+  const dy = diary;
+  diary = function (msg) {
+   const r = dy.apply(this, arguments);
+   try {
+    const m = /^Bayar bil utiliti RM (\d+)\./.exec(String(msg || ""));
+    if (m) { const bill = +m[1], sv = Math.min(saving(), Math.round(bill * .4)); if (sv > 0) { S.money += sv; H149.refunds += sv; toast(`💡 Jimat bil minggu ini: RM ${sv} (peralatan cekap tenaga & air)`) } }
+   } catch (x) { fail(x) }
+   return r
+  }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §150. hf130 (bahagian 11) Semua kedai baharu di peta, mudah dilihat (owner 22 Nov: "Tambah semua kedai dekat peta.
+   Semua ok."). The town (bandar) side of the Peta Dunia is full (houses, the PPR block, the Mall row), and §145-§149's pins sat
+   among the town houses, under their labels. Now the five new shops stand in a row of their own, "deretan kedai", in the kampung
+   between the house lots and the padang, a short scroll below the family's own house, beside the Nurseri (which keeps its
+   place by the dusun): Kedai Perabot, Kedai Hiasan, Kedai Elektrik, Butik Pakaian, Kedai Bayi. Short names on the map (WMN), the
+   full names in their cards; they are kampung places now (errands to the kampung row). Tapping a pin opens the place as every
+   other place on the map does. Nothing saved. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const ROW = [["perabot", 180, "Kedai Perabot"], ["hiasan", 270, "Kedai Hiasan"], ["elektrik", 360, "Kedai Elektrik"], ["pakaian", 450, "Butik Pakaian"], ["bayi", 540, "Kedai Bayi"]];
+ for (const [k, x, nm] of ROW) {
+  try {
+   if (PLACES[k]) PLACES[k].area = "kampung";
+   if (typeof WMPL !== "undefined") WMPL[k] = [x, 668];
+   if (typeof WMN !== "undefined") WMN[k] = nm;
+  } catch (e) { fail(e) }
+ }
+ try { if (typeof WMN !== "undefined") WMN.nurseri = "Nurseri Bunga Raya" } catch (e) { fail(e) }
+ HF.h150 = { ROW };
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §151. hf130 (bahagian 12) Ikon lukisan untuk kedai baharu di peta (owner 22 Nov: "Buat icon sama style macam dengan
+   peta"). The map's painted places (Kebun Buah, Kedai Roti: §110) are small hand-painted buildings, cut out, drawn on the map with
+   a soft shadow ellipse under them and the name below. The six new shops (§145-§150) had an emoji pin; now each has its own
+   painting the same way (tools/hf/ikon_kedai.py: the same style words and the same free Space as kebun-lukis.py), inlined below as
+   data URIs, as §110's two icons are, so no published file is added. The same picture heads each shop's card. Nothing saved. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const IK = /*ICONS:kedai*/ {"ikon-perabot":"data:image/webp;base64,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","ikon-hiasan":"data:image/webp;base64,UklGRnodAABXRUJQVlA4WAoAAAAQAAAAmwAAswAAQUxQSNAGAAABoAZb2yFJer/sHtu2bdvTY9u2bdu2jbUxtm2rMWi7630jKr+srMr68v21GxERENy2kSS52rPawJXes8/dfgBYOYSANG2bp9BXwNIosePDm/UFgCUoMOYSESWcHpKHIah+KobQOSjiX25AQIULREgk5SL+mdhAcwIfGo7oIGmg3u7ZMCnAhUYk6G9dQcSpoRIIDiSGO3SZgP7byEJcwFhJZhB5anzDVDrY3ZXOSTaHhPc7SkgBW7vyGcluAZ1d4ScFbG+3QC982NnEtiAMdn9IsMumIACqnCFdDIGA9KOuyeQxfNzVJLUOtnK6RREuzE4g7eII0veRHIFWfEW4xBbCx91NbdJGaM2vx0lmCAQUPSdv1r0Ayu8FBIDfn5GSvQRKB4QQzR+QNLwEn/bIoCo3v08OYgkE5Bh+X+rvXfi4xy+NDso51+4Yo9UIqOZ4yUrA3maKBVxYHVAnICBJg8NxZBjMBAT49ntDzqEa7JPB68485J0hplyguQTedakTIZJVBP99MnjRJX8jyfyAACj1G6FuhWF/Cy+BBqn7n5MrqkNaHSznFNOCXcR4CQghSiz6Jh1U8AMCoO6lBIltAgH7W0ptLHKW0bdIMkeQaV20TLYC/wNWgADfiltc2V4BA3hkreNDh2RbwsGW6TyD/DOekzRsC608CRQ8pm8XmILUW+S9o70h8GArN9u0eCdt6JmCSXF6jQMIONTajTYTDWIhcKi1FBCmYgX0uIlYgQJZpLhwIU7A//4PVVKCNN0gXoAeHOtfJbmvE2SxAnoh+umBdX6pwIXYiZP/gowuxE7cQcH9DGKpED+JISHKogtVJsRK3zlkprnub51hcrzh9j8bS2xErNz875zQ8wtR3N1Tl8PYSOxvPeFKNJEDLxeBNFMf7h1aJkOuReEsIBKNA63owK1viXakBkhROJ10v2xlHBOapAmAFA2WLiojH2sIITQofZccLGiifHQmHwIJQ8F3dhwhEwKQweXIuSOO2JD5gbeAnNtCHTzIzZP3jKO/ETIl0KCqP18SohZngpr/x5Lg7aVWAFsSkH5VDBFT0qBlMCFf6hLFmbpGMybRxJ8vCci7IZapiBBQ5fgDriT/RTixJAEZRl0nRKaUYm4kIVMvAnLfIAdx9U6ysV8ReZIAbUAQEXGlRJsJWZHZUvuavrAVafyakC81/cCWBGQ4RIjIlQpc4KysjY+LfOBPyFQ5x4TRRWcl6AtX53d5D0UTW8eN+v9KPOXs+nz+S5ydszf5zNg5e9LVCURsqeYrQr5U8hRjjQS0+spZpPonzq6t/fftPlqtAM6U/zRngqWc3atKvZuzc4Gcf3IlISDVgHc8yC2CsnsDuboGLgqOuUyEPF1PyDLmYjRb1+czr4t2Vpm6lptR/lc/lqRB4y/kILbUPASRMxFnCuZEwlQtwpCP8gTQzKYVP0+EyITmJgHTUXPXVWQC6NX6WolMl8Sl9wcSF/C8q6/54Wy6Nod4AHTQ2Wym+yQdWh9mARCv5dKPM9wBDgJIVyW5Ba0OBehgbxlf3AscdAYcaOfyphTyeZTbgRD7BhDpaW3JHsCkf/1tCkjRp9r5ePrQxcQZBl2zIyDR++W5hAWP40icq/PNYB3s5ZizftIMC8CnaLvzDiK0U8/AuQVBsiUAJWffiXOCXYj+aJnSygetCPApO+xIvC22ZEgUcqKUK7IskHvK0XAiVL4a/FOPLK5sYQAyTP01kBBR6eqDnlkMPa0H37SjAqWfRWUdcbqF4UFX3oHkHZdeDVIR5M/kyuA8wpwsXl2iAm2vhCOhgrPiTldT4ZmMULL9H/p2VjHHXp1Y2GyW19pAsZm34pQCpJeTimggkQrgU3KGOoAOpNfdhEKPQBTghJm34pUAJIr5rZ2vXFUKZigAiBR6fllOFZ9UamiDiN6s4quZ2ZM6q2pCie3B5L0AEkX9WjspSFYTMnb6Lkhv4x3Hn5Ee4a9bWcjSdLq0rfCGDxXyOKHEZlYrMe2mvjqrY08n5wWhW3nwKTHtvqWHlYgUdcJPmFVVbgP1vwslZ8Cy6uPZWeWYXSDD9CtBRISWVMN+recjk30gaY6OJ17HeB5AcryeYnLkaptJmSpOuetpESn6x1rJQNjMYNhC1j7xxQmexN6NyW2o2hIytv8T3d2BIlHszd6mPW3XutjihwlEbgBS7PWpxXxd2K6BxBXn/fSZCE1nRS4v4uKGgK2LWsb2x745wWRbOjOde7979vxlTDfqsdTGuC39pWYik1l2b1Nh4cN4Mvw6Bo13vQNioU2icttCo4nIEX5hUDKZWIEsLXocCgjf2qagMDcTq8vQeVg2L88CVlA4IIQWAAAQTwCdASqcALQAPm0wkkakIyGhKvV82IANiWMIcrGMk/aiCVddO+TFF2/vOuacP+1Xsq9KR+5nqD/5zMM/xQ8Pf71+OvnT5YPhMsjwzza/fj+F67P6fvd4BHsDzynxfK35v0C/Y/6x/zfDf/0vQ/7N/8X3APzH9ev8B/bfsA9d/y/2A/5l/Wf+R/fvdn/tf/T/qfyu9sX0z/3P9D+Tn2C/y7+rf77++/5P/5f575zvah+1/s7/sW4TZmHUNEyxIo0e2vtSVt3RrxBTEbvfWQY6DcHRNpO1Qsivq8G9YXUtmkZDz8+mbXm57K+r4KdMYp9VG3l172X5ymIr/Ap6SpAB3z9EHM446fTF310U6YxDf/EHHtOzGfwwDlJ+jMioFPKqObLRZMO9oFOyv104uN4ZyB5XfZlXbJiWtY8ub64PSlT16wUPZa6AvxQ2SARi58/Bfe19O02qAN6PPbKH8203AJeLX0kbtRUMPsvnNgk8qU9D+vkG+R9BdzKZVAXm/GNUCygbsZDBvnqapNp/3tQh/sFgFLal9uQUdsy6Mk1ttZ/W01BLZNZGn9s5slpZNGRM0sZCh/xHdOR4XfUnznIHjPfTpfl775vvNSNqIOTXY4tOJFVnTTlEi5q6C7tdM2lmDltTavP6OS+O7tl3yO734u+9G/u+XwWST1gKmklHnEEDmih7h+Rqu3ANLVDW+fdvmMU8G6Rrmnu+PjFPYs+tPUnWZGqpcS741/aIjqX51cs+CPeQH9mLQuPkobw4LwAahV1n01ZNp1I0kJcu+JdKfV6Y3li9PUW8ycn6GLl0XGc9+aaLfz5puEWA37hecDRGFloRS1WxPUk8hfkrGY0IgAD+6vui//hUj1HZSCU1TrUemd3/RD1AQ4m1gcF6k+8hYJ8aYEFHc90UUR/mhthT1uTTTGH7/ezHLaILyFytKs+j29SFDo0PHQ1fzoxovCgyZgQZstb7skLtDY6XyxxuLCbySWGthiTaZGoV7+v7xeYjIYQxqIliH9ekj83lcV6s37P/ZNemWWWvjL1I3ihvjVQaOvXvVCMFVwU2ywmLZoQt9CK0rQNjp072F49n3VH5PVfnVc5SJNn8rL2r48nA5eZqqfa/p74Bn2SNE5zePibkglyjIBqh/wp7I1cPBrHc9Voo9M8T0/dpxsVXBN7X80S4+yttqjxvN+rXKWougGv7RsgEQxwth3376Dch91sZlVs5lGK90QVuUpC51s/ueyUIS/4wA83BggAPdMLu914EqbOPeqF8Um2d35Cx23lJQ270mX7P/+WVMSAkcefGwoDXlHwGCjW0FqgMYgMiS7EVMWWolOb8KYzPkiIIFjfsK3vcfyfGdTA8zj3KhYKitpY8prKhyxt/1kFVbb7OhyJBqo6l2TjLf1ku6cF4YL3R9mFIH4s2zCC9LR+0+AHa/+0LaW5bjOBeW9mobyRUQh/zyGaxdhrEA0MW68y4LEZCAknkZOOo+Tny+8wNIf2h1m9onVWBF0FvP3LtPhTQuX7Z7dJ3oK5tTtVJE9jyGMIE/7DDGKFyM1X+mriF8NSu/6iNzqNUEasJHLQ1teYF12d9xvOEDmrA2/Fgo8enOQlPj2LsvzOSAlRzki+Cx257xk6xMhVGQ3w4TNRbEYourWNz0I0+QhgpsuxqgNfjlttFUiKMQ8cPn59x6+xWfmg8QCoOuHAksyY8WpfAdPgL3LtOaw+G13NNo1DTrfygkD91s14juXwSN12rdtWFDHK8RMAewzyhIluR/os9u1euyoOfDOKm7gAZuv9sXoQDWsKn+1oV1y6Q1ILLAS2CCkIyeP11NrJB1rXy7nuMtgTdBqyWAFIC2oRGjnzkFiWC/O7V4hwAbYgUaBfs0p9IjFF02GAnira+kF0ycridAGkDTPGwFRSkAFusZc7/Tf0OxKofMjDfE8e46IapNcobRljEmxoQEVRvGFPOQITsNuB2KanN8WfapxeaRkEIWy08zCH1WH5Z2gt5oi9AuP1IPFQgEQx6oqBhGFsAjEzg/4r9sU45SoDqZRsyU5cLSahxKISXV6eKFgxRjfiwUePTnISnx7F1bm5jbg4ApKVVt4GoqYlHlzk8S6S8XXUFSoV0GNOWPQZYL6vp0ZiEEe9FJHwXh5HuqwktL5ZzL597zZXNrCkySiCjZlMp1+mpL42Xi9K7DDMJsnsZ1mmv1XMmnulensFKb+KCYEQueEGOhTY45CBUyoNYTOnRiOPJRRTrf60B3AsB8J+QDuO0IPZORWqZt73pPrU48uBTWSq7ChyH8A30Ytdotc51wN8BG1y6BZw1fW8x9sIIVsRuW2w6SVdLu9d0WPOz+RC5YdAmmjeKWTikLRyL+4A6xjC0ZXx3mLoHYF4tfY5KZN4aVMAn6TTczJO/1YKJ1PSs80qTEuggKzGWxsX9SWGwNgrmeBn7BSs84Y2W9BOzp/8ezmd6KGowA5AjuDNbuXF50Eo9Pctz9lQHyEr20WDqarCsza7Ycy9D4oXSgrMkY3w09fh1E8lNHyXjwKuGeE9am/SnX/PDM97xahCeLhoIKa30hzkTmu3Zf+u+X846lZ+9oaVMXGgb2RpMkUIZFNR/Y+Hq4pTlSr4Pz+19lydeuIf8Ub+FOcR5B/e+Jyw5kgd//tYrBj36YTabbeGegxtRxAG0jVQr2876wX04O5e4L6v7hRTpgcz318Q8dh99Pee+27z6qnbDv3eOqvO46oqepEJ+Gbs+ZAvdgB71dXqcFa4bUJkqhHjQiXcSKVMSHDr8PaHyfWKoFK3NsQtigDn4RCFlV076hSkjixUM4WaIQ8Q1FgE149iQuqOqE+3HoXsDSalaz59cx9xHr7judVJSzwR3yM/edFGgwidpbpiOCaCuec5/3YS37vrM3PGWi6lKNbB5qTPFV4hL4byBHO914WmU5J6l1biMtI53om9pZmRmzRPvMuOMEadmWyi8IK+iTvCeIQgpIvus49CO+K+HFe3UVMGx/XbhJkjGaCJQPO047uqiIhCw6LX6H2I6+eiB6SZaaSezJE+qkX9P5LckRg932svR2WifVsxU8010XduCi75/Z9fi8QghHBzP6op8snmzaU8buArfJsLjo2gqyo/tngr378WKePfCMXlHUCGLzntjzu3PpBWqGWaQ/I9DY1S7S5V8prmkRhdkGbziM1s0xRFdZkm4t3JVbGBxkjnFCzVhx2PKwG9v0JS+2ma3kr5OjLTVZw34oCXrJRL3p41tXMSw6EEAcNcVthmP9R/GgxCY+1EweRxDTRyBVTXj5QCGiUgCrza2iLTcWeMt41JPiy5ltKEJ7eE0+RxZhaXq0gUX3H2E03vNlV1fB/g0EVsNoFo9pvI7xY7F0fc0gif7Ta1FTksd4bYJQ7XJjXhzxb/LBlv37aeTBvs9vsrGf9DGI6/dvCkivzudhHndTuTDCscKZVqCBRHG5Rfi2lTcUWbFLGmvWKLGIs57g3dcpDyZO3/gvp2j7kjkbttfF49eOivoq3KFwUfcnuCf21axBrDr9FXPVnvrHgMRTb7hcahd920lToZiAuGxE3+8UlDcEIEvqm0FrQYoIZgZBl9784TdbXSOy4YzTwM5nOwW2THWiv2Y6C89tv5sbjEeIKz5uH+5czB5m11K54dl9OlE08+y/kMFWbJIFi+jwy7/hOQvVeuE8WiETarZW0/OYhESxCxVsnD0h1m2kT/u+IIl910+dQhzKYUmZNgDDaTOQjAcNHq/y/zx4z/gPThbdAuzlDZzU0cqHdYgXamjDBdAfVnyrXo6nt8QqTWFZ0WpAZ44nqTJPCeF+LE84LDQ0qVPFJDsB3tb0yakfai8IUjSxFUu7rcz4of7SgUOJ2Bjia3TgCix+iqw7aXEXL4/UHy+QA+ONyk/t3Q5tRNtrDDzXiQ/L0cY2LXes4WrG7T5jOL2oPwXgUtwsTyd7yH7+CPJoQSidYOFRtN8/JxZhQVGh9TLC2iSCC0vHRH86F7ozNuCn0OPX8RGTMYMY/YPgFMS3qslRXlp9/Wv6jlsYXu53BZajUNBh4iUbNebIeIqvEkdzsgvrP6KyEc1WPK7y/Pek1RbaboQZloraJYp4bSGaIKXqhAFW+pFsHDMz4VabSwh4hHiQrJiPJ4bmwn8UMxBrNqzeT0rBOxJC1KPWxRFoeNJyo4+Yo7IGJu4mCzwQBIetAcjCeGutV1rpTOIg8h8PZx1RAl0DOtuTEX2oU+PEkT+u8TtkLCUxgyPulpttzZkw7pqozi3ZcGNHH8Ng2IKDavSJ8C+3eksjPebcN8mKQH5+3Jonc/uT5IUlvwSYz8N/i9b/qthP0ikdqbaR0mzieJrdvIqMFyDb4oJv6X1w6h8nMq1LqFhYd0fFXQiQlheQ2OlbO8HL5dlKgHVty4D9w7C0G32saI0Bxbw8fzSChjfopTNweEOgCbClpBfoqumxcYjtBOH55CNkfeGN/2q7LyZqcV4S9D5GKspx2wqHVfDLRx3LXbUsXlT4/BCelXzPje6LceRwkQCh7A3SdvxAUZx9XkkYa2Q7cSSCfkpyehyC+wJTDIGnp1yaOv5CijgJFL/Upww+A4ExpqVtrRLdZalM1nrxOwsiiV/oVz4i1Rc+9Wm/4GNDa6A1ITu2t4Rr6jy2Gn9/8gvvWyDsPJU1u/5MW0Nv8+bJeMcns8EXmSI2hTMcZgpJQoGpqdy7bvcJ1fX4RNfU6s3VA6Rl8DqNG6BUxvXRUrmYEXrX1Kv6iME1bMTzg3UojWFljvjZyTGXHmW4QW7Q8HXL4JGGcN/soUNges2/tM46eDN4bLwy0CaJzb9TMXauL3yl+bwTOwxf/7Afl2dL9+Dud3OthT+8TIwd4pnat+cxkddu+P4JGu6DjWKOZCsPf2cXJYC6c0WN68/w1IXS4EvMqsdTIDJJZ+B+semtdLMdqoTqc9ocm//8Ii53a7t/UIDCGEK8EMiql+RWiuiIroNCHXM3NEycTkhrt4dk9/lInqw49+lEL6jOUrrKMa6CMr1YUj97GnwCGMHLpFwXo7EEwBV/USiRJoMacugX90mrBn78MCcDPm5C9TCdM4ZRYUSXilF6aEpBSCgwr5PkbWPVuFcZhM8uSw3wacXtNoF8i0yyFLgy9ILqnZqY9TIIq5QsZAqaxSOk23Y3LE1I14A9wzmse2JLOclLkEZKzf+NQlEaRCB9u2E91we9a2NNrT+lN/MYWs5C8w+MxhwCN2pSzROSAB2nmuHNPzjUd+eaJPBF+yzq5dhM76bQBD326f0fN5Sy0/Sbl5UaOWk/Px4smNDmHFXW7PrgyDMcLrfT9SA5BThyQQ0Sg/878tNk+crGwGwDeDAE1ElRRjedSH5oRJsvOz0O11U6uptLh/6iNp2YISa02mihOpJ+lNyBCQ/qpjfDZpsFFfA4d2o1mC+lSirZOaQ9rO+UXVrCXVcJSxKIGDCdeV83KTN9UEozoFTvkAbK22hAcqPPAPD49N7FaXMx0oSgJ08LEtdAG+Xhay6CESsZG0MkQ8wM3mwRBKGHxLHd2cSmJ6BeSi9V7hv2KzmRyck+6Kj/2Tk2gsDSbf7QQ/6zZSSEkHwkwcbDmmdc5KpVwYuGmhAAO7Sl/yEbOzY7fzYV9bL6torSpRUDBaDj3Of34AdndvDwmIaykmd0i/6pd9hpdawsOf7cvX+TJleD4m+uDBtmkLJf3mftlB7V9zJ2Bke+/9+lOg79uR2Jzd9OnvrXEVMANv2yJWnGqmy8i9huAx2tE+Q8EFi00640qgp2i+MrBb91nGCLuxrz4lmhU3WvsqHk8Ty0RStOIhOb0vsj784SjqeXPWWo90zTlCeeSdxY4HbnUu3w/NTA5Ej3ODZsSj+qsj5u5vt3HSmOZp0nSEuDh3S52d4P/+1d4BRgEZGYrLDX7BzChKlrS1Kr5CPY+knNvSNyBo7lVYgJBDOIrdirJXfkclGCe43Gf/FVIntG8z8DUHeYGxcWQvKTh1btLFYnSZU1XUZqqD+tcKHhLcykHmmuo29bGayYT0gjkxXfEeLrjevhA0/73+tl9QGyX3rSfYzPrxFOyz2drmO2WvpImlZue8nvNG84YZv4zeec2Xx85st0HRglyDM4fbR8QfNQ5V3M+Bec48QKGwOjiVB+pOxfp8IwLgqn4zRYR3pRk02Np6a9mjHqqm1p7uqcMdu9usRHiNZQgtjyQzuD+hcn8DXVJQPPb8p1rWkWUSzpwY5Witl5xwA472qJno7VGjQvK2m3oVF1aRpvMY4wuE4bgvRv8y//HAP19jH/C7LmZcjFz8tXYbnzl/b0Y6yEeisFC9J5yHUV0RRWUYrflBuv3I7q0ywEVus6FTZ3uFuBCzW67jrHFDJr9zF/E2/2BuJP3P5dn/E4Dib6b27sjGOb9OR/L5FEdJ/Kq6Xd/pm+cIVfz6F/9xvx72h5aEsI31fDSffIG7ntbnEwlOj6Wf9xN8wStTWt6zUgp9ehLldJTuTGiDbOLjL6BjTLxekvYswWFUEuvVquFV3gVzgAAUi7EwL4xi59UgW4PuJpz0pP9mM9bVJvnpdixJQX7zDBTb9qECWteug12tvzPLiwVKX5LQdL7VVbvA5fi5W61TSGvb0Hs1pkV9+8KHs+tgGMj7JJ+3dvK17hfgAM27g0xMbcB8uSxtRnQMbrBbhvFQzuUtQKXuLEc1V8cWOIC1ZpFNAkzHhZfGAQ7tMmz+t0y7KYiMdFzOxt2gNX/bp6o/sGusgR3jLPZfHpGaQ+84tgmfVNr8xvtdxoU0Adh2ZkD4Wd//b4j0fQp++cgrZc0NGvxywW+ifAgFlpYUQBsm31ydXF4Gu47hyvXfebrw+zp4M+1OsFgLVoAHP5Bd6FfGxJzQ8hatVVOEBR0w7aaLD+8EjosK0gZfHUaUN0Vcr+zB3xXzxQkl85eXWc5/7lWG0QPxTivEDQ7W8Fz+uNx8+RVy8UU6lQVjkS/fMO/b6WAPbO6VwjniJyflKvzCLhxwCssXdxOqADGVI/cF4kYcyQvTt6yl0JYG3FbvNL0JN2kstUuFdLSn92kk0HogEgpwAg0stZL7nTC00tUJhKV2dbqxQTphtydd8lr95/IYGGl0Ux5V7Piwv+FSwy6LYa0l6OwUxPezmhjcvr3HZdmojp5RveBQ/s8XPUJWeu8utcw295toX31xdMq/9N1BaPt8WvVfdMxoqy6VksXb4EilGLhoSzCaoYHoJPUuw+T5p7G0KHJ+dwS/iBEMH2lmRSeMhD//F7PLoJgiJpSciMdZA9K7lKSnWPg4c6u8tHyhgNjMOf1/EYNbC6ra8osxWjYyVe+SN7nmgLjBBF1oZFW1scWuGyZOYNN/5NyT36zHOseNQkeKhLZcwKEkM9RznokPPBgq+fJr5May52/JjAGdyHfzAFPYttmRiWl2dfpSvrEpTfOl6MnOSXoNeobF7QUX2NTDU8sCWjgTUSOL6YMasEPRhzpPgVnWU2vgUMpSXbpnqoG3paRC2ko6mt+cI4uRDBc94Pa+LMO+Uerll5rur7UWchYjHq0xvUuBYimDd76cXXDOhgvFUP/CBv/eIWsjfMOz11z331xkAAAAAFIcLaZ2oklDunyGe4r/hNkRAK5x0VgsLa3dn1jVR4v2h+hDiT+EMR7uxgEcaYacC5D93c+1Z4eEZt7SkZOMiEXoyMbgkBvS9pf70nge0HBiFRrJ1WgAAAAAA","ikon-nurseri":"data:image/webp;base64,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","ikon-pakaian":"data:image/webp;base64,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","ikon-bayi":"data:image/webp;base64,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","ikon-elektrik":"data:image/webp;base64,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"};
+ const ART = { perabot: "ikon-perabot", hiasan: "ikon-hiasan", nurseri: "ikon-nurseri", pakaian: "ikon-pakaian", bayi: "ikon-bayi", elektrik: "ikon-elektrik" };
+ HF.h151 = { IK, ART };
+ HF.ikonKedai = k => (ART[k] && IK[ART[k]]) || "";
+ if (typeof worldMapSVG === "function") {
+  const ws = worldMapSVG;
+  worldMapSVG = function () {
+   let s2 = ws.apply(this, arguments);
+   try {
+    if (typeof s2 !== "string") return s2;
+    for (const k in ART) {
+     const P = typeof WMPL !== "undefined" && WMPL[k], pl = PLACES[k], src = IK[ART[k]]; if (!P || !pl || !src) continue;
+     const a = s2.indexOf(`<g class="wmp" data-wm-place="${k}"`); if (a < 0) continue;
+     const b = s2.indexOf("</g>", a); if (b < 0) continue;
+     const [x, y] = P, w = 86, h = Math.round(w * .93);
+     const g = `<g class="wmp" data-wm-place="${k}" role="button" tabindex="0" aria-label="${esc(pl.name)}"><title>${esc(pl.name)}</title><ellipse cx="${x}" cy="${y + 28}" rx="${w * .42}" ry="9" fill="rgba(60,40,20,.22)"/><image href="${src}" x="${x - w / 2}" y="${y + 30 - h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMax meet"/><text x="${x}" y="${y + 44}" text-anchor="middle" font-size="11" font-weight="800" fill="#3a2a10" stroke="#fff" stroke-width="3" paint-order="stroke">${esc((typeof WMN !== "undefined" && WMN[k]) || pl.name)}</text></g>`;
+     s2 = s2.slice(0, a) + g + s2.slice(b + 4)
+    }
+   } catch (x) { fail(x) }
+   return s2
+  }
+ }
+ /* the shop cards: the painting before the name (in place of the emoji) */
+ const head = () => {
+  try {
+   for (const [id, sel] of [["perabot", "#hfperabot h2"], [null, "#hfkedai2 h2"]]) {
+    const h = document.querySelector(sel); if (!h || h.dataset.ik) continue;
+    const k = id || (document.getElementById("hfkedai2") || {})._id, src = HF.ikonKedai(k); if (!src) continue;
+    const t = h.textContent.replace(/^\s*\S+\s+/, "");
+    h.dataset.ik = "1"; h.innerHTML = `<img src="${src}" alt="" style="height:40px;width:auto;vertical-align:-10px;margin-right:6px">` + esc(t)
+   }
+  } catch (x) { fail(x) }
+ };
+ HF.h151.head = head;
+ const mo = new MutationObserver(() => head());
+ const watch = () => { for (const id of ["hfperabot", "hfkedai2"]) { const e = document.getElementById(id); if (e && !e._ikw) { e._ikw = 1; mo.observe(e, { childList: true }) } } };
+ /* the cards are made on their first opening (appended to the body, then filled): watch the body's own children for them */
+ const mb = new MutationObserver(() => { try { watch(); head() } catch (x) { fail(x) } });
+ const go = () => { try { mb.observe(document.body, { childList: true }); watch() } catch (x) { fail(x) } };
+ if (document.body) go(); else document.addEventListener("DOMContentLoaded", go)
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §152. hf130 (bahagian 13) Peta lebih luas: Pekan Harmoni (owner 22 Nov: "Besarkan kawasan peta."). The Peta Dunia
+   was full: the five new shop paintings (§150-§151) stood on the kampung's empty house lots. Now the map grows 360 units to the
+   north (viewBox "0 -360 1800 1760"; the same width, so pins keep their size and the drag/zoom code is unchanged): a new strip,
+   PEKAN HARMONI, with its own street (Jalan Pekan) across the whole map, joined to the kampung road by a lane beside the Klinik
+   Desa and crossing the river (which now runs on up the map) on a wooden bridge. The five shops stand along Jalan Pekan with room
+   between them; the town (bandar) half of the street is left open, trees only, for shops to come. The game's own full-map layers
+   (paper texture, frame, filters, night shade) are stretched over the new strip. Only the drawing changes: no place is renamed or
+   removed, nothing saved (old saves keep every place). Small: about 4 KB of SVG, no new picture. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const N = 360, RD = -150;   /* the strip's height, and Jalan Pekan's y */
+ const SPOT = { perabot: [110, -220], hiasan: [300, -220], elektrik: [490, -220], pakaian: [205, -70], bayi: [395, -70] };
+ try { if (typeof WMPL !== "undefined") for (const k in SPOT) if (PLACES[k]) WMPL[k] = SPOT[k] } catch (e) { fail(e) }
+ const road = (d, w) => `<path d="${d}" stroke="#d4a273" stroke-width="${w}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#9c6a44" stroke-width="1.3" stroke-dasharray="18 9" stroke-opacity=".7" fill="none"/>`;
+ const tree = (x, y, s) => `<ellipse cx="${x}" cy="${y + 12 * s}" rx="${15 * s}" ry="${5 * s}" fill="rgba(40,60,30,.25)"/><circle cx="${x}" cy="${y}" r="${13 * s}" fill="#356b37"/><circle cx="${x + s}" cy="${y}" r="${12 * s}" fill="#2c5a32"/><circle cx="${x - 4 * s}" cy="${y - 4 * s}" r="${6 * s}" fill="rgba(255,255,255,.14)"/>`;
+ let BAND = null;
+ const band = () => {
+  if (BAND) return BAND;
+  const RV = "M786 -360C768 -230 834 -128 810 0";   /* the river, on up from the map's old top edge, the same curve going on */
+  let s = `<g class="hf152" pointer-events="none"><defs><linearGradient id="wmg152" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="979" y2="1602"><stop offset="0" stop-color="#a7c46a"/><stop offset="1" stop-color="#6f9b49"/></linearGradient></defs>`;
+  s += `<rect y="${-N}" width="1800" height="${N + 2}" fill="url(#wmg152)"/>`;
+  for (let i = 0; i < 9; i++) s += `<circle cx="${(i * 0.618 % 1) * 1800 | 0}" cy="${-N + ((i * 0.41 % 1) * N | 0)}" r="${90 + (i * 37 % 120)}" fill="url(#ltwb${i % 2})"/>`;
+  s += `<path d="${RV}" stroke="#3d7fa0" stroke-width="70" fill="none" opacity=".3"/><path d="${RV}" stroke="url(#wmr)" stroke-width="54" fill="none"/><path d="${RV}" stroke="#d6ecef" stroke-width="2" stroke-dasharray="8 14" fill="none" opacity=".7"/>`;
+  s += road(`M0 ${RD}H1800`, 18) + road(`M730 ${RD}V200`, 10);
+  s += `<rect x="759" y="${RD - 14}" width="84" height="28" rx="4" fill="#b88b5e" stroke="#3b2a20"/><path d="M763 ${RD - 14}V${RD + 14}M839 ${RD - 14}V${RD + 14}" stroke="#3b2a20" stroke-width="3"/>`;
+  /* street lamps along the shops, trees on the open town half */
+  for (const x of [20, 205, 395, 590, 690]) s += `<path d="M${x} ${RD - 11}v-22" stroke="#5a4a3a" stroke-width="2"/><circle cx="${x}" cy="${RD - 34}" r="3.5" fill="#f6dc8a" stroke="#8a6a2a"/>`;
+  for (let i = 0; i < 16; i++) { const x = 930 + i * 55 + (i % 3) * 9, y = (i % 2 ? RD + 62 : RD - 70) + (i * 13 % 22); s += tree(x, y, .8 + (i % 3) * .15) }
+  for (const [x, y] of [[650, -300], [700, -40], [30, -330], [600, -255]]) s += tree(x, y, .9);
+  s += `<text x="380" y="${-N + 40}" text-anchor="middle" font-size="26" font-weight="900" fill="#f8f8f7" stroke="#8a5a2a" stroke-width="6" paint-order="stroke" letter-spacing="2">🛍️ PEKAN HARMONI</text>`;
+  s += `<text x="380" y="${-N + 62}" text-anchor="middle" font-size="12" font-weight="800" fill="#4a3418" stroke="#fff8e6" stroke-width="3" paint-order="stroke">Jalan Pekan · deretan kedai · ketik kedai untuk pergi</text>`;
+  s += `<text x="1350" y="${RD + 5}" text-anchor="middle" font-size="11" font-weight="800" fill="#6a4a2a" stroke="#f3e2c0" stroke-width="3" paint-order="stroke" letter-spacing="1">JALAN PEKAN</text></g>`;
+  return BAND = s
+ };
+ HF.h152 = { N, SPOT, on: 0 };
+ if (typeof worldMapSVG === "function") {
+  const ws = worldMapSVG;
+  worldMapSVG = function () {
+   let s2 = ws.apply(this, arguments);
+   try {
+    if (typeof s2 !== "string" || s2.indexOf('viewBox="0 0 1800 1400"') < 0) return s2;
+    const B0 = '<rect width="1800" height="1100" fill="url(#wmg)"/>', i0 = s2.indexOf(B0); if (i0 < 0) return s2;
+    const i1 = i0 + B0.length;
+    s2 = s2.slice(0, i1) + band() + s2.slice(i1);
+    s2 = s2.replace('viewBox="0 0 1800 1400"', `viewBox="0 ${-N} 1800 ${1400 + N}"`);
+    /* the full-map layers (paper, frame, filters, night shade) over the new strip too */
+    s2 = s2.replace(/<rect width="1800" height="(1100|1400)"(?= (fill="#0e1a3a"|fill="url\(#ltpp\)"|fill="none" stroke="#7a5a3a"|filter=))/g, (m, h) => `<rect y="${-N}" width="1800" height="${+h + N}"`);
+    HF.h152.on++
+   } catch (x) { fail(x) }
+   return s2
+  }
+ }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §153. hf130 (bahagian 14) Simpan barang & "Barang disimpan" (owner 22 Nov: "Semua perabot, hiasan, nurseri, butik,
+   bayi, elektrik boleh diletak di rumah atau macam baju/perhiasan disimpan"). In Mod bina any piece in the house (old pieces and
+   every new shop's: perabot, hiasan, nurseri plants, bayi) can be put away instead of sold: "📦 Simpan" on the held piece's bar
+   and in the piece's menu. Stored pieces keep what they are (style set, fridge stars, induction hob, water-saving shower head,
+   facing) and wait in S.hfSimpan (one list per house, like S.pantry); the "📦 Barang disimpan" card at the top of Mod beli lists
+   them: "Letak" places one again free (the placing is the game's own: the same tile rules; for that one placing the price is 0),
+   "Jual" sells it for the game's 70%. The electric shop's home upgrades (LED lights, motion-sensor lights, rain-water tank) can be
+   taken down and stored ("Tanggal & simpan") and put back free ("Pasang semula"), from the shop's card or from this list; a
+   stored upgrade saves nothing on the bill. Clothes from the butik are each person's own outfits (the outfit editor keeps them),
+   so they need no box: the card says so. Undo (↶) covers storing and placing again. A baby's cot with the baby in it, and the
+   sejadah, are not stored. An old save has no list until something is stored; nothing else changes. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const H = HF.h153 = { stored: 0, placed: 0, sold: 0, up: 0 };
+ try { if (typeof HOMEF !== "undefined" && !HOMEF.includes("hfSimpan")) HOMEF.push("hfSimpan") } catch (e) { fail(e) }
+ const list = () => Array.isArray(S.hfSimpan) ? S.hfSimpan : [];
+ const mk = () => { if (!Array.isArray(S.hfSimpan)) S.hfSimpan = []; return S.hfSimpan };
+ const SKIP = new Set(["id", "x", "y", "f", "wl"]);   /* where it stood is not kept; what it is, is */
+ const NOSTORE = new Set(["sejadah"]);
+ const nm = t => (ITEMS[t] && ITEMS[t].name) || t;
+ const snap = () => { try { if (HF.tbina && HF.tbina.snap) HF.tbina.snap() } catch (e) { } };
+ const canStore = o2 => !!(o2 && ITEMS[o2.type] && !NOSTORE.has(o2.type));
+ /* (1) put a piece away */
+ const store = o2 => {
+  try {
+   if (!canStore(o2)) return false;
+   if (typeof babyIn === "function" && babyIn(o2)) { toast("Ada bayi di dalam — tak boleh disimpan."); return false }
+   snap();
+   const p = {}; for (const k in o2) if (!SKIP.has(k)) p[k] = o2[k];
+   S.objs = S.objs.filter(x => x.id !== o2.id);
+   for (const s2 of S.sims) { s2.queue = (s2.queue || []).filter(q => q.obj !== o2.id); if (s2.cur && s2.cur.obj === o2.id) { try { cancelCur(s2) } catch (e) { } } }
+   mk().push({ u: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: o2.type, p });
+   H.stored++;
+   if (placing && placing.moveId === o2.id) setPlacing(null);
+   try { renderBuy(); renderTop() } catch (e) { }
+   snap();
+   const m = `📦 ${nm(o2.type)} disimpan — letak semula percuma dari "Barang disimpan".`;
+   try { if (HF.tbina && HF.tbina.undoChip) HF.tbina.undoChip(`📦 ${nm(o2.type)} disimpan`); else toast(m) } catch (e) { toast(m) }
+   try { redrawNow() } catch (e) { }
+   return true
+  } catch (x) { fail(x); return false }
+ };
+ H.store = store;
+ /* (2) place one again, free: the game's own placing, with the price 0 for that one piece (S.freeBuild read as on, not saved) */
+ let pend = null;
+ const freeOn = () => {
+  if (S.freeBuild) return null;
+  const d = Object.getOwnPropertyDescriptor(S, "freeBuild"), S0 = S;
+  Object.defineProperty(S, "freeBuild", { configurable: true, enumerable: false, get: () => true, set: v => { delete S0.freeBuild; S0.freeBuild = v; if (pend) pend.fb = null } });
+  return { S0, d }
+ };
+ const freeOff = fb => { try { if (!fb) return; const { S0, d } = fb; delete S0.freeBuild; if (d) Object.defineProperty(S0, "freeBuild", d) } catch (x) { fail(x) } };
+ const finish = () => {
+  const P = pend; pend = null; if (!P) return;
+  freeOff(P.fb);
+  try {
+   const o = S === P.S0 && S.objs.find(x => x.id >= P.id0 && x.type === P.e.t);
+   if (!o) return;
+   for (const k in P.e.p) if (!SKIP.has(k) && k !== "type") o[k] = P.e.p[k];
+   const L = list(), i = L.indexOf(P.e); if (i >= 0) L.splice(i, 1);
+   H.placed++;
+   /* the game said "Dibeli … RM 0" and wrote "Beli …" in the diary: it was not bought */
+   const n0 = nm(o.type).toLowerCase();
+   try { document.querySelectorAll("#toasts .toast").forEach(el => { if (/^Dibeli .* RM 0\.?$/.test(el.textContent)) el.remove() }) } catch (e) { }
+   try { if (S.hist && S.hist[0] && S.hist[0].m === `Beli ${n0}.`) S.hist.shift(); if (S.log && S.log[0] && S.log[0].m === `Beli ${n0}.`) S.log.shift() } catch (e) { }
+   toast(`📦 ${nm(o.type)} diletak semula dari simpanan (percuma).`);
+   try { LCACHE.clear() } catch (e) { }
+  } catch (x) { fail(x) }
+ };
+ const letak = u => {
+  try {
+   const e = list().find(x => x.u === u); if (!e || !ITEMS[e.t]) return;
+   if (pend) { setPlacing(null); finish() }
+   try { if (typeof setTab === "function" && tab !== "buy") setTab("buy") } catch (x) { }
+   try { if (typeof tool !== "undefined" && tool !== "furniture") { tool = "furniture"; renderBuy() } } catch (x) { }
+   setPlacing({ type: e.t, hfSimpan: u });
+   pend = { e, id0: S.nextId, S0: S, fb: freeOn() };
+   const pb = $("#placebar"), sp = pb && pb.querySelector("span"); if (sp) sp.textContent = `Ketik jubin lantai untuk letak semula ${nm(e.t).toLowerCase()} · percuma (dari simpanan)`;
+  } catch (x) { fail(x) }
+ };
+ const jual = u => {
+  try {
+   const L = list(), e = L.find(x => x.u === u); if (!e) return;
+   snap();
+   const r = Math.round(((ITEMS[e.t] && ITEMS[e.t].price) || 0) * .7);
+   L.splice(L.indexOf(e), 1); S.money += r; H.sold++;
+   toast(`${nm(e.t)} (simpanan) dijual dengan harga RM ${r}.`);
+   snap(); try { renderBuy(); renderTop() } catch (x) { }
+  } catch (x) { fail(x) }
+ };
+ H.letak = letak; H.jual = jual; H.list = list;
+ /* (3) the electric shop's home upgrades: take down & store, put back */
+ const homeEl = () => { S.hfEl = S.hfEl || {}; return (S.hfEl[S.home] = S.hfEl[S.home] || {}) };
+ const UPN = { led: "Lampu LED seluruh rumah", sensor: "Lampu luar bersensor gerak", tong: "Tong air hujan" };
+ const upStore = k => {
+  try {
+   if (!UPN[k] || !homeEl()[k]) return; delete homeEl()[k];
+   mk().push({ u: "up" + k + Date.now().toString(36), up: k }); H.up++;
+   toast(`📦 ${UPN[k]} ditanggalkan dan disimpan. Pasang semula percuma bila-bila masa.`);
+   try { renderBuy() } catch (x) { }
+  } catch (x) { fail(x) }
+ };
+ const upPut = k => {
+  try {
+   const L = list(), e = L.find(x => x.up === k); if (!e) return;
+   L.splice(L.indexOf(e), 1); homeEl()[k] = 1; H.up++;
+   toast(`🔌 ${UPN[k]} dipasang semula (percuma).`);
+   try { renderBuy() } catch (x) { }
+  } catch (x) { fail(x) }
+ };
+ H.upStore = upStore; H.upPut = upPut;
+ const SH = HF.h146 && HF.h146.SHOPS;
+ if (SH && SH.elektrik && HF.h149) {
+  const D = SH.elektrik, c0 = D.card, a0 = D.act;
+  D.card = function () {
+   let h = c0.apply(this, arguments);
+   try {
+    for (const O of HF.h149.OFF) {
+     const [id, , n, , , , kind, tgt] = O; if (kind !== "home" || !UPN[tgt]) continue;
+     const i = h.indexOf(`<b>${esc(n)}</b>`); if (i < 0) continue;
+     if (homeEl()[tgt]) {
+      const b = `<button type="button" disabled>Sedang guna</button>`, j = h.indexOf(b, i); if (j < 0) continue;
+      h = h.slice(0, j + b.length) + `<button type="button" data-ka="simpan:${tgt}" style="background:#7a6a50">📦 Tanggal & simpan</button>` + h.slice(j + b.length)
+     } else if (list().some(x => x.up === tgt)) {
+      const j = h.indexOf(`data-ka="${id}"`, i); if (j < 0) continue;
+      const b0 = h.lastIndexOf("<button", j), b1 = h.indexOf("</button>", j); if (b0 < i || b1 < 0) continue;
+      h = h.slice(0, b0) + `<button type="button" data-ka="pasang:${tgt}">📦 Pasang semula (dari simpanan)</button>` + h.slice(b1 + 9)
+     }
+    }
+   } catch (x) { fail(x) }
+   return h
+  };
+  D.act = function (id) {
+   const v = String(id || "");
+   if (/^simpan:/.test(v)) { upStore(v.slice(7)); setTimeout(() => { try { HF.h146.open("elektrik") } catch (x) { } }, 60); return }
+   if (/^pasang:/.test(v)) { upPut(v.slice(7)); setTimeout(() => { try { HF.h146.open("elektrik") } catch (x) { } }, 60); return }
+   return a0.apply(this, arguments)
+  }
+ }
+ if (SH && SH.pakaian && SH.pakaian.card) {
+  const c1 = SH.pakaian.card;
+  SH.pakaian.card = function () { return c1.apply(this, arguments) + `<p class="nt">👗 Pakaian yang dipilih tersimpan pada set pakaian setiap ahli (harian, kerja, tradisional, Raya). Tukar semula bila-bila masa di butik ini — tiada kotak simpanan diperlukan.</p>` }
+ }
+ /* (4) the held piece's bar: 📦 Simpan beside 🗑️ Jual; the end of a placing from the list */
+ { const sp = setPlacing; setPlacing = function (p) {
+   const r = sp.apply(this, arguments);
+   try { if (pend && !(p && p.hfSimpan)) finish() } catch (x) { fail(x) }
+   try {
+    const pb = $("#placebar");
+    if (p && p.moveId && pb && !pb.hidden && !pb.querySelector("#hfsimpan")) {
+     const o2 = objById(p.moveId);
+     if (canStore(o2)) {
+      pb.insertAdjacentHTML("beforeend", `<button class="btn" type="button" id="hfsimpan" title="Simpan barang ini (letak semula percuma kemudian)">📦 Simpan</button>`);
+      pb.querySelector("#hfsimpan").addEventListener("click", ev => { ev.stopPropagation(); try { store(objById(p.moveId)) } catch (x) { fail(x) } })
+     }
+    }
+   } catch (x) { fail(x) }
+   return r
+  } }
+ setInterval(() => { try { if (pend && !(placing && placing.hfSimpan)) finish() } catch (x) { fail(x) } }, 1000);
+ /* (5) the piece's menu in Mod bina (Alih / Jual): + Simpan */
+ if (typeof openMenu === "function") {
+  const om = openMenu;
+  openMenu = function (sx, sy, title, sub, items) {
+   try {
+    if (sub === "Mod bina" && Array.isArray(items) && items.some(it => it && it.label === "Alih") && typeof hitObj === "function") {
+     const o2 = hitObj(sx, sy);
+     if (canStore(o2)) {
+      const bb = typeof babyIn === "function" && babyIn(o2);
+      items = items.concat([{ label: "📦 Simpan", sub: bb ? "ada bayi di dalam" : "letak semula percuma kemudian", dis: !!bb, fn: () => store(o2) }])
+     }
+    }
+   } catch (x) { fail(x) }
+   return om.call(this, sx, sy, title, sub, items)
+  }
+ }
+ /* (6) Mod beli: the "📦 Barang disimpan" card */
+ document.head.insertAdjacentHTML("beforeend", `<style>
+#hfsimpancard .hfsl{display:flex;flex-direction:column;gap:6px;margin-top:6px;max-height:260px;overflow:auto}
+#hfsimpancard .hfsr{display:flex;align-items:center;gap:8px;border:1px solid var(--line,#e3d6bd);border-radius:10px;padding:6px 8px;background:#fffdf7}
+#hfsimpancard .hfsr b{flex:1;font-size:.84rem}#hfsimpancard .hfsr small{color:var(--muted,#7a6650);font-size:.7rem;display:block;font-weight:600}
+#hfsimpancard .hfsr button{min-height:38px;min-width:58px;border:0;border-radius:10px;background:#2c6b4a;color:#fff;font:800 .76rem system-ui;padding:5px 10px;cursor:pointer}
+#hfsimpancard .hfsr button.j{background:#a2533a}
+</style>`);
+ const extra = p => { const a = []; if (p.bt) a.push(`${p.bt} bintang`); if (p.ind) a.push("induksi"); if (p.dp) a.push("pintu depan"); if (p.jimat) a.push("jimat air"); if (p.gv) a.push("gaya " + p.gv); return a.join(" · ") };
+ const cardHTML = () => {
+  const L = list();
+  const rows = L.map(e => e.up
+   ? `<div class="hfsr"><b>🔌 ${esc(UPN[e.up] || e.up)}<small>Peralatan elektrik rumah · disimpan</small></b><button type="button" data-hfsu="${esc(e.up)}">Pasang semula</button></div>`
+   : `<div class="hfsr"><b>${esc(nm(e.t))}<small>${esc(extra(e.p || {}) || "disimpan")}</small></b><button type="button" data-hfsl="${esc(e.u)}">Letak</button><button type="button" class="j" data-hfsj="${esc(e.u)}">Jual ${Math.round(((ITEMS[e.t] && ITEMS[e.t].price) || 0) * .7)}</button></div>`).join("");
+  return `<p class="cap">📦 Barang disimpan${L.length ? ` (${L.length})` : ""}</p>${L.length ? `<p class="hint" style="margin:2px 0 0">Letak semula percuma, atau jual (70%).</p><div class="hfsl">${rows}</div>` : `<p class="hint" style="margin:2px 0 0">Tiada barang disimpan. Ketik barang di rumah, kemudian 📦 Simpan — ia menunggu di sini.</p>`}`
+ };
+ if (typeof renderBuy === "function") {
+  /* the panel keeps its own nodes when a timed redraw comes out the same (the "panel Bina" section): this card is taken out
+     before the redraw and put back after it, the same node while its content is the same, so that still holds */
+  const rb = renderBuy;
+  renderBuy = function () {
+   const el = $("#p-buy"), oc = el && el.querySelector("#hfsimpancard"), sl = oc && oc.querySelector(".hfsl"), st = sl ? sl.scrollTop : 0;
+   if (oc) oc.remove();
+   const r = rb.apply(this, arguments);
+   try {
+    if (!el || typeof tool !== "undefined" && tool !== "furniture") return r;
+    const h = cardHTML();
+    let c = oc && oc._h === h ? oc : null;
+    if (!c) { c = document.createElement("div"); c.className = "card"; c.id = "hfsimpancard"; c.style.marginBottom = "8px"; c.innerHTML = h; c._h = h }
+    const hint = el.querySelector(":scope > p.hint"); if (hint) hint.after(c); else el.prepend(c);
+    if (c === oc && st) { const s2 = c.querySelector(".hfsl"); if (s2) s2.scrollTop = st }
+   } catch (x) { fail(x) }
+   return r
+  }
+ }
+ document.addEventListener("click", ev => {
+  try {
+   const t = ev.target; if (!t || !t.closest || !t.closest("#hfsimpancard")) return;
+   const a = t.closest("[data-hfsl]"), j = t.closest("[data-hfsj]"), u = t.closest("[data-hfsu]");
+   if (a) { ev.stopPropagation(); letak(a.dataset.hfsl) } else if (j) { ev.stopPropagation(); jual(j.dataset.hfsj) } else if (u) { ev.stopPropagation(); upPut(u.dataset.hfsu) }
+  } catch (x) { fail(x) }
+ }, true);
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
