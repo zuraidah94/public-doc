@@ -1,0 +1,26 @@
+{
+ "name": "Rumah Kita — Edisi Lukisan Tangan",
+ "short_name": "Rumah Kita",
+ "lang": "ms",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#efe5cf",
+ "theme_color": "#2c6b5a",
+ "description": "Permainan keluarga Malaysia yang dilukis tangan.",
+ "icons": [
+  {
+   "src": "img/ikon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "img/ikon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
