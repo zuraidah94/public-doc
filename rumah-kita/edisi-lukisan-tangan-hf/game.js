@@ -22535,6 +22535,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf132", "23 Nov 2026", ["🏘️ Pilihan baharu: Bilik Sewa Seri Murni di timur Pekan (peta): beli bangunan empat bilik (101-104) dan jadi tuan rumah, atau jika jiran sudah membelinya, sewa satu bilik untuk keluarga anda", "🔑 Tiga kadar sewa seminggu (RM 90, RM 180, RM 320; sewa tinggi hanya untuk bilik yang baik: perabot dan kebersihan), tanda ＋ untuk cari penyewa dan pilih satu daripada tiga calon, setiap penyewa ada satu sifat dan bajet", "⏳ Cabaran: tunggakan sewa (beri tempoh, ingatkan atau halau) dan kerosakan bilik (bayar baiki); bilik kosong ada kos seminggu"]],
    ["hf131", "23 Nov 2026", ["🗺️ Peta disusun semula: Pekan Harmoni di barat sungai (lapan kedai, dua baris), Bandar Diraja dan Istana Harmoni di atas kanan, tiada rumah, lot atau tempat atas jalan, jalan raya berturap di setiap kawasan", "📚 Kedai baharu di Jalan Pekan: Kedai Buku Pustaka Harmoni (baca percuma sekali sehari), Kafe Kopi Senja dan Mamak 24 Jam; semua pin sama saiz", "🎮 Permainan tradisi (gasing, sepak raga, congkak, batu seremban, galah panjang, wau) kini dibuka dari Padang Kampung di peta; kebun rumah dari Kebun Buah Harmoni", "📦 Barang disimpan ikut berpindah rumah atau boleh dijual; panel Bina tidak lagi dilukis semula setiap dua saat", "💾 Simpanan lama tidak berubah"]],
    ["hf130", "22 Nov 2026", ["🏡 Permainan baru: rumah kampung kini kemas dan tersusun ikut bilik — satu katil sebilik, bilik air bersama, dapur sebaris, ruang tamu menghadap TV, sejadah di sudut yang tenang dan serambi lapang di tangga", "🪑 Almari, almari kaca, rak buku, kerusi rotan, meja kopi, kerusi panjang, meja makan dan meja belajar permulaan dilukis semula dengan tangan: kayu asli, rotan dan kain polos (model 3D Poly Haven, CC0)", "🟫 Permaidani, cadar katil dan lantai dapur serta bilik air kini polos, warna lembut", "🏢 Flat Pak Zul kini kemas — Adam dapat bilik dan katil sendiri; rumah bandar juga dapat perabot kayu polos", "🎨 Mod beli: pilih gaya almari, almari kaca, rak buku, kerusi, meja dan kerusi panjang — Biasa, Kayu asli, Kayu terang, Kayu gelap atau Putih / krim", "🗺️ Peta lebih luas: Pekan Harmoni di utara peta, dengan Jalan Pekan dan deretan kedai baharu berikon lukisan tangan — Kedai Perabot Jati Harmoni (set gaya bilik), Kedai Hiasan Seri Laman, Butik Kain & Tudung, Kedai Bayi Comel dan Kedai Elektrik Cahaya (peralatan berbintang, jimat bil mingguan); Nurseri Bunga Raya di tepi dusun", "📦 Simpan barang: dalam Mod bina, perabot, hiasan, pokok dan barang bayi boleh disimpan dan diletak semula percuma dari \"Barang disimpan\"; lampu LED dan tong air hujan boleh ditanggalkan dan dipasang semula", "🌺 Hiasan dan pokok baharu: kerusi goyang, pasu, tanglung, bakul, pokok bunga raya, bunga kertas, limau kasturi, kotak herba dan banyak lagi", "💾 Simpanan lama tidak berubah"]],
    ["hf129", "22 Nov 2026", ["🛏️ Katil dijual atau dialihkan semasa Teman tidur: dia kini terjaga dan mencari tempat tidur lain, bukan terus tidur di lantai tanpa katil"]],
@@ -41071,7 +41072,7 @@ try {
    removed, nothing saved (old saves keep every place). Small: about 4 KB of SVG, no new picture. ---------- */
 try {
  const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
- const N = 430, RD = -150;   /* hf131: 70 more at the top, for the palace */   /* the strip's height, and Jalan Pekan's y */
+ const N = 540, RD = -150;   /* hf131: 70 more at the top, for the palace; 24 Nov: 540, the palace group reaches y -564 and was cut off at -430 */   /* the strip's height, and Jalan Pekan's y */
  const SPOT = { perabot: [110, -220], hiasan: [270, -220], elektrik: [430, -220], pakaian: [110, -70], bayi: [270, -70] };   /* hf131: four a row, as the owner's sketch */
  try { if (typeof WMPL !== "undefined") for (const k in SPOT) if (PLACES[k]) WMPL[k] = SPOT[k] } catch (e) { fail(e) }
  const road = (d, w) => `<path d="${d}" stroke="#d4a273" stroke-width="${w}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#9c6a44" stroke-width="1.3" stroke-dasharray="18 9" stroke-opacity=".7" fill="none"/>`;
@@ -41079,7 +41080,7 @@ try {
  let BAND = null;
  const band = () => {
   if (BAND) return BAND;
-  const RV = "M786 -430V-360C768 -230 834 -128 810 0";   /* the river, on up from the map's old top edge, the same curve going on */
+  const RV = "M786 -540V-360C768 -230 834 -128 810 0";   /* the river, on up from the map's old top edge, the same curve going on */
   let s = `<g class="hf152" pointer-events="none"><defs><linearGradient id="wmg152" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="979" y2="1602"><stop offset="0" stop-color="#a7c46a"/><stop offset="1" stop-color="#6f9b49"/></linearGradient></defs>`;
   s += `<rect y="${-N}" width="1800" height="${N + 2}" fill="url(#wmg152)"/>`;
   for (let i = 0; i < 9; i++) s += `<circle cx="${(i * 0.618 % 1) * 1800 | 0}" cy="${-N + ((i * 0.41 % 1) * N | 0)}" r="${90 + (i * 37 % 120)}" fill="url(#ltwb${i % 2})"/>`;
@@ -41579,6 +41580,231 @@ try {
  };
  HF.h158 = { add };
  if (typeof renderMap === "function") { const rm = renderMap; renderMap = function () { const r = rm.apply(this, arguments); try { add() } catch (x) { fail(x) } return r } }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §159. hf132: Rumah Bilik Sewa v1 (owner 23 Nov: pilihan BARU, bukan ganti rumah sewa sedia ada).
+   A new building on the empty green east of the river below Jalan Pekan: Bilik Sewa Seri Murni, units 101-104, drawn in code on the
+   Peta (no painting; the doors show who lives there) with a pin in WMPL / PLACES / WMN / ERR. State in S.bs (made lazily: an old save
+   has none): { owner: home key | null, units: [{ n, furn, clean, lv, t, brk, self, pl, cands }] }.
+   Roles: the player buys it (RM 16,000) and is the landlord, OR (from day 14, a weekly chance) a neighbour family buys it and the
+   player can rent a vacant unit for the family. Three rates per week (RM 90 / 180 / 320); the dear one only for a good room (quality
+   = furnishing + cleanliness). Tenants: a random existing character with only the skin, hair and clothes colours changed (the
+   recolour of portrait()), one trait each (rajin, bising, pembersih, suka berkawan, lewat bayar) and a budget. A vacant door shows
+   "+": find tenants (a small advert, RM 15) and choose one of three. Two troubles: arrears (grace / remind / evict) and breakage (pay
+   to repair). Cost of an empty room. v2 (not here): quarrels, holidays / Raya, more floors, a full-house reward. ---------- */
+try {
+ const HF = window.RKHF || (window.RKHF = { err: 0 }), fail = e => { HF.err = (HF.err || 0) + 1; try { console.warn("RKHF", e) } catch (e2) { } };
+ const B = HF.h159 = { opened: 0, weeks: 0, days: 0 };
+ const RATES = { murah: { t: "Murah", amt: 90, need: 0 }, biasa: { t: "Biasa", amt: 180, need: 40 }, mahal: { t: "Mahal", amt: 320, need: 75 } };
+ const PRICE = 16000, ADV = 15, VAC = 12, CLEANC = 25, FURNC = [300, 600], FURNN = ["Kosong", "Asas: katil & almari", "Selesa: katil, kipas & meja"], NAME = "Bilik Sewa Seri Murni";
+ const TRS = { rajin: ["💪", "Rajin", "Cuci dan baiki benda kecil sendiri; jarang merosakkan bilik."], bising: ["🔊", "Bising", "Muzik kuat sampai lewat malam; bilik cepat sepah dan rosak."], pembersih: ["🧼", "Pembersih", "Bilik sentiasa berkilat."], kawan: ["🤝", "Suka berkawan", "Membawa kawan yang mahu menyewa."], lewat: ["⏰", "Lewat bayar", "Selalu minta tempoh."] };
+ const BRK = [["Paip sinki bocor", 80], ["Kipas siling rosak", 60], ["Kunci pintu tersangkut", 50], ["Wayar & suis bermasalah", 120], ["Penghawa dingin tidak sejuk", 150]];
+ const BUD = [85, 100, 130, 170, 200, 240, 300, 340, 380];
+ const rnd = Math.random, cl = (v, a, z) => Math.max(a, Math.min(z, v)), pk = a => a[Math.floor(rnd() * a.length)], rm = n => "RM " + Math.round(n).toLocaleString();
+ const mkB = () => ({ v: 1, owner: null, nid: 1, wk: -1, dy: -1, units: [101, 102, 103, 104].map(n => ({ n, furn: 0, clean: 60, lv: "murah", t: null, brk: null, self: 0, pl: null, cands: null, cd: 0 })) });
+ const bs = () => { if (!S.bs || !Array.isArray(S.bs.units)) S.bs = mkB(); return S.bs };
+ const mine = b => !!(b && b.owner && b.owner === S.home);
+ const Q = u => Math.round(u.furn * 25 + cl(u.clean, 0, 100) * .5 - (u.brk ? 15 : 0));
+ const qTxt = q => q >= 75 ? "Mewah" : q >= 40 ? "Selesa" : "Sederhana";
+ const dd = () => dayIdx();
+ /* (1) tenants: an existing character, recoloured */
+ const tenant = b => {
+  let pool = []; try { for (const x of S.sims) if (x && x.ap && x.stage !== "child" && x.stage !== "baby") pool.push(x.ap) } catch (e) { }
+  try { if (typeof NBAP !== "undefined") for (const k in NBAP) pool.push(NBAP[k]) } catch (e) { }
+  if (!pool.length) pool = [defAp({})];
+  const ap = defAp(JSON.parse(JSON.stringify(pk(pool)))); ap.photo = null; ap.photoSrc = null; ap.crop = null; ap.wear = "casual";
+  ap.skin = pk(PAL.skin); ap.hairColor = pk(PAL.hair.slice(0, 9)); if (ap.hijab && ap.hijab !== "none") ap.hijabColor = pk(PAL.cloth);
+  ap.casual = Object.assign({}, ap.casual, { topC: pk(PAL.cloth), botC: pk(PAL.cloth) });
+  const fem = isFemAp(ap), used = new Set(); for (const u of b.units) { if (u.t) used.add(u.t.name); for (const c of u.cands || []) used.add(c.name) }
+  let name = pk(fem ? NAMES_F : NAMES_M); for (let i = 0; i < 8 && used.has(name); i++) name = pk(fem ? NAMES_F : NAMES_M);
+  return { id: "t" + (b.nid++), name, fem, ap, tr: pk(Object.keys(TRS)), bud: pk(BUD), amt: 0, stay: 0, owe: 0 }
+ };
+ B.tenant = () => tenant(bs());
+ /* the painted head of the character it was made from, recoloured by the tenant's own ap (skin, hair, clothes); the painted body is
+    picked by the tenant's name as for every other person, so the three candidates differ */
+ const face = t => { let v; try { v = HF.pntBustSVG ? HF.pntBustSVG(t.ap, "adult", "casual", false, { name: t.name, id: "bs" + t.id }, 100, 100) : portrait(t.ap, "adult", "thumb", "casual", "bs" + t.id) } catch (e) { fail(e); v = "🙂" } return `<span class="av">${v}</span>` };
+ const leave = (b, u, why) => { const t = u.t; if (!t) return; u.t = null; u.cands = null; const m = `🧳 ${t.name} pindah keluar dari bilik ${u.n}${why ? " (" + why + ")" : ""}.`; if (mine(b)) { toast(m); diary(m) } };
+ /* (2) the week and the day */
+ const npcBuy = b => {
+  let ks = []; try { ks = townIds().filter(k => k !== S.home) } catch (e) { }
+  if (!ks.length) return; const k = pk(ks); b.owner = k; const open = Math.floor(rnd() * 4);
+  b.units.forEach((u, i) => { u.furn = 1; u.clean = 65; u.lv = pk(["murah", "biasa", "biasa"]); if (i !== open) { u.t = tenant(b); u.t.amt = Math.min(RATES[u.lv].amt, u.t.bud); u.t.stay = Math.floor(rnd() * 10) } });
+  const m = `🏘️ Keluarga ${wmShort(homeName(k), 22)} membeli ${NAME} di Pekan dan menyewakan bilik. Ada satu bilik kosong untuk disewa.`; toast(m); diary(m)
+ };
+ const npcWeek = (b, d) => {
+  for (const u of b.units) {
+   if (u.pl) { const a = u.pl.amt, o = u.pl.owe || 0; if (S.money >= a + o) { S.money -= a + o; homeMoneyAdd(b.owner, a + o); u.pl.owe = 0; u.pl.weeks = (u.pl.weeks || 0) + 1 } else { u.pl.owe = o + a; toast(`⚠️ Duit tidak cukup untuk sewa bilik ${u.n}: tunggakan ${rm(u.pl.owe)}.`); if (u.pl.owe >= a * 3) { toast(`🚪 Tuan rumah menamatkan sewa bilik ${u.n} kerana tunggakan.`); u.pl = null } } continue }
+   if (u.t && rnd() < .08) leave(b, u, "") ; else if (!u.t && rnd() < .25) { u.t = tenant(b); u.t.amt = Math.min(RATES[u.lv].amt, u.t.bud) }
+  }
+ };
+ const day = (b, d) => {
+  B.days++;
+  for (const u of b.units) {
+   if (u.self) { u.clean = Math.max(u.clean, 80); u.brk = null; continue }
+   const t = u.t; if (!t) continue; const tr = t.tr;
+   u.clean = cl(u.clean + (tr === "pembersih" ? 2 : tr === "rajin" ? -1 : tr === "bising" ? -4 : -2.5), 0, tr === "pembersih" ? 95 : 100); t.stay = (t.stay || 0) + 1;
+   if (!u.brk && rnd() < (tr === "bising" ? .05 : tr === "rajin" ? .015 : .03)) {
+    const [w, c] = pk(BRK);
+    if (tr === "rajin" && c <= 80 && rnd() < .5) { const m = `💪 ${t.name} membaiki sendiri: ${w.toLowerCase()} (bilik ${u.n}).`; toast(m) } else { u.brk = { w, c, d }; toast(`🔧 Bilik ${u.n}: ${w.toLowerCase()}. Baiki di ${NAME}.`) }
+   }
+   if (u.brk && d - u.brk.d >= 6) { leave(b, u, "bilik rosak terlalu lama"); continue }
+   if (t.owe) {
+    if (t.grace === 1 && d >= t.oweD) { if (rnd() < (tr === "lewat" ? .5 : .8)) { S.money += t.owe; toast(`💵 ${t.name} jelaskan tunggakan ${rm(t.owe)} (bilik ${u.n}).`); t.owe = 0; t.grace = 0 } else { t.grace = 2; toast(`😬 ${t.name} masih belum bayar (bilik ${u.n}). Ingatkan atau halau.`) } }
+    if (t.owe && d - t.oweSince >= 7) { const o = t.owe; leave(b, u, "lari tanpa bayar " + rm(o)); continue }
+   }
+   if (t.stay >= 28 && tr !== "kawan" && rnd() < .015) leave(b, u, "dapat kerja di KL")
+  }
+ };
+ const week = (b, d) => {
+  B.weeks++; let inc = 0, cost = 0, n = 0, late = 0;
+  for (const u of b.units) {
+   if (u.self) continue; const t = u.t; if (!t) { cost += VAC; continue } if (t.owe) continue;
+   const low = Q(u) < RATES[u.lv].need; if (low && t.stay > 14 && rnd() < .2) { leave(b, u, "bilik tidak setaraf sewa"); continue }
+   const p = (t.tr === "lewat" ? .4 : .08) + (low ? .15 : 0) + (u.clean < 30 ? .08 : 0);
+   if (rnd() < p) { t.owe = t.amt; t.oweSince = d; t.oweD = 0; t.grace = 0; late++; toast(`⏳ ${t.name} (bilik ${u.n}) belum bayar sewa ${rm(t.amt)}. Lihat ${NAME}.`) } else { inc += t.amt; n++; t.weeks = (t.weeks || 0) + 1 }
+  }
+  S.money = Math.max(0, S.money + inc - cost);
+  const m = `🏘️ ${NAME}: sewa ${rm(inc)} dari ${n} penyewa${cost ? ", kos bilik kosong " + rm(cost) : ""}${late ? ", " + late + " tertunggak" : ""}.`; toast(m); diary(m)
+ };
+ const tick = () => {
+  const d = dd(); let b = S.bs; if (!b && d >= 14) b = bs(); if (!b || !Array.isArray(b.units) || b.dy === d) return; b.dy = d;
+  if (!b.owner) { if (d >= 14 && d % 7 === 0 && rnd() < .15) npcBuy(b); return }
+  if (!mine(b)) { if (d % 7 === 0) npcWeek(b, d); return }
+  day(b, d); if (d % 7 === 0 && b.wk !== d) { b.wk = d; week(b, d) }
+ };
+ B.tick = tick; B.npcBuy = npcBuy; B.npcWeek = npcWeek;
+ if (typeof HOURX !== "undefined") HOURX.push(h => { try { if (h === 9) tick() } catch (e) { fail(e) } });
+ /* (3) the actions */
+ const spend = n => { if (S.money < n) { toast(`Duit tidak cukup: perlu ${rm(n)}.`); return false } S.money -= n; return true };
+ const U = n => { const b = bs(); return b.units.find(u => u.n === +n) };
+ const A = {
+  buy() { const b = bs(); if (b.owner) return; if (!spend(PRICE)) return; b.owner = S.home; const m = `🏘️ Beli ${NAME} (4 bilik, 101-104) untuk disewakan: ${rm(PRICE)}.`; toast(m); diary(m) },
+  find(n) { const b = bs(), u = U(n); if (!u || u.t || !mine(b)) return; if (!spend(ADV)) return; const c = [tenant(b), tenant(b), tenant(b)]; u.cands = c; try { if (b.units.some(x => x.t && x.t.tr === "kawan")) { u.cands.push(tenant(b)); u.cands[3].tr = "kawan"; u.cands[3].friend = 1 } } catch (e) { } u.cd = dd(); toast(`📣 Iklan bilik ${n}: ${u.cands.length} calon datang melihat.`) },
+  take(n, i) {
+   const b = bs(), u = U(n); if (!u || u.t || !u.cands) return; const c = u.cands[i], a = RATES[u.lv].amt; if (!c) return;
+   if (Q(u) < RATES[u.lv].need) { toast(`Bilik ${n} belum cukup bagus untuk sewa ${RATES[u.lv].t.toLowerCase()}.`); return }
+   if (c.bud < a) { toast(`${c.name}: bajet hanya ${rm(c.bud)} seminggu.`); return }
+   c.amt = a; c.stay = 0; c.owe = 0; c.weeks = 0; u.t = c; u.cands = null; u.self = 0; const m = `🧳 ${c.name} berpindah masuk ke bilik ${n}. Sewa ${rm(a)} seminggu (${TRS[c.tr][1].toLowerCase()}).`; toast(m); diary(m)
+  },
+  lv(n, lv) {
+   const u = U(n); if (!u || !RATES[lv]) return; const r = RATES[lv];
+   if (Q(u) < r.need) { toast(`Sewa ${r.t.toLowerCase()} perlu mutu bilik ${r.need}+ (sekarang ${Q(u)}). Naik taraf perabot atau bersihkan.`); return }
+   if (u.t && u.t.bud < r.amt) { toast(`${u.t.name} hanya mampu ${rm(u.t.bud)} seminggu.`); return }
+   u.lv = lv; if (u.t) u.t.amt = r.amt
+  },
+  clean(n) { const u = U(n); if (!u || u.clean >= 100) return; if (!spend(CLEANC)) return; u.clean = 100; toast(`🧹 Bilik ${n} dibersihkan.`) },
+  furn(n) { const u = U(n); if (!u || u.furn >= 2) return; if (!spend(FURNC[u.furn])) return; u.furn++; toast(`🛋️ Bilik ${n} dinaik taraf: ${FURNN[u.furn]}.`) },
+  fix(n) { const u = U(n); if (!u || !u.brk) return; if (!spend(u.brk.c)) return; toast(`🔧 ${u.brk.w} dibaiki (${rm(u.brk.c)}).`); u.brk = null },
+  grace(n) { const u = U(n); if (!u || !u.t || !u.t.owe || u.t.grace) return; u.t.grace = 1; u.t.oweD = dd() + 3; toast(`⏳ ${u.t.name} diberi tempoh 3 hari.`) },
+  remind(n) {
+   const u = U(n), t = u && u.t; if (!t || !t.owe) return; if (t.remD === dd()) { toast("Sudah diingatkan hari ini."); return } t.remD = dd();
+   if (rnd() < (t.tr === "lewat" ? .5 : .7)) { S.money += t.owe; toast(`💵 ${t.name} minta maaf dan bayar ${rm(t.owe)}.`); t.owe = 0; t.grace = 0 } else toast(`😤 ${t.name} bersungut dan belum bayar. Cuba lagi esok atau halau.`)
+  },
+  evict(n) { const b = bs(), u = U(n); if (!u || !u.t) return; leave(b, u, "dihalau kerana tunggakan") },
+  self(n) { const b = bs(), u = U(n); if (!u || u.t) return; if (u.self) { u.self = 0; toast(`Bilik ${n} kembali disewakan.`); return } for (const x of b.units) x.self = 0; u.self = 1; u.cands = null; toast(`🏠 Anda tinggal di bilik ${n} (tiada sewa, bilik sentiasa bersih).`) },
+  rent(n) { const b = bs(), u = U(n); if (!u || u.t || u.pl || b.owner === S.home || !b.owner) return; if (b.units.some(x => x.pl)) { toast("Keluarga anda sudah menyewa satu bilik."); return } const a = RATES[u.lv].amt; if (!spend(a)) return; homeMoneyAdd(b.owner, a); u.pl = { amt: a, since: dd(), weeks: 0, owe: 0 }; u.cands = null; const m = `🔑 Keluarga anda menyewa bilik ${n} di ${NAME}: ${rm(a)} seminggu (minggu pertama dibayar).`; toast(m); diary(m) },
+  quit(n) { const u = U(n); if (!u || !u.pl) return; u.pl = null; toast(`Anda berhenti menyewa bilik ${n}.`) }
+ };
+ B.A = A;
+ /* (4) the card */
+ const css = () => {
+  if (document.getElementById("hf159css")) return; const st = document.createElement("style"); st.id = "hf159css";
+  st.textContent = `#hfbilik{position:fixed;inset:0;z-index:61;display:flex;align-items:center;justify-content:center;background:rgba(40,28,18,.45);padding:10px}#hfbilik[hidden]{display:none}
+#hfbilik .pk{max-width:560px;width:100%;max-height:94vh;overflow:auto;background:#fffaf0;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:12px 14px;font:14px system-ui;color:#3b2a20}
+#hfbilik h2{margin:0 0 2px;font:800 1.15rem Georgia,serif}#hfbilik .x{float:right;border:0;background:#f3ead7;border-radius:999px;width:34px;height:34px;font-size:16px;cursor:pointer}
+#hfbilik .nt{font-size:.78rem;color:#7a6650;margin:3px 0}#hfbilik .sm{font-size:.74rem;color:#7a6650}
+#hfbilik .u{border:1px solid #e3d6bd;border-radius:14px;padding:8px 10px;margin:8px 0;background:#fff}#hfbilik .u.me{box-shadow:inset 3px 0 0 #2c6b4a}
+#hfbilik .uh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800}#hfbilik .q{display:inline-block;height:7px;border-radius:5px;background:#eadfc8;width:90px;vertical-align:middle;margin:0 4px;overflow:hidden}#hfbilik .q i{display:block;height:100%;background:#2c6b4a}
+#hfbilik button.b{min-height:36px;border:0;border-radius:10px;background:#2c6b4a;color:#fff;font:800 .74rem system-ui;padding:5px 10px;cursor:pointer}#hfbilik button.b:disabled{background:#cfc4b2;color:#6a5a48}#hfbilik button.b.g{background:#7a4a2a}#hfbilik button.b.r{background:#a8402e}#hfbilik button.b.o{background:#fff;color:#3b2a20;border:1px solid #c9b790}#hfbilik button.b.o[aria-pressed=true]{background:#2c6b4a;color:#fff;border-color:#2c6b4a}
+#hfbilik .row{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}#hfbilik .t{display:flex;gap:8px;align-items:center;margin:6px 0}#hfbilik .av{width:54px;height:54px;border-radius:12px;overflow:hidden;background:#eaf6f1;flex:none;display:inline-block}#hfbilik .av svg{width:100%;height:100%}
+#hfbilik .plus{width:100%;min-height:54px;border:2px dashed #2c6b4a;border-radius:12px;background:#f1f8ef;color:#2c6b4a;font:800 .9rem system-ui;cursor:pointer}
+#hfbilik .al{background:#fde9d6;border-radius:10px;padding:6px 8px;margin:6px 0;font-size:.78rem}#hfbilik .cd{border:1px solid #e3d6bd;border-radius:12px;padding:6px;background:#fffdf7;margin:6px 0}
+#hfbilik .tg{display:inline-block;font:700 .62rem system-ui;border-radius:999px;padding:1px 6px;background:#e6efe0;color:#2c5a3a}`;
+  document.head.appendChild(st)
+ };
+ const el = () => { let e = document.getElementById("hfbilik"); if (!e) { e = document.createElement("div"); e.id = "hfbilik"; e.hidden = true; e.setAttribute("role", "dialog"); e.setAttribute("aria-label", NAME); document.body.appendChild(e) } return e };
+ const trTag = t => `<span class="tg" title="${esc(TRS[t.tr][2])}">${TRS[t.tr][0]} ${TRS[t.tr][1]}</span>`;
+ const unitHTML = (b, u, own) => {
+  const q = Q(u), t = u.t, r = RATES[u.lv]; let h = `<div class="u${u.self ? " me" : ""}" data-u="${u.n}"><div class="uh"><span>Bilik ${u.n}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span>${q} · ${qTxt(q)}</span></div>
+<div class="sm">Perabot: ${FURNN[u.furn]} · Kebersihan ${Math.round(u.clean)}%${u.brk ? ` · <b style="color:#a8402e">rosak</b>` : ""}</div>`;
+  if (!own) {
+   if (t) h += `<div class="t">${face(t)}<div><b>${esc(t.name)}</b> ${trTag(t)}<div class="sm">Sewa ${rm(t.amt)} seminggu · ${t.stay || 0} hari tinggal</div></div></div>`;
+   else if (u.pl) h += `<p class="sm">🔑 Keluarga anda menyewa bilik ini: ${rm(u.pl.amt)} seminggu${u.pl.owe ? ` · tunggakan ${rm(u.pl.owe)}` : ""}.</p><button class="b o" data-a="quit" data-n="${u.n}">Berhenti menyewa</button>`;
+   else h += `<p class="sm">Kosong. Sewa ${r.t.toLowerCase()} ${rm(r.amt)} seminggu (bayar minggu pertama dahulu).</p><button class="b" data-a="rent" data-n="${u.n}" ${S.money < r.amt ? "disabled" : ""}>🔑 Sewa untuk keluarga saya · ${rm(r.amt)}</button>`;
+   return h + "</div>"
+  }
+  h += `<div class="row">${Object.entries(RATES).map(([k, v]) => `<button type="button" class="b o" data-a="lv" data-n="${u.n}" data-v="${k}" aria-pressed="${u.lv === k}" ${q < v.need ? 'title="Perlu mutu ' + v.need + '+"' : ""}>${v.t} ${rm(v.amt)}${q < v.need ? " 🔒" : ""}</button>`).join("")}</div>`;
+  if (u.self) h += `<p class="sm">🏠 Anda tinggal di sini: tiada sewa, bilik sentiasa bersih dan tidak rosak.</p>`;
+  else if (t) {
+   h += `<div class="t">${face(t)}<div><b>${esc(t.name)}</b> ${trTag(t)}<div class="sm">Bajet ${rm(t.bud)} · sewa ${rm(t.amt)} · ${t.weeks || 0} minggu</div></div></div>`;
+   if (t.owe) h += `<div class="al">⏳ <b>Tunggakan ${rm(t.owe)}</b> ${t.grace === 1 ? `· diberi tempoh sehingga hari ke-${t.oweD + 1}` : t.grace === 2 ? "· tempoh sudah lepas" : ""}<div class="row"><button class="b" data-a="grace" data-n="${u.n}" ${t.grace ? "disabled" : ""}>⏳ Beri tempoh 3 hari</button><button class="b g" data-a="remind" data-n="${u.n}">🗣️ Ingatkan</button><button class="b r" data-a="evict" data-n="${u.n}">🚪 Halau</button></div></div>`
+  } else {
+   const cs = u.cands && dd() - u.cd <= 2 ? u.cands : null;
+   if (cs) h += `<p class="sm">📣 Calon penyewa (sewa ${r.t.toLowerCase()} ${rm(r.amt)}):</p>` + cs.map((c, i) => `<div class="cd"><div class="t">${face(c)}<div><b>${esc(c.name)}</b> ${trTag(c)}${c.friend ? ' <span class="tg">kawan penyewa</span>' : ""}<div class="sm">Bajet ${rm(c.bud)} seminggu</div></div></div><button class="b" data-a="take" data-n="${u.n}" data-i="${i}" ${c.bud < r.amt || q < r.need ? "disabled" : ""}>${q < r.need ? "Mutu bilik kurang" : c.bud < r.amt ? "Bajet kurang" : "Terima · " + rm(r.amt)}</button></div>`).join("");
+   else h += `<button type="button" class="plus" data-a="find" data-n="${u.n}" ${S.money < ADV ? "disabled" : ""}>＋ Cari penyewa · iklan ${rm(ADV)}</button>`;
+   h += `<p class="sm">Bilik kosong: kos ${rm(VAC)} seminggu.</p>`
+  }
+  if (u.brk) h += `<div class="al">🔧 ${esc(u.brk.w)} · kos baiki ${rm(u.brk.c)}<div class="row"><button class="b" data-a="fix" data-n="${u.n}">🔧 Baiki ${rm(u.brk.c)}</button></div></div>`;
+  h += `<div class="row"><button class="b g" data-a="clean" data-n="${u.n}" ${u.clean >= 100 ? "disabled" : ""}>🧹 Bersihkan ${rm(CLEANC)}</button><button class="b g" data-a="furn" data-n="${u.n}" ${u.furn >= 2 ? "disabled" : ""}>🛋️ ${u.furn >= 2 ? "Perabot penuh" : "Naik taraf " + rm(FURNC[u.furn])}</button>${!t ? `<button class="b o" data-a="self" data-n="${u.n}" aria-pressed="${!!u.self}">🏠 ${u.self ? "Saya tinggal di sini" : "Tinggal di sini"}</button>` : ""}</div></div>`;
+  return h
+ };
+ const draw = () => {
+  const e = el(), b = bs(), own = mine(b), keep = e.querySelector(".pk") ? e.querySelector(".pk").scrollTop : 0; let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><h2>🏘️ ${NAME}</h2>`;
+  if (!b.owner) h += `<p class="nt">Bangunan empat bilik (101–104) di timur Pekan, belum berpenghuni dan sedang dijual.</p><div class="u"><b>Harga ${rm(PRICE)}</b><p class="sm">Anda jadi tuan rumah: cari penyewa, tetapkan sewa seminggu (${rm(RATES.murah.amt)} / ${rm(RATES.biasa.amt)} / ${rm(RATES.mahal.amt)}), jaga mutu bilik, uruskan tunggakan dan kerosakan. Jika lambat, mungkin keluarga jiran yang membelinya dahulu, dan anda boleh menyewa satu bilik.</p><button class="b" data-a="buy" ${S.money < PRICE ? "disabled" : ""}>🏠 Beli bangunan · ${rm(PRICE)}</button>${S.money < PRICE ? `<p class="sm">Duit anda ${rm(S.money)}: belum cukup.</p>` : ""}</div>` + b.units.map(u => `<div class="u"><div class="uh"><span>Bilik ${u.n}</span><span class="sm">Kosong</span></div></div>`).join("");
+  else {
+   if (own) { let inc = 0, nt = 0, ve = 0; for (const u of b.units) { if (u.self) continue; if (u.t) { nt++; if (!u.t.owe) inc += u.t.amt } else ve++ } h += `<p class="nt">Anda tuan rumah. Anggaran seminggu: sewa ${rm(inc)} − bilik kosong ${rm(ve * VAC)}. Penyewa ${nt}/4. Duit: ${rm(S.money)}.</p>` }
+   else h += `<p class="nt">Milik keluarga ${esc(wmShort(homeName(b.owner), 24))}. Anda boleh menyewa satu bilik kosong.</p>`;
+   h += b.units.map(u => unitHTML(b, u, own)).join("")
+  }
+  e.innerHTML = h + "</div>"; const p = e.querySelector(".pk"); if (p) p.scrollTop = keep
+ };
+ B.draw = draw;
+ const open = () => { try { css(); bs(); const e = el(); draw(); e.hidden = false; HF.bilikOn = true; B.opened++; try { const m = document.getElementById("kmap"); if (m) m.hidden = true } catch (x) { } return true } catch (x) { fail(x); return false } };
+ const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.bilikOn = false; try { renderAll() } catch (x) { } };
+ B.open = open; B.close = close; HF.bilikOpen = open;
+ document.addEventListener("click", ev => {
+  try {
+   const t = ev.target; if (!t || !t.closest || !HF.bilikOn || !t.closest("#hfbilik")) return; ev.stopPropagation();
+   if (t.closest("[data-x]") || t === el()) { close(); return }
+   const a = t.closest("[data-a]"); if (!a || a.disabled) return; const f = A[a.dataset.a]; if (!f) return;
+   f(a.dataset.a === "lv" ? a.dataset.n : a.dataset.n, a.dataset.v !== undefined ? a.dataset.v : a.dataset.i !== undefined ? +a.dataset.i : undefined); draw(); try { save() } catch (x) { }
+  } catch (x) { fail(x) }
+ }, true);
+ document.addEventListener("keydown", ev => { try { if (HF.bilikOn && ev.key === "Escape") { ev.stopPropagation(); close() } } catch (x) { fail(x) } }, true);
+ /* (5) the place on the map: PLACES, ERR, WMPL, WMN, and the errand opens the card */
+ try {
+  PLACES.bilik = { area: "bandar", name: NAME, icon: "🏘️", acts: ["hf_bilik"], note: "Bangunan empat bilik sewa (101–104) di timur Pekan: beli untuk disewakan, atau sewa satu bilik. Buka 8:00–22:00." };
+  ERR.hf_bilik = { label: "Ke Bilik Sewa Seri Murni: urus bilik sewa", icon: "🏘️", dur: 25, ages: ["teen", "adult", "elder"], eff: { fun: .1 }, place: "bilik", when: (d2, h) => h >= 8 && h < 22, whenTxt: "8:00–22:00" };
+  if (typeof WMPL !== "undefined") WMPL.bilik = [1120, 24];
+  if (typeof WMN !== "undefined") WMN.bilik = NAME;
+  if (typeof WMCAT !== "undefined") WMCAT.bilik = "civic"
+ } catch (e) { fail(e) }
+ if (typeof errandReturn === "function") {
+  const er = errandReturn;
+  errandReturn = function (s2) { const e = s2 && s2.errand, r = er.apply(this, arguments); try { if (e === "hf_bilik" && s2 && S.sims.includes(s2) && !s2.visitFrom) setTimeout(() => open(), 350) } catch (x) { fail(x) } return r }
+ }
+ /* (6) the building drawn on the Peta in code (the doors show who lives there), and a button in the pin's panel */
+ const art = () => {
+  const b = S.bs, X = 1038, Y = -128, W = 164; let s = `<g class="hf159b" pointer-events="none"><ellipse cx="1120" cy="-44" rx="104" ry="9" fill="rgba(60,40,20,.22)"/><rect x="${X}" y="${Y + 28}" width="${W}" height="78" rx="3" fill="#ecdcbc" stroke="#8a6a44" stroke-width="2"/><path d="M${X - 10} ${Y + 30}L1120 ${Y - 6}L${X + W + 10} ${Y + 30}Z" fill="#b5523b" stroke="#7a3624" stroke-width="2"/><rect x="${X}" y="${Y + 66}" width="${W}" height="4" fill="#c9b48a"/>`;
+  for (let i = 0; i < 4; i++) {
+   const u = b && b.units ? b.units[i] : null, x = X + 8 + i * 39, st = !u ? 0 : u.brk || (u.t && u.t.owe) ? 3 : u.t || u.pl || u.self ? 1 : 2;
+   s += `<rect x="${x}" y="${Y + 36}" width="26" height="20" rx="2" fill="#a9cfdf" stroke="#6a5a48" stroke-width="1.5"/><rect x="${x + 2}" y="${Y + 74}" width="22" height="30" rx="2" fill="${st === 1 ? "#4f8a5a" : st === 3 ? "#c9743a" : "#a89a82"}" stroke="#5a4a38" stroke-width="1.5"/><text x="${x + 13}" y="${Y + 69}" text-anchor="middle" font-size="9" font-weight="800" fill="#4a3a28">${101 + i}</text>${st === 2 ? `<text x="${x + 13}" y="${Y + 95}" text-anchor="middle" font-size="18" font-weight="800" fill="#fffaf0">+</text>` : ""}${st === 3 ? `<text x="${x + 13}" y="${Y + 95}" text-anchor="middle" font-size="16" font-weight="800" fill="#fffaf0">!</text>` : ""}`
+  }
+  return s + "</g>"
+ };
+ if (typeof worldMapSVG === "function") {
+  const ws = worldMapSVG;
+  worldMapSVG = function () { const s2 = ws.apply(this, arguments); try { const i = s2.indexOf('<g class="wmp" data-wm-place="bilik"'); return i < 0 ? s2 : s2.slice(0, i) + art() + s2.slice(i) } catch (x) { fail(x); return s2 } }
+ }
+ const add = () => {
+  try {
+   const k = document.querySelector("#kmap"), inf = k && k.querySelector(".wminfo"); if (!inf || inf.querySelector(".hf159") || wmSel !== "pl:bilik") return;
+   const b = S.bs, txt = !b || !b.owner ? "Dijual " + rm(PRICE) : mine(b) ? "Anda tuan rumah" : "Milik keluarga " + wmShort(homeName(b.owner), 18);
+   inf.insertAdjacentHTML("beforeend", `<div class="hf159"><p class="sm"><b>🏘️ ${txt}</b></p><div class="acts"><button type="button" class="btn pri" data-b159="1">🔑 Buka ${NAME}</button></div></div>`);
+   inf.querySelectorAll("[data-b159]").forEach(x => x.onclick = () => { open() })
+  } catch (e) { fail(e) }
+ };
+ if (typeof renderMap === "function") { const rm0 = renderMap; renderMap = function () { const r = rm0.apply(this, arguments); try { add() } catch (x) { fail(x) } return r } }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
