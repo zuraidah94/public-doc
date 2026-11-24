@@ -12968,6 +12968,10 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
    for (const t of T) { if (t.dataset.o0 === undefined) t.dataset.o0 = JSON.stringify([t.getAttribute("font-size"), t.getAttribute("y"), t.getAttribute("stroke-width"), t.textContent, t.getAttribute("x")]); else rest(t) }
    const vb = sv.viewBox.baseVal, sr = sv.getBoundingClientRect(), W = sr.width; if (!vb || !vb.width || !W) return;
    ws.dataset.fw = String(Math.round(W));
+   /* rk-ringan: tapping a lot re-draws the whole map, and the names were measured one by one again (forced layout, ~half of the tap's cost on a phone). The same names at the same
+      width give the same placement: kept (a few maps) and put back without measuring. */
+   const lk = Math.round(W) + "|" + S.home + "|" + T.map(t => t.dataset.o0 + (t.closest("g").getAttribute("transform") || "")).join("~"), lc = HF.wmLabC || (HF.wmLabC = new Map()), hit0 = lc.get(lk);
+   if (hit0 && hit0.length === T.length) { T.forEach((t, i) => { const c = hit0[i]; t.setAttribute("x", c[0]); t.setAttribute("font-size", c[1]); t.setAttribute("y", c[2]); t.setAttribute("stroke-width", c[3]); t.innerHTML = c[4]; t.style.display = c[5] }); return }
    const s = W / vb.width, esc2 = x => String(x).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
    const prio = t => { const g = t.closest("g"); return g.classList.contains("wmp") ? 0 : (g.dataset.wmHome === S.home ? 1 : 2) };
    const order = T.map((t, i) => [prio(t), i]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(a => T[a[1]]);
@@ -12994,7 +12998,35 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
     }
     if (!done) { rest(t); const r = t.getBoundingClientRect(); if (f0 * s < 7 || hit(r)) t.style.display = "none"; else placed.push(r) }   /* painted size only if it is legible (>= 7 px) and free */
    }
+   if (lc.size >= 8) lc.delete(lc.keys().next().value); lc.set(lk, T.map(t => [t.getAttribute("x"), t.getAttribute("font-size"), t.getAttribute("y"), t.getAttribute("stroke-width"), t.innerHTML, t.style.display]));
   } catch (e) { fail(e) }
+ }
+ /* rk-ringan: tapping a house, lot or place on the Peta drew the whole map again before anything showed (~0.5 s on a phone). Now the tap answers in the same frame
+    (the pin lights up and the card shows the name), and the real redraw — the same click, unchanged — runs right after that frame. A drag that ends on a pin is left alone. */
+ {
+  let pd = null, busy = false, go = false;
+  const SEL = "#kmap g[data-wm-home],#kmap g[data-wm-place],#kmap g[data-wm-lot],#kmap g[data-wm-bld]";
+  document.addEventListener("pointerdown", e => { pd = [e.clientX, e.clientY] }, true);
+  document.addEventListener("click", e => {
+   try {
+    if (go || busy || !e.target.closest) return;
+    const g = e.target.closest(SEL); if (!g || !e.isTrusted) return;
+    if (pd && Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) > 5) return;
+    e.stopImmediatePropagation(); e.preventDefault(); busy = true;
+    try {
+     g.style.filter = "brightness(1.12)";
+     const w = document.querySelector("#kmap .wminfo-wrap"), t = g.querySelector("title"), nm = (t && t.textContent) || g.getAttribute("aria-label") || (g.querySelector("text") || {}).textContent || "";
+     if (w) w.innerHTML = '<div class="wminfo"><b>' + String(nm).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])) + "</b></div>"
+    } catch (e2) { fail(e2) }
+    const key = ["wmHome", "wmPlace", "wmLot", "wmBld", "wmI"].map(k => k + "=" + (g.dataset[k] || "")).join("&");
+    requestAnimationFrame(() => setTimeout(() => {
+     try {
+      let h = g; if (!h.isConnected) h = [...document.querySelectorAll(SEL)].find(x => ["wmHome", "wmPlace", "wmLot", "wmBld", "wmI"].map(k => k + "=" + (x.dataset[k] || "")).join("&") === key);
+      if (h) { go = true; h.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })) }
+     } catch (e3) { fail(e3) } finally { go = false; busy = false }
+    }, 0))
+   } catch (e) { fail(e) }
+  }, true)
  }
  /* peta-zoom: zoom state for the session (not saved: old saves and the old 'mapfit' setting are simply ignored) */
  const WMZ = { z: 1, min: .6, max: 2.5, t: 0 };
@@ -22571,6 +22603,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
    ["hf137", "24 Nov 2026", ["🔊 Bunyi baharu: hujan dan ribut ikut cuaca, angin, burung dan cengkerik ikut waktu, muzik gamelan tenang (skrin mula dan Rumah Kita), gumam gaya Sulsul bila orang bercakap (nada ikut umur dan jantina) dan klik halus; togol Bunyi suasana dan Suara berbual dalam Tetapan", "⚡ Lebih pantas: skrin Bilik Sewa (tab Tingkat, kad bilik, Sewa, tutup) dan tab Keluarga, Bina, Telefon, Kerjaya; butang Lihat dalam Bilik Sewa kini membuka bilik; perabot bilik sewa tidak senget lagi"]],
    ["hf136", "23 Nov 2026", ["🧍 Penyewa dalam bilik sewa kini Sim sebenar (badan penuh, watak lukisan tangan yang sama dengan dalam rumah), bukan bulatan avatar: tidur di katil, mandi di bilik air, makan di meja makan, memasak di dapur, bekerja di meja tulis atau komputer, menonton TV di sofa atau duduk; aktiviti mengikut waktu dan perabot bilik, dengan label aktiviti di atas kepala", "🛋️ Susunan Mewah diperbaiki sedikit (sofa lebih jauh dari TV, kerusi pejabat tidak tersembunyi di sebalik bilik air); penyewa duduk betul-betul di atas kusyen sofa, kerusi makan, kerusi pejabat dan bangku (model 3D duduk yang dirender bersama perabot dalam satu gambar, kedalaman tepat, warna kulit/rambut/tudung/baju ikut penyewa); penyewa mandi lebih kecil dan berdiri dalam ruang pancuran"]],
    ["hf135", "23 Nov 2026", ["🛋️ Perabot bilik sewa kini model 3D yang dirender dengan satu kamera isometrik tetap (sudut sama, tapak tepat pada petak, empat arah putar) dan saiz bilik ikut pakej: Murah 5 x 5 (Retro Malaysia: dinding hijau pudina, lantai kayu oren, tilam lantai, almari, kipas berdiri, meja lipat, bangku), Sederhana 6 x 6 (Japandi: dinding krim, lantai kayu cerah, katil kayu cadar sage, dapur kecil dengan kabinet, sinki dan hob, meja tulis dan kerusi) dan Mewah 6 x 6 (Butik Moden: dinding biru laut, lantai kayu gelap, dapur mewah dengan peti sejuk, hob dan sinki dengan meja makan dan dua kerusi di sebelahnya, TV dengan sofa L berjarak dua petak, meja komputer dengan kerusi pejabat di zon lain, katil besar, aircond dinding)", "🚶 Penyewa duduk di kerusi (siang) atau tidur di katil (malam); laluan ke katil, kerusi dan meja sentiasa lapang (editor menolak perabot yang menghalang); kipas siling tergantung di atas dan aircond di dinding tanpa ambil petak lantai; bilik air satu unit di sudut kanan belakang; bilik lama dipindah ke grid pakejnya tanpa kehilangan perabot"]],
@@ -42477,7 +42510,8 @@ try {
    (5) a soft click for buttons, tabs, close, buy / rent / open (pre-rendered, one BufferSource per click, passive capture listener).
    Switches: ⚙️ Tetapan → Bunyi kesan (all effects, ambience and clicks), Muzik, 🌧️ Bunyi suasana, 🗣️ Suara berbual; choices are kept in
    localStorage "rkhf_snd". iOS: the context is resumed on touchend / click / pointerup (not only pointerdown), 'interrupted' is handled, it
-   is suspended while the page is hidden and resumed on return; navigator.audioSession is "ambient" (the silent switch is respected).
+   is suspended while the page is hidden and resumed on return. hf138: the silent (ring) switch is respected by default (audioSession "ambient"; the real cause of "no sound" was the switch
+   being on); ⚙️ → "Bunyi walau suis senyap" (P.main) sets "playback" (iOS 16.4+) or plays a looping silent <audio> element from a tap. Levels lifted a little. ⚙️ → "🔊 Uji bunyi" plays a tap + two notes and prints the state.
    API (for tests): RKHF.snd.play('klik'|'tab'|'tutup'|'buka'|'beli'), .say(text, who), .gumam(who), .setMusic(on) .setSfx(on)
    .setVoice(on) .setAmbience(on), .state(), .live(), .tick(), .render(sec, what) (OfflineAudioContext: peak / rms). ---------- */
 try {
@@ -42498,16 +42532,55 @@ try {
  /* a DynamicsCompressorNode adds make-up gain of its own (about +1.7 dB with these settings), so a plain gain of 0.83 follows it: quiet sound passes unchanged, only peaks above about -3 dB are held down */
  const COMP = k => { k.threshold.value = -3; k.knee.value = 3; k.ratio.value = 16; k.attack.value = .002; k.release.value = .15 };
  const MK = .83;
+ /* levels: a modest lift only (about +4 dB music, +3.5 rain, +3 voice, +3.5 click); the owner confirmed the earlier silence was the silent switch */
+ const MUSB = 1.6, AMBB = 1.5, VOXB = 1.4, CLKB = .08;
+
+ /* ---- iOS: the silent switch, and the gesture that unlocks the sound ---- */
+ const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1);
+ const rs = c => { try { const p = c.resume(); if (p && p.catch) p.catch(() => { }); return p } catch (e) { return null } };
+ /* "playback" makes WebAudio sound with the silent switch on; "ambient" (default) respects the switch */
+ const session = () => { try { const as = navigator.audioSession; if (as) { const w = P.main === 1 ? "playback" : "ambient"; if (as.type !== w) as.type = w } } catch (e) { A.sessErr = String(e && e.message || e) } };
+ const wavUri = () => {
+  /* 0.5 s, 8 kHz, 16-bit mono, samples of ±1 (about -90 dB: silent to the ear, but not a "nothing" the system drops) */
+  const n = 4000, b = new Uint8Array(44 + n * 2), w = (o, s) => { for (let i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i) }, u32 = (o, v) => { b[o] = v & 255; b[o + 1] = v >> 8 & 255; b[o + 2] = v >> 16 & 255; b[o + 3] = v >>> 24 }, u16 = (o, v) => { b[o] = v & 255; b[o + 1] = v >> 8 & 255 };
+  w(0, "RIFF"); u32(4, 36 + n * 2); w(8, "WAVEfmt "); u32(16, 16); u16(20, 1); u16(22, 1); u32(24, 8000); u32(28, 16000); u16(32, 2); u16(34, 16); w(36, "data"); u32(40, n * 2);
+  for (let i = 0; i < n; i++) { b[44 + i * 2] = i & 1 ? 255 : 1; b[45 + i * 2] = i & 1 ? 255 : 0 }
+  let s = ""; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  return "data:audio/wav;base64," + btoa(s)
+ };
+ /* iOS without audioSession "playback" (before 16.4): a looping silent media element moves the page's audio into the "playback" class */
+ const hush = () => {
+  try {
+   const as = navigator.audioSession, via = !!as && as.type === "playback";
+   if (!IOS || P.main !== 1 || via || document.hidden) { if (A.au && !A.au.paused) A.au.pause(); return }
+   if (!A.au) { const a = new Audio(); a.loop = true; a.preload = "auto"; a.setAttribute("playsinline", ""); a.src = wavUri(); A.au = a }
+   if (A.au.paused) { const p = A.au.play(); if (p && p.catch) p.catch(() => { A.auFail = (A.auFail || 0) + 1 }) }
+  } catch (e) { A.auFail = (A.auFail || 0) + 1 }
+ };
+ /* called inside a real tap (touchend / pointerup / click / keydown) every time, until the context is running: creates the context if
+    nobody has, resumes it, starts one empty buffer (the classic iOS unlock), sets the audio session, starts the silent element */
+ const unlock = () => {
+  try {
+   if (document.hidden) return;
+   session();
+   let c = ctx(); if (!c) { try { audioInit() } catch (e) { } c = ctx() }
+   if (!c) return;
+   if (c.state !== "running") { rs(c); try { const s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, 22050); s.connect(c.destination); s.start(0) } catch (e) { } }
+   hush()
+  } catch (e) { }
+ };
  const boot = () => {
   const c = ctx(); if (!c || !SND.master) return null;
   if (A.B && A.B.c === c) return A.B;
   const B = { c, lim: false };
-  try { const k = c.createDynamicsCompressor(), mg = c.createGain(); COMP(k); mg.gain.value = MK; SND.master.disconnect(); SND.master.connect(k); k.connect(mg); mg.connect(c.destination); B.lim = true; B.k = k } catch (e) { try { SND.master.connect(c.destination) } catch (e2) { } }
+  try { const k = c.createDynamicsCompressor(), mg = c.createGain(); COMP(k); mg.gain.value = MK; SND.master.disconnect(); SND.master.connect(k); k.connect(mg); mg.connect(c.destination); B.lim = true; B.k = k; try { const an = c.createAnalyser(); an.fftSize = 1024; mg.connect(an); B.an = an; B.ab = new Float32Array(1024) } catch (e3) { } } catch (e) { try { SND.master.connect(c.destination) } catch (e2) { } }
   B.ui = c.createGain(); B.vo = c.createGain(); B.am = c.createGain();
   [B.ui, B.vo, B.am].forEach(g => { g.gain.value = 1; g.connect(SND.master) });
+  B.am.gain.value = AMBB;
+  try { SND.mus.disconnect(); const mb = c.createGain(); mb.gain.value = MUSB; SND.mus.connect(mb); mb.connect(SND.master); B.mb = mb } catch (e) { try { SND.mus.connect(SND.master) } catch (e2) { } }
   A.B = B;
-  try { if (navigator.audioSession) navigator.audioSession.type = "ambient" } catch (e) { }
-  c.addEventListener("statechange", () => { try { if (c.state === "interrupted" && !document.hidden) c.resume().catch(() => { }) } catch (e) { } });
+  session();
+  try { c.addEventListener("statechange", () => { try { if (c.state === "interrupted" && !document.hidden) rs(c) } catch (e) { } }) } catch (e) { }
   setTimeout(buildBank, 60);
   if (!A.t1) { A.t1 = setInterval(ambTick, 1200); A.t2 = setInterval(talkTick, 800); A.t3 = setInterval(scan, 7000); scan() }
   return B
@@ -42518,18 +42591,19 @@ try {
  const ex = (t, at, tau) => (t < at ? t / at : Math.exp(-(t - at) / tau));
  const sn = (f, t) => Math.sin(TAU * f * t);
  const CL = {
-  klik: mkA(.07, t => (sn(1500, t) * .75 + (t < .003 ? (rn() * 2 - 1) * .5 : 0)) * ex(t, .0015, .011), .055),
-  tab: mkA(.1, t => (sn(880, t) * .7 + sn(1320, t) * .22) * ex(t, .002, .02), .055),
-  tutup: mkA(.14, t => t < .06 ? sn(740, t) * ex(t, .002, .02) : sn(554, t - .06) * ex(t - .06, .002, .026), .055),
-  buka: mkA(.14, t => t < .06 ? sn(660, t) * ex(t, .002, .02) : sn(880, t - .06) * ex(t - .06, .002, .026), .055),
-  beli: mkA(.26, t => t < .05 ? sn(523, t) * ex(t, .002, .02) * .8 : (sn(1568, t - .05) * .7 + sn(2350, t - .05) * .2) * ex(t - .05, .002, .06), .055)
+  klik: mkA(.07, t => (sn(1500, t) * .75 + (t < .003 ? (rn() * 2 - 1) * .5 : 0)) * ex(t, .0015, .011), CLKB),
+  tab: mkA(.1, t => (sn(880, t) * .7 + sn(1320, t) * .22) * ex(t, .002, .02), CLKB),
+  tutup: mkA(.14, t => t < .06 ? sn(740, t) * ex(t, .002, .02) : sn(554, t - .06) * ex(t - .06, .002, .026), CLKB),
+  buka: mkA(.14, t => t < .06 ? sn(660, t) * ex(t, .002, .02) : sn(880, t - .06) * ex(t - .06, .002, .026), CLKB),
+  beli: mkA(.26, t => t < .05 ? sn(523, t) * ex(t, .002, .02) * .8 : (sn(1568, t - .05) * .7 + sn(2350, t - .05) * .2) * ex(t - .05, .002, .06), CLKB),
+  uji: mkA(.62, t => t < .3 ? sn(660, t) * ex(t, .004, .09) : sn(990, t - .3) * ex(t - .3, .004, .1), .22)
  };
  const BU = new WeakMap();
  const bufOf = (c, key, arr) => { let m = BU.get(c); if (!m) BU.set(c, m = {}); if (!m[key]) { const b = c.createBuffer(1, arr.length, SR); b.getChannelData(0).set(arr); m[key] = b } return m[key] };
  const play = (name, c, B, t) => {
   try {
    const real = !c;
-   if (real) { if (!sfxOn() || document.hidden) return false; c = ctx(); if (!c) return false; B = boot(); if (!B) return false; const now = performance.now(); if (now - A.lastClk < 40) return false; A.lastClk = now; if (c.state !== "running") c.resume().catch(() => { }) }
+   if (real) { if (!sfxOn() || document.hidden) return false; c = ctx(); if (!c) return false; B = boot(); if (!B) return false; const now = performance.now(); if (now - A.lastClk < 40) return false; A.lastClk = now; if (c.state !== "running") rs(c) }
    const arr = CL[name]; if (!arr) return false;
    const s = c.createBufferSource(); s.buffer = bufOf(c, name, arr); s.playbackRate.value = 1 + (rn() - .5) * .05; s.connect(B.ui); trk(s); s.start(t || 0);
    if (real) A.plays[name] = (A.plays[name] || 0) + 1;
@@ -42548,8 +42622,7 @@ try {
  const onClick = e => {
   const t0 = performance.now();
   try {
-   const c = ctx();
-   if (!c) { try { audioInit() } catch (e2) { } } else if (c.state !== "running" && !document.hidden) c.resume().catch(() => { });
+   unlock();
    const t = e.target; if (!t || !t.closest) return;
    const el = t.closest(SEL); if (!el || el.disabled || el.getAttribute("aria-disabled") === "true") return;
    if (el.hasAttribute("data-tab") && t0 - A.tabAt < 900) return;
@@ -42565,7 +42638,7 @@ try {
    A.tabAt = performance.now(); play("tab")
   } catch (e2) { fail(e2) }
  };
- const onOpen = () => { try { const c = ctx(); if (c) { if (c.state !== "running" && !document.hidden) c.resume().catch(() => { }); boot() } else audioInit() } catch (e) { } };
+ const onOpen = () => { try { unlock(); if (ctx()) boot() } catch (e) { } };
  const PO = { capture: true, passive: true };
  document.addEventListener("pointerdown", onDown, PO);
  document.addEventListener("click", onClick, PO);
@@ -42573,8 +42646,8 @@ try {
  { const s0 = sfx; sfx = function (name) { try { if (name === "tap") { const nw = performance.now(); if (nw - A.lastClk > 120 && play("klik")) A.tapAt = nw; return } } catch (e) { fail(e) } return s0.apply(this, arguments) } }
 
  /* ---- pause when hidden, resume on return (iOS: also 'interrupted') ---- */
- const susp = () => { try { const c = ctx(); if (c && c.state === "running") { A.paused = 1; c.suspend().catch(() => { }) } } catch (e) { } };
- const resu = () => { try { const c = ctx(); if (c && (A.paused || c.state === "interrupted")) { A.paused = 0; c.resume().catch(() => { }) } } catch (e) { } };
+ const susp = () => { try { try { if (A.au) A.au.pause() } catch (e) { } const c = ctx(); if (c && c.state === "running") { A.paused = 1; const p = c.suspend(); if (p && p.catch) p.catch(() => { }) } } catch (e) { } };
+ const resu = () => { try { session(); const c = ctx(); if (c && (A.paused || c.state === "interrupted" || c.state === "suspended")) { A.paused = 0; rs(c) } hush() } catch (e) { } };
  document.addEventListener("visibilitychange", () => { document.hidden ? susp() : resu() });
  addEventListener("pagehide", susp); addEventListener("pageshow", resu);
 
@@ -42582,7 +42655,7 @@ try {
  const bits = () => [S.sfx !== false ? 1 : 0, S.music !== false ? 1 : 0, S.voice !== false ? 1 : 0].join("");
  /* renderTop() sets aria-pressed of every ".speed button" from the game speed (the sound switches share that group), so the
     ⚙️ list showed every switch as "Tutup" after the next redraw; while the list is open it is put right again after each redraw */
- const syncBtns = () => { try { if (!S) return; for (const [id, on] of [["sfxbtn", S.sfx !== false], ["musbtn", S.music !== false], ["ambbtn", P.amb !== 0], ["vocbtn", S.voice !== false]]) { const b = document.getElementById(id); if (b && b.getAttribute("aria-pressed") !== String(on)) b.setAttribute("aria-pressed", String(on)); if (b && (id === "ambbtn" || id === "vocbtn")) { const ti = (id === "ambbtn" ? "Bunyi suasana: hujan, cengkerik, angin" : "Suara berbual (gumam)") + (on ? " · hidup" : " · tutup"); if (b.title !== ti) b.title = ti } } const tg = $("#voicetg"); if (tg) tg.checked = S.voice !== false } catch (e) { } };
+ const syncBtns = () => { try { if (!S) return; for (const [id, on] of [["sfxbtn", S.sfx !== false], ["musbtn", S.music !== false], ["ambbtn", P.amb !== 0], ["vocbtn", S.voice !== false], ["senybtn", P.main === 1], ["ujibtn", false]]) { const b = document.getElementById(id); if (b && b.getAttribute("aria-pressed") !== String(on)) b.setAttribute("aria-pressed", String(on)); if (b && (id === "ambbtn" || id === "vocbtn")) { const ti = (id === "ambbtn" ? "Bunyi suasana: hujan, cengkerik, angin" : "Suara berbual (gumam)") + (on ? " · hidup" : " · tutup"); if (b.title !== ti) b.title = ti } } const tg = $("#voicetg"); if (tg) tg.checked = S.voice !== false } catch (e) { } };
  { const r0 = renderTop; renderTop = function () { const r = r0.apply(this, arguments); try { const p = document.getElementById("setpop"); if (p && p.classList.contains("open")) syncBtns() } catch (e) { } return r } }
  document.addEventListener("click", e => { const t = e.target; if (t && t.closest && t.closest("#setbtn")) setTimeout(syncBtns, 0) }, true);
  const keep = () => { try { if (!S || A.obj !== S) return; const b = bits(); if (b === A.snap) return; A.snap = b; P.sfx = +b[0]; P.mus = +b[1]; P.voc = +b[2]; saveP(); syncBtns() } catch (e) { fail(e) } };
@@ -42640,10 +42713,10 @@ try {
  const speak = (pf, groups, o, c, B, t00) => {
   try {
    o = o || {}; const real = !c;
-   if (real) { if (!vocOn() || document.hidden) return 0; c = ctx(); if (!c) return 0; B = boot(); if (!B) return 0; if (c.state !== "running") c.resume().catch(() => { }) }
+   if (real) { if (!vocOn() || document.hidden) return 0; c = ctx(); if (!c) return 0; B = boot(); if (!B) return 0; if (c.state !== "running") rs(c) }
    if (!A.syl || !pf) return 0; const pool = poolOf(pf); if (!pool) return 0;
    if (real) { if (A.vc >= 4) return 0; const bz = A.busy.get(pf.key); if (bz && bz > c.currentTime) return 0 }
-   const t0 = (t00 != null ? t00 : c.currentTime) + .03 + (o.delay || 0), g = c.createGain(); g.gain.value = .085 * (o.vol == null ? 1 : o.vol); g.connect(B.vo);
+   const t0 = (t00 != null ? t00 : c.currentTime) + .03 + (o.delay || 0), g = c.createGain(); g.gain.value = .085 * VOXB * (o.vol == null ? 1 : o.vol); g.connect(B.vo);
    let t = t0, i = 0; const total = groups.reduce((a, b) => a + b, 0), sd = pf.h * 9;
    for (let w = 0; w < groups.length; w++) {
     for (let k = 0; k < groups[w]; k++, i++) {
@@ -42820,14 +42893,48 @@ try {
   } catch (e) { fail(e) }
  };
 
+ /* ---- ⚙️ "🔊 Uji bunyi": a tap + two notes, then the state in plain words (the silent switch itself cannot be read by a page) ---- */
+ const peakNow = () => { try { const B = A.B; if (!B || !B.an) return -1; B.an.getFloatTimeDomainData(B.ab); let m = 0; for (let i = 0; i < B.ab.length; i++) { const a = Math.abs(B.ab[i]); if (a > m) m = a } return m } catch (e) { return -1 } };
+ const showUji = msg => { try { A.lastMsg = msg; const p = document.getElementById("ujistat"); if (p) p.textContent = msg; if (typeof toast === "function") toast(msg) } catch (e) { } };
+ const uji = () => new Promise(done => {
+  const r = { ctx: "none", level: -1, session: "-", sfx: true, music: true, msg: "" };
+  try {
+   unlock(); adopt(); const c = ctx();
+   r.sfx = sfxOn(); r.music = musOn(); try { r.session = navigator.audioSession ? navigator.audioSession.type : "tiada" } catch (e) { }
+   if (!c) { r.msg = "Bunyi disekat: pelayar ini tiada WebAudio."; showUji(r.msg); return done(r) }
+   const B = boot(); let t0 = performance.now();
+   const go = () => {
+    const run = c.state === "running";
+    if (!run && performance.now() - t0 < 900) { rs(c); return setTimeout(go, 60) }
+    r.ctx = c.state;
+    if (run && B) { const t = c.currentTime + .03; play("klik", c, B, t); play("uji", c, B, t + .12) }
+    let mx = 0, n = 0; const poll = () => { mx = Math.max(mx, peakNow()); if (++n < 18) setTimeout(poll, 45); else fin() };
+    const fin = () => {
+     r.level = +mx.toFixed(4);
+     const tg = (r.sfx ? "" : " Bunyi kesan ditutup (🔊).") + (r.music ? "" : " Muzik ditutup (🎵).");
+     if (!run) r.msg = "Bunyi disekat (konteks: " + c.state + "). Sentuh butang ini sekali lagi; hidupkan bunyi dan nyahsenyapkan suis senyap iPhone." + tg;
+     else if (mx <= 0 && B && B.an) r.msg = "Bunyi: konteks running tetapi tiada isyarat sampai ke pembesar suara. Cuba sekali lagi." + tg;
+     else r.msg = "Bunyi: aktif (konteks: running" + (IOS ? ", sesi: " + r.session : "") + "). Kalau masih tiada suara: semak suis senyap iPhone dan kelantangan media." + tg;
+     showUji(r.msg); done(r)
+    };
+    poll()
+   };
+   go()
+  } catch (e) { r.msg = "Bunyi disekat: ralat " + (e && e.message || e); showUji(r.msg); done(r) }
+ });
+ const setMain = on => { P.main = on ? 1 : 0; saveP(); session(); hush(); syncBtns(); return P.main === 1 };
+
  /* ---- ⚙️ Tetapan: two more switches beside Bunyi kesan and Muzik ---- */
  { const st = document.createElement("style"); st.id = "rk-bunyi-css";
-  st.textContent = `@media (max-width:700px){html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::after{content:"Bunyi suasana (hujan, cengkerik)"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::before{content:"Tutup"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn[aria-pressed="true"]::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn[aria-pressed="true"]::before{content:"Hidup"}html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::after{content:"Suara berbual (gumam)"}}`;
+  st.textContent = `@media (max-width:700px){html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::after{content:"Bunyi suasana (hujan, cengkerik)"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::before{content:"Tutup"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn[aria-pressed="true"]::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn[aria-pressed="true"]::before{content:"Hidup"}html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::after{content:"Suara berbual (gumam)"}html body.hfc1:not(.x0):not(.x1) #setpop #ujibtn::after{content:"Uji bunyi"}html body.hfc1:not(.x0):not(.x1) #setpop #senybtn::after{content:"Bunyi walau suis senyap"}html body.hfc1:not(.x0):not(.x1) #setpop #senybtn::before{content:"Tutup"}html body.hfc1:not(.x0):not(.x1) #setpop #senybtn[aria-pressed="true"]::before{content:"Hidup"}#setpop #ujistat:not(:empty){display:block;margin:4px 4px 2px;max-width:260px;font-size:12px;line-height:1.35;color:var(--muted)}}@media (min-width:701px){#ujibtn,#senybtn,#ujistat{display:none!important}}#ujistat:empty{display:none}`;
   document.head.appendChild(st);
   let tries = 0; const t = setInterval(() => { try { const pop = $("#setpop"), g = pop && (pop.querySelector(".speed") || pop);
    if (g) { const mk = (id, em, ti, fn) => { if ($("#" + id)) return; const b = document.createElement("button"); b.type = "button"; b.id = id; b.textContent = em; b.title = ti; b.setAttribute("aria-pressed", "true"); b.addEventListener("click", e => { e.stopPropagation(); fn() }); g.appendChild(b) };
     mk("ambbtn", "🌧️", "Bunyi suasana: hujan, cengkerik, angin", () => setAmb(P.amb === 0));
     mk("vocbtn", "🗣️", "Suara berbual (gumam)", () => { adopt(); setVoice(S.voice === false); if (S.voice !== false) { const a = act(); if (a) gumam(a) } });
+    mk("ujibtn", "🔊", "Uji bunyi: ketuk + nada, papar keadaan bunyi", () => { uji() });
+    mk("senybtn", "🔔", "Bunyi walau suis senyap iPhone (lalai: tutup, suis senyap dihormati)", () => setMain(P.main !== 1)); const sb = $("#senybtn"); if (sb) sb.setAttribute("aria-pressed", String(P.main === 1));
+    if (!$("#ujistat")) { const p = document.createElement("p"); p.id = "ujistat"; p.className = "hfsetw"; p.textContent = "Jika tiada bunyi, semak suis senyap iPhone dan kelantangan media."; p.setAttribute("aria-live", "polite"); pop.appendChild(p) }
     syncBtns(); clearInterval(t) } else if (++tries > 80) clearInterval(t) } catch (e) { clearInterval(t) } }, 500)
  }
 
@@ -42836,12 +42943,12 @@ try {
   what = what || { music: 1, voice: 1, click: 1, rain: 1 };
   const Oc = window.OfflineAudioContext || window.webkitOfflineAudioContext, OR = 44100, c = new Oc(1, Math.round(sec * OR), OR);
   const master = c.createGain(), k = c.createDynamicsCompressor(), mg = c.createGain(); COMP(k); mg.gain.value = MK; master.connect(k); k.connect(mg); mg.connect(c.destination);
-  const B = { ui: c.createGain(), vo: c.createGain(), am: c.createGain() }; [B.ui, B.vo, B.am].forEach(g => g.connect(master));
-  const mus = c.createGain(); mus.gain.value = .17; mus.connect(master);
+  const B = { ui: c.createGain(), vo: c.createGain(), am: c.createGain() }; [B.ui, B.vo, B.am].forEach(g => g.connect(master)); B.am.gain.value = AMBB;
+  const mus = c.createGain(); mus.gain.value = .17 * MUSB; mus.connect(master);
   if (what.voice && !A.syl) { for (let i = 0; i < 60 && !A.syl; i++) { buildBank(); await new Promise(r => setTimeout(r, 120)) } }
   if (what.music) { const e = 60 / 68 / 2, o = { night: !!what.night, party: !!what.party, paused: false, title: !!what.title, light: false }; let t = .05, st = 0; while (t < sec - .5) { stepMusic(c, mus, st++, t, e, o); t += e } }
   if (what.voice && A.syl) { const P2 = [profOf(null, "child", "t1", true), profOf(null, "adult", "t2", true), profOf(null, "adult", "t3", false), profOf(null, "elder", "t4", false), profOf(null, "teen", "t5", true)]; let t = .2; for (let i = 0; i < 4 * (what.stress ? 3 : 1); i++) { P2.forEach((pf, j) => { pf.pos = 0; speak(pf, sylOf("Selamat pagi, apa khabar semua? Hari ni kita masak nasi lemak."), { q: j % 2 === 0, vol: 1 }, c, B, t + (what.stress ? 0 : j * 1.7)) }); t += what.stress ? 2.2 : 9 } }
-  if (what.click) { const names = Object.keys(CL); let t = .1; for (let i = 0; t < sec - .4; i++) { play(names[i % names.length], c, B, t); t += what.stress ? .03 : .45 } }
+  if (what.click) { const names = Object.keys(CL).filter(k => k !== "uji"); let t = .1; for (let i = 0; t < sec - .4; i++) { play(names[i % names.length], c, B, t); t += what.stress ? .03 : .45 } }
   const LV = what.lv || {};
   if (what.rain || what.amb) { const r = mkRain(c, B.am); r.g.gain.value = LV.rain != null ? LV.rain : what.stress ? .075 : .035 }
   if (what.wind || what.amb) { const w = mkWind(c, B.am); w.g.gain.value = LV.wind != null ? LV.wind : .03 }
@@ -42854,9 +42961,9 @@ try {
  };
 
  HF.snd = {
-  play: n => play(n), say, gumam, setMusic, setSfx, setVoice, setAmbience: setAmb, render, tick: () => { ambTick(); talkTick() },
+  play: n => play(n), say, gumam, setMusic, setSfx, setVoice, setAmbience: setAmb, render, uji, unlock, setMain, level: peakNow, tick: () => { ambTick(); talkTick() },
   live: () => A.live.size,
-  state: () => { const c = ctx(); return { ctx: c ? c.state : "none", limiter: !!(A.B && A.B.lim), music: musOn(), sfx: sfxOn(), voice: S ? S.voice !== false : true, amb: P.amb !== 0, live: A.live.size, layers: Object.keys(A.L), bank: A.syl ? A.syl.length : 0, plays: Object.assign({}, A.plays), clickAvgMs: A.n ? +(A.cost / A.n).toFixed(3) : 0, clickMaxMs: +A.maxMs.toFixed(2), clicks: A.n, lines: A.lines || 0, weather: weatherNow(), title: titleOn, saved: Object.assign({}, P) } },
+  state: () => { const c = ctx(); return { ctx: c ? c.state : "none", limiter: !!(A.B && A.B.lim), music: musOn(), sfx: sfxOn(), voice: S ? S.voice !== false : true, amb: P.amb !== 0, live: A.live.size, layers: Object.keys(A.L), bank: A.syl ? A.syl.length : 0, plays: Object.assign({}, A.plays), clickAvgMs: A.n ? +(A.cost / A.n).toFixed(3) : 0, clickMaxMs: +A.maxMs.toFixed(2), clicks: A.n, lines: A.lines || 0, session: (() => { try { return navigator.audioSession ? navigator.audioSession.type : null } catch (e) { return null } })(), main: P.main === 1, ios: IOS, au: !!A.au && !A.au.paused, level: +peakNow().toFixed(4), weather: weatherNow(), title: titleOn, saved: Object.assign({}, P) } },
   _bank: () => (A.syl || []).map(x => ({ c: x.c, v: x.v, a: Array.from(x.a) })), levels: () => levels(), profile: w => { const q = whoOf(w); return { k: q.k, rate: +q.rate.toFixed(3) } }, prefs: () => Object.assign({}, P)
  }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
