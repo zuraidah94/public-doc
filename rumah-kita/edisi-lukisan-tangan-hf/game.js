@@ -13437,11 +13437,16 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
  function decorateBuy() {
   const box = $("#p-buy"); if (!box || box.hidden) return;
   buildTools();
-  box.querySelectorAll("button.item[data-buy]").forEach(b => {
-   if (b.querySelector("canvas.hfth")) return;
-   const th = itemThumb(b.dataset.buy); if (!th) return;
+  /* rk-ringan: a few thumbnails per turn (a time budget), the rest a moment later - the first draw of a thumbnail costs ~50 ms on a phone and
+     the whole shop at once held the tab tap for ~1 s */
+  const t0 = performance.now(); let more = false;
+  for (const b of box.querySelectorAll("button.item[data-buy]")) {
+   if (b.querySelector("canvas.hfth")) continue;
+   if (performance.now() - t0 > 14) { more = true; break }
+   const th = itemThumb(b.dataset.buy); if (!th) continue;
    const c = document.createElement("canvas"); c.className = "hfth"; c.width = c.height = 120; c.getContext("2d").drawImage(th, 0, 0); b.appendChild(c)
-  })
+  }
+  if (more) setTimeout(() => { try { decorateBuy() } catch (e) { fail(e) } }, 40)
  }
  { const rb = renderBuy; renderBuy = function () { const r = rb.apply(this, arguments); try { decorateBuy() } catch (e) { fail(e) } return r } }   /* right after each redraw of the panel */
  setInterval(() => { try { if (mode === "buy") decorateBuy() } catch (e) { fail(e) } }, 400);
@@ -13578,19 +13583,22 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
  const phRefresh = () => { clearTimeout(phT); phT = setTimeout(() => { try { if (typeof avCache !== "undefined") avCache.clear() } catch (e) { } phSwap(); try { if (cac && cac.view === "face") cacPreview() } catch (e) { } }, 250) };
  const PWQ = new Map(); let pwN = 0;
  function phSwap() {
+  const W = new Set(), VH = innerHeight + 240;
+  const onS = el => { try { if (!el.isConnected) return false; const b = el.getBoundingClientRect(); return (b.width > 0 || b.height > 0) && b.bottom > -240 && b.top < VH && b.right > 0 && b.left < innerWidth } catch (e) { return true } };
   for (const el of document.querySelectorAll("[data-pw]")) {
    const r = PWQ.get(el.dataset.pw); if (!r) { el.removeAttribute("data-pw"); continue }
-   const o = PCUR; PCUR = r.who; let h = null; try { h = pntHead(r.ap, r.stage, r.wear, r.big, r.hi) } catch (e) { fail(e) } finally { PCUR = o }
+   const o = PCUR; PCUR = r.who; let h = null; HF.slW = onS(el) ? W : null; try { h = pntHead(r.ap, r.stage, r.wear, r.big, r.hi) } catch (e) { fail(e) } finally { PCUR = o; HF.slW = null }
    if (h) { el.outerHTML = h; PWQ.delete(el.dataset.pw) }
    else if (h === null) { el.removeAttribute("data-pw"); PWQ.delete(el.dataset.pw) }   /* nothing painted for this person after all */
   }
   /* (aduan 10) painted busts inside drawn pictures (SVG): the <image> gets its picture when it is cut */
   for (const el of document.querySelectorAll("[data-pwi]")) {
    const r = PWQ.get(el.dataset.pwi); if (!r) { el.removeAttribute("data-pwi"); continue }
-   const src = pntSrcOf(r.ap, r.stage, r.wear, r.big, r.who);
+   HF.slW = onS(el) ? W : null; let src; try { src = pntSrcOf(r.ap, r.stage, r.wear, r.big, r.who) } finally { HF.slW = null }
    if (src) { el.setAttribute("href", src); el.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", src); el.removeAttribute("opacity"); el.removeAttribute("data-pwi"); PWQ.delete(r.t) }
    else if (src === null) { el.removeAttribute("data-pwi"); PWQ.delete(r.t) }
   }
+  HF.slV = W;
   if (PWQ.size > 400) PWQ.clear()
  }
  setInterval(() => { if (document.querySelector("[data-pw],[data-pwi]")) phSwap() }, 700);
@@ -13668,6 +13676,32 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
     Muka view is a close-up of the face itself, cut from the full-size painting; elsewhere it shows head and shoulders */
  const cacDekat = () => { try { return !!cac && cac.view === "face" && ["face", "eyes", "mouth"].includes(cac.tab) } catch (e) { return false } };
  HF.pntHeadN = 0;
+/* rk-ringan (24 Nov): the portrait cuts (pntLook + toDataURL, 50-300 ms each on a phone) all ran back to back in one burst when the
+ family / Keluarga tab opened (a 1-2 s freeze: taps waited, "kena tekan banyak kali"). Now one cut per task, a frame in between,
+ and none while a finger is down or just lifted. */
+ const SLQ = []; let slOn = 0, slDn = 0, slDnT = 0, slUp = -1e9, slIn = -1e9, slSeen = 0;
+ for (const t of ["pointerdown", "touchstart", "keydown", "wheel"]) addEventListener(t, () => { slIn = performance.now() }, { capture: true, passive: true });
+ addEventListener("pointerdown", () => { slDn = 1; slDnT = performance.now() }, { capture: true, passive: true });
+ for (const t of ["pointerup", "pointercancel"]) addEventListener(t, () => { slDn = 0; slUp = performance.now() }, { capture: true, passive: true });
+ /* the 3D warps of the painted furniture (a setTimeout-0 batch of ~150 ms on a phone, from a scene redraw) wait for a quiet moment: not while a
+    finger has just touched the page. warpNow0 is the real one (used where the result is needed at once). */
+ try { if (window.RKDal && RKDal.warpNow && !RKDal.warpNow0) { const w0 = RKDal.warpNow; RKDal.warpNow0 = w0;
+  RKDal.warpNow = function () { if (!arguments.length && performance.now() - slIn < 450 && !document.hidden) { setTimeout(RKDal.warpNow, 200); return 0 } return w0.apply(this, arguments) } } } catch (e) { fail(e) }
+ HF.slV = new Set();   /* keys of the portraits whose placeholder is on screen now (set by phSwap): cut first; the others wait for a quiet moment */
+ const slRun = () => {
+  if (!SLQ.length) { slOn = 0; return }
+  const t = performance.now(); if ((slDn && t - slDnT < 1e4) || t - slUp < 300) { setTimeout(slRun, 90); return }
+  /* on-screen first, small cuts before the big close-ups (~200 ms each on a phone: a tap that lands inside one waits for it), and a job
+     only starts once the finger has been quiet for a moment (a tap, the next tap...), the big ones and the off-screen ones a little longer */
+  const q = t - slIn, vis = j => j.key && HF.slV.has(j.key), big = j => /^hd\|/.test(j.key || "");
+  let i = SLQ.findIndex(j => vis(j) && !big(j));
+  if (i >= 0) { if (q < 220) { setTimeout(slRun, 80); return } }
+  else if ((i = SLQ.findIndex(vis)) >= 0) { if (q < 1200) { setTimeout(slRun, 120); return } }
+  else { if (q < 900 || document.hidden) { setTimeout(slRun, 250); return } i = 0 }
+  const j = SLQ.splice(i, 1)[0], v = vis(j), t1 = performance.now(); try { j.res(j.f()) } catch (er) { j.rej(er) }
+  setTimeout(slRun, Math.max(14, (performance.now() - t1) * (v ? 1.5 : 3)))   /* a rest after each cut (a share of the time it took): the page is free for a tap between cuts */
+ };
+ HF.slice = (f, key) => { return new Promise((res, rej) => { SLQ.push({ f, res, rej, key }); if (!slOn) { slOn = 1; setTimeout(slRun, 0) } if (!slSeen) { slSeen = 1; setTimeout(() => { slSeen = 0; try { phSwap() } catch (e) { } }, 160) } }) };
  function pntHead(ap, stage, wear, big, hi) {
   if (!ap || ap.photo) return null;
   if (stage === "baby") return bayiPotret(ap, big);
@@ -13687,7 +13721,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
   const wk = (who.id || who.name || "?") + "|" + (big ? (dk ? "bd" : "b") : hi || "t");
   const key = [e.file, big ? (dk ? 2 : 1) : 0, hi || "", ap.skin, ap.hairColor, ap.hijabColor, hjKey(ap), ap.lipstick && ap.lipColor, ap.liner, ap.shadow, ap.blush, ap.glasses, ap.facial, ap.freckles, ap.mark, cl.join(","), fp ? 1 : 0, HF.muKey(ap)].join("|");
   const h = PH.get(key); if (h) { if (!hi) LASTP.set(wk, h); return h }
-  if (PHC.has(key)) return false;
+  if (PHC.has(key)) { if (HF.slW) HF.slW.add(key); return false }
   if (!fp && !e._phf) { e._phf = 1; setTimeout(phRefresh, 2500) }   /* face points arrive a moment later: makeup and glasses then */
   const [ax, ay, fw, fh] = f;
   /* the head: from the face outline where it was found, otherwise the top of the figure */
@@ -13712,7 +13746,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
   const mf = e.mx ? null : e.mask;
   const tD = tudNeed(e, ap) ? tudDonor(e) : null;   /* aduan #13: the donor tudung's sheet and mask, decoded too */
   const tS = trimS(e, ap), tSD = tD && trimOf(ap) && tD.trim ? tD.trim : null;
-  const job = Promise.all([bmpOf(e.file), mf ? bmpOf(mf) : null, tD ? bmpOf(tD.file) : null, tD && !tD.mx && tD.mask ? bmpOf(tD.mask) : null, tS ? bmpOf(tS.file) : null, tSD ? bmpOf(tSD.file) : null]).then(([B, M, TB, TM, TR, TRD]) => {
+  const job = Promise.all([bmpOf(e.file), mf ? bmpOf(mf) : null, tD ? bmpOf(tD.file) : null, tD && !tD.mx && tD.mask ? bmpOf(tD.mask) : null, tS ? bmpOf(tS.file) : null, tSD ? bmpOf(tSD.file) : null]).then(a0 => HF.slice(() => { const [B, M, TB, TM, TR, TRD] = a0;
    const src = pntLook(e, B, e.mx ? B : M, [ax + x, ay + y, sw, sh, f[4], f[5]], fp2, ap, cl, { di: 0, st: "idle", fi: 0, x, y, IM: TB, MK: tD && tD.mx ? TB : TM, TR, TRD });
    /* (hf122, §131) the creator's preview at the screen's own pixel size (a phone at 3x showed the 800 px close-up stretched to ~1070 px) */
    const PX = big && HF.rxPx ? HF.rxPx() : 0;
@@ -13734,7 +13768,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
    const html = `<img class="pnth${big ? " big" : ""}${dk ? " dekat" : ""}${chip ? " chip" : ""}"${da} src="${c.toDataURL("image/webp", .92)}" alt="" draggable="false">`;
    PH.set(key, html); if (!hi) LASTP.set(wk, html); HF.pntHeadN++;
    if (PH.size > 220) PH.delete(PH.keys().next().value)
-  }).catch(fail).finally(() => { PHC.delete(key); phRefresh() });
+  }, key)).catch(fail).finally(() => { PHC.delete(key); phRefresh() });
   PHC.set(key, job);
   return false
  }
@@ -39570,7 +39604,7 @@ try {
   const wk = (who.id || who.name || "?") + (bahu ? "|b" : "|bd");
   const key = ["hd", j.file, j.y || 0, ap.skin, ap.hairColor, ap.hijabColor, hjKey(ap), ap.lipstick && ap.lipColor, ap.liner, ap.shadow, ap.blush, ap.glasses, ap.facial, ap.freckles, ap.mark, ap.eyeSize, cl.join(","), HF.muKey(ap)].join("|");
   const h = PH.get(key); if (h) { LASTP.set(wk, h); return h }
-  if (PHC.has(key)) return false;
+  if (PHC.has(key)) { if (HF.slW) HF.slW.add(key); return false }
   const xs = fp.ov.map(p => p[0]), ys = fp.ov.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y1 = Math.max(...ys), cx = (x0 + x1) / 2;
   const br = [...(fp.bl || []), ...(fp.br || [])].map(p => p[1]), yb = br.length ? Math.min(...br) : Math.min(...ys) + (y1 - Math.min(...ys)) * .12;
   const H = Math.max(8, y1 - yb), Wf = x1 - x0, sd = Math.max(H * 1.38, Wf * 1.28), my = (yb - H * .25 + y1 + H * .13) / 2;
@@ -39580,7 +39614,7 @@ try {
   const sw = Math.max(1, Math.round(Math.min(SD - (x - dkF.x), n - x))), sh = Math.max(1, Math.round(Math.min(SD - (y - dkF.y), n - y)));
   const fp2 = Object.fromEntries(Object.entries(fp).map(([k2, v]) => [k2, Array.isArray(v) ? v.map(p => [p[0] - x, p[1] - y]) : v]));
   const Y0 = j.y || 0;   /* the picture's row in its file */
-  const job = Promise.resolve().then(() => {
+  const job = HF.slice(() => {
    const src = pntLook(HD.e, IM, IM, [x, y + Y0, sw, sh, 0, 0], fp2, ap, cl, { di: 0, st: "idle", fi: 0, x, y });
    const PX = HF.rxPx ? HF.rxPx() : 0, N = Math.max(bahu ? 640 : 800, PX), c = document.createElement("canvas"); c.width = N; c.height = N;
    const g = c.getContext("2d", { willReadFrequently: true }); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
@@ -39592,7 +39626,7 @@ try {
     : `<img class="pnth big dekat" data-hi="1" data-k="${kk}" data-fill="${dkF.fill.toFixed(3)}" data-cx="${((cx - dkF.x) / SD).toFixed(3)}" src="${c.toDataURL("image/webp", .92)}" alt="" draggable="false">`;
    PH.set(key, html); LASTP.set(wk, html); HF.pntHeadN++; HF.mukaHDN++;
    if (PH.size > 220) PH.delete(PH.keys().next().value)
-  }).catch(fail).finally(() => { PHC.delete(key); phRefresh() });
+  }, key).catch(fail).finally(() => { PHC.delete(key); phRefresh() });
   PHC.set(key, job);
   return false
  };
@@ -40401,7 +40435,7 @@ try {
  const set = w => {
   if (w === H142.on) return;
   const T = window.RKDal && RKDal.PB && RKDal.PB.atlas && RKDal.PB.atlas.kampung; if (!T) return;
-  try { if (RKDal.warpNow) RKDal.warpNow() } catch (e) { }   /* builds still queued with the other paintings: done first, then dropped below */
+  try { const wn = RKDal.warpNow0 || RKDal.warpNow; if (wn) wn() } catch (e) { }   /* builds still queued with the other paintings: done first, then dropped below */
   for (const k in QB) {
    const p = k.slice(0, -1) + "P";
    if (w) { if (!ORIG[p]) ORIG[p] = T[p]; T[p] = QB[k] } else if (ORIG[p]) T[p] = ORIG[p]
@@ -41974,7 +42008,10 @@ try {
   }
   if (add) sv.insertAdjacentHTML("beforeend", add)
  };
- const thG = () => { try { if (!HF.thbG) HF.itemThumb("bed") } catch (e) { } return HF.thbG || { tw: 100, th: 50 } };
+ /* the tile of the room: the 3D renders are baked with the game's own tile, th/tw = 0.68 (camera elevation asin(.68)); the room must use exactly that ratio. The measured HF.thbG is only used when it agrees; if the
+    thumbnail could not be drawn (a phone, before the art is ready) the old fallback 100 x 50 (2:1) made the room's floor and walls 2:1 while the sprites are .68: furniture looked tilted (owner 24 Nov, iPhone) */
+ const TILE = { tw: 55.83, th: 37.97 };
+ const thG = () => { try { if (!HF.thbG) HF.itemThumb("bed") } catch (e) { } const g = HF.thbG; return g && g.tw > 0 && Math.abs(g.th / g.tw - .68) < .02 ? g : TILE };
  /* (2) the room drawn: walls (the man's building greenish, the woman's pinkish), floor by tier, pieces, dust, breakage */
   const WALL = [["#a7d3bb", "#b9e0c9"], ["#ecdcbc", "#f5e9d2"], ["#3f5a78", "#4c6a8a"]];   /* the reference: mint, cream, navy (plain walls; the man's / woman's building differs by the skirting and trim colour) */
  const TRIM = { L: "#6f93ad", P: "#d98fa7" };
@@ -42363,6 +42400,45 @@ try {
   } catch (e) { fail(e); return null }
  };
  HF.h161 = { GK, render, actFor, CACHE };
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+/* rk-ringan (24 Nov): the bottom tabs switch on pointerdown and their click only skips if it comes within 700 ms of the START of that
+   switch; on a slow phone the switch itself takes longer, so the click did the whole switch (every panel render) a second time. A click
+   that follows a pointerdown on the same tab button is dropped here; a keyboard click (no pointerdown) still works. */
+try {
+ let tpd = { b: null, t: -1e9 };
+ document.addEventListener("pointerdown", e => { try { const b = e.target.closest && e.target.closest(".tabs button"); if (b && e.button <= 0) tpd = { b, t: performance.now() } } catch (er) { } }, true);
+ document.addEventListener("click", e => { try { const b = e.target.closest && e.target.closest(".tabs button"); if (b && tpd.b === b && performance.now() - tpd.t < 4000) { tpd.t = -1e9; e.stopImmediatePropagation(); e.stopPropagation() } } catch (er) { } }, true)
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+/* rk-ringan (24 Nov, tab lambat): a tab switch (setTab, run on pointerdown) used to build the whole panel before the first paint (Keluarga:
+   the household and ~120 neighbour cards with portraits and kin look-ups, ~170 ms on a phone; Bina, Telefon, Kerjaya, Matlamat likewise).
+   Now the tab shows at once (the panel's last content, or a light "Memuatkan" line the first time) and the real render follows in the next
+   frame, once, and only if that tab is still the one open. Renders called from anywhere else (a button, the clock) stay as they were. */
+try {
+ const fail = e => { try { console.warn("RKHF", e) } catch (e2) { } };
+ const DF = { on: 0 }, TABN = { renderFamily: ["family", "p-family"], renderBuy: ["buy", "p-buy"], renderPhone: ["phone", "p-phone"], renderCareer: ["career", "p-career"] };
+ for (const nm of Object.keys(TABN)) {
+  try {
+   const f0 = eval(nm); if (typeof f0 !== "function") continue;
+   const [tn, pid] = TABN[nm]; let pend = 0;
+   const w = function () {
+    if (!DF.on) return f0.apply(this, arguments);
+    const el = document.getElementById(pid); if (el && !el.firstElementChild) el.innerHTML = '<p class="hint" style="padding:14px;text-align:center">Memuatkan…</p>';
+    if (pend) return; pend = 1; const self = this, args = arguments;
+    requestAnimationFrame(() => setTimeout(() => { pend = 0; try { if (tab === tn) f0.apply(self, args) } catch (e) { fail(e) } }, 0))
+   };
+   eval(nm + " = w")
+  } catch (e) { fail(e) }
+ }
+ if (typeof setTab === "function") { const st = setTab; setTab = function () { DF.on++; try { return st.apply(this, arguments) } finally { DF.on-- } } }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+/* rk-ringan (24 Nov): every button answers a finger at once on a phone. touch-action:manipulation on the page (no double-tap-zoom wait; a
+   child that says touch-action:none keeps it), no grey tap flash, and an immediate pressed look (:active) so a tap is seen before the
+   (sometimes slow) work behind it is done. */
+try {
+ const st = document.createElement("style"); st.id = "rk-tekan";
+ st.textContent = "html,body{touch-action:manipulation}button,[role=button],[data-tab],[data-app],[data-rk],[data-rkt],[data-rkp],[data-rkx],[data-s],[data-sim],[data-f],[data-z],label,summary,select,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}" +
+  "@media (hover:none){button:active:not(:disabled),[role=button]:active,[data-tab]:active,[data-rk]:active,[data-rkt]:active,[data-rkp]:active,[data-app]:active,[data-s]:active,[data-sim]:active,.item:active,.cd:active{filter:brightness(.9)}}";
+ (document.head || document.documentElement).appendChild(st)
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
