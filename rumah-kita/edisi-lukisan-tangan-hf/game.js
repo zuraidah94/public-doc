@@ -22571,6 +22571,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf137", "24 Nov 2026", ["🔊 Bunyi baharu: hujan dan ribut ikut cuaca, angin, burung dan cengkerik ikut waktu, muzik gamelan tenang (skrin mula dan Rumah Kita), gumam gaya Sulsul bila orang bercakap (nada ikut umur dan jantina) dan klik halus; togol Bunyi suasana dan Suara berbual dalam Tetapan", "⚡ Lebih pantas: skrin Bilik Sewa (tab Tingkat, kad bilik, Sewa, tutup) dan tab Keluarga, Bina, Telefon, Kerjaya; butang Lihat dalam Bilik Sewa kini membuka bilik; perabot bilik sewa tidak senget lagi"]],
    ["hf136", "23 Nov 2026", ["🧍 Penyewa dalam bilik sewa kini Sim sebenar (badan penuh, watak lukisan tangan yang sama dengan dalam rumah), bukan bulatan avatar: tidur di katil, mandi di bilik air, makan di meja makan, memasak di dapur, bekerja di meja tulis atau komputer, menonton TV di sofa atau duduk; aktiviti mengikut waktu dan perabot bilik, dengan label aktiviti di atas kepala", "🛋️ Susunan Mewah diperbaiki sedikit (sofa lebih jauh dari TV, kerusi pejabat tidak tersembunyi di sebalik bilik air); penyewa duduk betul-betul di atas kusyen sofa, kerusi makan, kerusi pejabat dan bangku (model 3D duduk yang dirender bersama perabot dalam satu gambar, kedalaman tepat, warna kulit/rambut/tudung/baju ikut penyewa); penyewa mandi lebih kecil dan berdiri dalam ruang pancuran"]],
    ["hf135", "23 Nov 2026", ["🛋️ Perabot bilik sewa kini model 3D yang dirender dengan satu kamera isometrik tetap (sudut sama, tapak tepat pada petak, empat arah putar) dan saiz bilik ikut pakej: Murah 5 x 5 (Retro Malaysia: dinding hijau pudina, lantai kayu oren, tilam lantai, almari, kipas berdiri, meja lipat, bangku), Sederhana 6 x 6 (Japandi: dinding krim, lantai kayu cerah, katil kayu cadar sage, dapur kecil dengan kabinet, sinki dan hob, meja tulis dan kerusi) dan Mewah 6 x 6 (Butik Moden: dinding biru laut, lantai kayu gelap, dapur mewah dengan peti sejuk, hob dan sinki dengan meja makan dan dua kerusi di sebelahnya, TV dengan sofa L berjarak dua petak, meja komputer dengan kerusi pejabat di zon lain, katil besar, aircond dinding)", "🚶 Penyewa duduk di kerusi (siang) atau tidur di katil (malam); laluan ke katil, kerusi dan meja sentiasa lapang (editor menolak perabot yang menghalang); kipas siling tergantung di atas dan aircond di dinding tanpa ambil petak lantai; bilik air satu unit di sudut kanan belakang; bilik lama dipindah ke grid pakejnya tanpa kehilangan perabot"]],
    ["hf134", "23 Nov 2026", ["🚪 Masuk ke setiap bilik sewa (butang Masuk bilik, atau ketik bilik kecil di panel bangunan): nampak lantai, dinding, perabot dan penyewa dalam bilik; bangunan lelaki dan perempuan berlainan warna dinding", "🛋️ Tiga pakej bilik dengan satu ketik: Simple (RM 340), Sederhana (RM 1,120) dan Mewah (RM 4,070); kemudian susun sendiri: tambah, alih, putar, jual (separuh harga) dan buat asal. Mutu bilik kini dikira daripada perabot sebenar dan kebersihan: bilik mewah menyokong sewa Mahal, bilik kosong hanya sewa Murah", "🏢 Setiap bangunan kini empat tingkat, 16 bilik (101-404); tingkat 2, 3 dan 4 dibuka dengan RM 4,000, RM 5,000 dan RM 6,000; bilik rosak atau berhabuk ditanda dalam bilik dan mesti dibaiki sebelum menyusun perabot; lantai dan dinding bilik dilukis dengan Hugging Face"]],
@@ -41766,7 +41767,7 @@ try {
  /* (4) the card */
  const css = () => {
   if (document.getElementById("hf159css")) return; const st = document.createElement("style"); st.id = "hf159css";
-  st.textContent = `#hfbilik{position:fixed;inset:0;z-index:61;display:flex;align-items:center;justify-content:center;background:rgba(40,28,18,.45);padding:10px}#hfbilik[hidden]{display:none}
+  st.textContent = `#hfbilik{touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:fixed;inset:0;z-index:61;display:flex;align-items:center;justify-content:center;background:rgba(40,28,18,.45);padding:10px}#hfbilik[hidden]{display:none}
 #hfbilik .pk{max-width:560px;width:100%;max-height:94vh;overflow:auto;background:#fffaf0;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:12px 14px;font:14px system-ui;color:#3b2a20}
 #hfbilik h2{margin:0 0 2px;font:800 1.15rem Georgia,serif}#hfbilik .x{float:right;border:0;background:#f3ead7;border-radius:999px;width:34px;height:34px;font-size:16px;cursor:pointer}
 #hfbilik .nt{font-size:.78rem;color:#7a6650;margin:3px 0}#hfbilik .sm{font-size:.74rem;color:#7a6650}
@@ -41782,7 +41783,7 @@ try {
  const el = () => { let e = document.getElementById("hfbilik"); if (!e) { e = document.createElement("div"); e.id = "hfbilik"; e.hidden = true; e.setAttribute("role", "dialog"); e.setAttribute("aria-label", nm()); document.body.appendChild(e) } return e };
  const trTag = t => `<span class="tg" title="${esc(TRS[t.tr][2])}">${TRS[t.tr][0]} ${TRS[t.tr][1]}</span>`;
  const unitHTML = (b, u, own) => {
-  const q = Q(u), t = u.t, r = RATES[u.lv]; let h = `<div class="u${u.self ? " me" : ""}" data-u="${u.n}"><div class="uh"><span>Bilik ${u.n}${!own ? ' <button type="button" class="b o" data-a="enter" data-n="${u.n}">🚪 Lihat</button>' : ""}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span>${q} · ${qTxt(q)}</span></div>
+  const q = Q(u), t = u.t, r = RATES[u.lv]; let h = `<div class="u${u.self ? " me" : ""}" data-u="${u.n}"><div class="uh"><span>Bilik ${u.n}${!own ? ` <button type="button" class="b o" data-a="enter" data-n="${u.n}">🚪 Lihat</button>` : ""}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span>${q} · ${qTxt(q)}</span></div>
 <div class="sm">Perabot: ${u.fur ? u.fur.length + " buah" : FURNN[u.furn]} · Kebersihan ${Math.round(u.clean)}%${u.brk ? ` · <b style="color:#a8402e">rosak</b>` : ""}</div>`;
   if (!own) {
    if (t) h += `<div class="t">${face(t)}<div><b>${esc(t.name)}</b> ${trTag(t)}<div class="sm">Sewa ${rm(t.amt)} seminggu · ${t.stay || 0} hari tinggal</div></div></div>`;
@@ -41805,6 +41806,13 @@ try {
   h += `<div class="row"><button class="b g" data-a="clean" data-n="${u.n}" ${u.clean >= 100 ? "disabled" : ""}>🧹 Bersihkan ${rm(CLEANC)}</button><button class="b g" data-a="enter" data-n="${u.n}">🚪 Masuk bilik</button>${!t ? `<button class="b o" data-a="self" data-n="${u.n}" aria-pressed="${!!u.self}">🏠 ${u.self ? "Saya tinggal di sini" : "Tinggal di sini"}</button>` : ""}</div></div>`;
   return h
  };
+
+ const bodyHTML = (b, tab, own, fl) => {   /* rk-ringan: the part under the tabs, built alone so a tab tap only swaps it */
+  let h = "";
+   if (tab > fl) h += `<div class="u"><b>Tingkat ${tab} belum dibuka</b><p class="sm">${own ? tab === fl + 1 ? `Buka empat bilik baharu (${tab}01–${tab}04) untuk disewakan.` : "Buka tingkat di bawahnya dahulu." : "Tuan rumah belum membuka tingkat ini."}</p>${own && tab === fl + 1 ? `<button class="b" data-a="floor" data-n="${tab}" ${S.money < FLC[tab - 1] ? "disabled" : ""}>🏗️ Buka tingkat ${tab} · ${rm(FLC[tab - 1])}</button>` : ""}</div>`;
+   else h += (B.grid ? B.grid(b, tab, own) : "") + b.units.filter(u => flOf(u) === tab).map(u => unitHTML(b, u, own)).join("")
+  return h
+ };
  const draw = () => {
   if (B.room && B.rdraw) { try { B.rdraw(el(), bs()); return } catch (x) { fail(x); B.room = null } }
   const e = el(), b = bs(), own = mine(b), keep = e.querySelector(".pk") ? e.querySelector(".pk").scrollTop : 0; let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><h2>${BD[B.cur].ico} ${nm()}</h2>`;
@@ -41814,21 +41822,32 @@ try {
    else h += `<p class="nt">Milik keluarga ${esc(wmShort(homeName(b.owner), 24))}. Anda boleh menyewa satu bilik kosong.</p>`;
    const fl = b.fl || 1, tab = B.tab = cl(B.tab || 1, 1, NF);
    h += `<div class="row" role="tablist">${[1, 2, 3, 4].map(f => { const us = b.units.filter(u => flOf(u) === f), pr = f <= fl ? us.filter(u => u.brk || (u.t && u.t.owe)).length : 0, va = f <= fl ? us.filter(u => !u.t && !u.self && !u.pl).length : 0; return `<button type="button" class="b o" role="tab" data-a="tab" data-n="${f}" aria-pressed="${tab === f}">${f <= fl ? "" : "🔒 "}Tingkat ${f}${pr ? " ❗" : va ? " ＋" + va : ""}</button>` }).join("")}</div>`;
-   if (tab > fl) h += `<div class="u"><b>Tingkat ${tab} belum dibuka</b><p class="sm">${own ? tab === fl + 1 ? `Buka empat bilik baharu (${tab}01–${tab}04) untuk disewakan.` : "Buka tingkat di bawahnya dahulu." : "Tuan rumah belum membuka tingkat ini."}</p>${own && tab === fl + 1 ? `<button class="b" data-a="floor" data-n="${tab}" ${S.money < FLC[tab - 1] ? "disabled" : ""}>🏗️ Buka tingkat ${tab} · ${rm(FLC[tab - 1])}</button>` : ""}</div>`;
-   else h += (B.grid ? B.grid(b, tab, own) : "") + b.units.filter(u => flOf(u) === tab).map(u => unitHTML(b, u, own)).join("")
+   h += `<div class="hf159bd">${bodyHTML(b, tab, own, fl)}</div>`
   }
   e.innerHTML = h + "</div>"; const p = e.querySelector(".pk"); if (p) p.scrollTop = keep
  };
+ const lazySave = () => { clearTimeout(B.svT); B.svT = setTimeout(() => { B.svT = 0; try { save() } catch (x) { } }, 700) };   /* rk-ringan: save() (the whole state) is not run inside the tap */
+ addEventListener("pagehide", () => { if (B.svT) { clearTimeout(B.svT); B.svT = 0; try { save() } catch (x) { } } });
+ const fastTab = () => {
+  try {
+   const e = el(), bd = e.querySelector(".hf159bd"), b = bs(); if (!bd || !b.owner) return false;
+   const tab = B.tab = cl(B.tab || 1, 1, NF), fl = b.fl || 1;
+   e.querySelectorAll('[data-a="tab"]').forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.n === tab)));
+   bd.innerHTML = bodyHTML(b, tab, mine(b), fl); lazySave(); return true
+  } catch (x) { fail(x); return false }
+ };
  B.draw = draw; B.Q = Q; B.face = face; B.RATES = RATES; B.U = U; B.nm = nm; B.rm = rm; B.qTxt = qTxt; B.BD = BD; B.bs = bs; B.mine = mine; B.dd = dd; B.FURNN = FURNN; B.NF = NF;
  const open = w => { try { if (w === "L" || w === "P") B.cur = w; css(); bs(); const e = el(); draw(); e.hidden = false; HF.bilikOn = true; B.opened++; try { const m = document.getElementById("kmap"); if (m) m.hidden = true } catch (x) { } return true } catch (x) { fail(x); return false } };
- const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.bilikOn = false; B.room = null; B.pk = null; try { renderAll() } catch (x) { } };
+ const close = () => { const e = el(); e.hidden = true; e.innerHTML = ""; HF.bilikOn = false; B.room = null; B.pk = null; requestAnimationFrame(() => setTimeout(() => { try { renderAll() } catch (x) { } }, 0)) };   /* rk-ringan: the card goes at once, the page behind is redrawn after the frame */
  B.open = open; HF.bilikOpenP = () => open("P"); B.A_ = A; B.close = close; HF.bilikOpen = open;
  document.addEventListener("click", ev => {
   try {
    const t = ev.target; if (!t || !t.closest || !HF.bilikOn || !t.closest("#hfbilik")) return; ev.stopPropagation();
    if (t.closest("[data-x]") || t === el()) { close(); return }
    const a = t.closest("[data-a]"); if (!a || a.disabled) return; const f = A[a.dataset.a]; if (!f) return;
-   f(a.dataset.a === "lv" ? a.dataset.n : a.dataset.n, a.dataset.v !== undefined ? a.dataset.v : a.dataset.i !== undefined ? +a.dataset.i : undefined); draw(); try { save() } catch (x) { }
+   f(a.dataset.a === "lv" ? a.dataset.n : a.dataset.n, a.dataset.v !== undefined ? a.dataset.v : a.dataset.i !== undefined ? +a.dataset.i : undefined);
+   if (a.dataset.a === "tab" && !B.room && fastTab()) return;   /* rk-ringan: a floor tab only swaps the body (no rebuild of the title, tabs, scroller) and saves later */
+   draw(); lazySave()
   } catch (x) { fail(x) }
  }, true);
  document.addEventListener("keydown", ev => { try { if (HF.bilikOn && ev.key === "Escape") { ev.stopPropagation(); close() } } catch (x) { fail(x) } }, true);
@@ -42439,6 +42458,407 @@ try {
  st.textContent = "html,body{touch-action:manipulation}button,[role=button],[data-tab],[data-app],[data-rk],[data-rkt],[data-rkp],[data-rkx],[data-s],[data-sim],[data-f],[data-z],label,summary,select,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}" +
   "@media (hover:none){button:active:not(:disabled),[role=button]:active,[data-tab]:active,[data-rk]:active,[data-rkt]:active,[data-rkp]:active,[data-app]:active,[data-s]:active,[data-sim]:active,.item:active,.cd:active{filter:brightness(.9)}}";
  (document.head || document.documentElement).appendChild(st)
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §162. Bunyi: suasana cuaca, muzik gamelan, gumam gaya Sulsul, klik (rk-bunyi, 24 Nov) ----------
+   The game already had sound (SND: WebAudio, the 🔊 Bunyi kesan and 🎵 Muzik switches, a generative pentatonic tune, sfx(), a 10 s
+   opening cue, and sayVoice = a few oscillator beeps at the start of a social action). This section builds on that and adds, with
+   no sound file at all (everything is synthesised; extra download ≈ 0):
+   (1) a master limiter (DynamicsCompressor) between SND.master and the speakers, and three small buses (klik, suara, suasana);
+   (2) ambience that follows the real weather and the clock: rain and storm (+ distant thunder), wind, night crickets, daytime birds;
+       loops start only while wanted and are stopped and disconnected a few seconds after (no oscillator is left running);
+   (3) the background tune is replaced by a calm gamelan / kulintang-like one (bell partials, a low gong, a kenong, a soft "sape"
+       pluck by day, a drone) in D pentatonic, slower at night, with a livelier pattern at a party; the same tune, slightly fuller,
+       plays on the title screen (as soon as the first tap has opened the audio);
+   (4) "Sulsul" mumble in place of the beeps: syllables (consonant + vowel through three formants, made once at ~22 kHz into small
+       buffers) played at a pitch for the speaker (child high, teen, adult woman / man, elder lower), timed with the talk: a burst
+       while a social action is in its "do" phase (turns between the two speakers), and the length of the line when a dialogue card
+       (.say / the walk bubble) shows words;
+   (5) a soft click for buttons, tabs, close, buy / rent / open (pre-rendered, one BufferSource per click, passive capture listener).
+   Switches: ⚙️ Tetapan → Bunyi kesan (all effects, ambience and clicks), Muzik, 🌧️ Bunyi suasana, 🗣️ Suara berbual; choices are kept in
+   localStorage "rkhf_snd". iOS: the context is resumed on touchend / click / pointerup (not only pointerdown), 'interrupted' is handled, it
+   is suspended while the page is hidden and resumed on return; navigator.audioSession is "ambient" (the silent switch is respected).
+   API (for tests): RKHF.snd.play('klik'|'tab'|'tutup'|'buka'|'beli'), .say(text, who), .gumam(who), .setMusic(on) .setSfx(on)
+   .setVoice(on) .setAmbience(on), .state(), .live(), .tick(), .render(sec, what) (OfflineAudioContext: peak / rms). ---------- */
+try {
+ const HF = window.RKHF;
+ const fail = e => { HF.err++; try { console.warn("RKHF", e) } catch (e2) { } };
+ const SK = "rkhf_snd", SR = 22050, rn = Math.random, TAU = 6.2832;
+ let P = {};
+ try { const j = JSON.parse(localStorage.getItem(SK) || "{}"); if (j && typeof j === "object") P = j } catch (e) { }
+ const saveP = () => { try { localStorage.setItem(SK, JSON.stringify(P)) } catch (e) { } };
+ const A = { live: new Set(), plays: {}, cost: 0, n: 0, maxMs: 0, vc: 0, B: null, syl: null, lastClk: 0, tabAt: 0, tapAt: -9e3, obj: null, snap: null, L: {}, busy: new Map(), th: 0, off: 0 };
+ const sfxOn = () => !!S && S.sfx !== false, musOn = () => !!S && S.music !== false, vocOn = () => !!S && S.voice !== false && S.sfx !== false, ambOn = () => !!S && P.amb !== 0 && S.sfx !== false;
+ const ctx = () => (typeof SND !== "undefined" && SND && SND.ctx) || null;
+ const running = () => { const c = ctx(); return !!c && c.state === "running" && !document.hidden };
+ const trk = o => { try { if (o.context && o.context.length) return o } catch (e) { } A.live.add(o); o.onended = () => { A.live.delete(o) }; return o };
+ const hash = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) } return ((h >>> 0) % 10007) / 10007 };
+
+ /* ---- buses, limiter ---- */
+ /* a DynamicsCompressorNode adds make-up gain of its own (about +1.7 dB with these settings), so a plain gain of 0.83 follows it: quiet sound passes unchanged, only peaks above about -3 dB are held down */
+ const COMP = k => { k.threshold.value = -3; k.knee.value = 3; k.ratio.value = 16; k.attack.value = .002; k.release.value = .15 };
+ const MK = .83;
+ const boot = () => {
+  const c = ctx(); if (!c || !SND.master) return null;
+  if (A.B && A.B.c === c) return A.B;
+  const B = { c, lim: false };
+  try { const k = c.createDynamicsCompressor(), mg = c.createGain(); COMP(k); mg.gain.value = MK; SND.master.disconnect(); SND.master.connect(k); k.connect(mg); mg.connect(c.destination); B.lim = true; B.k = k } catch (e) { try { SND.master.connect(c.destination) } catch (e2) { } }
+  B.ui = c.createGain(); B.vo = c.createGain(); B.am = c.createGain();
+  [B.ui, B.vo, B.am].forEach(g => { g.gain.value = 1; g.connect(SND.master) });
+  A.B = B;
+  try { if (navigator.audioSession) navigator.audioSession.type = "ambient" } catch (e) { }
+  c.addEventListener("statechange", () => { try { if (c.state === "interrupted" && !document.hidden) c.resume().catch(() => { }) } catch (e) { } });
+  setTimeout(buildBank, 60);
+  if (!A.t1) { A.t1 = setInterval(ambTick, 1200); A.t2 = setInterval(talkTick, 800); A.t3 = setInterval(scan, 7000); scan() }
+  return B
+ };
+
+ /* ---- clicks: tiny pre-rendered buffers, one BufferSource each ---- */
+ const mkA = (dur, f, k) => { const n = Math.max(1, Math.round(dur * SR)), a = new Float32Array(n); for (let i = 0; i < n; i++) a[i] = f(i / SR) * k; return a };
+ const ex = (t, at, tau) => (t < at ? t / at : Math.exp(-(t - at) / tau));
+ const sn = (f, t) => Math.sin(TAU * f * t);
+ const CL = {
+  klik: mkA(.07, t => (sn(1500, t) * .75 + (t < .003 ? (rn() * 2 - 1) * .5 : 0)) * ex(t, .0015, .011), .055),
+  tab: mkA(.1, t => (sn(880, t) * .7 + sn(1320, t) * .22) * ex(t, .002, .02), .055),
+  tutup: mkA(.14, t => t < .06 ? sn(740, t) * ex(t, .002, .02) : sn(554, t - .06) * ex(t - .06, .002, .026), .055),
+  buka: mkA(.14, t => t < .06 ? sn(660, t) * ex(t, .002, .02) : sn(880, t - .06) * ex(t - .06, .002, .026), .055),
+  beli: mkA(.26, t => t < .05 ? sn(523, t) * ex(t, .002, .02) * .8 : (sn(1568, t - .05) * .7 + sn(2350, t - .05) * .2) * ex(t - .05, .002, .06), .055)
+ };
+ const BU = new WeakMap();
+ const bufOf = (c, key, arr) => { let m = BU.get(c); if (!m) BU.set(c, m = {}); if (!m[key]) { const b = c.createBuffer(1, arr.length, SR); b.getChannelData(0).set(arr); m[key] = b } return m[key] };
+ const play = (name, c, B, t) => {
+  try {
+   const real = !c;
+   if (real) { if (!sfxOn() || document.hidden) return false; c = ctx(); if (!c) return false; B = boot(); if (!B) return false; const now = performance.now(); if (now - A.lastClk < 40) return false; A.lastClk = now; if (c.state !== "running") c.resume().catch(() => { }) }
+   const arr = CL[name]; if (!arr) return false;
+   const s = c.createBufferSource(); s.buffer = bufOf(c, name, arr); s.playbackRate.value = 1 + (rn() - .5) * .05; s.connect(B.ui); trk(s); s.start(t || 0);
+   if (real) A.plays[name] = (A.plays[name] || 0) + 1;
+   return true
+  } catch (e) { fail(e); return false }
+ };
+ const SEL = "button,[role=button],[role=tab],[data-tab],[data-app],[data-rk],[data-rkt],[data-rkp],[data-rkx],[data-s],[data-sim],[data-f],[data-z],[data-bl],[data-a],summary,.choice,.item,.cd";
+ const CLOSE = /^(tutup|keluar|batal|skip|langkau|close|selesai)\b/;
+ const kindOf = el => {
+  const tx = (el.children.length < 4 ? (el.textContent || "") : "").trim().toLowerCase().slice(0, 50), al = (el.getAttribute("aria-label") || el.title || "").toLowerCase(), lab = al + " " + tx;
+  if (el.classList.contains("x") || el.getAttribute("data-bl") === "x" || tx === "✕" || tx === "×" || tx === "✖" || CLOSE.test(tx) || /tutup|close/.test(al)) return "tutup";
+  if (/\b(beli|sewa|bayar|tempah|buy|rent)\b/.test(lab)) return "beli";
+  if (/\b(buka|lihat|open)\b/.test(lab)) return "buka";
+  return "klik"
+ };
+ const onClick = e => {
+  const t0 = performance.now();
+  try {
+   const c = ctx();
+   if (!c) { try { audioInit() } catch (e2) { } } else if (c.state !== "running" && !document.hidden) c.resume().catch(() => { });
+   const t = e.target; if (!t || !t.closest) return;
+   const el = t.closest(SEL); if (!el || el.disabled || el.getAttribute("aria-disabled") === "true") return;
+   if (el.hasAttribute("data-tab") && t0 - A.tabAt < 900) return;
+   if (t0 - A.tapAt < 600) return;
+   play(kindOf(el))
+  } catch (e2) { fail(e2) }
+  const d = performance.now() - t0; A.cost += d; A.n++; if (d > A.maxMs) A.maxMs = d
+ };
+ const onDown = e => {
+  try {
+   const t = e.target; if (!t || !t.closest) return;
+   const el = t.closest("[data-tab]"); if (!el || el.disabled) return;
+   A.tabAt = performance.now(); play("tab")
+  } catch (e2) { fail(e2) }
+ };
+ const onOpen = () => { try { const c = ctx(); if (c) { if (c.state !== "running" && !document.hidden) c.resume().catch(() => { }); boot() } else audioInit() } catch (e) { } };
+ const PO = { capture: true, passive: true };
+ document.addEventListener("pointerdown", onDown, PO);
+ document.addEventListener("click", onClick, PO);
+ ["touchend", "pointerup", "keydown"].forEach(n => document.addEventListener(n, onOpen, PO));
+ { const s0 = sfx; sfx = function (name) { try { if (name === "tap") { const nw = performance.now(); if (nw - A.lastClk > 120 && play("klik")) A.tapAt = nw; return } } catch (e) { fail(e) } return s0.apply(this, arguments) } }
+
+ /* ---- pause when hidden, resume on return (iOS: also 'interrupted') ---- */
+ const susp = () => { try { const c = ctx(); if (c && c.state === "running") { A.paused = 1; c.suspend().catch(() => { }) } } catch (e) { } };
+ const resu = () => { try { const c = ctx(); if (c && (A.paused || c.state === "interrupted")) { A.paused = 0; c.resume().catch(() => { }) } } catch (e) { } };
+ document.addEventListener("visibilitychange", () => { document.hidden ? susp() : resu() });
+ addEventListener("pagehide", susp); addEventListener("pageshow", resu);
+
+ /* ---- the player's choices (S.sfx / S.music / S.voice, plus ambience) kept across games ---- */
+ const bits = () => [S.sfx !== false ? 1 : 0, S.music !== false ? 1 : 0, S.voice !== false ? 1 : 0].join("");
+ /* renderTop() sets aria-pressed of every ".speed button" from the game speed (the sound switches share that group), so the
+    ⚙️ list showed every switch as "Tutup" after the next redraw; while the list is open it is put right again after each redraw */
+ const syncBtns = () => { try { if (!S) return; for (const [id, on] of [["sfxbtn", S.sfx !== false], ["musbtn", S.music !== false], ["ambbtn", P.amb !== 0], ["vocbtn", S.voice !== false]]) { const b = document.getElementById(id); if (b && b.getAttribute("aria-pressed") !== String(on)) b.setAttribute("aria-pressed", String(on)); if (b && (id === "ambbtn" || id === "vocbtn")) { const ti = (id === "ambbtn" ? "Bunyi suasana: hujan, cengkerik, angin" : "Suara berbual (gumam)") + (on ? " · hidup" : " · tutup"); if (b.title !== ti) b.title = ti } } const tg = $("#voicetg"); if (tg) tg.checked = S.voice !== false } catch (e) { } };
+ { const r0 = renderTop; renderTop = function () { const r = r0.apply(this, arguments); try { const p = document.getElementById("setpop"); if (p && p.classList.contains("open")) syncBtns() } catch (e) { } return r } }
+ document.addEventListener("click", e => { const t = e.target; if (t && t.closest && t.closest("#setbtn")) setTimeout(syncBtns, 0) }, true);
+ const keep = () => { try { if (!S || A.obj !== S) return; const b = bits(); if (b === A.snap) return; A.snap = b; P.sfx = +b[0]; P.mus = +b[1]; P.voc = +b[2]; saveP(); syncBtns() } catch (e) { fail(e) } };
+ const adopt = () => { try { if (!S || A.obj === S) return; A.obj = S; if (P.sfx != null) S.sfx = P.sfx !== 0; if (P.mus != null) S.music = P.mus !== 0; if (P.voc != null) S.voice = P.voc !== 0; A.snap = bits(); syncBtns() } catch (e) { fail(e) } };
+ { const a0 = applyAudio; applyAudio = function () { try { if (A.obj !== S) adopt(); else keep() } catch (e) { fail(e) } return a0.apply(this, arguments) } }
+ document.addEventListener("change", e => { if (e.target && e.target.id === "voicetg") setTimeout(keep, 0) }, true);
+ const setSfx = on => { adopt(); S.sfx = !!on; applyAudio(); return S.sfx !== false };
+ const setMusic = on => { adopt(); S.music = !!on; applyAudio(); return S.music !== false };
+ const setVoice = on => { adopt(); S.voice = !!on; keep(); return S.voice !== false };
+ const setAmb = on => { P.amb = on ? 1 : 0; saveP(); syncBtns(); ambTick(); return P.amb !== 0 };
+
+ /* ---- the voice: "Sulsul" syllables ---- */
+ const FM = { a: [800, 1220, 2600], e: [530, 1850, 2500], i: [320, 2250, 2950], o: [520, 920, 2450], u: [340, 830, 2300] };
+ const synSyl = (cons, vow, dur) => {
+  /* the voiced part (vowel / nasal) and the noise part (burst / hiss) are made apart and set to their own levels, so a "k" or "t"
+     is no louder than an "a"; the noise goes through a resonator (not a bare difference), which keeps the hiss soft */
+  const n = Math.round(dur * SR), vo = new Float32Array(n), ns = new Float32Array(n), F = FM[vow], f0 = 150;
+  const mkR = (f, bw) => { const r = Math.exp(-Math.PI * bw / SR), th = TAU * f / SR; return [2 * r * Math.cos(th), -r * r, 1 - r, 0, 0] };
+  const R = [mkR(F[0], 90), mkR(F[1], 110), mkR(F[2], 170)], W = [1, 1.1, .9], NR = [mkR(270, 120), mkR(1100, 250)];
+  const NZ = mkR({ k: 1800, t: 3200, d: 2600, b: 900, s: 5200 }[cons] || 1500, cons === "s" ? 1800 : 1400);
+  const run = (r, x) => { const y = r[2] * x + r[0] * r[3] + r[1] * r[4]; r[4] = r[3]; r[3] = y; return y };
+  const co = { m: .07, n: .07, b: .02, d: .02, k: .03, t: .025, s: .075 }[cons] || .03;
+  let ph = 0, prev = 0, pv = 1e-9, pn = 1e-9, yp = 0;
+  for (let i = 0; i < n; i++) {
+   const t = i / SR, f = f0 * (1 + .05 * Math.sin(Math.PI * t / dur) - .06 * t / dur);
+   ph += f / SR; if (ph >= 1) ph -= 1;
+   const gp = ph < .4 ? .5 * (1 - Math.cos(Math.PI * ph / .4)) : ph < .5 ? Math.cos(Math.PI * (ph - .4) / .2) : 0, x = gp - prev; prev = gp;
+   const wz = run(NZ, rn() * 2 - 1);
+   const v = W[0] * run(R[0], x) + W[1] * run(R[1], x) + W[2] * run(R[2], x), nv = run(NR[0], x) + .5 * run(NR[1], x);
+   const ve = Math.min(1, t / .014) * Math.min(1, (dur - t) / .05) * (.8 + .2 * Math.sin(Math.PI * t / dur));
+   let y = 0, z = 0;
+   if (cons === "m" || cons === "n") { const w = Math.min(1, Math.max(0, (t - co * .55) / (co * .45))); y = nv * (1 - w) * .9 + v * ve * w }
+   else if (cons === "s") { const w = t < co ? 0 : Math.min(1, (t - co) / .015); z = t < co ? wz * Math.min(1, t / .02) * Math.min(1, (co - t) / .02 + .3) : 0; y = v * ve * w }
+   else { const w = t < co ? 0 : Math.min(1, (t - co) / .01); y = v * ve * w; z = t < .02 ? wz * Math.exp(-t / .006) : 0 }
+   const ye = y - .85 * yp; yp = y; y = ye;   /* pre-emphasis: the resonators alone make a dull, low voice */
+   vo[i] = y; ns[i] = z; if (Math.abs(y) > pv) pv = Math.abs(y); if (Math.abs(z) > pn) pn = Math.abs(z)
+  }
+  const kv = .85 / pv, kn = (cons === "s" ? .3 : cons === "k" || cons === "t" ? .4 : .25) / pn, a = new Float32Array(n);
+  for (let i = 0; i < n; i++) a[i] = vo[i] * kv + ns[i] * kn;
+  return a
+ };
+ const buildBank = () => {
+  if (A.syl || A.bb) return; A.bb = 1; const out = [], CS = ["m", "n", "b", "d", "k", "s", "t"], VS = ["a", "i", "u", "e", "o"]; let i = 0;
+  const step = () => { try { for (let k = 0; k < 9 && i < 35; k++, i++) { const a = synSyl(CS[i % 7], VS[Math.floor(i / 7)], .15 + rn() * .07); out.push({ a, c: CS[i % 7], v: VS[Math.floor(i / 7)] }) } } catch (e) { fail(e); i = 99 } if (i < 35) setTimeout(step, 25); else A.syl = out };
+  step()
+ };
+ const VP = { baby: [2.1, .8], child: [1.75, .85], teen_f: [1.32, .95], teen_m: [1.08, .95], adult_f: [1.17, 1], adult_m: [.88, 1], elder_f: [1.02, 1.3], elder_m: [.74, 1.35] };
+ const profOf = (ap, stage, id, fem) => {
+  let f = fem; if (f == null) { try { f = isFemAp(ap) } catch (e) { f = false } }
+  const k = stage === "baby" ? "baby" : stage === "child" || stage === "kid" ? "child" : stage === "teen" ? (f ? "teen_f" : "teen_m") : stage === "elder" ? (f ? "elder_f" : "elder_m") : (f ? "adult_f" : "adult_m");
+  const h = hash(id == null ? (ap && (ap.skin + "" + ap.face)) || "x" : id), v = VP[k];
+  return { k, key: String(id == null ? k + h : id), rate: v[0] * (.93 + .14 * h), gap: v[1], h, pos: 0, pool: null }
+ };
+ const poolOf = pf => { if (!pf.pool && A.syl) { const n = A.syl.length, s = Math.floor(pf.h * n); pf.pool = Array.from({ length: 12 }, (_, i) => (s + i * 5) % n) } return pf.pool };
+ const speak = (pf, groups, o, c, B, t00) => {
+  try {
+   o = o || {}; const real = !c;
+   if (real) { if (!vocOn() || document.hidden) return 0; c = ctx(); if (!c) return 0; B = boot(); if (!B) return 0; if (c.state !== "running") c.resume().catch(() => { }) }
+   if (!A.syl || !pf) return 0; const pool = poolOf(pf); if (!pool) return 0;
+   if (real) { if (A.vc >= 4) return 0; const bz = A.busy.get(pf.key); if (bz && bz > c.currentTime) return 0 }
+   const t0 = (t00 != null ? t00 : c.currentTime) + .03 + (o.delay || 0), g = c.createGain(); g.gain.value = .085 * (o.vol == null ? 1 : o.vol); g.connect(B.vo);
+   let t = t0, i = 0; const total = groups.reduce((a, b) => a + b, 0), sd = pf.h * 9;
+   for (let w = 0; w < groups.length; w++) {
+    for (let k = 0; k < groups[w]; k++, i++) {
+     const sy = A.syl[pool[(pf.pos++ + (rn() * 3 | 0)) % pool.length]], last = i === total - 1;
+     const r = pf.rate * (1 + .07 * Math.sin(i * 1.7 + sd)) * (k === 0 ? 1.04 : 1), r2 = r * (last ? (o.q ? 1.13 : .88) : 1 + (rn() - .5) * .1);
+     const s = c.createBufferSource(); s.buffer = bufOf(c, "s" + sy.c + sy.v, sy.a);
+     s.playbackRate.setValueAtTime(r, t); s.playbackRate.linearRampToValueAtTime(r2, t + sy.a.length / SR / r);
+     s.connect(g); trk(s); s.start(t);
+     t += sy.a.length / SR / r * .9 + (.012 + rn() * .03) * pf.gap
+    }
+    t += .07 * pf.gap
+   }
+   const end = t + .1;
+   if (real) { A.vc++; A.lines = (A.lines || 0) + 1; A.busy.set(pf.key, end); setTimeout(() => { A.vc--; try { g.disconnect() } catch (e) { } }, Math.max(100, (end - c.currentTime) * 1000 + 300)) }
+   return end - t0
+  } catch (e) { fail(e); return 0 }
+ };
+ const FEM = /^(mak|kak|cik|puan|datin|nenek|nek|opah|auntie|kakak|ibu|siti|nur|nurul|aina|nadia)\b/, MAL = /^(pak|abang|bang|encik|en|tuan|tok|atuk|datuk|dato|haji|uncle|abah|ayah|along|angah|hakim|ali|ahmad)\b/, OLD = /^(tok|atuk|nenek|nek|opah|wan|pak cik|mak cik|haji|hajjah|datuk|datin)\b/;
+ const whoOf = who => {
+  try {
+   if (who && typeof who === "object") { if (who.k && who.rate) return who; if (who.ap !== undefined || who.stage) return profOf(who.ap || null, who.stage || "adult", who.id, who.fem) }
+   if (typeof who === "string") {
+    const nm = who.replace(/[^\p{L} ]/gu, " ").trim().toLowerCase(), tok = nm.split(/\s+/)[0] || "";
+    if (tok && S) {
+     const sm = (S.sims || []).find(x => x && x.name && (x.name.toLowerCase().startsWith(tok) || nm.includes(x.name.toLowerCase().split(" ")[0])));
+     if (sm) return profOf(sm.ap, sm.stage, sm.id);
+     for (const n of (S.nb || [])) { try { const d = nbDef(n.id); if (d && d.name && (d.name.toLowerCase() === nm || nm.includes(d.name.toLowerCase()) || d.name.toLowerCase().includes(nm))) return profOf(nbAp(n.id), d.stage && d.stage !== "adult" ? (d.stage === "kid" ? "child" : d.stage) : (OLD.test(d.name.toLowerCase()) ? "elder" : "adult"), n.id) } catch (e) { } }
+    }
+    const f = FEM.test(nm) ? true : MAL.test(nm) ? false : hash(nm) < .5;
+    return profOf(null, OLD.test(nm) ? "elder" : "adult", "n:" + nm, f)
+   }
+  } catch (e) { fail(e) }
+  return profOf(null, "adult", "n:x", hash("x") < .5)
+ };
+ const sylOf = text => {
+  const w = String(text || "").replace(/[^\p{L}\s,.!?;:…-]/gu, " ").split(/\s+/).filter(Boolean), g = []; let tot = 0;
+  for (const x of w) { const n = Math.max(1, Math.min(4, Math.round(x.replace(/[^\p{L}]/gu, "").length / 2.5))); if (tot + n > 18) break; g.push(n); tot += n }
+  return g.length ? g : [2, 2]
+ };
+ const say = (text, who, o) => { o = o || {}; o.q = o.q != null ? o.q : /\?\s*[”"]?\s*$/.test(String(text || "")); return speak(whoOf(who), sylOf(text), o) };
+ const gumam = (who, o) => { const n = 2 + (rn() * 3 | 0), g = Array.from({ length: n }, () => 1 + (rn() * 3 | 0)); return speak(whoOf(who), g, o) };
+
+ /* the old beeps (sayVoice) were played when a social action was queued, long before anyone was talking: the queue call is muted, the
+    preview (the 🗣️ switch) still sounds, and the real mumble comes with the "do" phase (talkTick) */
+ let qMute = 0;
+ { const e0 = enqueue; enqueue = function () { qMute++; try { return e0.apply(this, arguments) } finally { qMute-- } } }
+ sayVoice = function (ap, stage, delay, n) { try { if (qMute > 0) return; speak(profOf(ap, stage, null), Array.from({ length: Math.min(3, n || 3) }, () => 1 + (rn() * 2 | 0)), { delay: delay || 0 }) } catch (e) { fail(e) } };
+ const TALK = new Set(["chat", "joke", "compliment", "deep", "meal", "bff", "greet", "flirt", "propose", "tanya", "nasihat", "ajakpindah", "berbaik", "pantun", "pujirupa", "pantuncinta", "sindir", "ejek", "marah", "hina", "musuh", "bincangkerja", "gosipbos", "mintatolong", "network", "belanjakopi", "story", "helphw"]);
+ const SOLO = new Set(["call", "speech"]);
+ const TS = new WeakMap();
+ const talkTick = () => {
+  try {
+   if (!S || document.hidden || !vocOn() || !running() || S.speed === 0 || !A.syl || (HF.intro && HF.intro.on)) return;
+   if (typeof isHouseV === "function" && !isHouseV(S.view)) return;
+   const now = performance.now(); let n = 0;
+   for (const s of S.sims) {
+    const c = s.cur; if (!c || c.phase !== "do" || s.away || s.f !== S.view) continue;
+    const solo = SOLO.has(c.act), talk = TALK.has(c.act) && (c.type === "fam" || c.type === "social"); if (!solo && !talk) continue;
+    let st = TS.get(s); if (!st) TS.set(s, st = { t: 0, k: 0 }); if (now < st.t) continue; if (++n > 2) break;
+    let who = s;
+    if (talk && (st.k & 1)) { try { if (c.type === "fam") who = simById(c.target) || s; else if (c.npc != null) { const d = nbDef(c.npc); who = { ap: nbAp(c.npc), stage: d && d.stage && d.stage !== "adult" ? (d.stage === "kid" ? "child" : d.stage) : "adult", id: "nb" + c.npc } } } catch (e) { who = s } }
+    const len = gumam(who, { vol: s.id === S.active ? 1 : .7 }); if (len) { st.k++; st.t = now + len * 1000 + 600 + rn() * 1400 } else st.t = now + 250
+   }
+  } catch (e) { fail(e) }
+ };
+ /* dialogue cards that show a speaker and words (.say in the overlays, .bub in Jalan sihat): the mumble is as long as the line */
+ const sayFrom = el => {
+  try {
+   if (el.hidden) { el.__rks = ""; return }
+   const q = el.querySelector(".say, .bub"); if (!q || q.hidden) return;
+   const b = q.querySelector("b"), nm = b ? b.textContent : "", txt = (q.textContent || "").replace(nm, "").trim();
+   if (!txt || txt === el.__rks) return; el.__rks = txt; say(txt, nm)
+  } catch (e) { fail(e) }
+ };
+ const watch = el => {
+  if (el.__rkv) return; el.__rkv = 1;
+  new MutationObserver(() => { if (el.__rkt) return; el.__rkt = setTimeout(() => { el.__rkt = 0; sayFrom(el) }, 70) }).observe(el, el.id === "hfjalan" ? { childList: true, subtree: true } : { childList: true })
+ };
+ const scan = () => { try { document.querySelectorAll("body > [role=dialog][id^=hf]").forEach(watch) } catch (e) { } };
+
+ /* ---- ambience ---- */
+ const NB = new WeakMap();
+ const noiseBuf = (c, pink) => {
+  let m = NB.get(c); if (!m) NB.set(c, m = {}); const k = pink ? "p" : "w";
+  if (!m[k]) { const n = SR * 3, b = c.createBuffer(1, n, SR), a = b.getChannelData(0); let b0 = 0, b1 = 0, b2 = 0; for (let i = 0; i < n; i++) { const w = rn() * 2 - 1; if (pink) { b0 = .99765 * b0 + w * .099046; b1 = .963 * b1 + w * .2965164; b2 = .57 * b2 + w * 1.0526913; a[i] = (b0 + b1 + b2 + w * .1848) * .22 } else a[i] = w } m[k] = b }
+  return m[k]
+ };
+ const loopSrc = (c, pink) => { const s = c.createBufferSource(); s.buffer = noiseBuf(c, pink); s.loop = true; return s };
+ const mkRain = (c, d) => { const s = loopSrc(c), hp = c.createBiquadFilter(), lp = c.createBiquadFilter(), g = c.createGain(); hp.type = "highpass"; hp.frequency.value = 600; lp.type = "lowpass"; lp.frequency.value = 6500; g.gain.value = 0; s.connect(hp); hp.connect(lp); lp.connect(g); g.connect(d); s.start(0, rn() * 2); trk(s); return { g, lp, nodes: [s] } };
+ const mkWind = (c, d) => { const s = loopSrc(c, 1), f = c.createBiquadFilter(), g = c.createGain(); f.type = "bandpass"; f.frequency.value = 420; f.Q.value = .6; g.gain.value = 0; s.connect(f); f.connect(g); g.connect(d); s.start(0, rn() * 2); trk(s); return { g, nodes: [s] } };
+ const mkCri = (c, d) => {
+  const g = c.createGain(), nodes = []; g.gain.value = 0; g.connect(d);
+  [[4350, 24, 1.35], [3850, 19, .9]].forEach(([fc, tr, sl]) => {
+   const o = c.createOscillator(), a = c.createGain(), b = c.createGain(), l1 = c.createOscillator(), k1 = c.createGain(), l2 = c.createOscillator(), k2 = c.createGain();
+   o.type = "sine"; o.frequency.value = fc; a.gain.value = .5; b.gain.value = .5; l1.frequency.value = tr; k1.gain.value = .5; l2.frequency.value = sl; k2.gain.value = .5;
+   l1.connect(k1); k1.connect(a.gain); l2.connect(k2); k2.connect(b.gain); o.connect(a); a.connect(b); b.connect(g);
+   [o, l1, l2].forEach(x => { x.start(); trk(x); nodes.push(x) })
+  });
+  return { g, nodes }
+ };
+ const thunder = (c, d, t) => {
+  [[220, .3, 2.8, 0], [110, .3, 3.6, .3]].forEach(([fq, v, du, dl]) => {
+   const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = noiseBuf(c); s.loop = true; f.type = "lowpass"; f.frequency.value = fq;
+   g.gain.setValueAtTime(0, t + dl); g.gain.linearRampToValueAtTime(v * .5, t + dl + .12); g.gain.exponentialRampToValueAtTime(1e-4, t + dl + du); s.connect(f); f.connect(g); g.connect(d); trk(s); s.start(t + dl, rn() * 2); s.stop(t + dl + du + .1)
+  })
+ };
+ const bird = (c, d, t, v) => {
+  const n = 2 + (rn() * 3 | 0), f0 = 2400 + rn() * 1300;
+  for (let i = 0; i < n; i++) { const o = c.createOscillator(), g = c.createGain(), tt = t + i * .13; o.type = "sine"; o.frequency.setValueAtTime(f0 * (1 + i * .02), tt); o.frequency.exponentialRampToValueAtTime(f0 * 1.25, tt + .09); g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(v, tt + .012); g.gain.exponentialRampToValueAtTime(1e-4, tt + .1); o.connect(g); g.connect(d); trk(o); o.start(tt); o.stop(tt + .12) }
+ };
+ const kill = (k, l) => { try { l.nodes.forEach(n => { try { n.stop() } catch (e) { } }); try { l.g.disconnect() } catch (e) { } if (A.L[k] === l) delete A.L[k] } catch (e) { } };
+ const want = (c, B, k, v, build, jit) => {
+  let l = A.L[k];
+  if (v <= .002) { if (l && !l.dying) { l.dying = 1; l.g.gain.setTargetAtTime(0, c.currentTime, .5); l.to = setTimeout(() => kill(k, l), 3200) } return }
+  if (l && l.dying) { clearTimeout(l.to); l.dying = 0 }
+  if (!l) l = A.L[k] = build(c, B.am);
+  l.g.gain.setTargetAtTime(v * (jit ? .88 + .24 * rn() : 1), c.currentTime, 1.4); return l
+ };
+ const weatherNow = () => { try { const w = S.weather && S.weather.type; return w === "storm" ? 2 : w === "rain" ? 1 : 0 } catch (e) { return 0 } };
+ const levels = () => {
+  const w = weatherNow(), h = hourF(), night = h >= 19.5 || h < 5.5, dusk = h >= 17.5 && h < 19.5, dawn = h >= 5.5 && h < 7.5, inH = typeof isHouseV === "function" && isHouseV(S.view), bandar = S.area === "bandar";
+  return { w, night, dusk, dawn, inH, rain: w === 2 ? .075 : w === 1 ? .035 : 0, wind: w === 2 ? .06 : (!night && !w) ? .03 : 0, cri: (night || dusk) ? .014 * (w ? .35 : 1) * (bandar ? .4 : 1) : 0, bird: (!night && !dusk && !w && !bandar) }
+ };
+ const ambTick = () => {
+  try {
+   const c = ctx(); if (!c || !S) return; if (A.obj !== S) { adopt(); applyAudio() }
+   const B = boot(); if (!B || document.hidden || c.state !== "running") return;
+   const hush = !ambOn() || document.querySelector(".lt-title") || (HF.intro && HF.intro.on), V = levels(), q = V.inH ? .6 : 1;
+   want(c, B, "rain", hush ? 0 : V.rain * q, mkRain, 1);
+   if (A.L.rain && A.L.rain.lp) A.L.rain.lp.frequency.setTargetAtTime(V.inH ? 3000 : 6500, c.currentTime, 1);
+   want(c, B, "wind", hush ? 0 : V.wind * (V.inH ? .5 : 1), mkWind, 1);
+   want(c, B, "cri", hush ? 0 : V.cri * q, mkCri, 0);
+   const now = performance.now();
+   if (!hush && V.w === 2) { if (!A.th) A.th = now + 6000 + rn() * 9000; if (now > A.th) { thunder(c, B.am, c.currentTime + .1); A.th = now + 20000 + rn() * 35000 } } else A.th = 0;
+   if (!hush && V.bird && S.gfx !== "jimat" && rn() < (V.dawn ? .4 : .2)) bird(c, B.am, c.currentTime + .05, .02 * (V.inH ? .5 : 1))
+  } catch (e) { fail(e) }
+ };
+
+ /* ---- the tune: gamelan / kulintang-like, calm ---- */
+ const SC = [62, 64, 66, 69, 71], midi = n => SC[((n % 5) + 5) % 5] + 12 * Math.floor(n / 5);
+ const CELLS = { A: [5, -1, 6, 7, -1, 6, 5, -1], B: [7, -1, 8, 7, -1, 5, 6, -1], C: [4, -1, 5, -1, 6, -1, 5, 4], D: [6, -1, 7, 8, 9, -1, 8, -1], E: [5, 6, -1, 7, 5, -1, 4, -1] };
+ const PHR = [["A", "B", "A", "C"], ["A", "D", "B", "C"], ["C", "A", "E", "B"], ["A", "B", "D", "C"]];
+ const bell = (c, d, t, f, dur, vol, big, att) => {
+  const Pt = big ? [[1, 1, 1], [2.76, .32, .5], [5.4, .12, .25]] : [[1, 1, 1], [2.76, .3, .4]];
+  for (const [r, a, k] of Pt) { const o = trk(c.createOscillator()), g = c.createGain(); o.type = "sine"; o.frequency.value = f * r; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol * a, t + (att || .006)); g.gain.exponentialRampToValueAtTime(1e-4, t + dur * k + .02); o.connect(g); g.connect(d); o.start(t); o.stop(t + dur * k + .06) }
+ };
+ const pad = (c, d, t, dur, vol) => [50, 57].forEach((m, i) => { const o = trk(c.createOscillator()), g = c.createGain(); o.type = "sine"; o.frequency.value = mtof(m) * (i ? 1.002 : 1); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 2.2); g.gain.setValueAtTime(vol, t + dur - 1); g.gain.linearRampToValueAtTime(0, t + dur + 2.5); o.connect(g); g.connect(d); o.start(t); o.stop(t + dur + 2.6) });
+ const sape = (c, d, t, f, vol) => { const o = trk(c.createOscillator()), fl = c.createBiquadFilter(), g = c.createGain(); o.type = "sawtooth"; o.frequency.setValueAtTime(f * 1.012, t); o.frequency.exponentialRampToValueAtTime(f, t + .06); fl.type = "lowpass"; fl.Q.value = 1.2; fl.frequency.setValueAtTime(2600, t); fl.frequency.exponentialRampToValueAtTime(420, t + .7); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .004); g.gain.exponentialRampToValueAtTime(1e-4, t + 1.3); o.connect(fl); fl.connect(g); g.connect(d); o.start(t); o.stop(t + 1.35) };
+ const tom = (c, d, t, f, v) => { const o = trk(c.createOscillator()), g = c.createGain(); o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(70, t + .14); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(1e-4, t + .2); o.connect(g); g.connect(d); o.start(t); o.stop(t + .24) };
+ const stepMusic = (c, d, st, t, e, o) => {
+  const cell = st % 8, ph32 = st % 32, arr = CELLS[PHR[Math.floor(st / 32) % PHR.length][Math.floor(st / 8) % 4]], full = o.title ? 1.1 : 1;
+  if (ph32 === 0) { pad(c, d, t, e * 32, .05 * full); bell(c, d, t, mtof(50), 6.5, (o.night ? .17 : .22) * full, true, .02) }
+  if (ph32 === 16) bell(c, d, t, mtof(57), e * 6, .11 * full, true);
+  if (cell === 4 && ph32 % 16 === 4) bell(c, d, t, mtof(ph32 % 32 === 4 ? 50 : 57), e * 2.5, .07);
+  const p = o.paused ? .35 : o.party ? .95 : o.night ? .55 : o.title ? .95 : .8, n = arr[cell];
+  if (n >= 0 && rn() < p) {
+   bell(c, d, t, mtof(midi(n)), e * (o.night ? 4.5 : 3.2), (o.night ? .11 : .15) * (cell === 0 ? 1.15 : 1) * full);
+   if (!o.light && rn() < .28) bell(c, d, t + e * .5, mtof(midi(n + 5)), e * 2, .055)
+  }
+  if (!o.night && !o.paused && !o.light && ph32 % 16 === 12 && rn() < .55) sape(c, d, t, mtof(midi(rn() < .5 ? 5 : 7)), .085);
+  if (o.party) { const s8 = st % 8; if (s8 === 0 || s8 === 3 || s8 === 6) tom(c, d, t, s8 === 0 ? 160 : 200, .2); if (s8 === 4) tom(c, d, t, 260, .16) }
+ };
+ let tcheck = 0, titleOn = false;
+ musicTick = function () {
+  try {
+   const c = SND.ctx; if (!c) return;
+   const now = performance.now(); if (now - tcheck > 500) { tcheck = now; titleOn = !!document.querySelector(".lt-title") }
+   if (S === null || S.music === false || document.hidden || c.state !== "running" || (HF.intro && HF.intro.on)) { SND.next = c.currentTime + .1; return }
+   boot();
+   const party = !!(S.party && !S.party.over), h = hourF(), night = h >= 21.5 || h < 6, paused = S.speed === 0 || mode === "buy";
+   const e = 60 / (titleOn ? 66 : party ? 112 : night ? 56 : 68) / 2, o = { night, party, paused, title: titleOn, light: S.gfx === "jimat" };
+   if (SND.next < c.currentTime) SND.next = c.currentTime + .05;
+   for (let g = 0; g < 8 && SND.next < c.currentTime + .35; g++) { stepMusic(c, SND.mus, SND.step, SND.next, e, o); SND.step++; SND.next += e }
+  } catch (e) { fail(e) }
+ };
+
+ /* ---- ⚙️ Tetapan: two more switches beside Bunyi kesan and Muzik ---- */
+ { const st = document.createElement("style"); st.id = "rk-bunyi-css";
+  st.textContent = `@media (max-width:700px){html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::after{content:"Bunyi suasana (hujan, cengkerik)"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::before{content:"Tutup"}html body.hfc1:not(.x0):not(.x1) #setpop #ambbtn[aria-pressed="true"]::before,html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn[aria-pressed="true"]::before{content:"Hidup"}html body.hfc1:not(.x0):not(.x1) #setpop #vocbtn::after{content:"Suara berbual (gumam)"}}`;
+  document.head.appendChild(st);
+  let tries = 0; const t = setInterval(() => { try { const pop = $("#setpop"), g = pop && (pop.querySelector(".speed") || pop);
+   if (g) { const mk = (id, em, ti, fn) => { if ($("#" + id)) return; const b = document.createElement("button"); b.type = "button"; b.id = id; b.textContent = em; b.title = ti; b.setAttribute("aria-pressed", "true"); b.addEventListener("click", e => { e.stopPropagation(); fn() }); g.appendChild(b) };
+    mk("ambbtn", "🌧️", "Bunyi suasana: hujan, cengkerik, angin", () => setAmb(P.amb === 0));
+    mk("vocbtn", "🗣️", "Suara berbual (gumam)", () => { adopt(); setVoice(S.voice === false); if (S.voice !== false) { const a = act(); if (a) gumam(a) } });
+    syncBtns(); clearInterval(t) } else if (++tries > 80) clearInterval(t) } catch (e) { clearInterval(t) } }, 500)
+ }
+
+ /* ---- a check without ears: render a few seconds offline and read the numbers ---- */
+ const render = async (sec, what) => {
+  what = what || { music: 1, voice: 1, click: 1, rain: 1 };
+  const Oc = window.OfflineAudioContext || window.webkitOfflineAudioContext, OR = 44100, c = new Oc(1, Math.round(sec * OR), OR);
+  const master = c.createGain(), k = c.createDynamicsCompressor(), mg = c.createGain(); COMP(k); mg.gain.value = MK; master.connect(k); k.connect(mg); mg.connect(c.destination);
+  const B = { ui: c.createGain(), vo: c.createGain(), am: c.createGain() }; [B.ui, B.vo, B.am].forEach(g => g.connect(master));
+  const mus = c.createGain(); mus.gain.value = .17; mus.connect(master);
+  if (what.voice && !A.syl) { for (let i = 0; i < 60 && !A.syl; i++) { buildBank(); await new Promise(r => setTimeout(r, 120)) } }
+  if (what.music) { const e = 60 / 68 / 2, o = { night: !!what.night, party: !!what.party, paused: false, title: !!what.title, light: false }; let t = .05, st = 0; while (t < sec - .5) { stepMusic(c, mus, st++, t, e, o); t += e } }
+  if (what.voice && A.syl) { const P2 = [profOf(null, "child", "t1", true), profOf(null, "adult", "t2", true), profOf(null, "adult", "t3", false), profOf(null, "elder", "t4", false), profOf(null, "teen", "t5", true)]; let t = .2; for (let i = 0; i < 4 * (what.stress ? 3 : 1); i++) { P2.forEach((pf, j) => { pf.pos = 0; speak(pf, sylOf("Selamat pagi, apa khabar semua? Hari ni kita masak nasi lemak."), { q: j % 2 === 0, vol: 1 }, c, B, t + (what.stress ? 0 : j * 1.7)) }); t += what.stress ? 2.2 : 9 } }
+  if (what.click) { const names = Object.keys(CL); let t = .1; for (let i = 0; t < sec - .4; i++) { play(names[i % names.length], c, B, t); t += what.stress ? .03 : .45 } }
+  const LV = what.lv || {};
+  if (what.rain || what.amb) { const r = mkRain(c, B.am); r.g.gain.value = LV.rain != null ? LV.rain : what.stress ? .075 : .035 }
+  if (what.wind || what.amb) { const w = mkWind(c, B.am); w.g.gain.value = LV.wind != null ? LV.wind : .03 }
+  if (what.cri || what.amb) { const cr = mkCri(c, B.am); cr.g.gain.value = LV.cri != null ? LV.cri : .014 }
+  if (what.thunder || what.amb) { thunder(c, B.am, 1); thunder(c, B.am, 1.2) }
+  if (what.bird || what.amb) for (let i = 0; i < 6; i++) bird(c, B.am, .5 + i * .6, .02)
+  const buf = await c.startRendering(), d = buf.getChannelData(0);
+  let pk = 0, sq = 0, nan = 0, sil = 0, dc = 0; for (let i = 0; i < d.length; i++) { const v = d[i]; if (v !== v) { nan++; continue } const a = Math.abs(v); if (a > pk) pk = a; sq += v * v; dc += v; if (a < 1e-5) sil++ }
+  return { raw: what.raw ? Array.from(d.slice(0, Math.min(d.length, OR * 10))) : undefined, peak: +pk.toFixed(4), rms: +Math.sqrt(sq / d.length).toFixed(5), dBpeak: +(20 * Math.log10(pk + 1e-9)).toFixed(1), dBrms: +(10 * Math.log10(sq / d.length + 1e-12)).toFixed(1), nan, silentFrac: +(sil / d.length).toFixed(3), dc: +(dc / d.length).toFixed(6), sec }
+ };
+
+ HF.snd = {
+  play: n => play(n), say, gumam, setMusic, setSfx, setVoice, setAmbience: setAmb, render, tick: () => { ambTick(); talkTick() },
+  live: () => A.live.size,
+  state: () => { const c = ctx(); return { ctx: c ? c.state : "none", limiter: !!(A.B && A.B.lim), music: musOn(), sfx: sfxOn(), voice: S ? S.voice !== false : true, amb: P.amb !== 0, live: A.live.size, layers: Object.keys(A.L), bank: A.syl ? A.syl.length : 0, plays: Object.assign({}, A.plays), clickAvgMs: A.n ? +(A.cost / A.n).toFixed(3) : 0, clickMaxMs: +A.maxMs.toFixed(2), clicks: A.n, lines: A.lines || 0, weather: weatherNow(), title: titleOn, saved: Object.assign({}, P) } },
+  _bank: () => (A.syl || []).map(x => ({ c: x.c, v: x.v, a: Array.from(x.a) })), levels: () => levels(), profile: w => { const q = whoOf(w); return { k: q.k, rate: +q.rate.toFixed(3) } }, prefs: () => Object.assign({}, P)
+ }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
