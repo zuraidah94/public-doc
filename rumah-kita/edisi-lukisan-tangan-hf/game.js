@@ -13466,17 +13466,38 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
   return THB[type] = c
  }
  HF.itemThumb = itemThumb;
+ /* rk-ringan (Baiki lukis, 24 Nov): a thumbnail is drawn only for an item on (or within ~500 px of) the screen, not for all ~120 at once: the first draw of one
+    costs ~50 ms on a phone (the game's own furniture art, painted sprites warped on first use), and the list sits below the house, so none is on screen when the
+    tab opens. The others are drawn as they scroll into view (IntersectionObserver), one small turn at a time; a thumbnail already made is kept (THB) and copied. */
+ const THQ = { q: [], on: 0, io: null };
+ const thumbDraw = b => {
+  if (!b.isConnected || b.querySelector("canvas.hfth")) return;
+  const th = itemThumb(b.dataset.buy); if (!th) return;
+  const c = document.createElement("canvas"); c.className = "hfth"; c.width = c.height = 120; c.getContext("2d").drawImage(th, 0, 0); b.appendChild(c)
+ };
+ const thumbPump = () => {
+  THQ.on = 0; const t0 = performance.now();
+  while (THQ.q.length) { thumbDraw(THQ.q.shift()); if (performance.now() - t0 > 14) break }
+  if (THQ.q.length) { THQ.on = 1; setTimeout(thumbPump, 30) }
+ };
+ const thumbIO = () => {
+  if (THQ.io || typeof IntersectionObserver !== "function") return THQ.io;
+  THQ.io = new IntersectionObserver(es => {
+   for (const e of es) if (e.isIntersecting) { THQ.io.unobserve(e.target); THQ.q.push(e.target) }
+   if (THQ.q.length && !THQ.on) { THQ.on = 1; setTimeout(thumbPump, 0) }
+  }, { rootMargin: "500px 0px" });
+  return THQ.io
+ };
+ HF.thq = THQ;
  function decorateBuy() {
   const box = $("#p-buy"); if (!box || box.hidden) return;
   buildTools();
-  /* rk-ringan: a few thumbnails per turn (a time budget), the rest a moment later - the first draw of a thumbnail costs ~50 ms on a phone and
-     the whole shop at once held the tab tap for ~1 s */
-  const t0 = performance.now(); let more = false;
+  const io = thumbIO(); const t0 = performance.now(); let more = false;
   for (const b of box.querySelectorAll("button.item[data-buy]")) {
-   if (b.querySelector("canvas.hfth")) continue;
-   if (performance.now() - t0 > 14) { more = true; break }
-   const th = itemThumb(b.dataset.buy); if (!th) continue;
-   const c = document.createElement("canvas"); c.className = "hfth"; c.width = c.height = 120; c.getContext("2d").drawImage(th, 0, 0); b.appendChild(c)
+   if (b.querySelector("canvas.hfth") || b._thq) continue;
+   if (io) { b._thq = 1; io.observe(b); continue }
+   if (performance.now() - t0 > 14) { more = true; break }   /* no IntersectionObserver: a few per turn, as before */
+   thumbDraw(b)
   }
   if (more) setTimeout(() => { try { decorateBuy() } catch (e) { fail(e) } }, 40)
  }
@@ -13720,8 +13741,12 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
  try { if (window.RKDal && RKDal.warpNow && !RKDal.warpNow0) { const w0 = RKDal.warpNow; RKDal.warpNow0 = w0;
   RKDal.warpNow = function () { if (!arguments.length && performance.now() - slIn < 450 && !document.hidden) { setTimeout(RKDal.warpNow, 200); return 0 } return w0.apply(this, arguments) } } } catch (e) { fail(e) }
  HF.slV = new Set();   /* keys of the portraits whose placeholder is on screen now (set by phSwap): cut first; the others wait for a quiet moment */
+ HF.slVis = () => SLQ.reduce((n, j) => n + (j.key && HF.slV.has(j.key) ? 1 : 0), 0);
+ HF.slLeft = () => SLQ.length; HF.slKeys = () => SLQ.map(j => String(j.key || "").slice(0, 3) + (HF.slV.has(j.key) ? "*" : ""));   /* (rk-ringan, pemanasan) cuts waiting */
  const slRun = () => {
   if (!SLQ.length) { slOn = 0; return }
+  /* the loading screen's warm-up (HF.warmAll, section 77) cuts the portraits the panels need at once, one per task, a frame between: nobody is touching the page */
+  if (HF.slTurbo) { const k = SLQ.findIndex(x => x.key && HF.slV.has(x.key)); if (k >= 0) { const j = SLQ.splice(k, 1)[0]; try { j.res(j.f()) } catch (er) { j.rej(er) } setTimeout(slRun, 4); return } }
   const t = performance.now(); if ((slDn && t - slDnT < 1e4) || t - slUp < 300) { setTimeout(slRun, 90); return }
   /* on-screen first, small cuts before the big close-ups (~200 ms each on a phone: a tap that lands inside one waits for it), and a job
      only starts once the finger has been quiet for a moment (a tap, the next tap...), the big ones and the off-screen ones a little longer */
@@ -22603,6 +22628,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
    ["hf137", "24 Nov 2026", ["🔊 Bunyi baharu: hujan dan ribut ikut cuaca, angin, burung dan cengkerik ikut waktu, muzik gamelan tenang (skrin mula dan Rumah Kita), gumam gaya Sulsul bila orang bercakap (nada ikut umur dan jantina) dan klik halus; togol Bunyi suasana dan Suara berbual dalam Tetapan", "⚡ Lebih pantas: skrin Bilik Sewa (tab Tingkat, kad bilik, Sewa, tutup) dan tab Keluarga, Bina, Telefon, Kerjaya; butang Lihat dalam Bilik Sewa kini membuka bilik; perabot bilik sewa tidak senget lagi"]],
    ["hf136", "23 Nov 2026", ["🧍 Penyewa dalam bilik sewa kini Sim sebenar (badan penuh, watak lukisan tangan yang sama dengan dalam rumah), bukan bulatan avatar: tidur di katil, mandi di bilik air, makan di meja makan, memasak di dapur, bekerja di meja tulis atau komputer, menonton TV di sofa atau duduk; aktiviti mengikut waktu dan perabot bilik, dengan label aktiviti di atas kepala", "🛋️ Susunan Mewah diperbaiki sedikit (sofa lebih jauh dari TV, kerusi pejabat tidak tersembunyi di sebalik bilik air); penyewa duduk betul-betul di atas kusyen sofa, kerusi makan, kerusi pejabat dan bangku (model 3D duduk yang dirender bersama perabot dalam satu gambar, kedalaman tepat, warna kulit/rambut/tudung/baju ikut penyewa); penyewa mandi lebih kecil dan berdiri dalam ruang pancuran"]],
@@ -26110,6 +26136,77 @@ ${P.n > 0 ? `<p class="cap2">Ambil duit</p><div class="bjc">${outs.map(v => `<bu
    return Promise.race([Promise.all(L.map(im => im.decode().catch(() => { }))), new Promise(r => setTimeout(r, 6000))]).then(() => L.length)
   };
   const MSG = ["Menyusun rumah & perabot…", "Memanggil keluarga…", "Hampir siap…"];
+  /* ---- (rk-ringan, 24 Nov: "tekan tab masih lambat" / macam The Sims) the warm-up behind the loading screen: every panel is drawn once for
+     real (tabs, the Bina categories, the phone's apps, the map, the family tree, the sheets of the Keperluan tab), one small step per task
+     with a frame between, so the portraits are cut, the pictures decoded and the code warm before the first tap. Nothing is kept from it
+     (no cached HTML: the next tap draws the panel again, from the data of that moment, so nothing stale); the tab, the page position and
+     every sheet are put back. It stops at HF.warmMax ms (what is left is cut later in the quiet, as before) or at "Langkau". ---- */
+  HF.warmMax = 3500; try { const w = +localStorage.getItem("rkhf_warmmax"); if (w >= 0 && localStorage.getItem("rkhf_warmmax") !== null) HF.warmMax = w } catch (e) { }   /* (tests: rkhf_warmmax = ms, 0 = no warm-up) */
+  { const dr0 = draw; draw = function () { if (HF.warmQuiet) return; return dr0.apply(this, arguments) } }   /* the house is not drawn behind the loading screen while the panels are warmed */
+  const warmAll = tok => new Promise(done => {
+   const t0 = performance.now(); let skip = 0, i = 0, fin = 0, tab0 = null; const Y0 = scrollY;
+   const wait = ms => new Promise(r => setTimeout(r, ms)), frame = () => new Promise(r => requestAnimationFrame(() => r()));
+   const q = s => { try { return document.querySelector(s) } catch (e) { return null } };
+   const vis = e => !!e && e.isConnected && !e.hidden && (e.offsetWidth > 0 || e.offsetHeight > 0);
+   const stop = () => skip || tok !== M.tok || performance.now() - t0 > HF.warmMax;
+   /* the cuts waiting for the portraits of what was just drawn */
+   const drain = async (mx = 250) => { let quiet = 0; const d0 = performance.now(); HF.slTurbo = 1; try { for (let n = 0; n < 400 && quiet < 3 && !stop() && performance.now() - d0 < mx; n++) { await frame(); await wait(30); if (HF.slVis && HF.slVis() > 0) quiet = 0; else quiet++ } } finally { HF.slTurbo = 0 } };
+   const decode = async root => { try { const L = [...(root || document).querySelectorAll("img")].filter(im => im.complete && im.naturalWidth && im.decode && !im.dataset.hfdec).slice(0, 60); for (const im of L) im.dataset.hfdec = "1"; await Promise.race([Promise.all(L.map(im => im.decode().catch(() => { }))), wait(700)]) } catch (e) { } };
+   const closeOne = async (before, extra) => {   /* closes what the click opened: a sheet unhidden or added, by its own close button */
+    for (let n = 0; n < 3; n++) {
+     const ov = [...document.querySelectorAll("body *")].filter(e => (extra && e.matches && e.matches(extra)) && vis(e));
+     const cand = ov.length ? ov : [...document.body.children].filter(e => !before.has(e) && e.id !== "rkload" && e.tagName === "DIV" && vis(e));
+     if (!cand.length) return true;
+     const top = cand[cand.length - 1], bs = [...top.querySelectorAll("button,[role=button]")].filter(b => b.offsetWidth > 0);
+     const x = bs.find(b => /^(✕|×)/.test(b.textContent.trim()) || b.matches(".x,[data-x],[data-close],[aria-label=Tutup]")) || bs.find(b => /^[^a-z]{0,3}\s*(tutup|siap|kembali|selesai)/i.test(b.textContent.trim()));
+     if (x) x.click(); else return false;
+     await frame(); await wait(40)
+    }
+    return false
+   };
+   /* a sheet: tap its opener, wait for its portraits and pictures, close it again */
+   const sheet = (open, ov, mx) => async () => {
+    const b = typeof open === "function" ? open : q(open); if (typeof open !== "function" && !b) return;
+    const T = [performance.now()], before = new Set([...document.body.children]); try { typeof open === "function" ? open() : b.click() } catch (e) { fail(e) }
+    T.push(performance.now()); await frame(); await frame(); T.push(performance.now()); await drain(mx); T.push(performance.now()); await decode(null); T.push(performance.now());
+    if (!(await closeOne(before, ov))) { try { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })) } catch (e) { } await frame() }
+    T.push(performance.now()); (HF.warmD = HF.warmD || []).push(["sheet", ...T.slice(1).map((x, k) => Math.round(x - T[k]))])
+   };
+   const tabStep = (t, then) => async () => { const T = [performance.now()]; try { setTab(t) } catch (e) { fail(e); return } T.push(performance.now()); await frame(); await frame(); T.push(performance.now()); if (then) await then(); T.push(performance.now()); await drain(); T.push(performance.now()); await decode(q("#p-" + t)); T.push(performance.now()); (HF.warmD = HF.warmD || []).push([t, ...T.slice(1).map((x, k) => Math.round(x - T[k]))]) };
+   const cats = async () => { const P = q("#p-buy"); if (!P) return; const orig = typeof bcatSel !== "undefined" ? bcatSel : null; const b = P.querySelector('[data-bcat="semua"]'); if (b) { b.click(); await frame(); await decode(P) } const b0 = orig && P.querySelector(`[data-bcat="${orig}"]`); if (b0) b0.click(); await frame() };
+   const phone = async () => { for (const a of ["wa"]) { if (stop()) break; try { setTab("phone") } catch (e) { } await frame(); const b = q(`#p-phone [data-app="${a}"]`); if (!b) continue; const before = new Set([...document.body.children]); b.click(); await frame(); await frame(); await drain(200); await decode(null); if (!(await closeOne(before, "#wa"))) { try { document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })) } catch (e) { } } await frame(); try { setTab("phone") } catch (e) { } await frame() } };
+   /* [name, step, rough cost in ms at 4x CPU]: in the order of what a first tap costs most; a step that no longer fits the budget is left out */
+   /* Baiki lukis: only the three that are slow EVERY time and have nothing to keep (Matlamat, Telefon/WasapKita, Panduan). Keluarga, Bina and Peta are no longer warmed:
+      they keep their panel and show it at once (see the "Baiki lukis" notes), and warming them added ~3 s to the load. */
+   const steps = [
+    ["Matlamat", tabStep("goals"), 500], ["Telefon", tabStep("phone", phone), 1100],
+    ["Panduan", sheet("#guideopen", "#guide", 150), 600]
+   ];
+   const extra = [];
+   const run = async () => {
+    try {
+     tab0 = typeof tab !== "undefined" ? tab : "needs"; HF.warmQuiet = 1;
+     const n = steps.length + 1 + extra.length;
+     const prog = m => { try { window.rkProg && window.rkProg(i, 0, "Menyediakan Rumah Kita…", 97 + 2.6 * Math.min(1, i / n)) } catch (e) { } };
+     /* a "Langkau" button on the loading screen */
+     try { const l = document.getElementById("rkmsg"); if (l && !document.getElementById("rkskip")) { const b = document.createElement("button"); b.id = "rkskip"; b.type = "button"; b.textContent = "Langkau ›"; b.style.cssText = "margin-left:8px;border:0;background:none;color:#8a5a1a;font:700 12px system-ui,sans-serif;text-decoration:underline;padding:6px 4px;cursor:pointer"; b.onclick = () => { skip = 1 }; l.parentNode.appendChild(b) } } catch (e) { }
+     HF.warmT = []; for (const [nm, f, est] of steps) { if (stop()) break; if (performance.now() - t0 + est * .8 > HF.warmMax) continue; prog(); const ts = performance.now(); try { await f() } catch (e) { fail(e) } HF.warmT.push([nm, Math.round(performance.now() - ts)]); i++ }
+     for (const [nm, open, ov] of extra) {
+      if (stop()) break; prog(); const ts = performance.now(); try { await sheet(open, ov)() } catch (e) { fail(e) } HF.warmT.push([nm, Math.round(performance.now() - ts)]); i++
+     }
+    } catch (e) { fail(e) }
+    /* put everything back: the tab, the page position */
+    /* whatever a step failed to close is closed here, by its own button, else hidden the way the game hides it */
+    try { for (const sel of ["#wa", "#kmap", "#tree", "#choice", "#guide", "#hfbaru"]) { const e = q(sel); if (!vis(e)) continue; const x = [...e.querySelectorAll("button")].find(b => /^(✕|×)/.test(b.textContent.trim()) || b.matches(".x,[data-close]")); if (x) x.click(); if (vis(e)) e.hidden = true; if (vis(e) && e.parentNode) e.remove() } } catch (e) { fail(e) }
+    HF.warmQuiet = 0; try { if (typeof tab !== "undefined" && tab !== tab0) setTab(tab0) } catch (e) { fail(e) }
+    try { const b = document.getElementById("rkskip"); if (b) b.remove() } catch (e) { }
+    try { scrollTo(0, Y0) } catch (e) { }
+    HF.warmLast = { ms: Math.round(performance.now() - t0), steps: i, skip, left: HF.slLeft ? HF.slLeft() : -1, vis: HF.slVis ? HF.slVis() : -1 };
+    if (!fin) { fin = 1; done() }
+   };
+   run()
+  });
+  HF.warmAll = warmAll;
   /* wait until the scene's pictures are in; go() hides the screen */
   const settle = (tok, go, msg0) => {
    M.tl = []; const t0 = performance.now(); let lastD = -1, lastN = -1, moved = t0, quiet = 0, warmed = 0, drawn = 0, k = 0, stalled = 0;
@@ -26129,7 +26226,7 @@ ${P.n > 0 ? `<p class="cap2">Ambil duit</p><div class="bjc">${outs.map(v => `<bu
       runAfter(1200);
       setTimeout(bgStart, 15000)
      };
-     requestAnimationFrame(() => requestAnimationFrame(finish)); setTimeout(finish, 2500)
+     (M.boot && !HF.noWarm ? Promise.race([warmAll(tok), new Promise(r => setTimeout(r, HF.warmMax + 4000))]) : Promise.resolve()).catch(() => { }).then(() => { if (tok !== M.tok) return; requestAnimationFrame(() => requestAnimationFrame(finish)); setTimeout(finish, 2500) })
     })
    };
    const step = () => {
@@ -41419,7 +41516,7 @@ try {
  if (typeof renderBuy === "function") {
   const rb = renderBuy, nz = h => h.replace(/ data-fit="[^"]*"/g, "");   /* thumbnails get data-fit a moment after they are drawn: not a change */
   renderBuy = function () {
-   const el = window.RKHF.buyTick ? $("#p-buy") : null;
+   const el = (window.RKHF.buyTick || window.RKHF.keepNow) ? $("#p-buy") : null;
    if (!el || !el.firstChild) return rb.apply(this, arguments);
    const old = Array.from(el.childNodes), h0 = nz(el.innerHTML), fo = document.activeElement;
    const sc = [el, ...el.querySelectorAll("*")].filter(n => n.scrollLeft || n.scrollTop).map(n => [n, n.scrollLeft, n.scrollTop]);
@@ -42461,27 +42558,114 @@ try {
  document.addEventListener("pointerdown", e => { try { const b = e.target.closest && e.target.closest(".tabs button"); if (b && e.button <= 0) tpd = { b, t: performance.now() } } catch (er) { } }, true);
  document.addEventListener("click", e => { try { const b = e.target.closest && e.target.closest(".tabs button"); if (b && tpd.b === b && performance.now() - tpd.t < 4000) { tpd.t = -1e9; e.stopImmediatePropagation(); e.stopPropagation() } } catch (er) { } }, true)
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
-/* rk-ringan (24 Nov, tab lambat): a tab switch (setTab, run on pointerdown) used to build the whole panel before the first paint (Keluarga:
-   the household and ~120 neighbour cards with portraits and kin look-ups, ~170 ms on a phone; Bina, Telefon, Kerjaya, Matlamat likewise).
-   Now the tab shows at once (the panel's last content, or a light "Memuatkan" line the first time) and the real render follows in the next
-   frame, once, and only if that tab is still the one open. Renders called from anywhere else (a button, the clock) stay as they were. */
+/* rk-ringan (24 Nov, tab lambat; Baiki lukis): a tab switch (setTab, run on pointerdown) used to build the whole panel before the first paint (Keluarga:
+   the household and ~115 neighbour cards with portraits and kin look-ups; Bina, Telefon, Kerjaya, Matlamat likewise). Now the tab shows at once and the real
+   render follows in the next frame, once, and only if that tab is still the one open. Renders called from anywhere else (a button, the clock) stay as they were.
+   Baiki lukis: Bina and Keluarga keep their panel (the DOM stays when the tab is left). A cheap signature of what the panel shows (money, owned things, style,
+   family, friendships ...) is stored with the DOM it was drawn from. Same signature on the next open: the kept panel is shown and usable at once and the real render
+   still runs a moment later, when the phone is quiet (it keeps the nodes when the result is identical; an input the signature does not know about shows up then).
+   Different signature (money, furniture, family changed): the kept panel is dimmed and not tappable (no stale button can be pressed) until the real render, the
+   very next frame, replaces it. The first ever open shows "Memuatkan" and then the render, as before. */
 try {
  const fail = e => { try { console.warn("RKHF", e) } catch (e2) { } };
+ const HF = window.RKHF || (window.RKHF = { err: 0 });
+ const st0 = document.createElement("style"); st0.id = "rk-upd"; st0.textContent = ".rk-upd{opacity:.45!important;pointer-events:none!important}"; (document.head || document.documentElement).appendChild(st0);
+ /* the last time the finger / pointer / scroll was busy: a verify render waits for a quiet moment */
+ let lastIn = 0; for (const t of ["pointerdown", "touchstart", "touchmove", "wheel", "scroll", "keydown"]) addEventListener(t, () => { lastIn = performance.now() }, { capture: true, passive: true });
+ HF.sinceInput = () => performance.now() - lastIn;
+ /* Keluarga: kinRel() runs regAll() (register every person of every house) on EVERY call and the panel asks it ~4 times per neighbour: within one render the
+    first regAll does the work, the others find nothing new (nothing changes the people while the panel is being built) */
+ try {
+  if (typeof renderFamily === "function" && typeof regAll === "function") {
+   let inR = 0, done = 0; const ra = regAll, rf = renderFamily;
+   regAll = function () { if (inR && done) return; const r = ra.apply(this, arguments); if (inR) done = 1; return r };
+   renderFamily = function () { if (!inR) done = 0; inR++; try { return rf.apply(this, arguments) } finally { inR-- } }
+  }
+ } catch (e) { fail(e) }
+ const SIG = {
+  renderBuy: () => { const o = placing; return [S.money, S.view, tool, o ? o.type + "/" + (o.moveId || "") : "", (S.objs || []).length, S.nextId, S.style, S.home, (S.hfSimpan || []).length, S.stair ? 1 : 0, S.estateOwned ? 1 : 0, S.wallsUp ? 1 : 0, S.wallTint || "", ((S.walls && S.walls[S.view || 0]) || []).length, (S.levels || []).length, Object.keys(S.perks || {}).filter(k => S.perks[k]).length, S.area, S.htype || "", HF.price || "", S.visiting ? 1 : 0].join("|") },
+  renderFamily: () => [S.active, S.home, S.visiting ? 1 : 0, S.pregnancy ? 1 : 0, dayIdx(), S.sims.map(m => [m.id, m.name, m.stage, m.age, m.partner || "", m.job ? m.job.career + m.job.level : "", m.grade || "", m.away ? 1 : 0].join(":")).join("|"), (S.nb || []).map(n => n.id + n.status + n.rel + (n.rom || 0)).join(",")].join("#")
+ };
  const DF = { on: 0 }, TABN = { renderFamily: ["family", "p-family"], renderBuy: ["buy", "p-buy"], renderPhone: ["phone", "p-phone"], renderCareer: ["career", "p-career"] };
+ HF.df = { quick: 0, verify: 0, full: 0 };
  for (const nm of Object.keys(TABN)) {
   try {
-   const f0 = eval(nm); if (typeof f0 !== "function") continue;
-   const [tn, pid] = TABN[nm]; let pend = 0;
+   const g0 = eval(nm); if (typeof g0 !== "function") continue;
+   const [tn, pid] = TABN[nm], sig = SIG[nm];
+   const stamp = () => { if (!sig) return; const e2 = document.getElementById(pid); if (e2) { let v = null; try { v = sig() } catch (e) { } e2._rkS = v } };
+   const f0 = function () { const r = g0.apply(this, arguments); try { stamp() } catch (e) { } return r };
+   let tm = 0, tr = 0, self = null, args = null, cold = false;
+   const run = () => {
+    tm = 0; tr = 0;
+    try {
+     if (tab === tn) {
+      HF.keepNow = nm === "renderBuy" ? 1 : 0;
+      /* the first ever draw of Keluarga (nothing kept yet): the household and the first neighbours only (~10 of ~115; the cards cost ~4 ms each on a phone, ~1 s when
+         the code is cold), painted at once; the whole list follows in a later task. The panel is not "same" (no signature) until the whole list is drawn. */
+      if (cold && nm === "renderFamily" && Array.isArray(S.nb) && S.nb.length > 14) {
+       cold = false; const orig = S.nb, part = orig.slice(0, 10); S.nb = part;
+       try { f0.apply(self, args) } finally { if (S.nb === part) S.nb = part.length === 10 && part.every((x, i) => x === orig[i]) ? orig : orig.concat(part.slice(10)) }
+       const e1 = document.getElementById(pid); if (e1) e1._rkS = null;
+       HF.df.part = (HF.df.part || 0) + 1; tm = setTimeout(() => quiet(5), 150); return
+      }
+      cold = false; f0.apply(self, args)
+     }
+    } catch (e) { fail(e) } finally { HF.keepNow = 0; if (!tm) { const e2 = document.getElementById(pid); if (e2) e2.classList.remove("rk-upd") } }
+   };
+   const quiet = n => { tm = 0; if (tab !== tn) return; if (n < 8 && HF.sinceInput() < 700) { tm = setTimeout(() => quiet(n + 1), 400); return } HF.df.verify++; run() };
    const w = function () {
     if (!DF.on) return f0.apply(this, arguments);
-    const el = document.getElementById(pid); if (el && !el.firstElementChild) el.innerHTML = '<p class="hint" style="padding:14px;text-align:center">Memuatkan…</p>';
-    if (pend) return; pend = 1; const self = this, args = arguments;
-    requestAnimationFrame(() => setTimeout(() => { pend = 0; try { if (tab === tn) f0.apply(self, args) } catch (e) { fail(e) } }, 0))
+    self = this; args = arguments;
+    const el = document.getElementById(pid); let same = false;
+    if (el && !el.firstElementChild) { el.innerHTML = '<p class="hint" style="padding:14px;text-align:center">Memuatkan…</p>'; el._rkS = null; cold = true }
+    else if (el && sig) { let v = null; try { v = sig() } catch (e) { } same = v !== null && el._rkS === v; if (!same) el.classList.add("rk-upd") }
+    if (same) { HF.df.quick++; if (tm || tr) return; tm = setTimeout(() => quiet(0), 450); return }
+    HF.df.full++; clearTimeout(tm); cancelAnimationFrame(tr); tm = 0;
+    tr = requestAnimationFrame(() => { tr = 0; tm = setTimeout(run, 0) })
    };
    eval(nm + " = w")
   } catch (e) { fail(e) }
  }
  if (typeof setTab === "function") { const st = setTab; setTab = function () { DF.on++; try { return st.apply(this, arguments) } finally { DF.on-- } } }
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+/* rk-ringan (Baiki lukis, 24 Nov): the Peta. Opening it built a 700 KB SVG (data-URI pictures, ~3600 nodes) and measured every name, ~0.3 s warm and ~0.8 s the
+   first time, before anything showed. Now: the first open shows the sheet's head and "Memuatkan peta" at once and draws the map in the next frame; the sheet is kept
+   when closed (the game only hides it), so the next open shows the same map nodes at once (pictures already decoded, no new <image> elements) and starts from the
+   same scroll corner as before. Same signature (home, area, selection, hour, money, lots) = usable now, the real render follows when the phone is quiet and keeps
+   the nodes if the result is identical; different signature = dimmed and not tappable until the real render of the next frame. Taps inside the map are untouched. */
+try {
+ const fail = e => { try { console.warn("RKHF", e) } catch (e2) { } };
+ const HF = window.RKHF || (window.RKHF = { err: 0 });
+ if (typeof openMap === "function" && typeof renderMap === "function") {
+  const om = openMap, rm = renderMap;
+  const sigM = () => { try { const ar = mapArea || areaOf(S.home); return [S.home, ar, wmSel || "", wmShowList ? 1 : 0, Math.floor(S.t / 60), S.money, S.visiting ? 1 : 0, S.sims.length, (ar === "bandar" ? townIds() : lotIds()).map(k => k + ":" + homeName(k)).join(",")].join("|") } catch (e) { return null } };
+  renderMap = function () { const r = rm.apply(this, arguments); try { const el = document.getElementById("kmap"); if (el && !el.hidden && el.querySelector(".wmscroll")) el._rkS = sigM() } catch (e) { } return r };
+  let tm = 0, tr = 0;
+  const run = () => { tm = 0; tr = 0; try { const el = document.getElementById("kmap"); if (el && !el.hidden) renderMap() } catch (e) { fail(e) } finally { const e2 = document.getElementById("kmap"); if (e2) e2.classList.remove("rk-upd") } };
+  const quiet = n => { tm = 0; const el = document.getElementById("kmap"); if (!el || el.hidden) return; if (n < 8 && HF.sinceInput && HF.sinceInput() < 700) { tm = setTimeout(() => quiet(n + 1), 400); return } run() };
+  HF.mapOpen = { quick: 0, full: 0, cold: 0 };
+  openMap = function () {
+   const el = document.getElementById("kmap");
+   if (!el || HF.warmQuiet) return om.apply(this, arguments);
+   el.hidden = false; mapArea = areaOf(S.home);
+   const sc = el.querySelector(".wmscroll");
+   if (el.firstElementChild && el._rkS && sc) {
+    let v = null; try { v = sigM() } catch (e) { } const same = v !== null && el._rkS === v;
+    if (!wmSel) { try { sc.scrollLeft = mapArea === "bandar" ? sc.scrollWidth : 0; sc.scrollTop = 0 } catch (e) { } }
+    clearTimeout(tm); cancelAnimationFrame(tr); tm = 0;
+    if (same) { HF.mapOpen.quick++; tm = setTimeout(() => quiet(0), 600) }
+    else { HF.mapOpen.full++; el.classList.add("rk-upd"); tr = requestAnimationFrame(() => { tr = 0; tm = setTimeout(run, 0) }) }
+    return
+   }
+   HF.mapOpen.cold++;
+   el._rkS = null;
+   el.innerHTML = '<div class="sheet-head"><div><p class="cap">Peta</p><h3>Peta Dunia Harmoni</h3></div><button class="x" id="mapx" aria-label="Tutup peta">✕</button></div><p class="hint" style="padding:18px;text-align:center">Memuatkan peta…</p>';
+   const x = el.querySelector("#mapx"); if (x) x.onclick = () => { el.hidden = true };
+   clearTimeout(tm); cancelAnimationFrame(tr); tm = 0;
+   tr = requestAnimationFrame(() => { tr = 0; tm = setTimeout(run, 0) })
+  };
+  { const mb = document.getElementById("mapbtn"); if (mb) mb.onclick = () => openMap() }
+ }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 /* rk-ringan (24 Nov): every button answers a finger at once on a phone. touch-action:manipulation on the page (no double-tap-zoom wait; a
    child that says touch-action:none keeps it), no grey tap flash, and an immediate pressed look (:active) so a tap is seen before the
@@ -42620,6 +42804,7 @@ try {
   return "klik"
  };
  const onClick = e => {
+  if (HF.warmQuiet) return;   /* the loading screen's warm-up taps panels itself: no sound, no audio set-up, not counted */
   const t0 = performance.now();
   try {
    unlock();
