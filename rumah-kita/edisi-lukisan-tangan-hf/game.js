@@ -13043,6 +13043,11 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
   const pc = ws.previousElementSibling && ws.previousElementSibling.querySelector(".wmzp"); if (pc) pc.textContent = Math.round(z * 100) + "%";
   clearTimeout(WMZ.t); WMZ.t = setTimeout(() => wmLabels(ws), 160)
  }
+ const WMD = { ws: null, dg: null, on: 0, init() {
+  WMD.on = 1;
+  addEventListener("pointermove", e => { const dg = WMD.dg, ws = WMD.ws; if (!dg || !ws) return; const dx = e.clientX - dg.x, dy = e.clientY - dg.y; if (!dg.on && Math.hypot(dx, dy) > 5) { dg.on = true; ws.classList.add("wmdrag") } if (dg.on) { ws.scrollLeft = dg.l - dx; ws.scrollTop = dg.t - dy } });
+  addEventListener("pointerup", () => { const dg = WMD.dg, ws = WMD.ws; if (ws && dg && dg.on) { const stop = ev => { ev.stopPropagation(); ev.preventDefault() }; ws.addEventListener("click", stop, { capture: true, once: true }); setTimeout(() => ws.removeEventListener("click", stop, true), 50) } WMD.dg = null; if (ws) ws.classList.remove("wmdrag") })
+ } };
  function wmSetup(ws) {
   if (!ws || ws.dataset.hf) return; ws.dataset.hf = "1";
   ws.style.setProperty("--wmz", WMZ.z.toFixed(3));
@@ -13058,10 +13063,11 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
   const pe = e => { if (e.touches.length < 2) pin = null };
   ws.addEventListener("touchend", pe, { passive: true }); ws.addEventListener("touchcancel", pe, { passive: true });
   /* mouse drag to pan (touch pans natively); a drag must not count as a tap on a place */
-  let dg = null;
-  ws.addEventListener("pointerdown", e => { if (e.pointerType === "mouse" && e.button === 0) dg = { x: e.clientX, y: e.clientY, l: ws.scrollLeft, t: ws.scrollTop, on: false } });
-  addEventListener("pointermove", e => { if (!dg) return; const dx = e.clientX - dg.x, dy = e.clientY - dg.y; if (!dg.on && Math.hypot(dx, dy) > 5) { dg.on = true; ws.classList.add("wmdrag") } if (dg.on) { ws.scrollLeft = dg.l - dx; ws.scrollTop = dg.t - dy } });
-  addEventListener("pointerup", () => { if (dg && dg.on) { const stop = ev => { ev.stopPropagation(); ev.preventDefault() }; ws.addEventListener("click", stop, { capture: true, once: true }); setTimeout(() => ws.removeEventListener("click", stop, true), 50) } dg = null; ws.classList.remove("wmdrag") });
+  /* Baiki (24 Nov, peta keluar ke menu di iPhone): these two listeners used to be added to the window on EVERY drawing of the map, each closure holding that
+     drawing's whole map (~2600 nodes + 12 pictures) for ever = every Peta open / lot tap leaked a map until the phone ran out of memory and reloaded the page.
+     Now added once; they act on the map drawn last (WMD.ws, WMD.dg); the old maps are free to be collected. */
+  WMD.ws = ws; WMD.dg = null; WMD.on || WMD.init();
+  ws.addEventListener("pointerdown", e => { if (e.pointerType === "mouse" && e.button === 0) WMD.dg = { x: e.clientX, y: e.clientY, l: ws.scrollLeft, t: ws.scrollTop, on: false } });
   wmLabels(ws)
  }
  /* the Peta is set up right when it is drawn, so the zoom is in place before the base code restores the scroll position */
@@ -22628,6 +22634,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
    ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
    ["hf137", "24 Nov 2026", ["🔊 Bunyi baharu: hujan dan ribut ikut cuaca, angin, burung dan cengkerik ikut waktu, muzik gamelan tenang (skrin mula dan Rumah Kita), gumam gaya Sulsul bila orang bercakap (nada ikut umur dan jantina) dan klik halus; togol Bunyi suasana dan Suara berbual dalam Tetapan", "⚡ Lebih pantas: skrin Bilik Sewa (tab Tingkat, kad bilik, Sewa, tutup) dan tab Keluarga, Bina, Telefon, Kerjaya; butang Lihat dalam Bilik Sewa kini membuka bilik; perabot bilik sewa tidak senget lagi"]],
