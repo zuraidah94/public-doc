@@ -22634,7 +22634,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
-   ["hf141", "26 Nov 2026", ["💬 Borak percuma dengan Melur di Spa Ratu Cantik: pilih cerita panas, baik atau buruk tentang Bandar Harmoni, Kampung Harmoni, golongan diraja dan selebriti."]],
+   ["hf141", "26 Nov 2026", ["💬 Borak percuma dengan Melur di Spa Ratu Cantik: pilih cerita panas, baik atau buruk tentang Bandar Harmoni, Kampung Harmoni, golongan diraja dan selebriti. Borak pasal Drama Kampung atau Drama Sendiri dan buka senarainya terus dari salon."]],
    ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
    ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
@@ -30812,6 +30812,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
 #hfspa .gosip .topik button{flex:1 0 auto}
 #hfspa .gosip [role=status]{margin:8px 0 0;overflow-wrap:anywhere}
 #hfspa .gosip [role=status]:empty{margin:0}
+#hfspa .gosip [data-sp-gossip-drama]{margin-top:8px}
 #hfspa .ld{flex:1;display:grid;place-items:center;font:700 14px system-ui;color:#8a5a6c}
 @media (min-width:700px){#hfspa .sp{border-radius:0;box-shadow:0 0 40px rgba(0,0,0,.25)}}
 </style>`);
@@ -31166,14 +31167,25 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
     hot: "Ada dua bintang Studio Harmoni keluar dari raptai dengan jaket sedondon. Peminat dah teka mereka tengah rakam duet rahsia.",
     baik: "Seorang pelakon senior di Studio Harmoni tinggal lepas syif untuk bantu pelakon tambahan hafal dialog sebelum penggambaran esok.",
     buruk: "Dengar cerita seorang bintang drama asyik tengok telefon masa latihan. Kru terpaksa ulang babak sampai tiga kali."
+   },
+   dramakg: {
+    hot: `Orang warung masih berteka-teki pasal “${DRAMA.emaspusaka.name}”. Pagi Hari Kebudayaan, peti dah kosong. Awak nak mula siasat dari mana?`,
+    baik: `Dalam “${DRAMA.pialawau.name}”, Atuk Deraman boleh ajar cara buat wau daripada buluh dan kertas bunga. Seronok tengok orang lama turunkan ilmu.`,
+    buruk: `Bab awal “${DRAMA.emaspusaka.name}” buat saya geram. Ada yang nak tuduh keluarga penyewa baru sebelum semak petunjuk. Orang baru pun ada hati, kan?`
+   },
+   drama: {
+    hot: `Dalam “${DZ_ARCS.tari.t.replace(/^👑 /, "")}”, ada tetamu bertopeng perak ajak menari. Kalau awak di situ, berani tanya siapa dia?`,
+    baik: `Saya suka pilihan berbual di taman bulan dalam “${DZ_ARCS.tari.t.replace(/^👑 /, "")}”. Boleh kenal tetamu tu jauh dari hiruk-pikuk dewan.`,
+    buruk: `Dalam “${DZ_ARCS.tari.t.replace(/^👑 /, "")}”, ada tetamu yang pegang tangan dan minta nama masa awak nak balik. Kalau rasa tak selesa, awak boleh pilih cara sendiri.`
    }
   };
   const gossipMenu = `<details class="gosip">
 <summary>💬 Gosip dengan Melur · Percuma</summary>
-<label>Siapa nak diborakkan?
-<select data-sp-gossip-group><option value="bandar">Bandar Harmoni</option><option value="kampung">Kampung Harmoni</option><option value="diraja">Golongan diraja</option><option value="selebriti">Selebriti</option></select></label>
+<label>Nak borak pasal apa?
+<select data-sp-gossip-group><option value="bandar">Bandar Harmoni</option><option value="kampung">Kampung Harmoni</option><option value="diraja">Golongan diraja</option><option value="selebriti">Selebriti</option><option value="dramakg">Drama Kampung</option><option value="drama">Drama Sendiri</option></select></label>
 <div class="topik"><button type="button" data-sp-gossip="hot">Cerita panas</button><button type="button" data-sp-gossip="baik">Cerita baik</button><button type="button" data-sp-gossip="buruk">Cerita buruk</button></div>
 <p role="status" data-sp-gossip-story></p>
+<button type="button" data-sp-gossip-drama hidden></button>
 </details>`;
   /* the menu */
   const menu = function () {
@@ -31193,7 +31205,10 @@ ${gossipMenu}
    begin(k)
   }
   const clearGossip = ev => {
-   if (ev.target.matches("[data-sp-gossip-group]")) ev.target.closest(".gosip").querySelector("[data-sp-gossip-story]").textContent = "";
+   if (!ev.target.matches("[data-sp-gossip-group]")) return;
+   const panel = ev.target.closest(".gosip");
+   panel.querySelector("[data-sp-gossip-story]").textContent = "";
+   panel.querySelector("[data-sp-gossip-drama]").hidden = true;
   };
   let wired = null;
   const wire = function () {
@@ -31211,6 +31226,18 @@ ${gossipMenu}
      const panel = t.closest(".gosip");
      const group = panel.querySelector("[data-sp-gossip-group]").value;
      panel.querySelector("[data-sp-gossip-story]").textContent = "Melur: “" + gossip[group][t.dataset.spGossip] + "”";
+     const shortcut = panel.querySelector("[data-sp-gossip-drama]");
+     shortcut.hidden = group !== "dramakg" && group !== "drama";
+     if (!shortcut.hidden) {
+      shortcut.dataset.spGossipDrama = group;
+      shortcut.textContent = group === "dramakg" ? "Buka Drama Kampung" : "Buka Drama Sendiri";
+     }
+     return
+    }
+    if (t.dataset.spGossipDrama && G.ph === "menu") {
+     const app = t.dataset.spGossipDrama;
+     close();
+     openApp(app);
      return
     }
     if (t.dataset.spk) { choose(t.dataset.spk); return }
