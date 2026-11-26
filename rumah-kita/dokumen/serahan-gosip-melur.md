@@ -40,3 +40,11 @@ Berkait dengan *Tari Bertopeng di Istana*.
 1. Buka **Peta Dunia → Bandar Harmoni → Salun Ratu Cantik → Rawatan Spa Ratu Cantik → Gosip dengan Melur**.
 2. Cuba keempat-empat dialog pada skrin telefon. Pastikan teks panjang boleh dibaca dan bertukar apabila pemain memilih topik lain.
 3. Cuba dengan baki RM0. Pastikan gosip masih percuma dan kedua-dua pintasan membuka katalog yang betul.
+
+## Ciri tambahan dalam draf PR
+
+1. **Gosip ikut episod.** Melur beri pembayang sebelum pemain mengikuti cerita. Untuk Drama Kampung, dia semak episod, pilihan terakhir dan tindakan seperti belajar buat wau dengan Atuk Deraman. Untuk Drama Sendiri, dia semak rekod tamat cerita bagi Sim yang sedang mengunjungi spa.
+2. **Buka cerita yang disebut.** Butang menunjukkan tajuk drama dan terus memfokuskan kad cerita itu dalam katalog. Pemain masih tentukan bila hendak memulakan cerita.
+3. **Reaksi pemain.** Selepas membaca gosip, pemain boleh pilih **Eh, serius?**, **Kesian dia** atau **Kita simpan sini je**. Melur memberi balasan ringkas dan reaksi dikosongkan apabila topik atau cerita bertukar.
+
+Ketiga-tiga ciri sudah ada dalam kod draf PR. Empat dialog cadangan di bahagian atas masih disimpan untuk dimasukkan oleh Claude. Semasa memasukkannya, pautkan dialog santai tentang wau kepada kad *Piala Wau Bulan Kampung* dan semak bahawa pembayang, dialog susulan serta reaksi masih muncul pada keadaan yang betul.
