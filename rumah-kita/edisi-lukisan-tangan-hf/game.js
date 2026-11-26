@@ -22634,7 +22634,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
-   ["hf141", "26 Nov 2026", ["💬 Borak percuma dengan Melur di Spa Ratu Cantik: pilih cerita hot, baik atau buruk tentang Bandar Harmoni, Kampung Harmoni, golongan diraja dan selebriti."]],
+   ["hf141", "26 Nov 2026", ["💬 Borak percuma dengan Melur di Spa Ratu Cantik: pilih cerita panas, baik atau buruk tentang Bandar Harmoni, Kampung Harmoni, golongan diraja dan selebriti."]],
    ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
    ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
@@ -31172,7 +31172,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
 <summary>💬 Gosip dengan Melur · Percuma</summary>
 <label>Siapa nak diborakkan?
 <select data-sp-gossip-group><option value="bandar">Bandar Harmoni</option><option value="kampung">Kampung Harmoni</option><option value="diraja">Golongan diraja</option><option value="selebriti">Selebriti</option></select></label>
-<div class="topik"><button type="button" data-sp-gossip="hot">Cerita hot</button><button type="button" data-sp-gossip="baik">Cerita baik</button><button type="button" data-sp-gossip="buruk">Cerita buruk</button></div>
+<div class="topik"><button type="button" data-sp-gossip="hot">Cerita panas</button><button type="button" data-sp-gossip="baik">Cerita baik</button><button type="button" data-sp-gossip="buruk">Cerita buruk</button></div>
 <p role="status" data-sp-gossip-story></p>
 </details>`;
   /* the menu */
