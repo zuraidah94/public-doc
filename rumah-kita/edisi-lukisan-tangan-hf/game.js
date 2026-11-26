@@ -31151,27 +31151,27 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
   }
   const gossip = {
    bandar: {
-    hot: "Pak Ali tutup kedai awal semalam. Rupanya dia tengah berlatih untuk pertandingan karaoke Bandar Harmoni. Lagu pilihan pun dirahsiakan!",
+    hot: "Dengar cerita seorang peniaga Bandar Harmoni dah kahwin satu lagi. Isteri pertama nampak gambar akad dalam grup keluarga, siap ada orang tulis “tahniah” dulu. Haa, memang panjang malam tu.",
     baik: "Pak Ali tinggalkan satu bakul barang dapur di kaunter untuk jiran yang sedang susah. Siap pesan, ambil saja yang perlu.",
     buruk: "Ada pelanggan di kedai Pak Ali potong barisan. Bila ditegur, dia buat-buat sibuk tengok telefon."
    },
    kampung: {
-    hot: "Mak Jah kata ada orang tempah seluruh warung untuk majlis kejutan. Satu kampung dah cuba teka siapa tetamunya.",
+    hot: "Mak Jah kata satu pasangan kahwin lari masa semua orang sibuk gotong-royong. Esoknya mereka balik bawa sijil nikah. Mak dia baca dua kali, lepas tu tanya, “Dah makan belum?”",
     baik: "Mak Jah bungkus nasi lemak lebih untuk orang yang datang bergotong-royong bersihkan balai kampung.",
     buruk: "Mak Jah mengeluh. Ada orang janji nak tolong kemas selepas kenduri, tapi hilang sebaik saja pinggan kena basuh."
    },
    diraja: {
-    hot: "Orang istana kata Tengku Amir sedang siapkan hadiah kejutan untuk satu majlis. Kotaknya besar, tapi semua yang nampak buat muka selamba.",
+    hot: "Orang istana berbisik ada kerabat yang bertunang senyap-senyap, padahal keluarga dah susun majlis dengan orang lain. Kad jemputan dah siap cetak. Yang tukang cetak pun dah dapat dua versi nama.",
     baik: "Katanya Tengku Amir luangkan masa dengar persembahan murid sekolah sampai lagu terakhir. Budak-budak tu seronok betul.",
     buruk: "Katanya rombongan istana lambat sampai ke satu majlis. Sukarelawan dah beratur lama dan makanan pun sempat sejuk."
    },
    selebriti: {
-    hot: "Ada dua bintang Studio Harmoni keluar dari raptai dengan jaket sedondon. Peminat dah teka mereka tengah rakam duet rahsia.",
+    hot: "Kecoh dekat Studio Harmoni. Seorang pelakon umum dia dah dapat anak sebelum bernikah. Lepas tu orang mula teka siapa bapanya. Saya kata, biar mak ayah dia urus hal tu. Bayi tu tengah tidur pun orang dah buat teori.",
     baik: "Seorang pelakon senior di Studio Harmoni tinggal lepas syif untuk bantu pelakon tambahan hafal dialog sebelum penggambaran esok.",
     buruk: "Dengar cerita seorang bintang drama asyik tengok telefon masa latihan. Kru terpaksa ulang babak sampai tiga kali."
    },
    dramakg: {
-    hot: `Orang warung masih berteka-teki pasal “${DRAMA.emaspusaka.name}”. Pagi Hari Kebudayaan, peti dah kosong. Awak nak mula siasat dari mana?`,
+    hot: `Awak dah dengar pasal “${DRAMA.rizal.name}”? Rizal beli sejambak ros dekat pasar malam. Wan Kasturi tunggu di rumah, tapi Mawar Seri pula ada dekat gerai satay. Satu jambak, dua orang. Saya pun nak tahu bunga tu sampai ke siapa.`,
     baik: `Dalam “${DRAMA.pialawau.name}”, Atuk Deraman boleh ajar cara buat wau daripada buluh dan kertas bunga. Seronok tengok orang lama turunkan ilmu.`,
     buruk: `Bab awal “${DRAMA.emaspusaka.name}” buat saya geram. Ada yang nak tuduh keluarga penyewa baru sebelum semak petunjuk. Orang baru pun ada hati, kan?`
    },
@@ -31182,7 +31182,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
    }
   };
   const gossipDrama = {
-   dramakg: { hot: "emaspusaka", baik: "pialawau", buruk: "emaspusaka" },
+   dramakg: { hot: "rizal", baik: "pialawau", buruk: "emaspusaka" },
    drama: { hot: "tari", baik: "tari", buruk: "tari" }
   };
   const gossipReply = {

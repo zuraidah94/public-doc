@@ -48,3 +48,15 @@ Berkait dengan *Tari Bertopeng di Istana*.
 3. **Reaksi pemain.** Selepas membaca gosip, pemain boleh pilih **Eh, serius?**, **Kesian dia** atau **Kita simpan sini je**. Melur memberi balasan ringkas dan reaksi dikosongkan apabila topik atau cerita bertukar.
 
 Ketiga-tiga ciri sudah ada dalam kod draf PR. Empat dialog cadangan di bahagian atas masih disimpan untuk dimasukkan oleh Claude. Semasa memasukkannya, pautkan dialog santai tentang wau kepada kad *Piala Wau Bulan Kampung* dan semak bahawa pembayang, dialog susulan serta reaksi masih muncul pada keadaan yang betul.
+
+## Cerita panas bertema skandal dalam draf PR
+
+Menu **Cerita panas** kini ada lima dialog baharu.
+
+- **Bandar Harmoni** — berita peniaga kahwin lagi terbongkar dalam grup keluarga.
+- **Kampung Harmoni** — pasangan kahwin lari pulang membawa sijil nikah.
+- **Golongan diraja** — pertunangan rahsia bercanggah dengan rancangan keluarga.
+- **Selebriti** — pelakon ada anak sebelum bernikah dan orang mula meneka siapa bapanya. Melur mengulas gosip orang dewasa sambil menjaga maruah anak itu.
+- **Drama Kampung** — gosip bunga ros Rizal membawa pemain terus ke kad *Rizal: Buaya Darat*. Dialog emas Tok Penghulu dalam bahagian serahan di atas boleh digunakan sebagai cerita tambahan dengan pintasan ke kadnya sendiri.
+
+Jika Claude menambah giliran cerita, simpan tajuk atau ID drama bersama setiap dialog supaya pintasan dan gosip susulan menggunakan cerita yang sedang dipaparkan.
