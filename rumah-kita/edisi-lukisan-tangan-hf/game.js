@@ -22634,6 +22634,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf141", "26 Nov 2026", ["💬 Baru: Gosip dengan Melur di Spa Ratu Cantik, percuma; pilih topik dan jenis cerita (panas, baik, buruk atau santai)", "📣 Baru: Khabar Kampung; lepaskan satu khabar dan lihat ia merebak dari mulut ke mulut, malah Sim keluarga pergi ke tempat yang disebut"]],
    ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
    ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
@@ -43159,5 +43160,360 @@ try {
   _bank: () => (A.syl || []).map(x => ({ c: x.c, v: x.v, a: Array.from(x.a) })), levels: () => levels(), profile: w => { const q = whoOf(w); return { k: q.k, rate: +q.rate.toFixed(3) } }, prefs: () => Object.assign({}, P)
  }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §171. 💬 Gosip dengan Melur at Spa Ratu Cantik (hf141, 26 Nov 2026; ported from draft PR #11 zuraidah94/public-doc "codex/spa-ratu-cantik-gosip" + its handover note serahan-gosip-melur.md, written for this layer instead of copying that game.js).
+   A free panel in the spa menu (§134), added from outside the menu code: a MutationObserver puts it above the note whenever the menu is drawn, one delegated click handler runs it (the spa's own handler ignores buttons it has no data-attribute for). Free even with RM 0: nothing is paid or changed in the save; the three treatments and their prices (Spa Kaki RM 35) are untouched.
+   Six topics (Bandar Harmoni, Kampung Harmoni, Golongan diraja, Selebriti, Drama Kampung, Drama Sendiri) x Cerita panas / baik / buruk = 18 stories, plus Gosip santai for Drama Kampung and Selebriti. A story is a list of turns {id, t}; a repeat tap of the same button goes to the next turn, and the drama id stays with its turn so the shortcut button ("Buka <tajuk>") and the follow-up line always use the story on screen. The shortcut closes the spa (its own close button) and opens the Drama Kampung log (openDramaLog) or the Drama Harmoni catalogue (DZ_catalog), then focuses the card of that drama; it never starts the story. Follow-up: a second paragraph from the save (S.drama state of the Drama Kampung ep / choice / flags, S.drama.log of the Drama Sendiri arcs the visiting Sim has played). Reactions (Eh, serius? / Kesian dia / Kita simpan sini je) answer in Melur's voice and are cleared when the topic or the story changes. */
+try {
+ const HF = window.RKHF; if (!HF) throw new Error("RKHF");
+ const fail = e => { try { HF.err = (HF.err || 0) + 1; console.warn("RKHF §171", e) } catch (e2) { } };
+ const T = s => ({ t: s });
+ const dk = (id, s) => ({ id, g: "dramakg", t: s });
+ const GS = {
+  bandar: {
+   hot: [T("Dengar cerita seorang peniaga Bandar Harmoni dah kahwin satu lagi. Isteri pertama nampak gambar akad dalam grup keluarga, siap ada orang tulis “tahniah” dulu. Haa, memang panjang malam tu.")],
+   baik: [T("Pak Ali tinggalkan satu bakul barang dapur di kaunter untuk jiran yang sedang susah. Siap pesan, ambil saja yang perlu.")],
+   buruk: [T("Ada pelanggan di kedai Pak Ali potong barisan. Bila ditegur, dia buat-buat sibuk tengok telefon.")]
+  },
+  kampung: {
+   hot: [T("Mak Jah kata satu pasangan kahwin lari masa semua orang sibuk gotong-royong. Esoknya mereka balik bawa sijil nikah. Mak dia baca dua kali, lepas tu tanya, “Dah makan belum?”")],
+   baik: [T("Mak Jah bungkus nasi lemak lebih untuk orang yang datang bergotong-royong bersihkan balai kampung.")],
+   buruk: [T("Mak Jah mengeluh. Ada orang janji nak tolong kemas selepas kenduri, tapi hilang sebaik saja pinggan kena basuh.")]
+  },
+  diraja: {
+   hot: [T("Orang istana berbisik ada kerabat yang bertunang senyap-senyap, padahal keluarga dah susun majlis dengan orang lain. Kad jemputan dah siap cetak. Yang tukang cetak pun dah dapat dua versi nama.")],
+   baik: [T("Katanya Tengku Amir luangkan masa dengar persembahan murid sekolah sampai lagu terakhir. Budak-budak tu seronok betul.")],
+   buruk: [T("Katanya rombongan istana lambat sampai ke satu majlis. Sukarelawan dah beratur lama dan makanan pun sempat sejuk.")]
+  },
+  selebriti: {
+   hot: [T("Kecoh dekat Studio Harmoni. Seorang pelakon umum dia dah dapat anak sebelum bernikah. Lepas tu orang mula teka siapa bapanya. Saya kata, biar mak ayah dia urus hal tu. Bayi tu tengah tidur pun orang dah buat teori.")],
+   santai: [T("Dua pelakon Studio Harmoni datang pakai jaket sama. Peminat dah sibuk teka mereka bercinta. Saya cuma nak tahu kedai mana jual jaket tu. Cantiklah.")],
+   baik: [T("Seorang pelakon senior di Studio Harmoni tinggal lepas syif untuk bantu pelakon tambahan hafal dialog sebelum penggambaran esok.")],
+   buruk: [T("Dengar cerita seorang bintang drama asyik tengok telefon masa latihan. Kru terpaksa ulang babak sampai tiga kali.")]
+  },
+  dramakg: {
+   hot: [
+    dk("emaspusaka", "Eh, pasal emas Tok Penghulu tu… semalam dekat warung, semua orang kata tak tahu apa-apa. Tapi bila Mak Jah tanya siapa pegang kunci, sudu pun tiba-tiba tak berbunyi. Saya sambung makan je. Telinga saya yang sambung kerja."),
+    dk("rizal", `Awak dah dengar pasal “${DRAMA.rizal.name}”? Rizal beli sejambak ros dekat pasar malam. Wan Kasturi tunggu di rumah, tapi Mawar Seri pula ada dekat gerai satay. Satu jambak, dua orang. Saya pun nak tahu bunga tu sampai ke siapa.`)],
+   santai: [dk("pialawau", "Atuk Deraman ajar budak-budak buat wau. Seronok tengok. Yang paling beria tu Pak Ali. Katanya datang nak hantar gam je, sekali dia yang paling lama pilih warna ekor.")],
+   baik: [dk("pialawau", `Dalam “${DRAMA.pialawau.name}”, Atuk Deraman boleh ajar cara buat wau daripada buluh dan kertas bunga. Seronok tengok orang lama turunkan ilmu.`)],
+   buruk: [dk("emaspusaka", `Bab awal “${DRAMA.emaspusaka.name}” buat saya geram. Ada yang nak tuduh keluarga penyewa baru sebelum semak petunjuk. Orang baru pun ada hati, kan?`)]
+  },
+  drama: (() => {
+   const n = () => DZ_ARCS.tari.t.replace(/^👑 /, ""), d = s => ({ id: "tari", g: "drama", t: s });
+   return {
+    hot: [d("Dekat tari bertopeng tu, tetamu topeng perak ajak awak menari. Kawan saya kata dia nampak orang yang sama tunggu dekat taman bulan lepas lagu habis. Tunggu siapa? Haa, yang tu dia suruh saya jangan tanya.")],
+    baik: [d(`Saya suka pilihan berbual di taman bulan dalam “${n()}”. Boleh kenal tetamu tu jauh dari hiruk-pikuk dewan.`)],
+    buruk: [d(`Dalam “${n()}”, ada tetamu yang pegang tangan dan minta nama masa awak nak balik. Kalau rasa tak selesa, awak boleh pilih cara sendiri.`)]
+   }
+  })()
+ };
+ const TONE = { hot: "Cerita panas", santai: "Gosip santai", baik: "Cerita baik", buruk: "Cerita buruk" };
+ const GRP = [["bandar", "Bandar Harmoni"], ["kampung", "Kampung Harmoni"], ["diraja", "Golongan diraja"], ["selebriti", "Selebriti"], ["dramakg", "Drama Kampung"], ["drama", "Drama Sendiri"]];
+ const REPLY = { serius: "Haa, betul pelik. Kita dengar dulu cerita orang sebelah sana pula.", kesian: "Kan? Kalau saya di tempat dia pun, mesti serba salah.", simpan: "Setuju. Biar cerita ni habis dekat kerusi salon." };
+ const title = turn => turn.g === "dramakg" ? DRAMA[turn.id].name : DZ_ARCS[turn.id].t.replace(/^👑 /, "");
+ /* a second line from the save: where the Sim being treated stands in that story */
+ const follow = (turn, sim) => {
+  if (!turn.id || !sim) return "";
+  if (turn.g === "drama") return (S.drama && S.drama.log || []).some(x => x.a === turn.id && x.s === sim.name) ? "Awak dah lalui sendiri malam bertopeng tu. Dengar cerita orang memang lain rasanya bila kita yang ada dalam dewan." : "";
+  const st = S.drama && S.drama[turn.id]; if (!st || !st.ep) return "";
+  if (turn.id === "pialawau" && st.F && st.F.atuk) return "Awak minta Atuk Deraman ajar buat wau, kan? Haa, lepas ni Pak Ali tempah satu dengan awak pula.";
+  if (turn.id === "emaspusaka" && st.F && st.F.salah) return "Ingat masa keluarga penyewa dituduh? Kesian mereka. Elok semak petunjuk dulu sebelum cerita tu sampai satu kampung.";
+  const ep = st.log && st.log[st.log.length - 1];
+  if (ep && ep.choice) return `Awak dah sampai episod ${st.ep}. Pilihan awak masa tu “${ep.choice}”. Saya tertanya-tanya apa orang warung akan kata.`;
+  return `Awak dah tengok ${st.ep} episod. Makin lama, makin banyak cerita yang orang warung nak borakkan.`
+ };
+ document.head.insertAdjacentHTML("beforeend", `<style>
+#hfspa .gosip{margin:8px 0 10px;padding:8px 12px;border:2px solid #ecd0da;border-radius:16px;background:#fff;color:#4a2c38;font:600 14px/1.45 system-ui}
+#hfspa .gosip summary{display:flex;align-items:center;gap:6px;min-height:44px;cursor:pointer;color:#a3285a;font:800 15px system-ui}
+#hfspa .gosip summary em{margin-left:auto;font:800 12px system-ui;font-style:normal;color:#7a3552;background:#fbe3ea;border-radius:99px;padding:3px 9px}
+#hfspa .gosip label{display:grid;gap:4px;margin:6px 0;font:700 13px system-ui;color:#7a3552}
+#hfspa .gosip select{min-height:44px;border:1px solid #e9c2d2;border-radius:12px;background:#fffdf9;color:#4a2c38;padding:6px 10px;font:600 14px system-ui}
+#hfspa .gosip .gt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+#hfspa .gosip .gt[hidden],#hfspa .gosip [hidden]{display:none}
+#hfspa .gosip .gt button,#hfspa .gosip .gsc{min-height:44px;border:1px solid #e9c2d2;border-radius:12px;background:#fffdf9;color:#6a3a4c;padding:6px 12px;font:700 13.5px system-ui}
+#hfspa .gosip .gt button{flex:1 1 auto}
+#hfspa .gosip .gt button[aria-pressed=true]{background:#c2306a;border-color:#c2306a;color:#fff}
+#hfspa .gosip .gs,#hfspa .gosip .gr{margin:8px 0 0;overflow-wrap:anywhere;white-space:pre-line;font:600 14px/1.5 system-ui;color:#4a2c38}
+#hfspa .gosip .gs:not(:empty){padding:9px 11px;background:#fff4ea;border:1px solid #f0d3b8;border-radius:12px 12px 12px 4px}
+#hfspa .gosip .gr:not(:empty){padding:8px 11px;background:#fbe9ef;border:1px solid #f0cdd9;border-radius:12px 12px 4px 12px;color:#7a3552}
+#hfspa .gosip .gs:empty,#hfspa .gosip .gr:empty{display:none}
+#hfspa .gosip .gsc{display:block;width:100%;margin-top:8px;text-align:left;border-color:#c2306a;color:#a3285a;font-weight:800}
+</style>`);
+ const PANEL = `<details class="gosip" data-gosip><summary>💬 Gosip dengan Melur <em>Percuma</em></summary>
+<label>Nak borak pasal apa?<select data-gp-grp>${GRP.map(g => `<option value="${g[0]}">${g[1]}</option>`).join("")}</select></label>
+<div class="gt" data-gp-tones>${["hot", "santai", "baik", "buruk"].map(k => `<button type="button" data-gp-tone="${k}" aria-pressed="false"${k === "santai" ? " hidden" : ""}>${TONE[k]}</button>`).join("")}</div>
+<p class="gs" role="status" data-gp-story></p>
+<button type="button" class="gsc" data-gp-open hidden></button>
+<div class="gt" data-gp-react hidden><button type="button" data-gp-r="serius">Eh, serius?</button><button type="button" data-gp-r="kesian">Kesian dia</button><button type="button" data-gp-r="simpan">Kita simpan sini je</button></div>
+<p class="gr" role="status" data-gp-reply></p></details>`;
+ const box = () => document.getElementById("hfspa");
+ const simOf = () => { try { const h = box().querySelector(".mn h4"), nm = h && h.textContent.replace(/^Rawatan untuk\s+/, "").trim(); return (S.sims || []).find(x => x.name === nm) || act() } catch (e) { return null } };
+ const reset = p => {
+  p.querySelector("[data-gp-story]").textContent = ""; p.querySelector("[data-gp-reply]").textContent = "";
+  p.querySelector("[data-gp-open]").hidden = true; p.querySelector("[data-gp-react]").hidden = true;
+  p.querySelectorAll("[data-gp-tone]").forEach(b => b.setAttribute("aria-pressed", "false")); p._k = null; p._i = 0
+ };
+ const tones = p => { const g = GS[p.querySelector("[data-gp-grp]").value]; p.querySelector("[data-gp-tone=santai]").hidden = !g.santai };
+ const inject = () => {
+  try {
+   const b = box(); if (!b || b.hidden) return; const mn = b.querySelector(".mn");
+   if (!mn || mn.querySelector("[data-gosip]")) return;
+   const note = mn.querySelector(".note"); note ? note.insertAdjacentHTML("beforebegin", PANEL) : mn.insertAdjacentHTML("beforeend", PANEL)
+  } catch (e) { fail(e) }
+ };
+ const focusCard = (g, id) => {
+  const sheet = document.getElementById(g === "dramakg" ? "drama" : "choice"); if (!sheet || sheet.hidden) return null;
+  const want = g === "dramakg" ? DRAMA[id].name : DZ_ARCS[id].t;
+  const card = [...sheet.querySelectorAll(g === "dramakg" ? ".card" : ".dzcard")].find(c => { const b = c.querySelector("b"); return b && b.textContent.includes(want) });
+  if (card) { card.setAttribute("data-gossip-drama-card", id); card.tabIndex = -1; card.scrollIntoView({ block: "nearest" }); card.focus({ preventScroll: true }) }
+  return card
+ };
+ const openDrama = (g, id, sim) => {
+  const x = box().querySelector("[data-spx]"); if (x) x.click();   /* the spa's own close */
+  setTimeout(() => {
+   try {
+    if (g === "dramakg") { DKCAT = "all"; openDramaLog() } else { DZ_catG = DZ_tabG = "all"; DZ_catalog(sim) }
+    focusCard(g, id); setTimeout(() => { try { const c = focusCard(g, id); if (c) c.scrollIntoView({ block: "nearest" }) } catch (e) { fail(e) } }, 350)   /* once more: the sheet can be redrawn right after it opens */
+   } catch (e) { fail(e) }
+  }, 60)
+ };
+ document.addEventListener("change", ev => { try { const s = ev.target; if (s && s.matches && s.matches("[data-gp-grp]")) { const p = s.closest("[data-gosip]"); reset(p); tones(p) } } catch (e) { fail(e) } });
+ document.addEventListener("click", ev => {
+  try {
+   const t = ev.target.closest && ev.target.closest("[data-gosip] button"); if (!t) return;
+   const p = t.closest("[data-gosip]"), grp = p.querySelector("[data-gp-grp]").value;
+   if (t.dataset.gpTone) {
+    const tone = t.dataset.gpTone, list = GS[grp][tone]; if (!list) return;
+    const k = grp + "|" + tone; p._i = p._k === k ? (p._i + 1) % list.length : 0; p._k = k;
+    const turn = list[p._i], sim = simOf(), fu = follow(turn, sim);
+    p.querySelectorAll("[data-gp-tone]").forEach(b => b.setAttribute("aria-pressed", String(b === t)));
+    const st = p.querySelector("[data-gp-story]"); st.textContent = "Melur: “" + turn.t + "”" + (fu ? "\n\nMelur: “" + fu + "”" : "");
+    p.querySelector("[data-gp-reply]").textContent = "";
+    p.querySelector("[data-gp-react]").hidden = false;
+    const o = p.querySelector("[data-gp-open]"); o.hidden = !turn.id;
+    if (turn.id) { o.dataset.gpId = turn.id; o.dataset.gpG = turn.g; o.textContent = "📖 Buka " + title(turn) }
+    st.scrollIntoView({ block: "nearest" }); return
+   }
+   if (t.hasAttribute("data-gp-open")) { openDrama(t.dataset.gpG, t.dataset.gpId, simOf()); return }
+   if (t.dataset.gpR) { const r = p.querySelector("[data-gp-reply]"); r.textContent = "Melur: “" + REPLY[t.dataset.gpR] + "”"; r.scrollIntoView({ block: "nearest" }) }
+  } catch (e) { fail(e) }
+ });
+ if (!box()) throw new Error("hfspa"); new MutationObserver(inject).observe(box(), { childList: true, subtree: true });
+ HF.gosip = { GS, GRP, TONE, REPLY, follow, inject };
+} catch (e) { try { console.warn("RKHF §171", e); window.RKHF && (RKHF.err = (RKHF.err || 0) + 1) } catch (e2) { } }
+
+/* ---------- §172. 📣 Khabar Kampung (hf142, 26 Nov 2026; owner: the "Rumor Village" mechanic, the LIGHT version: no AI/LLM, pre-written Malay text tables only).
+   One khabar is let loose in the kampung (from the Melur panel in the spa, §171, or the 📣 Khabar button in the strip under the clock). Every game hour each holder may tell one other person (a family Sim or a neighbour or Melur; a few hops per hour at most) and each telling may twist ONE detail (tempat, masa, bilangan orang, nama) from a fixed table. A family Sim who hears a version goes to the place it names at the time it names (the game's own errand: enqueue + errOk, so a closed place or a Sim who is away simply means "terlepas"; nothing in the autonomy or the queue is replaced). Meeting a neighbour at the warung, kafe, taman or balai after an errand can also pass a khabar to the Sim.
+   Small and cheap: at most 3 khabar live at once (a 4th waits), at most 3 tellings per game hour, a poll every 3 s that does nothing unless the game hour changed, trail 10 lines, effects 6 lines, 2 game days of life then it fades into a one-line memory (max 3 kept). Mild effects only: a Sim who finds the true place at the true time gets "Puas hati" for 4 hours, a little social and +2 with the neighbour who told; a wrong place or a closed one costs a little fun (-3 / -2) and -1 with the teller. Nothing harsh: the five khabar are kuih, gotong-royong, layang-layang, kek, doa selamat.
+   Save: ONE optional field S.hfKhabar {v, last, L: live khabar, O: faded}, created on the first khabar only; an old save has none and nothing reads it until then. The panel is #hfkhabar (z 90, above the spa menu). Test hooks: RKHF.khabar.rng (replace Math.random), .release, .step, .spread, .goers. */
+try {
+ const HF = window.RKHF; if (!HF) throw new Error("RKHF");
+ const fail = e => { try { HF.err = (HF.err || 0) + 1; console.warn("RKHF §172", e) } catch (e2) { } };
+ const PL = [["Warung Mak Jah", "tehwarung"], ["Taman Tasik Harmoni", "piknik"], ["Kafe Kopi Senja", "kopi"], ["Balai Raya", "khidmat"]];
+ const MS = [["pukul 8 pagi", 8], ["tengah hari", 12], ["pukul 5 petang", 17], ["pukul 9 malam", 21]];
+ const BL = ["tiga orang", "lima orang", "dua puluh orang", "lima puluh orang", "satu kampung"];
+ const NMS = ["Mak Jah", "Pak Ali", "Mak Som", "Atuk Deraman", "Tok Ketua"];
+ const FL = { p: "tempat", m: "masa", b: "bilangan orang", n: "nama" };
+ const SEED = [
+  { ic: "🧁", ti: "Kuih percuma", tx: "{N} nak bagi kuih percuma di {P} {M}. Katanya {B} dah beratur.", tr: { n: 0, p: 0, m: 0, b: 1 } },
+  { ic: "🤝", ti: "Gotong-royong", tx: "{N} ajak gotong-royong cat pagar di {P} {M}. {B} dah setuju nak datang.", tr: { n: 4, p: 3, m: 0, b: 2 } },
+  { ic: "🪁", ti: "Layang-layang", tx: "{N} ajak berkelah dan main layang-layang di {P} {M}. {B} dah janji datang.", tr: { n: 3, p: 1, m: 2, b: 1 } },
+  { ic: "🍰", ti: "Kek separuh harga", tx: "{N} kata ada jualan kek separuh harga di {P} {M}. {B} dah tempah tempat.", tr: { n: 2, p: 2, m: 1, b: 0 } },
+  { ic: "🤲", ti: "Kenduri doa selamat", tx: "Ada kenduri doa selamat kecil di {P} {M}, {N} yang jemput. {B} dijemput.", tr: { n: 1, p: 0, m: 2, b: 2 } }
+ ];
+ const CFG = { max: 3, cap: 3, spread: .4, mut: .45, go: .85, chat: .4, life: 2880 };
+ const K = { rng: () => Math.random(), cfg: CFG };
+ const esc2 = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+ const st = (mk) => { if (!S.hfKhabar && mk) S.hfKhabar = { v: 1, last: Math.floor(S.t / 60), L: [], O: [], n: 0 }; return S.hfKhabar || null };
+ const pick = a => a[Math.floor(K.rng() * a.length) % a.length];
+ const poolKeys = () => {
+  const o = ["m:Melur"];
+  for (const s of S.sims || []) if (!isBaby(s) && !s.visitFrom) o.push("s:" + s.id);
+  for (const n of (S.nb || [])) { if (n.status === "neighbour" && nbDef(n.id)) o.push("n:" + n.id); if (o.length >= 14) break }
+  return o
+ };
+ const nameOf = k => { try { if (k === "m:Melur") return "Melur"; const [t, id] = [k[0], k.slice(2)]; if (t === "s") { const s = simById(+id); return s ? s.name : "Seseorang" } const d = nbDef(id); return d ? d.name : "Jiran" } catch (e) { return "Jiran" } };
+ const sent = (k, v, tr, hl) => SEED[k].tx.replace(/\{([NPMB])\}/g, (m0, c, off, all) => {
+  const f = c.toLowerCase(); let t = f === "n" ? NMS[v.n] : f === "p" ? PL[v.p][0] : f === "m" ? MS[v.m][0] : BL[v.b];
+  if (off === 0 || all.slice(off - 2, off) === ". ") t = t[0].toUpperCase() + t.slice(1);
+  return hl && tr && v[f] !== tr[f] ? `<mark>${esc2(t)}</mark>` : (hl ? esc2(t) : t)
+ });
+ const plain = (k, v) => sent(k, v, null, false);
+ const nextAt = h => { const d = Math.floor(S.t / 1440) * 1440 + h * 60; return d <= S.t + 30 ? d + 1440 : d };
+ const twist = v => {
+  const w = K.rng(), f = w < .3 ? "p" : w < .6 ? "m" : w < .8 ? "b" : "n", n = Object.assign({}, v), lim = { p: PL.length, m: MS.length, b: BL.length, n: NMS.length }[f];
+  let x = v[f];
+  if (f === "b") { x = Math.max(0, Math.min(lim - 1, v.b + (K.rng() < .7 ? 1 : -1) * (1 + (K.rng() < .3 ? 1 : 0)))); if (x === v.b) x = v.b >= lim - 1 ? v.b - 1 : v.b + 1 }
+  else x = (v[f] + 1 + Math.floor(K.rng() * (lim - 1))) % lim
+  n[f] = x; return [n, f]
+ };
+ const push = (a, x, mx) => { a.push(x); while (a.length > mx) a.shift() };
+ const note = (R, t) => push(R.X, t, 6);
+ const live = () => { const k = st(); return k ? k.L.filter(r => !r.done) : [] };
+ const fin = (k, R) => { R.done = true; push(k.O, `${SEED[R.k].ic} ${SEED[R.k].ti}: sampai ke ${Object.keys(R.H).length} orang, versi akhir "${plain(R.k, R.H[R.last])}"`, 3); k.L = k.L.filter(r => r !== R) };
+ const hear = (R, s, fromKey, v) => {
+  try {
+   if (s.needs) s.needs.social = Math.min(100, (s.needs.social || 0) + 2);
+   if (R.G.some(g => g.s === s.id) || K.rng() >= CFG.go) return;
+   R.G.push({ s: s.id, at: nextAt(MS[v.m][1]), p: v.p, m: v.m, f: fromKey, st: "tunggu" });
+   toast(`📣 ${s.name} dengar khabar daripada ${nameOf(fromKey)}: ${plain(R.k, v)}`)
+  } catch (e) { fail(e) }
+ };
+ K.spread = (R, from, to, force) => {
+  let v = Object.assign({}, R.H[from]), ch = "";
+  if (force || K.rng() < CFG.mut) {
+   let r; if (force) { const lim = { p: PL.length, m: MS.length, b: BL.length, n: NMS.length }[force]; r = [Object.assign({}, v, { [force]: (v[force] + 1) % lim }), force] } else r = twist(v);
+   v = r[0]; ch = r[1]
+  }
+  R.H[to] = v; R.last = to;
+  push(R.T, [nameOf(from), nameOf(to), ch, ch ? FL[ch] + ": " + (ch === "p" ? PL[v.p][0] : ch === "m" ? MS[v.m][0] : ch === "b" ? BL[v.b] : NMS[v.n]) : ""], 10);
+  if (to[0] === "s") { const s = simById(+to.slice(2)); if (s) hear(R, s, from, v) }
+  return ch
+ };
+ K.release = (k, srcKey) => {
+  const ks = st(true);
+  if (live().length >= CFG.max) return null;
+  const key = srcKey || "s:" + (act() || S.sims[0]).id, R = { id: ++ks.n, k, t0: S.t, ends: S.t + CFG.life, H: { [key]: Object.assign({}, SEED[k].tr) }, last: key, T: [], G: [], X: [], done: false };
+  ks.L.push(R);
+  const others = poolKeys().filter(x => x !== key && x[0] !== "s"); if (others.length) K.spread(R, key, pick(others));
+  return R
+ };
+ K.step = (force) => {
+  const ks = st(); if (!ks) return 0; let n = 0;
+  for (const R of ks.L.slice()) {
+   if (R.done) continue;
+   if (S.t > R.ends) { fin(ks, R); continue }
+   const pool = poolKeys();
+   for (const h of Object.keys(R.H)) {
+    if (n >= CFG.cap) break;
+    const rest = pool.filter(x => !R.H[x]); if (!rest.length) break;
+    if (force || K.rng() < CFG.spread) { K.spread(R, h, pick(rest)); n++ }
+   }
+   if (!pool.some(x => !R.H[x]) && R.G.every(g => g.st !== "tunggu")) fin(ks, R)
+  }
+  return n
+ };
+ K.goers = () => {
+  const ks = st(); if (!ks) return 0; let n = 0;
+  for (const R of ks.L) for (const g of R.G) {
+   if (g.st !== "tunggu" || S.t < g.at) continue;
+   const s = simById(g.s), pl = PL[g.p], a = pl[1], right = g.p === SEED[R.k].tr.p && g.m === SEED[R.k].tr.m, who = s ? s.name : "Seseorang", tp = `${pl[0]} ${MS[g.m][0]}`;
+   if (!s || !S.sims.includes(s) || S.t > g.at + 180) { g.st = "lepas"; note(R, `${who} tak sempat ke ${tp}.`); n++; continue }
+   if (s.away || isBaby(s) || S.visiting || (s.queue || []).length >= 3 || (HF.spaOn)) continue;
+   let ok = false; try { ok = !!(ERR[a] && errOk(s, a)) } catch (e) { }
+   if (!ok) { g.st = "tutup"; note(R, `${who} nak ke ${tp}, tapi tempat itu tutup atau tak sesuai sekarang. Terlepas.`); try { if (s.needs) s.needs.fun = Math.max(0, s.needs.fun - 2) } catch (e) { } n++; continue }
+   try { enqueue(s, { type: "errand", act: a }) } catch (e) { fail(e); continue }
+   const tell = g.f && g.f[0] === "n" ? g.f.slice(2) : null;
+   if (right) {
+    g.st = "betul"; s.buff = Math.max(s.buff || 0, S.t + 240); try { s.needs.social = Math.min(100, s.needs.social + 4) } catch (e) { }
+    if (tell) try { withRel(s.id, () => { const x = nbSt(tell); if (x) x.rel = clamp(x.rel + 2, -100, 100) }) } catch (e) { }
+    note(R, `${who} ke ${tp}: betul! Puas hati.`)
+   } else {
+    g.st = "salah"; try { s.needs.fun = Math.max(0, s.needs.fun - 3) } catch (e) { }
+    if (tell) try { withRel(s.id, () => { const x = nbSt(tell); if (x) x.rel = clamp(x.rel - 1, -100, 100) }) } catch (e) { }
+    note(R, `${who} ke ${tp}, tapi khabar itu dah terpusing. Yang betul: ${PL[SEED[R.k].tr.p][0]} ${MS[SEED[R.k].tr.m][0]}.`)
+   }
+   n++
+  }
+  return n
+ };
+ /* every game hour */
+ const poll = () => {
+  try {
+   if (typeof S === "undefined" || !S || !S.sims || S.over) return; const ks = st(); if (!ks) return;
+   const h = Math.floor(S.t / 60); if (h !== ks.last) { ks.last = h; K.step(); if (P && !P.hidden) draw() }
+   if (K.goers() && P && !P.hidden) draw()
+  } catch (e) { fail(e) }
+ };
+ setInterval(poll, 3000);
+ /* a chat with a neighbour after an errand at a gathering place */
+ { const er = errandReturn; errandReturn = function (s2) {
+   const e = s2 && s2.errand, r = er.apply(this, arguments);
+   try {
+    const ks = st();
+    if (ks && s2 && S.sims.includes(s2) && ["tehwarung", "piknik", "kopi", "khidmat", "nlwarung", "lepak"].includes(e) && K.rng() < CFG.chat) {
+     const L = live().filter(R => !R.G.some(g => g.s === s2.id)); if (L.length) { const R = pick(L), f = pick(Object.keys(R.H)); if (f !== "s:" + s2.id) { const v = R.H[f]; R.H["s:" + s2.id] = Object.assign({}, v); push(R.T, [nameOf(f), s2.name, "", "bertemu di tempat lepak"], 10); hear(R, s2, f, v) } }
+    }
+   } catch (x) { fail(x) }
+   return r
+  } }
+ /* panel */
+ document.head.insertAdjacentHTML("beforeend", `<style>
+#hfkhabar{position:fixed;inset:0;z-index:90;display:flex;justify-content:center;align-items:flex-start;background:rgba(74,40,20,.55);overflow:auto;touch-action:manipulation}
+#hfkhabar[hidden]{display:none}
+#hfkhabar .kh{box-sizing:border-box;width:min(560px,100%);min-height:100%;padding:14px 16px 28px;background:#fff7ea;color:#4a2c18;font:600 14px/1.5 system-ui}
+#hfkhabar .kh h3{display:flex;align-items:center;gap:8px;margin:0 0 4px;font:800 19px system-ui;color:#9a4a1a}
+#hfkhabar .kh h3 button{margin-left:auto;min-width:44px;min-height:44px;border:1px solid #e3c9a6;border-radius:50%;background:#fff;color:#7a4018;font:800 16px system-ui}
+#hfkhabar .kh h4{margin:16px 0 6px;font:800 14px system-ui;color:#8a4a20}
+#hfkhabar .kh p{margin:4px 0}
+#hfkhabar .kh .sd{display:grid;gap:6px}
+#hfkhabar .kh .sd button{min-height:48px;text-align:left;border:1px solid #e3c9a6;border-radius:14px;background:#fffdf7;color:#4a2c18;padding:8px 12px;font:700 13.5px/1.4 system-ui}
+#hfkhabar .kh .sd button[disabled]{opacity:.5}
+#hfkhabar .kh .sd button b{display:block;color:#9a4a1a}
+#hfkhabar .kh .cd{margin:8px 0;padding:10px 12px;border:1px solid #ecd2ae;border-radius:16px;background:#fff;overflow-wrap:anywhere}
+#hfkhabar .kh .cd b.t{color:#9a4a1a;font-size:15px}
+#hfkhabar .kh .cd .vs{margin:6px 0;padding:7px 10px;border-radius:10px;background:#fdf0dc}
+#hfkhabar .kh .cd .vs.nw{background:#fff0e4;border-left:4px solid #d9742c}
+#hfkhabar mark{background:#ffd98a;color:#5a2c08;border-radius:4px;padding:0 3px}
+#hfkhabar .kh ol,#hfkhabar .kh ul{margin:4px 0 0;padding-left:20px}
+#hfkhabar .kh li{margin:2px 0;font-weight:600}
+#hfkhabar .kh li i{font-style:normal;color:#b0561c;font-weight:800}
+#hfkhabar .kh small{color:#8a6a4a;font-weight:600}
+#hfkhabar .kh .mt{color:#8a6a4a}
+#hfkhabar button:focus-visible{outline:3px solid #d9742c;outline-offset:2px}
+#hfkhbtn{white-space:nowrap}
+#hfspa .gosip .khb{display:block;width:100%;min-height:44px;margin-top:10px;border:1px solid #c2306a;border-radius:12px;background:#fff;color:#a3285a;font:800 13.5px system-ui;padding:6px 12px}
+</style>`);
+ document.body.insertAdjacentHTML("beforeend", `<div id="hfkhabar" hidden role="dialog" aria-modal="true" aria-label="Khabar Kampung"><div class="kh"></div></div>`);
+ const P = document.getElementById("hfkhabar"); let SRC = null;
+ const draw = () => {
+  try {
+   const ks = st(), L = ks ? ks.L.filter(r => !r.done) : [], full = L.length >= CFG.max, src = SRC || ("s:" + (act() || S.sims[0]).id), sn = nameOf(src);
+   let h = `<h3>📣 Khabar Kampung<button type="button" data-kh-x aria-label="Tutup">✕</button></h3><p class="mt">Satu khabar dilepaskan, jiran menyebarnya dari mulut ke mulut, dan di tengah jalan ia boleh berubah: tempat, masa, bilangan orang atau nama.</p>`;
+   h += `<h4>Sebar khabar${SRC ? "" : ` (oleh ${esc2(sn)})`}</h4>`;
+   h += full ? `<p>Sudah ${CFG.max} khabar berlegar. Tunggu ada yang reda dahulu.</p>` : `<p><small>Dilepaskan oleh ${esc2(sn)}. Muat sehingga ${CFG.max} khabar serentak.</small></p>`;
+   h += `<div class="sd">${SEED.map((s, i) => `<button type="button" data-kh-s="${i}"${full ? " disabled" : ""}><b>${s.ic} ${esc2(s.ti)}</b>${esc2(plain(i, s.tr))}</button>`).join("")}</div>`;
+   h += `<h4>Khabar yang berlegar (${L.length}/${CFG.max})</h4>`;
+   if (!L.length) h += `<p class="mt">Belum ada khabar. Pilih satu di atas.</p>`;
+   for (const R of L) {
+    const tr = SEED[R.k].tr, cur = R.H[R.last], n = Object.keys(R.H).length;
+    const diff = ["p", "m", "b", "n"].some(f => cur[f] !== tr[f]);
+    h += `<div class="cd" data-kh-r="${R.id}"><b class="t">${SEED[R.k].ic} ${esc2(SEED[R.k].ti)}</b> <small>· sampai ke ${n} orang</small>`;
+    h += `<div class="vs"><small>Asal:</small> ${esc2(plain(R.k, tr))}</div><div class="vs nw"><small>${diff ? "Versi terkini (sudah berubah):" : "Versi terkini (belum berubah):"}</small> ${sent(R.k, cur, tr, true)}</div>`;
+    h += `<small>Jejak (siapa kepada siapa):</small><ol>${R.T.map(t => `<li>${esc2(t[0])} → ${esc2(t[1])}${t[2] ? ` <i>berubah ${esc2(t[3])}</i>` : t[3] ? ` <small>(${esc2(t[3])})</small>` : ""}</li>`).join("")}</ol>`;
+    const gs = R.G.filter(g => g.st === "tunggu").map(g => { const s = simById(g.s); return s ? `${esc2(s.name)} akan ke ${esc2(PL[g.p][0])} ${esc2(MS[g.m][0])}` : "" }).filter(Boolean);
+    if (gs.length) h += `<p><small>Dalam perjalanan: </small>${gs.join("; ")}</p>`;
+    if (R.X.length) h += `<small>Kesan:</small><ul>${R.X.map(x => `<li>${esc2(x)}</li>`).join("")}</ul>`;
+    h += `</div>`
+   }
+   if (ks && ks.O.length) h += `<h4>Sudah reda</h4><ul>${ks.O.map(x => `<li>${esc2(x)}</li>`).join("")}</ul>`;
+   P.querySelector(".kh").innerHTML = h
+  } catch (e) { fail(e) }
+ };
+ const open = (src) => { SRC = src || null; P.hidden = false; draw(); const c = P.querySelector("[data-kh-x]"); if (c) c.focus(); P.scrollTop = 0 };
+ const close = () => { P.hidden = true; SRC = null };
+ P.addEventListener("click", ev => {
+  try {
+   const t = ev.target.closest && ev.target.closest("button"); if (!t) { if (ev.target === P) close(); return }
+   if (t.hasAttribute("data-kh-x")) { close(); return }
+   if (t.dataset.khS != null) { const R = K.release(+t.dataset.khS, SRC); if (R) { try { sfx("click") } catch (e) { } } draw(); const c = P.querySelector(".cd:last-of-type"); if (c) c.scrollIntoView({ block: "nearest" }) }
+  } catch (e) { fail(e) }
+ });
+ document.addEventListener("keydown", ev => { if (ev.key === "Escape" && !P.hidden) close() });
+ document.addEventListener("click", ev => { try { const t = ev.target.closest && ev.target.closest("[data-kh-melur]"); if (t) open("m:Melur"); else if (ev.target.closest && ev.target.closest("#hfkhbtn")) open(null) } catch (e) { fail(e) } });
+ /* entries: a button in the strip under the clock, and one in the Melur panel (§171) */
+ const ensure = () => {
+  try {
+   if (!document.getElementById("hfkhbtn")) { const tb = document.getElementById("treebtn"), w = tb && tb.closest(".floors"); if (w) w.insertAdjacentHTML("afterend", `<div class="floors"><button id="hfkhbtn" type="button" aria-label="Khabar Kampung" aria-pressed="false">📣 Khabar</button></div>`) }
+   const b = document.getElementById("hfspa"), g = b && b.querySelector("[data-gosip]");
+   if (g && !g.querySelector("[data-kh-melur]")) g.insertAdjacentHTML("beforeend", `<button type="button" class="khb" data-kh-melur>📣 Sebar khabar kampung (Melur)</button>`)
+  } catch (e) { fail(e) }
+ };
+ setInterval(ensure, 1500); ensure();
+ { const b = document.getElementById("hfspa"); if (b) new MutationObserver(ensure).observe(b, { childList: true, subtree: true }) }
+ Object.assign(K, { SEED, PL, MS, BL, NMS, poolKeys, nameOf, plain, sent, open, close, draw, poll, st });
+ HF.khabar = K;
+} catch (e) { try { console.warn("RKHF §172", e); window.RKHF && (RKHF.err = (RKHF.err || 0) + 1) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
