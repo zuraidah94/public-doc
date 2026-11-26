@@ -22634,6 +22634,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf141", "26 Nov 2026", ["💬 Borak percuma dengan Melur di Spa Ratu Cantik: pilih cerita hot, baik atau buruk tentang Bandar Harmoni, Kampung Harmoni, golongan diraja dan selebriti."]],
    ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
    ["hf139", "24 Nov 2026", ["⚡ Lebih pantas: Bina dan Keluarga kini dibuka hampir serta-merta (panel disimpan, kad dilukis ikut paparan, kemas kini senyap bila ada perubahan); Peta menunjukkan kepala dahulu dan butiran menyusul", "⏳ Skrin pemuat: panel berat disediakan dahulu (butang Langkau tersedia)"]],
    ["hf138", "24 Nov 2026", ["🔊 Bunyi: butang Uji bunyi dan nasihat suis senyap dalam Tetapan; pilihan Bunyi walau suis senyap; bunyi sedikit lebih kuat", "⚡ Peta: ketik lot, rumah atau tempat kini terus memberi respons, butiran penuh menyusul"]],
@@ -30803,6 +30804,14 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
 #hfspa .res .pt img,#hfspa .res .pt svg{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
 #hfspa .res .pt .av{display:block;width:100%;height:100%}
 #hfspa .res h3{margin:0;font:800 15px system-ui;color:#a3285a}#hfspa .res p{margin:2px 0 0;font:500 12px/1.35 system-ui}
+#hfspa .gosip{margin:8px 0;padding:10px 12px;border:1px solid #e9c2d2;border-radius:14px;background:#fffdf9;color:#5a3442;font:600 13px/1.4 system-ui}
+#hfspa .gosip summary{padding:6px 0;cursor:pointer;color:#a3285a;font-weight:800}
+#hfspa .gosip label{display:grid;gap:4px;margin:8px 0}
+#hfspa .gosip select,#hfspa .gosip button{min-height:44px;border:1px solid #e9c2d2;border-radius:10px;background:#fff;color:#5a3442;padding:5px 8px;font:inherit}
+#hfspa .gosip .topik{display:flex;gap:5px;flex-wrap:wrap}
+#hfspa .gosip .topik button{flex:1 0 auto}
+#hfspa .gosip [role=status]{margin:8px 0 0;overflow-wrap:anywhere}
+#hfspa .gosip [role=status]:empty{margin:0}
 #hfspa .ld{flex:1;display:grid;place-items:center;font:700 14px system-ui;color:#8a5a6c}
 @media (min-width:700px){#hfspa .sp{border-radius:0;box-shadow:0 0 40px rgba(0,0,0,.25)}}
 </style>`);
@@ -31137,12 +31146,42 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
    };
    go()
   }
+  const gossip = {
+   bandar: {
+    hot: "Pak Ali tutup kedai awal semalam. Rupanya dia tengah berlatih untuk pertandingan karaoke Bandar Harmoni. Lagu pilihan pun dirahsiakan!",
+    baik: "Pak Ali tinggalkan satu bakul barang dapur di kaunter untuk jiran yang sedang susah. Siap pesan, ambil saja yang perlu.",
+    buruk: "Ada pelanggan di kedai Pak Ali potong barisan. Bila ditegur, dia buat-buat sibuk tengok telefon."
+   },
+   kampung: {
+    hot: "Mak Jah kata ada orang tempah seluruh warung untuk majlis kejutan. Satu kampung dah cuba teka siapa tetamunya.",
+    baik: "Mak Jah bungkus nasi lemak lebih untuk orang yang datang bergotong-royong bersihkan balai kampung.",
+    buruk: "Mak Jah mengeluh. Ada orang janji nak tolong kemas selepas kenduri, tapi hilang sebaik saja pinggan kena basuh."
+   },
+   diraja: {
+    hot: "Orang istana kata Tengku Amir sedang siapkan hadiah kejutan untuk satu majlis. Kotaknya besar, tapi semua yang nampak buat muka selamba.",
+    baik: "Katanya Tengku Amir luangkan masa dengar persembahan murid sekolah sampai lagu terakhir. Budak-budak tu seronok betul.",
+    buruk: "Katanya rombongan istana lambat sampai ke satu majlis. Sukarelawan dah beratur lama dan makanan pun sempat sejuk."
+   },
+   selebriti: {
+    hot: "Ada dua bintang Studio Harmoni keluar dari raptai dengan jaket sedondon. Peminat dah teka mereka tengah rakam duet rahsia.",
+    baik: "Seorang pelakon senior di Studio Harmoni tinggal lepas syif untuk bantu pelakon tambahan hafal dialog sebelum penggambaran esok.",
+    buruk: "Dengar cerita seorang bintang drama asyik tengok telefon masa latihan. Kru terpaksa ulang babak sampai tiga kali."
+   }
+  };
+  const gossipMenu = `<details class="gosip">
+<summary>💬 Gosip dengan Melur · Percuma</summary>
+<label>Siapa nak diborakkan?
+<select data-sp-gossip-group><option value="bandar">Bandar Harmoni</option><option value="kampung">Kampung Harmoni</option><option value="diraja">Golongan diraja</option><option value="selebriti">Selebriti</option></select></label>
+<div class="topik"><button type="button" data-sp-gossip="hot">Cerita hot</button><button type="button" data-sp-gossip="baik">Cerita baik</button><button type="button" data-sp-gossip="buruk">Cerita buruk</button></div>
+<p role="status" data-sp-gossip-story></p>
+</details>`;
   /* the menu */
   const menu = function () {
    const b = box(), x = G.s; b.classList.remove("play"); G.ph = "menu";
    b.querySelector(".sp").innerHTML = `<div class="hd"><button type="button" class="x" data-spx aria-label="Tutup">✕</button><b>🧖‍♀️ Spa Ratu Cantik</b><span class="rm"></span></div>
 <div class="bn"><canvas></canvas><div class="bb"></div></div>
 <div class="mn"><h4>Rawatan untuk ${esc(x.name)}</h4>${Object.keys(TR).map(k => { const T = TR[k], [i0] = [T.tray[k === "i" ? 1 : k === "k" ? 2 : 0]]; return `<button type="button" class="spc" data-spk="${k}" ${S.money < T.cost ? "disabled" : ""}><span class="ic" style="${icoCss(i0, 52)}"></span><span><b>${T.ic} ${T.nm}</b><small>${T.S.length} langkah: ${esc(T.sub)} · ${T.min} min</small></span><span class="rp">RM ${T.cost}</span></button>` }).join("")}
+${gossipMenu}
 <p class="note">${S.money < 30 ? "💸 Duit tak cukup untuk rawatan hari ini. " : ""}Bayar di kaunter bila pilih rawatan. Sentuh & leret dengan jari atau tetikus; boleh langkau bila-bila.</p></div>
 <div class="ft"><button type="button" data-spx>Lain kali je</button></div>`;
    say(G.n ? "Ada lagi? Pilih rawatan seterusnya." : SAY0); money(); banner(); G.cv = null
@@ -31153,6 +31192,9 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
    try { sfx("buy") } catch (e) { }
    begin(k)
   }
+  const clearGossip = ev => {
+   if (ev.target.matches("[data-sp-gossip-group]")) ev.target.closest(".gosip").querySelector("[data-sp-gossip-story]").textContent = "";
+  };
   let wired = null;
   const wire = function () {
    const b = box(), c = b.querySelector(".wk canvas"); if (!c || c._w) return; c._w = 1;
@@ -31165,6 +31207,12 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
    try {
     const t = ev.target.closest && ev.target.closest("button"); if (!t || !G) return;
     if (t.hasAttribute("data-spx")) { if (G.ph === "play") { skipAll(); return } close(); return }
+    if (t.dataset.spGossip && G.ph === "menu") {
+     const panel = t.closest(".gosip");
+     const group = panel.querySelector("[data-sp-gossip-group]").value;
+     panel.querySelector("[data-sp-gossip-story]").textContent = "Melur: “" + gossip[group][t.dataset.spGossip] + "”";
+     return
+    }
     if (t.dataset.spk) { choose(t.dataset.spk); return }
     if (t.dataset.spt) { const s = step(); G.tool = t.dataset.spt; if (s && G.tool !== s.t) say(`Bukan yang itu — cuba ${TL[s.t][1].toLowerCase()}.`); else if (s) say(s.say); hud(); paint(); return }
     if (t.hasAttribute("data-spskip")) { if (G.ph === "play" && !G.wait && !G.rest) { G.tool = step().t; finishStep(true) } return }
@@ -31183,7 +31231,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
    b.hidden = false; b.classList.remove("play");
    b.querySelector(".sp").innerHTML = `<div class="hd"><button type="button" class="x" data-spx aria-label="Tutup">✕</button><b>🧖‍♀️ Spa Ratu Cantik</b><span class="rm"></span></div><div class="ld">🌸 Menyediakan bilik spa…</div>`;
    money();
-   if (!wired) { wired = 1; b.addEventListener("click", onClick); document.addEventListener("keydown", onKey); addEventListener("resize", onResize) }
+   if (!wired) { wired = 1; b.addEventListener("click", onClick); b.addEventListener("change", clearGossip); document.addEventListener("keydown", onKey); addEventListener("resize", onResize) }
    load().then(im => {
     try {
      if (!G || G.s !== s2) return;
