@@ -4,12 +4,9 @@ Public documents and projects.
 
 ## Play Rumah Kita
 
-- [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
-- [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
-- [Edisi Lukisan Tangan HF](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/): test copy with Sims 4 / inZOI-style camera, build mode and mood reasons
-- [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
+- [Edisi Lukisan Tangan HF](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/) — Sims 4 / inZOI-style camera, build mode and mood reasons
 
-New to the game? Read [how to play](rumah-kita/README.md#how-to-play): which version to pick, the controls, and how saving works.
+New to the game? Read [how to play](rumah-kita/README.md#how-to-play): the controls and how saving works.
 
 ## Claude Prompt Book
 
@@ -33,4 +30,4 @@ Scan to open the live app. Print [`qr-code.png`](inspection-app/qr-code.png) or 
 | --- | --- |
 | [`prompt-book/`](prompt-book/) | Claude Prompt Book: prompts for video, LinkedIn, ISO compliance, reports, production, training, writing, career and Rumah Kita. |
 | [`inspection-app/`](inspection-app/) | Workplace Inspection app: HACCP, workplace safety and ISO 14001 environmental inspections, saving to Google Sheets through Apps Script. |
-| [`rumah-kita/`](rumah-kita/) | Rumah Kita, a Malaysian family life-sim browser game: every version, art tools and design documents. |
+| [`rumah-kita/`](rumah-kita/) | Rumah Kita, a Malaysian family life-sim browser game: the HF edition, art tools and design documents. |

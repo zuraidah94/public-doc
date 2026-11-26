@@ -2,34 +2,20 @@
 
 Rumah Kita is a Malaysian family life-sim that plays in a web browser. All in-game text is in Bahasa Melayu.
 
-This folder collects every version of the game, plus the art tools and design documents, copied from the Claude artifacts where they were built (October 2026).
+This folder contains the HF edition, art tools and design documents. Earlier editions are archived in the [Claude repository](https://github.com/zuraidah94/Claude/tree/65a55e3b895de1c43c751391361be4b9cfc68979/rumah-kita).
 
 ## Play online
 
-- [Edisi Episod (latest)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/)
-- [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/)
-- [Edisi Lukisan Tangan HF (versi rasmi, hf127)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/)
-- [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/)
+- [Edisi Lukisan Tangan HF (versi rasmi)](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/)
 
 ## How to play
-
-### Which version to pick
-
-All three run the same family life-sim; they differ in art and in how stories are shown.
-
-| Version | What's different | Pick it if |
-| --- | --- | --- |
-| [Edisi Episod](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-episod/) | Hand-drawn art, and every 🎭 drama plays as a visual-novel episode with painted backdrops and a cast. Serial stories release a new episode every few game days. | You want the newest and fullest game. |
-| [Edisi Lukisan Tangan](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan/) | Same hand-drawn art, but dramas open as a classic story sheet with painted key art. | You prefer quick, text-first dramas. |
-| [Edisi Lukisan Tangan HF](https://zuraidah94.github.io/public-doc/rumah-kita/edisi-lukisan-tangan-hf/) | A test copy of Edisi Lukisan Tangan with a Sims 4 / inZOI-style live mode: free camera, wall modes, better build mode, mood reasons, an on-screen action queue, and sharper paintings. | You want to try the new controls. See [below](#edisi-lukisan-tangan-hf-sims-style-controls). |
-| [Original](https://zuraidah94.github.io/public-doc/rumah-kita/asal/) | The first isometric build with simpler art. Older, so some newer features are missing. | You want to see where the game started. |
 
 Works on phone and computer. On a phone, "ketik" means tap; on a computer, click.
 
 ### Start a game
 
-1. Open a link above. The first load takes a few seconds (the game file is about 5 MB).
-2. On the Edisi versions, tap **Ketik untuk mula** on the title screen. The original goes straight in.
+1. Open the play link above. The first load may take a few seconds.
+2. Tap **Ketik untuk mula** on the title screen.
 3. You start at **06:30, Day 1** with a family in **Taman Harmoni**.
 4. **Tap a family member** to control them. Their name card appears under the clock.
 5. **Tap furniture or the floor** to give an order: sleep, cook, bathe, or walk there. **Tap another person** to chat, joke or flirt.
@@ -124,18 +110,9 @@ Nota: mod orang 3D lama sudah dibuang dari salinan ini; permainan guna orang 2D 
 
 This copy shares its save with the other versions (same browser, same site). Furniture you turn here also shows turned in the other Edisi versions.
 
-## Game versions
+## Game folder
 
-Open the `index.html` in any folder to play. Newest first.
-
-| Folder | Version | Last updated | Notes |
-| --- | --- | --- | --- |
-| [`edisi-episod/`](edisi-episod/) | Rumah Kita Edisi Episod | 22 Oct 2026 | Latest full game. Edisi Lukisan Tangan plus episode backdrops (`img/ep/`) and the episode cast sheet. |
-| [`edisi-lukisan-tangan-hf/`](edisi-lukisan-tangan-hf/) | Rumah Kita — Edisi Lukisan Tangan (HF) | 23 Oct 2026 | Test copy of Edisi Lukisan Tangan: Sims-style live mode, sharpened paintings and cut-out portraits. The new code is one marked block near the end of `game.js` (search for `Edisi Lukisan Tangan HF`). |
-| [`edisi-lukisan-tangan/`](edisi-lukisan-tangan/) | Rumah Kita — Edisi Lukisan Tangan | 22 Oct 2026 | Full game with hand-drawn art: houses, scenes, drama cards, families, maps, UI. |
-| [`episod/`](episod/) | Rumah Kita Episod | 22 Oct 2026 | Rumah Kita 2.0 prototype (PixiJS) with Nadia's 12 portrait expressions. |
-| [`gerbang-1/`](gerbang-1/) | Rumah Kita 2.0 Gerbang 1 | 19 Oct 2026 | First Rumah Kita 2.0 milestone (PixiJS): furniture atlas, floors and Nadia's poses. |
-| [`asal/`](asal/) | Rumah Kita (original) | 18 Oct 2026 | The original isometric game, before the hand-drawn art. |
+Open [the HF edition](edisi-lukisan-tangan-hf/) to find the game files and artwork.
 
 ## Tools
 
@@ -154,11 +131,11 @@ Open the `index.html` in any folder to play. Newest first.
 
 ## Playing outside Claude
 
-The games run from any web server, including GitHub Pages (Settings → Pages → deploy from the `main` branch). Opening `index.html` straight from disk may block some images, so a server is the safer choice.
+The game runs from a web server, including GitHub Pages (Settings → Pages → deploy from the `main` branch). Opening `index.html` straight from disk may block some images, so a server is the safer choice.
 
 A few features need Claude's artifact runtime and are switched off elsewhere:
 
 - **Cloud save** (☁️ Save to cloud / Load from cloud). Saves still work in the browser's local storage.
 - **Downloading generated images** (kad raya, salasilah poster, konvokesyen photo). The game asks you to take a screenshot instead.
 
-`episod/` and `gerbang-1/` load PixiJS from the internet, and `gerbang-1/` and `alat/pelukis/` load Google Fonts, so they need a connection.
+`alat/pelukis/` loads Google Fonts from the internet.
