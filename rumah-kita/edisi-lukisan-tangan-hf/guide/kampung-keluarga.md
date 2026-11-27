@@ -14,6 +14,8 @@ Pilih **Pasang Bangku Rehat**. Padankan kaki serong ke kiri dan kaki tegak ke ka
 
 ![Kemajuan pembaikan taman permainan dan pilihan sumbangan](projek-kampung.png)
 
+Untuk projek kebun, buka **Tanam Kebun Komuniti**. Pilih benih cili, serai atau pandan, kemudian tanam dan siram. Siraman pertama bagi setiap petak menyumbang 8 mata jika projek masih berjalan. Petik tanaman dua hari selepas disiram, apabila kebun dibuka, untuk menambah bekalan memasak.
+
 ## Janji Keluarga
 
 Pilih aktiviti, hari, jam dan ahli keluarga. Semak pertindihan jadual kerja atau sekolah sebelum menekan **Buat janji**.
