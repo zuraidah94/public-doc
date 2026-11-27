@@ -43683,19 +43683,92 @@ try {
  const face = sim => `<span class="kf-face" data-kf-face="${sim.id}" aria-hidden="true">${avatar(sim)}</span>`;
  let portraitTimer;
  let page = "project", edit = null, returnTo = null;
+ const fenceColours = {
+  green: ["Hijau daun", "#52784d"],
+  blue: ["Biru laut", "#437d8f"],
+  red: ["Merah bata", "#a85540"]
+ };
+ const plankCount = 8;
+ let painting = false, paintPointer = null, paintDirty = false;
+ const fence = p => p.fence || (p.fence = { colour: "green", boards: 0 });
+ const painted = (f, i) => !!(f.boards & (1 << i));
+ const countBoards = f => Array.from({ length: plankCount }, (_, i) => painted(f, i)).filter(Boolean).length;
+ const coat = f => (fenceColours[f.colour] || fenceColours.green)[1];
+ const fenceArt = (f, interactive) => `<div class="kf-fence" style="--kf-paint:${coat(f)}"${interactive ? ' data-kf-fence role="group" aria-label="Papan pagar"' : ' aria-hidden="true"'}>
+  ${Array.from({ length: plankCount }, (_, i) => {
+   const done = painted(f, i);
+   return interactive ?
+    `<button type="button" data-kf-plank="${i}" aria-pressed="${done}" aria-label="Papan ${i + 1}"><span aria-hidden="true">${done ? "✓" : ""}</span></button>` :
+    `<span class="kf-plank" data-painted="${done}"></span>`;
+  }).join("")}</div>`;
+ function fenceView(p) {
+  const f = fence(p);
+  const n = countBoards(f);
+  return `<div class="kf-paint-tools">
+   <div class="acts" role="group" aria-label="Warna cat">${Object.entries(fenceColours).map(([id, [name, colour]]) =>
+    `<button type="button" class="btn" data-kf="colour-${id}" aria-pressed="${id === f.colour}"><span class="kf-swatch" aria-hidden="true" style="background:${colour}"></span>${name}</button>`).join("")}</div>
+   <p>Ketik atau leret merentasi papan. Papan bertanda ✓ sudah dicat.</p>
+   ${fenceArt(f, true)}
+   <p class="kf-paint-result" data-kf-paint-status role="status">${fenceStatus(f, n)}</p>
+   ${button("paint-back", "Kembali ke projek")}
+  </div>`;
+ }
+ function fenceStatus(f, count) {
+  return count === plankCount ? "Pagar siap dicat!" : `${count} daripada ${plankCount} papan siap. Boleh sambung bila-bila masa.`;
+ }
+ function paintBoard(board) {
+  const p = project();
+  if (!painting || p?.kind !== "play" || S.visiting || !board) return;
+  const f = fence(p);
+  const i = Number(board.dataset.kfPlank);
+  if (painted(f, i)) return;
+  f.boards |= 1 << i;
+  paintDirty = true;
+  board.setAttribute("aria-pressed", "true");
+  board.firstElementChild.textContent = "✓";
+  const count = countBoards(f);
+  dialog.querySelector("[data-kf-paint-status]").textContent = fenceStatus(f, count);
+  sfx("tap");
+  if (count === plankCount) {
+   if (!p.done) progress(p, 25);
+   diary("Pagar taman permainan siap dicat " + fenceColours[f.colour][0].toLowerCase() + ".");
+   flushPaint();
+  }
+ }
+ function flushPaint() {
+  paintPointer = null;
+  if (!paintDirty) return;
+  paintDirty = false;
+  save();
+ }
+ dialog.addEventListener("pointerdown", event => {
+  const board = event.target.closest("[data-kf-plank]");
+  if (!board || event.button !== 0 || !event.isPrimary) return;
+  paintPointer = event.pointerId;
+  paintBoard(board);
+ });
+ dialog.addEventListener("pointermove", event => {
+  if (event.pointerId !== paintPointer) return;
+  paintBoard(document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-kf-plank]"));
+ });
+ window.addEventListener("pointerup", event => { if (event.pointerId === paintPointer) flushPaint() });
+ window.addEventListener("pointercancel", event => { if (event.pointerId === paintPointer) flushPaint() });
+ window.addEventListener("blur", flushPaint);
  function projectView() {
   const p = project();
   if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>
    <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)}</div>`;
+  const paintButton = p.kind === "play" ? button("paint", p.fence?.boards ? "Sambung cat pagar" : "Cat Pagar Padang") : "";
   if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>
    <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
-   ${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")}`;
+   ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton}</div>`;
   return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>
    <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
    <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
    <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
    ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
-   ${button("cash", "Sumbang RM 40", p.cash)}</div>`;
+   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton}</div>`;
  }
  function plansView() {
   const h = household(), p = edit;
@@ -43742,16 +43815,18 @@ try {
  function render() {
   const me = act();
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
   if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
+  flushPaint();
+  painting = false;
   page = next;
   edit = null;
   returnTo = source || document.activeElement;
@@ -43790,6 +43865,7 @@ try {
  dialog.addEventListener("input", previewConflicts);
  dialog.addEventListener("close", () => {
   if (dialog.open) return;
+  flushPaint();
   clearInterval(portraitTimer);
   if (returnTo?.isConnected) returnTo.focus();
  });
@@ -43829,10 +43905,28 @@ try {
   render();
  });
  dialog.addEventListener("click", event => {
+  const board = event.target.closest("[data-kf-plank]");
+  if (board) { paintBoard(board); flushPaint(); return }
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; page = key; edit = null; render(); return }
+  if (key === "paint-back") { flushPaint(); painting = false; render(); return }
+  if (key === "paint" && project()?.kind === "play") {
+   painting = true;
+   render();
+   dialog.querySelector("[data-kf-plank]")?.focus();
+   return;
+  }
+  if (painting && key.startsWith("colour-")) {
+   const colour = key.slice(7), f = fence(project());
+   if (!Object.hasOwn(fenceColours, colour)) return;
+   f.colour = colour;
+   save();
+   dialog.querySelector("[data-kf-fence]").style.setProperty("--kf-paint", coat(f));
+   dialog.querySelectorAll('[data-kf^="colour-"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.kf === key)));
+   return;
+  }
   const p = project(), h = household();
   if (key.startsWith("vote-") && !p) {
    S.hfVillageProject = { kind: key.slice(5), points: 0, start: dayIdx(), last: dayIdx() };
@@ -43899,10 +43993,14 @@ try {
   const result = mapOriginal.apply(this, arguments);
   const info = $("#kmap .wminfo"), p = project();
   info?.querySelector("[data-kf-map]")?.remove();
+  info?.querySelector("[data-kf-map-fence]")?.remove();
   if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
    const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
     (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
    info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
+   if (wmSel === "pl:padang" && p?.fence?.boards) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-fence><p>Pagar padang · ${(fenceColours[p.fence.colour] || fenceColours.green)[0]}</p>${fenceArt(p.fence, false)}</div>`);
+   }
   }
   return result;
  };
