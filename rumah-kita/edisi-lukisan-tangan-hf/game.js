@@ -43775,22 +43775,44 @@ try {
    ${button("swing-test", swing.tested ? "Tolak sekali lagi" : "Uji buaian", !ready)}</div>
    <p>${button("swing-back", "Kembali ke projek")}</p>`;
  }
+ const benchSpots = { tree: "Bawah pokok rendang", porch: "Bawah wakaf padang" };
+ let buildingBench = false;
+ ERR.hf_bench = { label: "Duduk dan bersembang", icon: "🪑", place: "padang", dur: 30, ages, eff: { energy: 8, social: 20 },
+  when: (d, h) => project()?.kind === "play" && project().done && !!project().bench?.spot && openHours(8, 18)(d, h) };
+ function benchArt(b) {
+  return `<div class="kf-bench" aria-hidden="true"><div class="kf-bench-shadow"></div>
+   ${b.left ? '<span class="kf-bench-leg"></span>' : ''}${b.right ? '<span class="kf-bench-leg right"></span>' : ''}
+   ${b.slat ? '<span class="kf-bench-slat"></span>' : ''}</div>`;
+ }
+ function benchView(p) {
+  const b = p.bench || {};
+  const hasLegs = b.left && b.right;
+  return `${benchArt(b)}
+   <p role="status">${b.spot ? "Bangku siap. " + benchSpots[b.spot] + "." : !hasLegs ? "Padankan kaki serong ke kiri dan kaki tegak ke kanan." : !b.slat ? "Pasang papan tempat duduk." : "Pilih tempat teduh untuk bangku."}</p>
+   <div class="acts">
+   ${!hasLegs ? ["left", "right"].filter(side => !b[side]).map(side => `<fieldset><legend>${side === "left" ? "Bahagian kiri" : "Bahagian kanan"}</legend>
+    ${button("bench-" + side + "-angled", "Kaki serong")} ${button("bench-" + side + "-straight", "Kaki tegak")}</fieldset>`).join("") : ""}
+   ${hasLegs && !b.slat ? button("bench-slat", "Pasang papan") : ""}
+   ${b.slat && !b.spot ? Object.entries(benchSpots).map(([id, label]) => button("bench-spot-" + id, label)).join(" ") : ""}
+   </div><p>${button("bench-back", "Kembali ke projek")}</p>`;
+ }
  function projectView() {
   const p = project();
   if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>
    <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)}</div>`;
   const paintButton = p.kind === "play" ? button("paint", p.fence?.boards ? "Sambung cat pagar" : "Cat Pagar Padang") : "";
   const swingButton = p.kind === "play" ? button("swing", p.swing?.tested ? "Lihat buaian" : p.swing?.seat ? "Sambung baiki buaian" : "Baiki Buaian") : "";
+  const benchButton = p.kind === "play" ? button("bench-open", p.bench?.spot ? "Lihat bangku" : p.bench?.left || p.bench?.right ? "Sambung pasang bangku" : "Pasang Bangku Rehat") : "";
   if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>
    <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
    ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
-   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""}</div>`;
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${benchButton} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}</div>`;
   return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>
    <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
    <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
    <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
    ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
-   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton}</div>`;
+   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton} ${benchButton}</div>`;
  }
  function plansView() {
   const h = household(), p = edit;
@@ -43837,18 +43859,18 @@ try {
  function render() {
   const me = act();
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
   if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
   flushPaint();
-  painting = false; repairing = false;
+  painting = false; repairing = false; buildingBench = false;
   page = next;
   edit = null;
   returnTo = source || document.activeElement;
@@ -43932,7 +43954,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -43950,6 +43972,31 @@ try {
    return;
   }
   const p = project();
+  if (key === "bench-open" && p?.kind === "play") { buildingBench = true; render(); return }
+  if (key === "bench-back") { buildingBench = false; render(); return }
+  if (key === "bench-outing") {
+   if (!queueErrand(act(), "hf_bench")) { toast("Pilih Teman yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (buildingBench && key.startsWith("bench-") && p?.kind === "play") {
+   const b = p.bench || (p.bench = {});
+   if (key === "bench-left-angled" && !b.left) b.left = true;
+   else if (key === "bench-right-straight" && !b.right) b.right = true;
+   else if (key === "bench-left-straight" || key === "bench-right-angled") {
+    dialog.querySelector(".kf-content [role=status]").textContent = "Kaki ini belum sepadan. Cuba bentuk yang satu lagi.";
+    return;
+   } else if (key === "bench-slat" && b.left && b.right && !b.slat) b.slat = true;
+   else if (key.startsWith("bench-spot-") && b.slat && !b.spot && Object.hasOwn(benchSpots, key.slice(11))) {
+    b.spot = key.slice(11);
+    if (!p.done) progress(p, 25);
+    notify("Bangku rehat siap dipasang di padang.");
+   } else return;
+   save();
+   render();
+   dialog.querySelector(".kf-content button")?.focus();
+   return;
+  }
   if (p?.kind === "play" && key === "swing") { repairing = true; render(); return }
   if (key === "swing-back") { repairing = false; render(); return }
   if (key === "swing-outing") {
@@ -44047,10 +44094,14 @@ try {
   info?.querySelector("[data-kf-map]")?.remove();
   info?.querySelector("[data-kf-map-fence]")?.remove();
   info?.querySelector("[data-kf-map-swing]")?.remove();
+  info?.querySelector("[data-kf-map-bench]")?.remove();
   if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
    const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
     (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
    info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
+   if (wmSel === "pl:padang" && p?.bench?.spot) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-bench><p>Bangku rehat · ${benchSpots[p.bench.spot]}</p>${benchArt(p.bench)}</div>`);
+   }
    if (wmSel === "pl:padang" && p?.swing?.tested) {
     info.insertAdjacentHTML("beforeend", `<div data-kf-map-swing><p>Buaian siap dibaiki</p>${swingArt(p.swing)}</div>`);
    }

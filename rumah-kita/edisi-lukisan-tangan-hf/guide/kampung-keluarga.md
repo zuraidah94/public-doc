@@ -10,6 +10,8 @@ Untuk projek taman permainan, pilih **Cat Pagar Padang**. Pilih warna dan ketik 
 
 Pilih **Baiki Buaian**, pilih tempat duduk, pasang kedua-dua tali dan uji buaian. Menyiapkan buaian menyumbang 25 mata pada projek yang masih berjalan. Selepas taman dibuka, pilih **Main buaian** untuk menghantar Teman ke padang.
 
+Pilih **Pasang Bangku Rehat**. Padankan kaki serong ke kiri dan kaki tegak ke kanan, pasang papan, kemudian pilih tempat teduh. Selepas taman dibuka, pilih **Duduk dan bersembang** untuk menghantar Teman berehat di padang.
+
 ![Kemajuan pembaikan taman permainan dan pilihan sumbangan](projek-kampung.png)
 
 ## Janji Keluarga
