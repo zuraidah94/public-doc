@@ -43754,21 +43754,43 @@ try {
  window.addEventListener("pointerup", event => { if (event.pointerId === paintPointer) flushPaint() });
  window.addEventListener("pointercancel", event => { if (event.pointerId === paintPointer) flushPaint() });
  window.addEventListener("blur", flushPaint);
+ const swingSeats = { wood: ["Kayu", "#9c6846"], green: ["Hijau", "#547c54"], blue: ["Biru", "#437d8f"] };
+ let repairing = false;
+ ERR.hf_swing = { label: "Main buaian", icon: "🛝", place: "padang", dur: 30, ages, eff: { fun: 22, social: 8 },
+  when: (d, h) => project()?.kind === "play" && project().done && project().swing?.tested && openHours(8, 18)(d, h) };
+ function swingArt(swing, moving = false) {
+  const colour = swingSeats[swing.seat]?.[1] || "#9c6846";
+  return `<div class="kf-swing${moving ? " swinging" : ""}" style="--kf-seat:${colour}" aria-hidden="true"><div class="kf-swing-frame"></div>
+   <div class="kf-swing-hanging">${swing.left ? '<span class="kf-rope"></span>' : ''}${swing.right ? '<span class="kf-rope right"></span>' : ''}
+   ${swing.seat ? '<span class="kf-swing-seat"></span>' : ''}</div></div>`;
+ }
+ function swingView(p) {
+  const swing = p.swing || {};
+  const ready = swing.left && swing.right;
+  return `${swingArt(swing)}
+   <p>${swing.tested ? "Buaian siap dan selamat digunakan." : !swing.seat ? "Pilih tempat duduk." : !ready ? "Pasang tali kiri dan kanan." : "Tolak buaian untuk mengujinya."}</p>
+   <div class="acts">${Object.entries(swingSeats).map(([id, [label]]) => button("seat-" + id, label, !!swing.seat)).join(" ")}
+   ${button("rope-left", swing.left ? "Tali kiri dipasang" : "Pasang tali kiri", !swing.seat || swing.left)}
+   ${button("rope-right", swing.right ? "Tali kanan dipasang" : "Pasang tali kanan", !swing.seat || swing.right)}
+   ${button("swing-test", swing.tested ? "Tolak sekali lagi" : "Uji buaian", !ready)}</div>
+   <p>${button("swing-back", "Kembali ke projek")}</p>`;
+ }
  function projectView() {
   const p = project();
   if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>
    <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)}</div>`;
   const paintButton = p.kind === "play" ? button("paint", p.fence?.boards ? "Sambung cat pagar" : "Cat Pagar Padang") : "";
+  const swingButton = p.kind === "play" ? button("swing", p.swing?.tested ? "Lihat buaian" : p.swing?.seat ? "Sambung baiki buaian" : "Baiki Buaian") : "";
   if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>
    <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
    ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
-   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton}</div>`;
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""}</div>`;
   return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>
    <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
    <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
    <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
    ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
-   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton}</div>`;
+   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton}</div>`;
  }
  function plansView() {
   const h = household(), p = edit;
@@ -43815,18 +43837,18 @@ try {
  function render() {
   const me = act();
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
   if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
   flushPaint();
-  painting = false;
+  painting = false; repairing = false;
   page = next;
   edit = null;
   returnTo = source || document.activeElement;
@@ -43910,7 +43932,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -43927,7 +43949,37 @@ try {
    dialog.querySelectorAll('[data-kf^="colour-"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.kf === key)));
    return;
   }
-  const p = project(), h = household();
+  const p = project();
+  if (p?.kind === "play" && key === "swing") { repairing = true; render(); return }
+  if (key === "swing-back") { repairing = false; render(); return }
+  if (key === "swing-outing") {
+   if (!queueErrand(act(), "hf_swing")) { toast("Pilih Teman yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (repairing && p?.kind === "play") {
+   const swing = p.swing || (p.swing = {});
+   const seat = key.slice(5);
+   if (key.startsWith("seat-") && Object.hasOwn(swingSeats, seat) && !swing.seat) swing.seat = seat;
+   else if (swing.seat && key === "rope-left") swing.left = true;
+   else if (swing.seat && key === "rope-right") swing.right = true;
+   else if (key === "swing-test" && swing.left && swing.right) {
+    if (!swing.tested) {
+     swing.tested = true;
+     if (!p.done) progress(p, 25);
+     notify("Buaian padang siap dibaiki.");
+    }
+    render();
+    dialog.querySelector(".kf-swing")?.classList.add("swinging");
+    dialog.querySelector('[data-kf="swing-test"]')?.focus();
+    return;
+   } else return;
+   save();
+   render();
+   dialog.querySelector('.kf-content button:not([disabled])')?.focus();
+   return;
+  }
+  const h = household();
   if (key.startsWith("vote-") && !p) {
    S.hfVillageProject = { kind: key.slice(5), points: 0, start: dayIdx(), last: dayIdx() };
    notify("🤝 Jiran bersetuju memulakan " + projects[S.hfVillageProject.kind].toLowerCase() + ".");
@@ -43994,10 +44046,14 @@ try {
   const info = $("#kmap .wminfo"), p = project();
   info?.querySelector("[data-kf-map]")?.remove();
   info?.querySelector("[data-kf-map-fence]")?.remove();
+  info?.querySelector("[data-kf-map-swing]")?.remove();
   if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
    const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
     (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
    info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
+   if (wmSel === "pl:padang" && p?.swing?.tested) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-swing><p>Buaian siap dibaiki</p>${swingArt(p.swing)}</div>`);
+   }
    if (wmSel === "pl:padang" && p?.fence?.boards) {
     info.insertAdjacentHTML("beforeend", `<div data-kf-map-fence><p>Pagar padang · ${(fenceColours[p.fence.colour] || fenceColours.green)[0]}</p>${fenceArt(p.fence, false)}</div>`);
    }

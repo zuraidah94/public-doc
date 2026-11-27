@@ -8,6 +8,8 @@ Pilih projek di Balai Raya. Sertai sesi kerja, belikan bekalan atau sumbang wang
 
 Untuk projek taman permainan, pilih **Cat Pagar Padang**. Pilih warna dan ketik atau leret merentasi lapan papan. Anda boleh tutup panel dan sambung kemudian. Apabila semua papan siap, projek yang masih berjalan menerima 25 mata kemajuan. Warna pagar dipaparkan pada kad **Padang** selepas taman dibuka.
 
+Pilih **Baiki Buaian**, pilih tempat duduk, pasang kedua-dua tali dan uji buaian. Menyiapkan buaian menyumbang 25 mata pada projek yang masih berjalan. Selepas taman dibuka, pilih **Main buaian** untuk menghantar Teman ke padang.
+
 ![Kemajuan pembaikan taman permainan dan pilihan sumbangan](projek-kampung.png)
 
 ## Janji Keluarga

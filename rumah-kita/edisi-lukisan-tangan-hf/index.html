@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2c6b5a">
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf143-cat-pagar" as="script">
+<link rel="preload" href="game.js?v=hf143-baiki-buaian" as="script">
 <script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
 <div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
@@ -516,6 +516,17 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 #hfkf .kf-paint-tools [aria-pressed="true"].btn{outline:2px solid #498562;outline-offset:1px}
 #hfkf .kf-swatch{display:inline-block;width:.85rem;height:.85rem;margin-right:.35rem;border:1px solid #3c4e41;border-radius:50%}
 #hfkf .kf-paint-result{font-weight:700}
+/* Baiki Buaian */
+.kf-swing{position:relative;height:9rem;margin:.4rem 0;border:1px solid #758661;border-radius:1rem;overflow:hidden;background:linear-gradient(#d4e0ce 72%,#9cab75 72%)}
+.kf-swing-frame{position:absolute;top:15%;bottom:9%;left:24%;right:24%;border:7px solid #725340;border-bottom:0;border-radius:12px 12px 0 0}
+.kf-swing-hanging{position:absolute;top:20%;bottom:21%;left:40%;right:40%;transform-origin:top center}
+.kf-rope{position:absolute;top:0;bottom:0;left:8%;width:4px;background:#635342}
+.kf-rope.right{left:auto;right:8%}
+.kf-swing-seat{position:absolute;bottom:-5px;left:0;right:0;height:12px;border-radius:4px;background:var(--kf-seat);box-shadow:0 3px #493924}
+.kf-swing.swinging .kf-swing-hanging{animation:kf-swing-test 1.5s ease-in-out}
+@keyframes kf-swing-test{0%,100%{transform:rotate(0)}24%{transform:rotate(16deg)}61%{transform:rotate(-12deg)}84%{transform:rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.kf-swing.swinging .kf-swing-hanging{animation:none}}
+[data-kf-map-swing] .kf-swing{height:5rem}
 @media(max-width:480px){#hfkf .kf-nav{grid-template-columns:repeat(2,minmax(0,1fr))}#hfkf .kf-nav button{min-height:2.75rem}#hfkf .kf-cover{min-height:8.5rem}}
 </style>
 <div class="app">
@@ -599,5 +610,5 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf143-cat-pagar"></script>
+<script src="game.js?v=hf143-baiki-buaian"></script>
 </body></html>
