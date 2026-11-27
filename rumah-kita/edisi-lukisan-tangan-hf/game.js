@@ -43676,11 +43676,12 @@ try {
 
  const dialog = document.createElement("dialog");
  dialog.id = "hfkf";
- dialog.className = "card";
  dialog.setAttribute("aria-labelledby", "hfkf-title");
- dialog.style.cssText = "width:min(36rem,calc(100% - 2rem));max-height:85dvh;overflow:auto;padding:1rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:1rem";
  document.body.append(dialog);
  const titles = { project: "Projek Kampung", plans: "Janji Keluarga", recipes: "Resipi Turun-Temurun", order: "Pesanan Sekampung" };
+ const icons = { project: "🌱", plans: "📅", recipes: "🍲", order: "🧺" };
+ const face = sim => `<span class="kf-face" data-kf-face="${sim.id}" aria-hidden="true">${avatar(sim)}</span>`;
+ let portraitTimer;
  let page = "project", edit = null, returnTo = null;
  function projectView() {
   const p = project();
@@ -43704,7 +43705,9 @@ try {
    <label>Aktiviti <select name="kind">${Object.entries(plans).map(([k, v]) => `<option value="${k}" ${p?.kind === k ? "selected" : ""} ${k === "play" && !(project()?.done && project().kind === "play") ? "disabled" : ""}>${v[0]}</option>`).join("")}</select></label>
    <label>Hari <input name="day" type="number" min="${Math.floor(min / 1440) + 1}" max="${dayIdx() + 15}" value="${Math.floor(at / 1440) + 1}" required></label>
    <label>Jam <input name="hour" type="number" min="0" max="23" value="${Math.floor(at % 1440 / 60)}" required></label>
-   <fieldset><legend>Ahli keluarga</legend>${people.map(s => `<label style="display:block"><input type="checkbox" name="guest" value="${s.id}" ${(p ? p.guests.includes(s.id) : s === act()) ? "checked" : ""}> ${esc(s.name)}</label>`).join("")}</fieldset>
+   <fieldset><legend>Ahli keluarga</legend><div class="kf-people">${people.map(s => `
+    <label class="kf-person"><input type="checkbox" name="guest" value="${s.id}" ${(p ? p.guests.includes(s.id) : s === act()) ? "checked" : ""}>
+     ${face(s)} <span>${esc(s.name)}</span></label>`).join("")}</div></fieldset>
    <p class="hint" data-kf-conflicts aria-live="polite"></p>
    <button class="btn pri" type="submit">${p ? "Simpan jadual baharu" : "Buat janji"}</button>
    ${p ? button("stop-edit", "Batal sunting") : ""}
@@ -43737,10 +43740,14 @@ try {
    <p class="hint">Perlu Kedai Kecil yang menjual kuih lapis dan bisnes Gubah Hantaran. Bekalan buah boleh dibeli atau dipetik.</p>`;
  }
  function render() {
-  dialog.innerHTML = `<header class="sheet-head"><h2 id="hfkf-title">${titles[page]}</h2>
-    ${button("close", "Tutup")}</header><nav class="acts" aria-label="Aktiviti kampung dan keluarga">
-    ${Object.keys(titles).map(k => `<button class="btn${page === k ? " pri" : ""}" type="button" data-kf="${k}" aria-pressed="${k === page}">${titles[k]}</button>`).join("")}</nav>
-    <div style="margin-top:1rem">${({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+  const me = act();
+  dialog.innerHTML = `<header class="kf-cover">
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${titles[page]}</h2></div>
+    ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
+    ${button("close", "Tutup")}</header>
+    <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
+    ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
+    <div class="kf-content">${({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
@@ -43749,7 +43756,19 @@ try {
   edit = null;
   returnTo = source || document.activeElement;
   render();
-  if (!dialog.open) dialog.showModal();
+  if (!dialog.open) {
+   dialog.showModal();
+   // Painted portraits can finish loading after the panel renders.
+   clearInterval(portraitTimer);
+   portraitTimer = setInterval(() => {
+    for (const node of dialog.querySelectorAll("[data-kf-face]")) {
+     const sim = simById(Number(node.dataset.kfFace));
+     if (!sim) continue;
+     const html = avatar(sim);
+     if (node._portrait !== html) { node._portrait = html; node.innerHTML = html }
+    }
+   }, 850);
+  }
  }
  function readPlan(form) {
   const data = new FormData(form);
@@ -43769,7 +43788,11 @@ try {
   form.querySelector("[data-kf-conflicts]").textContent = issues.length ? "Pertindihan jadual: " + issues.join(", ") : "";
  }
  dialog.addEventListener("input", previewConflicts);
- dialog.addEventListener("close", () => { if (returnTo?.isConnected) returnTo.focus() });
+ dialog.addEventListener("close", () => {
+  if (dialog.open) return;
+  clearInterval(portraitTimer);
+  if (returnTo?.isConnected) returnTo.focus();
+ });
  dialog.addEventListener("submit", event => {
   event.preventDefault();
   const form = event.target, h = household();
