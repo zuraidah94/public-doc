@@ -10,6 +10,8 @@ This folder contains the HF edition, art tools and design documents. Earlier edi
 
 ## How to play
 
+- [Panduan bergambar Kampung & Keluarga](edisi-lukisan-tangan-hf/guide/kampung-keluarga.md)
+
 Works on phone and computer. On a phone, "ketik" means tap; on a computer, click.
 
 ### Start a game
