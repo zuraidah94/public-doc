@@ -1,6 +1,6 @@
 # Panduan Kampung & Keluarga
 
-Dalam permainan, buka **Keperluan → Kampung & Keluarga → Aktiviti**. Kesemua sembilan permainan kecil ada di sini. Kad menyatakan bila anda boleh mula, sambung atau lihat hasil. Buka **Lihat projek**, **Pilih resipi** atau **Lihat pesanan** jika aktiviti masih memerlukan persediaan.
+Dalam permainan, buka **Keperluan → Kampung & Keluarga → Aktiviti**. Kesemua tiga belas permainan kecil ada di sini. Kad menyatakan bila anda boleh mula, sambung atau lihat hasil. Buka **Lihat projek**, **Pilih resipi** atau **Lihat pesanan** jika aktiviti masih memerlukan persediaan.
 
 ## Projek Kampung
 
@@ -17,6 +17,8 @@ Pilih **Pasang Bangku Rehat**. Padankan kaki serong ke kiri dan kaki tegak ke ka
 Untuk projek kebun, buka **Tanam Kebun Komuniti**. Pilih benih cili, serai atau pandan, kemudian tanam dan siram. Siraman pertama bagi setiap petak menyumbang 8 mata jika projek masih berjalan. Petik tanaman dua hari selepas disiram, apabila kebun dibuka, untuk menambah bekalan memasak.
 
 Buka **Hias Balai Raya** melalui **Projek Kampung** atau **Pesanan Sekampung**. Pilih susunan meja, warna bendera dan tempat pasu, kemudian tekan **Siapkan balai**. Susunan siap dipaparkan pada kad Balai Raya dan dalam pesanan kenduri yang aktif.
+
+**Papan Projek Balai Raya** menunjukkan kerja yang sedang dibuat, pembaikan yang sudah siap dan Teman yang membantu. Buka papan melalui projek taman permainan. Pilih **Baiki Gelongsor** untuk memasang anak tangga, mengetatkan skru dan menguji dengan bola. Dalam **Bersihkan Kotak Pasir**, asingkan barang dan ratakan pasir. Untuk **Tanam Pokok Teduh**, tanam di tepi bangku, siram dan beri dua hari permainan untuk pokok membesar. Selepas taman dibuka dan buaian, bangku serta gelongsor siap, cuba ketiga-tiganya melalui **Uji Taman Bersama Jiran** untuk menyimpan kenangan dalam Buku Warisan.
 
 ## Janji Keluarga
 

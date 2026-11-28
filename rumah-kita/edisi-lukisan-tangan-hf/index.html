@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2c6b5a">
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf143-aktiviti-atuk" as="script">
+<link rel="preload" href="game.js?v=hf143-papan-taman" as="script">
 <script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
 <div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
@@ -584,6 +584,23 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 #hfkf .kf-activity h3{font:750 1rem/1.2 'Fraunces',Georgia,serif}
 #hfkf .kf-activity p{font-size:.9rem}
 #hfkf .kf-activity .btn{min-height:2.6rem;white-space:normal}
+/* Papan Projek Balai Raya */
+#hfkf .kf-project-board{margin-top:1rem}
+#hfkf .kf-project-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:.4rem}
+#hfkf .kf-project-tasks .card{display:grid;gap:.35rem;align-content:start}
+#hfkf .kf-project-tasks small{font-size:.84rem}
+.kf-park-art{display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:1px solid #8b9c6d;border-radius:.75rem;background:#dce8cc;color:#2c4626}
+.kf-park-picture{display:block;width:min(100%,30rem);height:auto;border-radius:.65rem}
+.kf-park-art span{padding:.25rem .45rem;background:#f8f3df;border-radius:.45rem}
+.kf-slide-demo,.kf-sand-demo,.kf-tree-demo{position:relative;display:grid;place-items:center;height:8rem;border:1px solid #8b9c6d;border-radius:.8rem;background:linear-gradient(#d4e0ce 72%,#9cab75 72%);font-size:3rem}
+.kf-sand-demo{background:radial-gradient(ellipse,#edd69a 55%,#9cab75 56%)}
+.kf-slide-ladder{position:absolute;left:24%;top:22%;bottom:15%;width:20%;display:flex;flex-direction:column;justify-content:space-around;border-inline:.4rem solid #785437}
+.kf-slide-ladder i{height:.28rem;background:#aa744c}
+.kf-slide-track{position:absolute;left:42%;top:32%;width:34%;height:.8rem;border-radius:.5rem;background:#50859b;transform:rotate(39deg);transform-origin:left center}
+.kf-slide-ball{position:absolute;left:42%;top:24%;width:1rem;height:1rem;border-radius:50%;background:#aa513d;opacity:0}
+.kf-slide-demo.rolling .kf-slide-ball{animation:kf-roll 1s ease-in forwards}
+@keyframes kf-roll{0%{left:42%;top:24%;opacity:1}100%{left:75%;top:63%;opacity:1}}
+@media(prefers-reduced-motion:reduce){.kf-slide-demo.rolling .kf-slide-ball{animation:none;left:75%;top:63%;opacity:1}}
 @media(max-width:480px){#hfkf .kf-nav{grid-template-columns:repeat(2,minmax(0,1fr))}#hfkf .kf-nav button{min-height:2.75rem}#hfkf .kf-cover{min-height:8.5rem}}
 </style>
 <div class="app">
@@ -667,5 +684,5 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf143-aktiviti-atuk"></script>
+<script src="game.js?v=hf143-papan-taman"></script>
 </body></html>

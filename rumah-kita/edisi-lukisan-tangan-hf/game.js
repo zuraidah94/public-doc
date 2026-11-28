@@ -43566,6 +43566,7 @@ try {
   const p = project();
   if (data?.act === "hf_project" && p && !p.done && p.work !== dayIdx()) {
    p.work = dayIdx();
+   recordHelper(p, "sesi kerja", s);
    progress(p, 25);
    save();
   }
@@ -43737,6 +43738,7 @@ try {
   const i = Number(board.dataset.kfPlank);
   if (painted(f, i)) return;
   f.boards |= 1 << i;
+  recordHelper(p, "fence");
   paintDirty = true;
   board.setAttribute("aria-pressed", "true");
   board.firstElementChild.textContent = "✓";
@@ -43852,24 +43854,176 @@ try {
    ${button("hall-back", "Kembali")}</div>`;
  }
  const hallButton = () => button("hall-open", hallDecoration()?.saved ? "Ubah hiasan balai" : "Hias Balai Raya");
+ const parkJobs = {
+  slide: ["Baiki Gelongsor", "🛝", "Padankan anak tangga, ketatkan skru dan uji dengan bola."],
+  sand: ["Bersihkan Kotak Pasir", "🏰", "Asingkan daun, batu dan sampah, kemudian ratakan pasir."],
+  tree: ["Tanam Pokok Teduh", "🌳", "Pilih tempat berhampiran bangku, tanam dan siram."],
+  trial: ["Uji Taman Bersama Jiran", "📷", "Cuba buaian, bangku dan gelongsor dengan jiran."]
+ };
+ let parkJob = null;
+ const parkStates = p => p.park || (p.park = {});
+ const parkState = (p, job) => parkStates(p)[job] || (parkStates(p)[job] = {});
+ const treeReady = data => data.watered != null && dayIdx() >= data.watered + 2;
+ const trialReady = p => p.done && p.swing?.tested && p.bench?.spot && p.park?.slide?.done;
+ const recordHelper = (p, key, sim = act()) => {
+  if (!sim) return;
+  const helpers = p.helpers || (p.helpers = {});
+  const names = helpers[key] || (helpers[key] = {});
+  names[sim.id] = sim.name;
+ };
+ const parkStatus = (p, key) => {
+  if (key === "fence") return p.fence?.boards === (1 << plankCount) - 1 ? 2 : p.fence?.boards ? 1 : 0;
+  if (key === "swing") return p.swing?.tested ? 2 : p.swing?.seat ? 1 : 0;
+  if (key === "bench") return p.bench?.spot ? 2 : p.bench?.left || p.bench?.right ? 1 : 0;
+  const d = p.park?.[key];
+  if (!d) return 0;
+  if (key === "tree" ? treeReady(d) : d.done) return 2;
+  return Object.keys(d).length ? 1 : 0;
+ };
+ function projectBoard(p) {
+  const entries = [["fence", "Cat Pagar Padang", "paint"], ["swing", "Baiki Buaian", "swing"], ["bench", "Pasang Bangku Rehat", "bench-open"],
+   ...Object.entries(parkJobs).map(([key, [name]]) => [key, name, "park-open-" + key])];
+  const done = entries.filter(([key]) => parkStatus(p, key) === 2).length;
+  const names = [...new Set(Object.values(p.helpers || {}).flatMap(group => Object.values(group)))];
+  return `<section class="kf-project-board"><h3>Papan Projek Balai Raya</h3>
+   <p><b>${done}/${entries.length} kerja siap</b> · ${p.points}% kemajuan pembukaan taman</p>
+   <p>Jiran membantu setiap hari.${names.length ? " Teman yang membantu: " + names.map(esc).join(", ") + "." : ""}</p>
+   <div class="kf-project-tasks">${entries.map(([key, title, action]) => {
+    const status = parkStatus(p, key);
+    return `<div class="card"><b>${title}</b><small>${key === "trial" && !trialReady(p) ? "Perlu taman dibuka, buaian, bangku dan gelongsor siap" :
+     key === "tree" && status === 1 && p.park?.tree?.watered != null ? "Pokok sedang membesar" : ["Belum mula", "Sedang dibuat", "Siap"][status]}</small>
+    ${button(action, status === 2 ? "Lihat hasil · " + title : status ? "Sambung · " + title : "Mula · " + title)}</div>`;
+   }).join("")}</div></section>`;
+ }
+ const parkArt = p => {
+  const data = p.park || {}, d = data.trial;
+  return `<div class="kf-park-art" aria-label="Pemandangan taman permainan">
+   ${data.slide?.done ? "<span>🛝 Gelongsor</span>" : ""}${data.sand?.done ? "<span>🏰 Kotak pasir</span>" : ""}
+   ${data.tree?.planted ? `<span>${treeReady(data.tree) ? "🌳 Pokok teduh" : "🌱 Anak pokok"}</span>` : ""}
+   ${p.swing?.tested ? "<span>🪁 Buaian</span>" : ""}${p.bench?.spot ? "<span>🪑 Bangku</span>" : ""}
+   ${d?.done ? "<span>📷 Hari bersama jiran</span>" : ""}</div>`;
+ };
+ const rungs = ["Pendek", "Sederhana", "Panjang"];
+ const sandItems = { leaf: ["Daun kering", "Kompos"], stone: ["Batu kecil", "Bakul batu"], litter: ["Pembungkus", "Tong sampah"] };
+ const sortBins = { compost: "Kompos", stones: "Bakul batu", waste: "Tong sampah" };
+ const trialStops = { swing: "Buaian", bench: "Bangku", slide: "Gelongsor" };
+ function parkView(p) {
+  const data = parkState(p, parkJob), back = button("park-back", "Kembali ke Papan Projek");
+  if (parkJob === "slide") {
+   const count = data.rungs || 0, secured = data.left && data.right;
+   return `<div class="kf-slide-demo" aria-hidden="true"><div class="kf-slide-ladder">${"<i></i>".repeat(count)}</div>
+    <div class="kf-slide-track"></div><i class="kf-slide-ball"></i></div>
+    <p role="status">${data.done ? "Bola meluncur dengan lancar. Gelongsor siap." : count < 3 ? "Padankan anak tangga dari pendek ke panjang." : secured ? "Luncurkan bola untuk menguji gelongsor." : "Ketatkan kedua-dua skru."}</p>
+    <div class="acts">${count < 3 ? [2, 0, 1].map(i => button("park-rung-" + i, rungs[i], i < count)).join("") :
+     secured ? button("park-slide-test", data.done ? "Luncurkan bola lagi" : "Uji dengan bola") :
+     button("park-screw-left", "Ketatkan skru kiri", data.left) + button("park-screw-right", "Ketatkan skru kanan", data.right)} ${back}</div>`;
+  }
+  if (parkJob === "sand") {
+   const item = Object.keys(sandItems)[data.sorted || 0];
+   return `<div class="kf-sand-demo" aria-hidden="true">${data.done ? "🏰" : item === "leaf" ? "🍂" : item === "stone" ? "🪨" : item ? "🧃" : ""}</div>
+    <p role="status">${data.done ? "Kotak pasir sudah bersih dan rata." : item ? "Asingkan " + sandItems[item][0].toLowerCase() + "." : "Semua barang sudah dialihkan. Ratakan pasir."}</p>
+    <div class="acts">${item ? Object.entries(sortBins).map(([k, label]) => button("park-sort-" + k, label)).join("") : !data.done ? button("park-level", "Ratakan pasir") : ""} ${back}</div>`;
+  }
+  if (parkJob === "tree") {
+   return `<div class="kf-tree-demo" aria-hidden="true">${treeReady(data) ? "🌳" : data.planted ? "🌱" : "🪴"}</div>
+    <p role="status">${treeReady(data) ? "Pokok sudah memberi teduh." : data.watered != null ? `Pokok membesar pada hari ${data.watered + 3}.` : data.planted ? "Siram anak pokok." : data.spot ? "Tempat sudah dipilih. Tanam anak pokok." : "Pilih petak berhampiran bangku supaya laluan kekal lapang."}</p>
+    <div class="acts">${!data.spot ? button("park-tree-path", "Tengah laluan") + button("park-tree-bench", "Tepi bangku") :
+     !data.planted ? button("park-tree-plant", "Tanam") : data.watered == null ? button("park-tree-water", "Siram") : button("park-refresh", "Semak pokok")} ${back}</div>`;
+  }
+  return `${parkArt(p)}<p role="status">${data.done ? "Jiran pesan supaya keluarga datang bermain lagi. Kenangan disimpan dalam Buku Warisan." :
+   trialReady(p) ? "Cuba ketiga-tiga kemudahan bersama jiran." : "Buka taman dan siapkan buaian, bangku serta gelongsor dahulu."}</p>
+   <div class="acts">${Object.entries(trialStops).map(([key, name]) => button("park-try-" + key, (data[key] ? "✓ " : "Cuba ") + name, !trialReady(p) || data[key])).join("")}
+   ${!data.done ? button("park-photo", "Ambil gambar kenangan", !Object.keys(trialStops).every(k => data[k])) : ""} ${back}</div>`;
+ }
+ const parkErrands = { slide: ["Main gelongsor", "🛝"], sand: ["Bina istana pasir", "🏰"] };
+ for (const [key, [label, icon]] of Object.entries(parkErrands)) {
+  ERR["hf_park_" + key] = { label, icon, place: "padang", dur: 30, ages: ["child"], eff: { fun: 24, social: 8 },
+   when: (d, h) => project()?.done && project().park?.[key]?.done && openHours(8, 18)(d, h) };
+ }
+ function parkPicture(p) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 480;
+  canvas.height = 240;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+  const sky = ctx.createLinearGradient(0, 0, 0, 154);
+  sky.addColorStop(0, "#c4ddd8");
+  sky.addColorStop(1, "#f7eaca");
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, 480, 154);
+  ctx.fillStyle = "#91aa72"; ctx.fillRect(0, 154, 480, 86);
+  ctx.fillStyle = "#ead6a9"; ctx.beginPath(); ctx.ellipse(240, 219, 192, 20, 0, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = "#253f2e"; ctx.font = "bold 24px Georgia, serif"; ctx.textAlign = "center";
+  ctx.fillText("Hari di taman bersama jiran", 240, 53);
+  ctx.font = "42px system-ui";
+  const icons = [treeReady(p.park.tree || {}) ? "🌳" : "🌿", "🪑", "🛝", p.park.sand?.done ? "🏰" : "🌼"];
+  icons.forEach((icon, i) => ctx.fillText(icon, 90 + i * 100, 178));
+  ctx.font = "18px system-ui"; ctx.fillText("Taman Harmoni · Hari " + (dayIdx() + 1), 240, 222);
+  return canvas.toDataURL("image/jpeg", .78);
+ }
+ function parkAction(p, key) {
+  const data = parkState(p, parkJob), count = data.rungs || 0;
+  let points = 0, animate = false, feedback = "";
+  if (parkJob === "slide") {
+   if (key === "park-rung-" + count && count < 3) data.rungs = count + 1;
+   else if (key.startsWith("park-rung-")) feedback = "Anak tangga ini belum sepadan. Cuba saiz lain.";
+   else if (count === 3 && key === "park-screw-left" && !data.left) data.left = true;
+   else if (count === 3 && key === "park-screw-right" && !data.right) data.right = true;
+   else if (key === "park-slide-test" && data.left && data.right) {
+    animate = true;
+    if (!data.done) { data.done = true; points = 20 }
+   } else return;
+  } else if (parkJob === "sand") {
+   const item = Object.values(sandItems)[data.sorted || 0];
+   if (item && key.startsWith("park-sort-")) {
+    if (sortBins[key.slice(10)] !== item[1]) feedback = "Bekas ini tidak sepadan. Cuba bekas lain.";
+    else data.sorted = (data.sorted || 0) + 1;
+   } else if (!item && key === "park-level" && !data.done) { data.done = true; points = 15 }
+   else return;
+  } else if (parkJob === "tree") {
+   if (key === "park-tree-path" && !data.spot) feedback = "Laluan perlu kosong. Cuba petak di tepi bangku.";
+   else if (key === "park-tree-bench" && !data.spot) data.spot = true;
+   else if (key === "park-tree-plant" && data.spot && !data.planted) data.planted = true;
+   else if (key === "park-tree-water" && data.planted && data.watered == null) { data.watered = dayIdx(); points = 15 }
+   else if (key !== "park-refresh") return;
+  } else {
+   if (!trialReady(p)) return;
+   const stop = key.slice(9);
+   if (key.startsWith("park-try-") && Object.hasOwn(trialStops, stop) && !data[stop]) data[stop] = true;
+   else if (key === "park-photo" && !data.done && Object.keys(trialStops).every(k => data[k])) {
+    data.done = true;
+    const h = household();
+    h.parkMemory = { day: dayIdx(), names: family().map(sim => sim.name), picture: parkPicture(p) };
+    addAlbum("📷", "Uji Taman Bersama Jiran", false);
+    diary("Keluarga dan jiran mencuba taman permainan yang dibaiki.");
+   } else return;
+  }
+  if (feedback) { dialog.querySelector(".kf-content [role=status]").textContent = feedback; return }
+  if (points && !p.done) progress(p, points);
+  recordHelper(p, parkJob);
+  save();
+  render();
+  if (animate) dialog.querySelector(".kf-slide-demo")?.classList.add("rolling");
+  dialog.querySelector(".kf-content button:not([disabled])")?.focus();
+ }
  function projectView() {
   const p = project();
   if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>
    <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)} ${hallButton()}</div>`;
-  const paintButton = p.kind === "play" ? button("paint", p.fence?.boards ? "Sambung cat pagar" : "Cat Pagar Padang") : "";
-  const swingButton = p.kind === "play" ? button("swing", p.swing?.tested ? "Lihat buaian" : p.swing?.seat ? "Sambung baiki buaian" : "Baiki Buaian") : "";
-  const benchButton = p.kind === "play" ? button("bench-open", p.bench?.spot ? "Lihat bangku" : p.bench?.left || p.bench?.right ? "Sambung pasang bangku" : "Pasang Bangku Rehat") : "";
   const gardenButton = p.kind === "garden" ? button("garden-open", "Tanam Kebun Komuniti") : "";
   if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>
    <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
    ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
-   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${benchButton} ${gardenButton} ${hallButton()} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}</div>`;
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${gardenButton} ${hallButton()} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}
+   ${p.park?.slide?.done ? button("park-out-slide", "Main gelongsor") : ""}
+   ${p.park?.sand?.done ? button("park-out-sand", "Bina istana pasir") : ""}</div>
+   ${p.kind === "play" ? projectBoard(p) : ""}`;
   return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>
    <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
    <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
    <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
    ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
-   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton} ${benchButton} ${gardenButton} ${hallButton()}</div>`;
+   ${button("cash", "Sumbang RM 40", p.cash)} ${gardenButton} ${hallButton()}</div>
+   ${p.kind === "play" ? projectBoard(p) : ""}`;
  }
  function plansView() {
   const h = household(), p = edit;
@@ -43960,7 +44114,8 @@ try {
   ["calendar", "📅", "Cari Masa Bersama", "Bandingkan waktu lapang untuk satu janji keluarga."],
   ["cook", "🍲", "Masak Bersama Guru", "Ikut petua keluarga dan simpan resipi warisan."],
   ["packing", "🧺", "Bungkus Bekalan Kenduri", "Padankan tiga jenis bekalan dengan bekasnya."],
-  ["memories", "📷", "Jejak Kenangan Atuk", "Cari tiga tempat dan padankan gambar album."]
+  ["memories", "📷", "Jejak Kenangan Atuk", "Cari tiga tempat dan padankan gambar album."],
+  ...Object.entries(parkJobs).map(([key, [title, icon, description]]) => [key, icon, title, description])
  ];
  function activitiesView() {
   const p = project(), h = S.hfFamilyActivities, order = h?.order;
@@ -43972,6 +44127,11 @@ try {
    packing: order?.boxes && Object.keys(order.boxes).length, cook: lesson?.prep, memories: memoryCount() };
   const done = { fence: p?.fence?.boards === (1 << plankCount) - 1, swing: p?.swing?.tested, bench: p?.bench?.spot,
    hall: hallDecoration()?.saved, packing: sold && order.packed, memories: memoryCount() === memories.length };
+  for (const key of Object.keys(parkJobs)) {
+   ready[key] = p?.kind === "play";
+   state[key] = ready[key] && parkStatus(p, key) === 1;
+   done[key] = ready[key] && parkStatus(p, key) === 2;
+  }
   return `<div class="kf-activities">${activityCards.map(([key, icon, title, description]) => {
    const access = Object.hasOwn(ready, key) && !ready[key];
    const prompt = access ? key === "packing" ? "Lihat pesanan" : key === "cook" ? "Pilih resipi" : "Lihat projek"
@@ -43985,6 +44145,7 @@ try {
   const p = project(), h = S.hfFamilyActivities, order = h?.order;
   const lesson = h?.recipes.find(r => r.student === S.active && !r.learned);
   page = "project";
+  if (Object.hasOwn(parkJobs, key) && p?.kind === "play") parkJob = key;
   if (key === "fence") painting = p?.kind === "play";
   if (key === "swing") repairing = p?.kind === "play";
   if (key === "bench") buildingBench = p?.kind === "play";
@@ -44025,12 +44186,12 @@ try {
   const me = act();
   const memoryPage = page === "memories";
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : memoryPage ? "Jejak Kenangan Atuk" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : memoryPage ? "Jejak Kenangan Atuk" : parkJob ? parkJobs[parkJob][0] : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : memoryPage ? memoriesView() : ({ activities: activitiesView, project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : memoryPage ? memoriesView() : parkJob ? parkView(project()) : ({ activities: activitiesView, project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}
     ${page === "project" && !painting && !repairing && !buildingBench && !gardening && !decoratingHall ? `<p>${button("memory-open", "Jejak Kenangan Atuk")}</p>` : ""}
     </div>`;
   previewConflicts();
@@ -44040,6 +44201,7 @@ try {
   flushPaint();
   painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null;
   page = next;
+  parkJob = null;
   matchingMemory = false;
   edit = null;
   returnTo = source || document.activeElement;
@@ -44165,7 +44327,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; matchingMemory = false; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; matchingMemory = false; parkJob = null; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -44263,6 +44425,16 @@ try {
    dialog.querySelector(`[data-kf="${key}"]:not([disabled])`)?.focus();
    return;
   }
+  if (key === "park-back") { parkJob = null; render(); return }
+  if (key.startsWith("park-open-") && p?.kind === "play" && Object.hasOwn(parkJobs, key.slice(10))) {
+   parkJob = key.slice(10); render(); return;
+  }
+  if (key.startsWith("park-out-") && p?.kind === "play" && Object.hasOwn(parkErrands, key.slice(9))) {
+   if (!queueErrand(act(), "hf_park_" + key.slice(9))) { toast("Pilih kanak-kanak yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (parkJob && key.startsWith("park-") && p?.kind === "play") { parkAction(p, key); return }
   if (key === "garden-open" && p?.kind === "garden") { gardening = true; render(); return }
   if (key === "garden-back") { gardening = false; render(); return }
   if (gardening && p?.kind === "garden") {
@@ -44311,6 +44483,7 @@ try {
    } else if (key === "bench-slat" && b.left && b.right && !b.slat) b.slat = true;
    else if (key.startsWith("bench-spot-") && b.slat && !b.spot && Object.hasOwn(benchSpots, key.slice(11))) {
     b.spot = key.slice(11);
+    recordHelper(p, "bench");
     if (!p.done) progress(p, 25);
     notify("Bangku rehat siap dipasang di padang.");
    } else return;
@@ -44335,6 +44508,7 @@ try {
    else if (key === "swing-test" && swing.left && swing.right) {
     if (!swing.tested) {
      swing.tested = true;
+     recordHelper(p, "swing");
      if (!p.done) progress(p, 25);
      notify("Buaian padang siap dibaiki.");
     }
@@ -44362,6 +44536,7 @@ try {
    if (S.money < price) { toast("Wang tidak mencukupi."); return }
    S.money -= price;
    p[key] = true;
+   recordHelper(p, key);
    progress(p, key === "cash" ? 20 : 18);
    save();
   } else if (key === "order-start") newOrder();
@@ -44422,6 +44597,7 @@ try {
   info?.querySelector("[data-kf-map-fence]")?.remove();
   info?.querySelector("[data-kf-map-swing]")?.remove();
   info?.querySelector("[data-kf-map-bench]")?.remove();
+  info?.querySelector("[data-kf-map-park]")?.remove();
   info?.querySelector("[data-kf-map-hall]")?.remove();
   info?.querySelector("[data-kf-map-memory]")?.remove();
   const next = memories[memoryCount()];
@@ -44435,6 +44611,9 @@ try {
    info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
    if (wmSel === "pl:balai" && hallDecoration()?.published) {
     info.insertAdjacentHTML("beforeend", `<div data-kf-map-hall><p>Balai dihias untuk kenduri</p>${hallArt(hallDecoration().published)}</div>`);
+   }
+   if (wmSel === "pl:padang" && p?.park) {
+    info.insertAdjacentHTML("beforeend", `<section data-kf-map-park><p><b>Hasil pembaikan</b></p>${parkArt(p)}</section>`);
    }
    if (wmSel === "pl:padang" && p?.bench?.spot) {
     info.insertAdjacentHTML("beforeend", `<div data-kf-map-bench><p>Bangku rehat · ${benchSpots[p.bench.spot]}</p>${benchArt(p.bench)}</div>`);
@@ -44454,6 +44633,10 @@ try {
   const book = $("#tree .tree-wrap");
   if (book) {
    const entries = (S.hfFamilyActivities?.recipes || []).filter(r => r.learned);
+   const parkMemory = S.hfFamilyActivities?.parkMemory;
+   if (parkMemory && project()?.park?.trial?.done) book.insertAdjacentHTML("beforeend",
+    `<section class="card"><h3>Hari di taman bersama jiran</h3>${/^data:image\/jpeg;base64,[a-z0-9+/=]+$/i.test(parkMemory.picture || "") ? `<img class="kf-park-picture" src="${parkMemory.picture}" alt="Ilustrasi kenangan taman permainan">` : parkArt(project())}
+     <p>Hari ${parkMemory.day + 1} · ${parkMemory.names.map(esc).join(", ")}</p></section>`);
    book.insertAdjacentHTML("beforeend", `<section class="card"><h3>Resipi Turun-Temurun</h3>
      ${entries.map(r => `<p>${esc(DISH[r.dish].name)} · ${esc(r.teacherName)} mengajar ${esc(r.studentName)}</p>`).join("")}
      <button class="btn" type="button" data-kf-entry="recipes">📖 Resipi keluarga</button></section>`);
