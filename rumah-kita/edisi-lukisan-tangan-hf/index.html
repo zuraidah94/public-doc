@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2c6b5a">
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf146" as="script">
+<link rel="preload" href="game.js?v=hf146-kampus-draf" as="script">
 <script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
 <div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
@@ -475,6 +475,30 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 .lt-st{display:inline-block;vertical-align:-4px;margin-right:4px;border-radius:50%;box-shadow:0 0 0 1px rgba(59,42,32,.35)}
 #bars .bar{grid-template-columns:96px 1fr 34px}
 #bars .bar > span:first-child{display:inline-flex;align-items:center;white-space:nowrap}
+/* Universiti & Kolej */
+#rk-campus{width:min(46rem,calc(100% - 1rem));max-height:calc(100dvh - 1rem);padding:0;overflow:auto;color:var(--ink);background:var(--panel);background-image:var(--lt-paper);border:1px solid var(--line);border-radius:1.2rem;box-shadow:0 18px 68px #21180e70}
+#rk-campus::backdrop{background:#2c211bb0}
+.rk-campus-cover{min-height:8rem;position:relative;isolation:isolate;display:flex;align-items:flex-end;justify-content:space-between;gap:.65rem;padding:2.6rem .9rem .8rem;color:#fff9e8;background:#304f35 url("img/rumah/kampung.webp") center 48%/cover}
+.rk-campus-cover::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#182f22f2,#253a2f42 90%)}
+.rk-campus-cover p,.rk-campus-cover h2{margin:0}
+.rk-campus-cover h2{font:750 clamp(1.45rem,5vw,2.2rem)/1.1 'Fraunces',Georgia,serif}
+.rk-campus-cover [data-campus="close"]{position:absolute;top:.45rem;right:.55rem}
+.rk-campus-host{display:grid;justify-items:center;gap:.2rem;font-weight:700}
+.rk-campus-face{display:inline-grid;place-items:center;flex:none;width:2.35rem;height:2.35rem;border:1px solid var(--line);border-radius:50%;background:var(--panel);overflow:hidden}
+.rk-campus-host .rk-campus-face{width:3rem;height:3rem}
+.rk-campus-face .av,.rk-campus-face svg,.rk-campus-face img{width:100%;height:100%;display:block;object-fit:cover}
+.rk-campus-content{padding:.8rem;line-height:1.45}
+#rk-campus .acts{flex-wrap:wrap;gap:.35rem}
+#rk-campus .kf-campus-people{display:flex;flex-wrap:wrap;gap:.4rem;margin:.65rem 0}
+#rk-campus .kf-campus-people button{display:flex;align-items:center;gap:.4rem}
+#rk-campus .kf-campus-people [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+#rk-campus .kf-activities{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10.25rem),1fr));gap:.5rem}
+#rk-campus .kf-activity{display:grid;align-content:start;gap:.4rem;margin:0;padding:.65rem;border:1px solid var(--line);border-radius:.85rem;background:color-mix(in srgb,var(--panel) 92%,#bd9a63)}
+#rk-campus .kf-activity h3,#rk-campus .kf-activity p{margin:0}
+#rk-campus .kf-activity h3{font:750 1rem/1.2 'Fraunces',Georgia,serif}
+#rk-campus .kf-activity label{display:grid;gap:.2rem}
+#rk-campus .kf-activity select{width:100%;max-width:100%;min-height:2.5rem;padding:.25rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:.4rem}
+#rk-campus .card{margin-top:.6rem}
 </style>
 <div class="app">
   <header class="top">
@@ -541,7 +565,7 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
         <div><p class="cap" style="margin-bottom:6px">Diari keluarga</p><ul class="diary" id="diary"></ul></div>
         <div class="row">
           <label class="toggle"><input type="checkbox" id="fw" checked> Kehendak sendiri untuk semua</label>
-          <span class="acts"><button class="btn" id="cheatopen">Cheats</button><button class="btn danger" id="newgame">🔄 Mula semula</button></span>
+          <span class="acts"><button class="btn" type="button" data-campus-entry="hf-kolej">🎓 Universiti &amp; Kolej</button><button class="btn" id="cheatopen">Cheats</button><button class="btn danger" id="newgame">🔄 Mula semula</button></span>
         </div>
         <div class="card" id="cloudcard" style="margin-top:8px"></div>
       </div>
@@ -557,5 +581,5 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf146"></script>
+<script src="game.js?v=hf146-kampus-draf"></script>
 </body></html>
