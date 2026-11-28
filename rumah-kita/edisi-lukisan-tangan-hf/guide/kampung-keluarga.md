@@ -1,6 +1,6 @@
 # Panduan Kampung & Keluarga
 
-Dalam permainan, buka **Keperluan → Kampung & Keluarga**.
+Dalam permainan, buka **Keperluan → Kampung & Keluarga → Aktiviti**. Kesemua sembilan permainan kecil ada di sini. Kad menyatakan bila anda boleh mula, sambung atau lihat hasil. Buka **Lihat projek**, **Pilih resipi** atau **Lihat pesanan** jika aktiviti masih memerlukan persediaan.
 
 ## Projek Kampung
 
@@ -35,3 +35,8 @@ Pilih Teman yang ingin belajar, pilih ahli keluarga dewasa sebagai guru dan mint
 Terima pesanan di Balai Raya, kemudian pilih **Bungkus Bekalan Kenduri**. Padankan bekalan dengan bekas, semak dan sahkan. Sediakan stok dan hantar kuih, buah dan hantaran melalui buku tempahan masing-masing. Siapkan ketiga-tiganya sebelum tarikh tutup untuk mendapat bonus RM60.
 
 ![Senarai tiga bekalan kenduri dan status penghantaran](pesanan-sekampung.png)
+
+
+## Jejak Kenangan Atuk
+
+Buka **Jejak Kenangan Atuk** melalui **Projek Kampung** atau **Buku Warisan Keluarga**. Baca petunjuk, pilih **Cari tempat di peta**, dan tekan **Periksa lokasi** pada kad tempat yang anda rasa sepadan. Padankan gambar album selepas menemui lokasi. Ketiga-tiga cerita disimpan dalam Buku Warisan, dan jejak boleh disambung kemudian.

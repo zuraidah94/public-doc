@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2c6b5a">
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf143-masak-bungkus" as="script">
+<link rel="preload" href="game.js?v=hf143-aktiviti-atuk" as="script">
 <script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
 <div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
@@ -487,7 +487,7 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 #hfkf .kf-face{display:inline-grid;place-items:center;flex:none;width:2.85rem;height:2.85rem;border:1px solid var(--line);border-radius:50%;background:var(--panel);overflow:hidden}
 #hfkf .kf-host .kf-face{width:4.25rem;height:4.25rem;border:2px solid #fff2d5;background:#f0d9ae}
 #hfkf .kf-face .av,#hfkf .kf-face svg,#hfkf .kf-face img{width:100%;height:100%;display:block;object-fit:cover}
-#hfkf .kf-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.4rem;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
+#hfkf .kf-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
 #hfkf .kf-nav button{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25rem .4rem;white-space:normal;min-height:3.5rem;padding:.35rem;font-size:.86rem;line-height:1.2}
 #hfkf .kf-nav button[aria-pressed="true"]{background:#285b42;color:#fffcf1;border-color:#285b42}
 #hfkf .kf-content{padding:.75rem 1rem 1rem;line-height:1.5}
@@ -568,6 +568,22 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 #hfkf .kf-pack-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:.4rem;margin:.65rem 0}
 #hfkf .kf-pack-boxes section{padding:.6rem;border:1px solid var(--line);border-radius:.65rem;background:color-mix(in srgb,var(--panel) 91%,#bc9574)}
 #hfkf .kf-pack [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+/* Jejak Kenangan Atuk */
+#hfkf .kf-atuk{width:3.5rem;height:3.5rem;flex:none;object-fit:cover;border:1px solid var(--line);border-radius:50%;background:#ead8b7}
+#hfkf .kf-memory-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem}
+#hfkf .kf-memory-choices button{min-width:0;padding:.3rem;white-space:normal}
+#hfkf .kf-memory-choices img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:.4rem;margin-bottom:.25rem}
+.kf-memory{display:flex;align-items:flex-start;gap:.7rem;margin:.7rem 0;padding:.6rem;border:1px solid var(--line);border-radius:.8rem}
+.kf-memory img{width:clamp(4rem,20vw,8rem);aspect-ratio:1;object-fit:cover;border-radius:.5rem}
+.kf-memory h3,.kf-memory p{margin:0 0 .25rem}
+/* Menu aktiviti */
+#hfkf .kf-activities{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.55rem}
+#hfkf .kf-activity{display:grid;grid-template-rows:auto auto 1fr auto;gap:.35rem;padding:.65rem;background:color-mix(in srgb,var(--panel) 92%,#bd9a63);border:1px solid var(--line);border-radius:.85rem}
+#hfkf .kf-activity-icon{display:grid;place-items:center;min-height:3rem;background:color-mix(in srgb,var(--panel) 80%,#7f9c6a);border-radius:.55rem;font-size:1.7rem}
+#hfkf .kf-activity h3,#hfkf .kf-activity p{margin:0}
+#hfkf .kf-activity h3{font:750 1rem/1.2 'Fraunces',Georgia,serif}
+#hfkf .kf-activity p{font-size:.9rem}
+#hfkf .kf-activity .btn{min-height:2.6rem;white-space:normal}
 @media(max-width:480px){#hfkf .kf-nav{grid-template-columns:repeat(2,minmax(0,1fr))}#hfkf .kf-nav button{min-height:2.75rem}#hfkf .kf-cover{min-height:8.5rem}}
 </style>
 <div class="app">
@@ -635,7 +651,7 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
         <div><p class="cap" style="margin-bottom:6px">Diari keluarga</p><ul class="diary" id="diary"></ul></div>
         <div class="row">
           <label class="toggle"><input type="checkbox" id="fw" checked> Kehendak sendiri untuk semua</label>
-          <span class="acts"><button class="btn" type="button" data-kf-entry="project">Kampung &amp; Keluarga</button><button class="btn" id="cheatopen">Cheats</button><button class="btn danger" id="newgame">🔄 Mula semula</button></span>
+          <span class="acts"><button class="btn" type="button" data-kf-entry="activities">Kampung &amp; Keluarga</button><button class="btn" id="cheatopen">Cheats</button><button class="btn danger" id="newgame">🔄 Mula semula</button></span>
         </div>
         <div class="card" id="cloudcard" style="margin-top:8px"></div>
       </div>
@@ -651,5 +667,5 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf143-masak-bungkus"></script>
+<script src="game.js?v=hf143-aktiviti-atuk"></script>
 </body></html>

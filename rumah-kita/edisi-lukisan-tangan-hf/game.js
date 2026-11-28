@@ -43692,8 +43692,8 @@ try {
  dialog.id = "hfkf";
  dialog.setAttribute("aria-labelledby", "hfkf-title");
  document.body.append(dialog);
- const titles = { project: "Projek Kampung", plans: "Janji Keluarga", recipes: "Resipi Turun-Temurun", order: "Pesanan Sekampung" };
- const icons = { project: "🌱", plans: "📅", recipes: "🍲", order: "🧺" };
+ const titles = { activities: "Aktiviti", project: "Projek Kampung", plans: "Janji Keluarga", recipes: "Resipi Turun-Temurun", order: "Pesanan Sekampung" };
+ const icons = { activities: "🎮", project: "🌱", plans: "📅", recipes: "🍲", order: "🧺" };
  const face = sim => `<span class="kf-face" data-kf-face="${sim.id}" aria-hidden="true">${avatar(sim)}</span>`;
  let portraitTimer;
  let page = "project", edit = null, returnTo = null;
@@ -43924,6 +43924,80 @@ try {
    <p role="status">${o.packed ? "Bekas siap dilabel. Buka buku tempahan untuk penghantaran." : "Semak semua bekas sebelum mengesahkan."}</p>
    <div class="acts">${button("pack-confirm", "Sahkan bungkusan", o.packed || !Object.keys(parts).every(done))} ${button("pack-back", "Kembali ke pesanan")}</div>`;
  }
+ const memories = [
+  { place: "padang", title: "Wau yang terbang tinggi", image: "img/wau/wau.webp", photo: "Wau",
+   clue: "Cari tanah lapang tempat angin boleh angkat wau tinggi-tinggi.",
+   story: "Atuk pernah bawa wau buatan sendiri. Talinya putus, tetapi jiran sebelah tolong kejar sampai ke hujung padang. Sejak itu kami selalu bawa segulung tali tambahan." },
+  { place: "warung", title: "Sarapan sebelum sekolah", image: "img/drama/lauk.webp", photo: "Hidangan pagi",
+   clue: "Cari tempat orang singgah untuk sarapan dan minum teh sebelum memulakan hari.",
+   story: "Dahulu Atuk singgah sarapan sebelum sekolah. Mak Jah selalu kenal kami melalui bunyi loceng basikal, lalu menyimpan satu bungkus untuk dibawa pulang." },
+  { place: "balai", title: "Kenduri satu kampung", image: "img/drama/duakenduri.webp", photo: "Kenduri",
+   clue: "Cari tempat jiran berkumpul untuk mesyuarat dan menyediakan kenduri bersama.",
+   story: "Waktu kenduri di balai, hujan turun ketika meja baru disusun. Jiran angkat hidangan bersama-sama ke bawah bumbung. Akhirnya semua makan sambil dengar hujan." }
+ ];
+ let matchingMemory = false;
+ const memoryCount = () => S.hfFamilyActivities?.memories?.length || 0;
+ function memoryCard(m) {
+  return `<article class="kf-memory"><img src="${m.image}" alt="${m.photo}" loading="lazy"><div><h3>${m.title}</h3><p>${m.story}</p></div></article>`;
+ }
+ function memoriesView() {
+  const count = memoryCount(), next = memories[count];
+  const photos = [memories[2], memories[0], memories[1]];
+  return `<div class="kf-lesson-guide"><img class="kf-atuk" src="img/orang-hf/muka/atuk-casual.webp" alt=""><div>
+   <b>Atuk</b><p>${next ? next.clue : "Semua kenangan telah dikumpulkan dalam Buku Warisan Keluarga."}</p></div></div>
+   <p><b>${count}/${memories.length} kenangan ditemui</b></p>
+   ${next ? (matchingMemory ? `<p>Padankan tempat ini dengan gambar dalam album.</p>
+    <div class="kf-memory-choices">${photos.map(m => `<button type="button" class="btn" data-kf="memory-photo-${m.place}"><img src="${m.image}" alt="" loading="lazy">${m.photo}</button>`).join("")}</div>
+    <p role="status" data-kf-memory-feedback></p>` : button("memory-map", "Cari tempat di peta")) : ""}
+   ${count ? memoryCard(memories[count - 1]) : ""}`;
+ }
+ const activityCards = [
+  ["fence", "🎨", "Cat Pagar Padang", "Pilih warna dan cat lapan papan."],
+  ["swing", "🛝", "Baiki Buaian", "Pasang tempat duduk dan kedua-dua tali."],
+  ["bench", "🪑", "Pasang Bangku Rehat", "Padankan kaki bangku dan pilih tempat teduh."],
+  ["garden", "🌱", "Tanam Kebun Komuniti", "Tanam, siram dan tukar hasil kepada bekalan memasak."],
+  ["hall", "🎏", "Hias Balai Raya", "Susun meja, bendera dan pasu untuk kenduri."],
+  ["calendar", "📅", "Cari Masa Bersama", "Bandingkan waktu lapang untuk satu janji keluarga."],
+  ["cook", "🍲", "Masak Bersama Guru", "Ikut petua keluarga dan simpan resipi warisan."],
+  ["packing", "🧺", "Bungkus Bekalan Kenduri", "Padankan tiga jenis bekalan dengan bekasnya."],
+  ["memories", "📷", "Jejak Kenangan Atuk", "Cari tiga tempat dan padankan gambar album."]
+ ];
+ function activitiesView() {
+  const p = project(), h = S.hfFamilyActivities, order = h?.order;
+  const sold = order && dayIdx() <= order.due && order.needsPacking;
+  const lesson = h?.recipes.find(r => r.student === S.active && !r.learned);
+  const ready = { fence: p?.kind === "play", swing: p?.kind === "play", bench: p?.kind === "play", garden: p?.kind === "garden", packing: sold, cook: !!lesson };
+  const state = { fence: p?.fence?.boards, swing: p?.swing?.seat, bench: p?.bench?.left || p?.bench?.right,
+   garden: p?.plots?.some(x => x.seed), hall: hallDecoration()?.tables || hallDecoration()?.flags || hallDecoration()?.pots,
+   packing: order?.boxes && Object.keys(order.boxes).length, cook: lesson?.prep, memories: memoryCount() };
+  const done = { fence: p?.fence?.boards === (1 << plankCount) - 1, swing: p?.swing?.tested, bench: p?.bench?.spot,
+   hall: hallDecoration()?.saved, packing: sold && order.packed, memories: memoryCount() === memories.length };
+  return `<div class="kf-activities">${activityCards.map(([key, icon, title, description]) => {
+   const access = Object.hasOwn(ready, key) && !ready[key];
+   const prompt = access ? key === "packing" ? "Lihat pesanan" : key === "cook" ? "Pilih resipi" : "Lihat projek"
+    : done[key] ? "Lihat hasil" : state[key] ? "Sambung" : "Mula";
+   return `<article class="kf-activity"><div class="kf-activity-icon" aria-hidden="true">${icon}</div>
+    <h3>${title}</h3><p>${description}</p>
+    <button type="button" class="btn" data-kf="activity-${key}" aria-label="${prompt}: ${title}">${prompt}</button></article>`;
+  }).join("")}</div>`;
+ }
+ function openActivity(key) {
+  const p = project(), h = S.hfFamilyActivities, order = h?.order;
+  const lesson = h?.recipes.find(r => r.student === S.active && !r.learned);
+  page = "project";
+  if (key === "fence") painting = p?.kind === "play";
+  if (key === "swing") repairing = p?.kind === "play";
+  if (key === "bench") buildingBench = p?.kind === "play";
+  if (key === "garden") gardening = p?.kind === "garden";
+  if (key === "hall") decoratingHall = true;
+  if (key === "calendar") page = "plans";
+  if (key === "cook") { page = "recipes"; activeLesson = lesson || null }
+  if (key === "packing") { page = "order"; packing = !!(order?.needsPacking && dayIdx() <= order.due) }
+  if (key === "memories") { page = "memories"; matchingMemory = false }
+  render();
+  if (key === "calendar") dialog.querySelector("[data-kf-calendar]").open = true;
+  dialog.querySelector(".kf-content button:not([disabled]), .kf-content summary")?.focus();
+ }
  function recipeView() {
   const student = act(), teachers = family().filter(s => s !== student && ["adult", "elder"].includes(s.stage));
   const h = household();
@@ -43949,13 +44023,16 @@ try {
  }
  function render() {
   const me = act();
+  const memoryPage = page === "memories";
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : memoryPage ? "Jejak Kenangan Atuk" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : memoryPage ? memoriesView() : ({ activities: activitiesView, project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}
+    ${page === "project" && !painting && !repairing && !buildingBench && !gardening && !decoratingHall ? `<p>${button("memory-open", "Jejak Kenangan Atuk")}</p>` : ""}
+    </div>`;
   previewConflicts();
  }
  function show(next, source) {
@@ -43963,6 +44040,7 @@ try {
   flushPaint();
   painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null;
   page = next;
+  matchingMemory = false;
   edit = null;
   returnTo = source || document.activeElement;
   render();
@@ -44087,7 +44165,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; matchingMemory = false; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -44105,6 +44183,30 @@ try {
    return;
   }
   const p = project();
+  if (page === "activities" && key.startsWith("activity-")) { openActivity(key.slice(9)); return }
+  if (key === "memory-open") { page = "memories"; matchingMemory = false; render(); return }
+  if (key === "memory-map" && page === "memories" && memories[memoryCount()]) {
+   const h = household();
+   h.memoryTrail = true;
+   save();
+   returnTo = null;
+   dialog.close();
+   openMap();
+   return;
+  }
+  if (matchingMemory && key.startsWith("memory-photo-")) {
+   const h = household(), next = memories[memoryCount()];
+   if (!next || key.slice(13) !== next.place) {
+    dialog.querySelector("[data-kf-memory-feedback]").textContent = "Cuba gambar lain yang sepadan dengan petunjuk Atuk.";
+    return;
+   }
+   (h.memories || (h.memories = [])).push(next.place);
+   h.memoryTrail = false;
+   matchingMemory = false;
+   notify("📖 Kenangan Atuk disimpan: " + next.title + ".");
+   render();
+   return;
+  }
   if (key === "pack-open") { packing = true; pickedPackage = null; render(); return }
   if (key === "pack-back") { packing = false; pickedPackage = null; render(); return }
   if (packing && key.startsWith("pack-")) {
@@ -44321,6 +44423,12 @@ try {
   info?.querySelector("[data-kf-map-swing]")?.remove();
   info?.querySelector("[data-kf-map-bench]")?.remove();
   info?.querySelector("[data-kf-map-hall]")?.remove();
+  info?.querySelector("[data-kf-map-memory]")?.remove();
+  const next = memories[memoryCount()];
+  if (info && wmSel?.startsWith("pl:") && next && S.hfFamilyActivities?.memoryTrail && !S.visiting) {
+   info.insertAdjacentHTML("beforeend", `<section data-kf-map-memory><p><b>Petunjuk Atuk</b> · ${next.clue}</p>
+     <button type="button" class="btn" data-kf-inspect-memory>Periksa lokasi</button><p role="status"></p></section>`);
+  }
   if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
    const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
     (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
@@ -44349,10 +44457,26 @@ try {
    book.insertAdjacentHTML("beforeend", `<section class="card"><h3>Resipi Turun-Temurun</h3>
      ${entries.map(r => `<p>${esc(DISH[r.dish].name)} · ${esc(r.teacherName)} mengajar ${esc(r.studentName)}</p>`).join("")}
      <button class="btn" type="button" data-kf-entry="recipes">📖 Resipi keluarga</button></section>`);
+   book.insertAdjacentHTML("beforeend", `<section class="card"><h3>Jejak Kenangan Atuk</h3>
+     ${memories.slice(0, memoryCount()).map(memoryCard).join("")}
+     <button class="btn" type="button" data-kf-entry="memories">Buka jejak kenangan</button></section>`);
   }
   return result;
  };
  document.addEventListener("click", event => {
+  const inspect = event.target.closest?.("[data-kf-inspect-memory]");
+  if (inspect) {
+   const next = memories[memoryCount()];
+   if (!next || !S.hfFamilyActivities?.memoryTrail || S.visiting) return;
+   if (wmSel !== "pl:" + next.place) {
+    inspect.parentElement.querySelector("[role=status]").textContent = "Belum sepadan. Pilih tempat lain pada peta.";
+    return;
+   }
+   show("memories", inspect);
+   matchingMemory = true;
+   render();
+   return;
+  }
   const source = event.target.closest?.("[data-kf-entry]");
   if (source) show(source.dataset.kfEntry, source);
  });
