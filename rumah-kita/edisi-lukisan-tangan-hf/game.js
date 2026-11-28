@@ -97,7 +97,7 @@
      <div class="sm">Rakan sekelas: ${r.cm.map(c2=>esc(c2.n)+" "+c2.g).join(" · ")}</div></div>`}).join("");else body=kids.map(x=>{const sp=x.sports;return`<div class="lot rc"><div class="row"><b>${esc(x.name)}</b><span class="pill" style="background:${RUMAHC[x.rumah]||"#888"};color:#fff">Rumah ${esc(x.rumah)}</span></div>
      ${sp.evs.map(e=>`<div class="sm"><b>${esc(e.ev)}</b>: ${e.field.map((n2,i)=>`${MED[i+1]||i+1+"."} ${n2===x.name?"<b>"+esc(n2)+"</b>":esc(n2)}`).join(" · ")}</div>`).join("")}
      <div class="sm">${sp.watch?"👏 Keluarga bersorak dari tempat duduk penonton.":"Tiada ahli keluarga datang menonton kali ini."}</div></div>`}).join("")+(S.sukan&&S.sukan.day===dayIdx()?`<p class="hint" style="padding:0 12px">🏆 Johan keseluruhan: <b style="color:${RUMAHC[S.sukan.champ]}">Rumah ${S.sukan.champ}</b></p>`:"");el.innerHTML=`<div class="sheet-head"><div><p class="cap">${k==="exam"?"📜 Keputusan peperiksaan":k==="report"?"📒 Kad laporan":"🏅 Hari Sukan"}</p><h3>${k==="exam"?"Keputusan peperiksaan":k==="report"?"Kad laporan":"Keputusan hari sukan"}</h3></div><button class="x" id="schx" aria-label="Close">✕</button></div>
-   <div class="dishes" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">${body||'<p class="hint">Nothing yet.</p>'}</div>`;$("#schx").onclick=()=>{el.hidden=true}}document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-rep]");if(b)openSchool(b.dataset.kind||"report",[+b.dataset.rep])});function pelaminSpot(){const bl=blockedSet(0);const ok=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&!bl.has(key(x,y))&&!isStair(x,y)&&!(x===DOOR.x&&y===DOOR.y);for(const y of[1,2,3,4,5,6])for(const x of[3,2,4,1,5])if(ok(x,y)&&ok(x+1,y))return[x,y];const t=freeTile(0)||[3,3];return[Math.min(t[0],N-2),t[1]]}function startWedding(){const W2=S.wedding,a=simById(W2.a),b=simById(W2.b);if(!a||!b){S.wedding=null;return false}if(a.away||b.away||a.leaving||b.leaving||isBaby(a))return false;if(!startParty(festById("wedding"),true))return false;W2.started=true;S.party.wed={a:a.id,b:b.id};const sp=pelaminSpot();S.party.pel=sp;[a,b].forEach((x,i)=>{cancelCur(x);x.queue=[];x.f=0;x.x=sp[0]+i+.5;x.y=sp[1]+.5;x.path=[];x.cur={type:"self",act:"bersanding",phase:"do",t:0};x.buff=S.party.end});toast(`💐 Selamat Pengantin Baru! ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"start",S.party.guests.length):`${a.name} dan ${b.name} bersanding di pelamin bagai raja sehari. ${S.party.guests.length} tetamu datang bersalam dengan duit salam dan pulang membawa bunga telur.`}`);diary(window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"diary"):`${a.name} dan ${b.name} mengadakan kenduri kahwin dengan pelamin di rumah.`);return true}function drawPelamin(x,y){const h=.1,top=1.3;poly([P(x-.05,y-.05,h),P(x+2.05,y-.05,h),P(x+2.05,y+1.05,h),P(x-.05,y+1.05,h)],"#8e2a3c","#d9b45a");poly([P(x-.05,y+1.05,h),P(x+2.05,y+1.05,h),P(x+2.05,y+1.05,0),P(x-.05,y+1.05,0)],"#6e1f2e","#d9b45a");poly([P(x+2.05,y-.05,h),P(x+2.05,y+1.05,h),P(x+2.05,y+1.05,0),P(x+2.05,y-.05,0)],"#5a1826","#d9b45a");const[lx,ly]=P(x-.05,y-.05,top),[rx,ry]=P(x+2.05,y-.05,top),[ax,ay]=P(x+1,y-.05,top);ctx.fillStyle="#d9b45a";ctx.beginPath();ctx.moveTo(lx,ly);ctx.quadraticCurveTo(ax,ay-TW*.6,rx,ry);ctx.closePath();ctx.fill();poly([P(x-.05,y-.05,h),P(x+2.05,y-.05,h),P(x+2.05,y-.05,top),P(x-.05,y-.05,top)],"#f4e6c8","#c9a441");poly([P(x+.15,y-.04,h+.08),P(x+1.85,y-.04,h+.08),P(x+1.85,y-.04,top-.08),P(x+.15,y-.04,top-.08)],"#e8b4c8","#c9a441");for(let i=1;i<6;i++){const[a1,b1]=P(x+i/3,y-.03,top-.08),[a2,b2]=P(x+i/3,y-.03,h+.1);ctx.strokeStyle="rgba(201,164,65,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a1,b1);ctx.quadraticCurveTo((a1+a2)/2+3,(b1+b2)/2,a2,b2);ctx.stroke()}for(const cx of[x+.5,x+1.5])poly([P(cx-.28,y+.12,h),P(cx+.28,y+.12,h),P(cx+.28,y+.12,h+.8),P(cx-.28,y+.12,h+.8)],"#d9b45a","#8a6a1a");for(const[fx,fy]of[[x-.2,y+1.15],[x+2.2,y+1.15]]){const[bx,by]=P(fx,fy,0),[tx,ty]=P(fx,fy,1.05);ctx.strokeStyle="#c9a441";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx,ty);ctx.stroke();for(let i=0;i<14;i++){const an=-Math.PI/2+(i-6.5)*.23,len=TW*(.16+.06*(i%3));const ex=tx+Math.cos(an)*len,ey=ty+Math.sin(an)*len*.8+len*.45;ctx.strokeStyle="rgba(201,164,65,.85)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo((tx+ex)/2,ty-len*.35,ex,ey);ctx.stroke();ctx.fillStyle=["#e8577a","#f4f1ea","#f0c040","#7fc8a9"][i%4];ctx.beginPath();ctx.arc(ex,ey,Math.max(1.5,TW*.022),0,7);ctx.fill()}}}function npcPartnered(n2){const H2=S.homes&&S.homes[npcHome(n2.id)];const sm=H2&&H2.sims&&H2.sims.find(x=>x.nbId===n2.id);return!!(sm&&sm.partner)}function npcSingles(){if(!S.npcs)return[];return Object.values(S.npcs).filter(n2=>n2.stage==="adult"&&!n2.spouse&&nbSt(n2.id)?.status==="neighbour"&&nbSt(n2.id).rom<30&&npcHome(n2.id)!==S.home&&!npcPartnered(n2))}function maybeNpcWed(d,force){if(S.npcWed||!force&&Math.random()>.3)return false;const sg=npcSingles(),f=sg.filter(n2=>isFemAp(n2.ap)),m=sg.filter(n2=>!isFemAp(n2.ap));if(!f.length||!m.length)return false;const a=pick(m),b=pick(f);a.spouse=b.id;b.spouse=a.id;S.npcWed={a:a.id,b:b.id,day:d+(force?0:2)};wa(a.name,`${window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"greet"):"Assalamualaikum semua"} 🙏 Dengan sukacitanya menjemput ke majlis perkahwinan saya dengan ${b.name}, ${force?"hari ini":WD[(d+2)%7]} 11 pagi di Balai Raya. Jemput datang! 💐`,a.id);toast(`💌 Kad jemputan! ${a.name} dan ${b.name} akan berkahwin. Kenduri kahwin di Balai Raya pada ${force?"hari ini":WD[(d+2)%7]}, 11:00–16:00.`);diary(`${a.name} dan ${b.name} bertunang.`);return true}function settleNpcWed(W2){const a=S.npcs?.[W2.a],b=S.npcs?.[W2.b];if(!a||!b)return;diary(`${a.name} dan ${b.name} kini suami isteri.`);const ka=npcHome(a.id),kb=npcHome(b.id),ha=S.homes?.[ka],hb=S.homes?.[kb];if(ha&&hb&&ka!==kb&&ka!==S.home&&kb!==S.home&&!S.rentals?.[ka]&&!S.rentals?.[kb]&&ha.sims.length+hb.sims.length<=MAXFAM){const sa=ha.sims.find(x=>x.nbId===a.id),sb=hb.sims.find(x=>x.nbId===b.id);if(sa&&sb){ha.sims.push(...hb.sims);sa.partner=sb.id;sb.partner=sa.id;for(const n2 of Object.values(S.npcs))if(npcHome(n2.id)===kb)n2.home=ka;delete S.homes[kb];toast(`🏡 Keluarga ${b.name} berpindah ke ${homeName(ka)} selepas majlis kahwin.`)}}else if(!ha&&hb&&kb!==S.home){a.home=kb}else if(ha&&!hb&&ka!==S.home){b.home=ka}}function maybeArrive(d){if(S.noArrivals||nhh||S.visiting||d<2||lotIds().length>=20||Math.random()>.3)return;autoFamily()}function autoFamily(){if(nhh||lotIds().length>=20)return false;const ms=[newPerson("adult")];if(Math.random()<.7){let b;for(let i=0;i<25;i++){b=newPerson("adult");if(isFemAp(b.ap)!==isFemAp(ms[0].ap)&&b.name!==ms[0].name)break}ms.push(b)}const nk=Math.floor(Math.random()*3);for(let i=0;i<nk;i++)ms.push(newPerson(Math.random()<.65?"child":"teen"));if(Math.random()<.2)ms.push(newPerson("elder"));for(let i=1;i<ms.length;i++){let t=0;while(ms.slice(0,i).some(o2=>o2.name===ms[i].name)&&t++<20)ms[i].name=pick(isFemAp(ms[i].ap)?NAMES_F:NAMES_M)}nhh={members:ms,couple:ms.length>1&&ms[1].stage==="adult",play:false};return buildHousehold(true)}const reqTxt=()=>{const r=ensureReq(),d=DISH[r.dish];return r.done?`Pesanan hari ini untuk ${d.name} selesai ✓`:`Pesanan hari ini: ${r.qty} bungkus ${d.e} ${d.name} (+RM ${r.bonus} bonus)`};const stockCount=()=>(S.stock||[]).reduce((a,x)=>a+x.n,0);const packetPrice=(d,q)=>Math.max(2,Math.round(d.cost/4*1.8+q*.9));function errandReturn(s2){let e=s2.errand;if(e==="bazaarshopb")e="bazaarshop";if(e==="bazaarsellb")e="bazaarsell";s2.away=null;s2.errand=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;s2.path=[];s2.cur=null;if(e&&ERR[e]&&ERR[e].place==="estate"){estReturn(s2,e);emit(s2,"errand",{act:e});return}if(e==="beraya")berayaReturn(s2);if(["thaipusam","ponggal","tanglung","limau","kaamatan","gawai","merdeka","ethvisit"].includes(e))festReturn(s2,e);if(["menghadap","santap","lawatistana","tamandiraja","solatistana","beradu","darjah","royalwed","chepuan","gala","sambutdiraja","minumtengku","merisik","pertabalan","aqiqahdiraja","tidurist"].includes(e))istanaReturn(s2,e);outReturn(s2,e);if(e==="evak")toast(`🏠 ${s2.name} dah balik ke rumah. Bau asap masih ada, tetapi sekeluarga bersama.`);if(e==="pps")toast(`🏠 ${s2.name} dah balik dari PPS. Masa untuk membersihkan lumpur.`);if(e==="bizwork"&&S.biz){S.biz.worked=dayIdx();skillGain(s2,"cooking",50);skillGain(s2,"charisma",20);s2.needs.energy=clamp(s2.needs.energy-20,0,100);toast(`🧑‍🍳 ${s2.name} bekerja satu syif di ${S.biz.name}. Kualiti jualan hari ini naik.`)}if(e==="bizclean"&&S.biz){S.biz.clean=clamp(S.biz.clean+45,0,100);if(S.biz.closedUntil>=dayIdx())S.biz.closedUntil=dayIdx();toast(`🧽 ${s2.name} mencuci menyeluruh ${S.biz.name}: permukaan disanitasi, log suhu peti sejuk disemak dan kawalan perosak. Kebersihan ${Math.round(S.biz.clean)}.`)}if(e==="tdam")tourPlay(s2,"dam");if(e==="tcongkak")tourPlay(s2,"congkak");if(e==="congkak")s2.congkakPlays=(s2.congkakPlays||0)+1;if(e==="n95"||e==="n95b"){S.mask=dayIdx()+5;toast(`😷 ${s2.name} beli pelitup N95 untuk sekeluarga. Lebih selamat di luar semasa jerebu.`)}if(HAZEOUT.includes(e)&&hazeAPI(dayIdx())>150&&!masked()){s2.needs.hygiene=clamp(s2.needs.hygiene-15,0,100);toast(`🌫️ ${s2.name} balik berbau asap jerebu.`);if(Math.random()<.25)hazeSick(s2)}if(e==="lrtkl"){s2.needs.fun=clamp(s2.needs.fun+50,0,100);s2.needs.social=clamp(s2.needs.social+20,0,100);s2.needs.energy=clamp(s2.needs.energy-15,0,100);toast(`🚆 ${s2.name} naik LRT ke bandar besar: ${pick(["bergambar di menara berkembar","memburu barang murah di Petaling Street","satay di Jalan Alor","Muzium Negara dan Dataran Merdeka","konsert percuma di taman bandar"])}.`)}if(e==="mallshop"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.worn=0;S.pantry=(S.pantry||0)+2;toast(`🛍️ ${s2.name} membeli-belah di Harmoni Mall: ${pick(["baju baru","kasut baru","beg tangan murah","gajet","skincare"])} dan barang dapur untuk 2 hidangan.`)}if(e==="wayang"){s2.needs.fun=clamp(s2.needs.fun+55,0,100);s2.needs.social=clamp(s2.needs.social+10,0,100);toast(`🎬 ${s2.name} tonton ${pick(["filem seram Melayu 👻","filem adiwira","filem aksi Tamil","tayangan semula filem klasik lama","drama cinta Korea"])} di panggung wayang. Bertih jagung!`)}if(e==="foodcourt"){s2.needs.hunger=clamp(s2.needs.hunger+60,0,100);s2.needs.fun=clamp(s2.needs.fun+10,0,100);toast(`🍜 ${s2.name} makan ${pick(["nasi ayam","laksa","chicken chop","nasi kandar","dim sum","pad thai"])} di medan selera.`)}if(e==="mamak"){s2.needs.hunger=clamp(s2.needs.hunger+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);toast(`☕ ${s2.name} minum teh tarik dan makan ${pick(["roti canai","roti telur","maggi goreng","tosai","nasi lemak"])} di kedai mamak.`)}if(e==="bola"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.energy=clamp(s2.needs.energy-10,0,100);toast(`⚽ ${s2.name} tonton bola sepak di kedai mamak. ${pick(["Harimau Malaya menang! 🐯🎉","Seri 1-1, tension!","Kalah… teh tarik tak manis malam ni 😩"])}`)}if(e==="jogging"){s2.needs.fun=clamp(s2.needs.fun+20,0,100);s2.needs.energy=clamp(s2.needs.energy-12,0,100);s2.dirt=Math.min(100,(s2.dirt||0)+30);s2.buff=Math.max(s2.buff||0,S.t+240);toast(`🏃 ${s2.name} berjoging 5 km keliling tasik. Rasa cergas!`)}if(e==="piknik"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.needs.hunger=clamp(s2.needs.hunger+30,0,100);toast(`🧺 ${s2.name} berkelah di tepi tasik dan memberi ikan makan.`)}if(e&&e.startsWith("tl_"))tlReturn(s2,e);if(["konsertt","konsertp","dramashoot","dramaextra","sukant","sukanp"].includes(e))fameReturn(s2,e);if(["solatmasjid","kelasquran","sembahyangtokong","tilikan","pujakuil","misa","lawatibadah","ziarahkubur"].includes(e))faithReturn(s2,e);if(e==="khidmat")khidmatReturn(s2);if(["lawatkilang","kilangpart","kitarsemula","asramaderma"].includes(e))kilangReturn(s2,e);if(["isiminyak","servis","cucikereta","bengkelmod"].includes(e))stesenReturn(s2,e);if(MJOB[e])mallJobReturn(s2,e);franReturn(s2,e);konvoReturn(s2,e);tadEvReturn(s2,e);slipReturn(s2,e);mallSaleReturn(s2,e);for(const f of RETX)try{f(s2,e)}catch(er){console.error(er)}if(e==="kondoswim"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene+10,0,100);toast(`🏊 ${s2.name} berenang di kolam kondo di tingkat 8.`)}if(e==="gym"){s2.needs.energy=clamp(s2.needs.energy-15,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);s2.buff=Math.max(s2.buff||0,S.t+240);toast(`🏋️ ${s2.name} bersenam di gim kondo.`)}if(e==="klinik"||e==="klinikd")clinicVisit(s2,e==="klinik");if(e==="lawat"){const pt=S.sims.find(x=>x.away==="hospital");s2.needs.social=clamp(s2.needs.social+25,0,100);if(pt){pt.visited=true;pt.needs.fun=clamp(pt.needs.fun+30,0,100);toast(`💐 ${s2.name} melawat ${pt.name} di wad bersama ${pick(["buah tangan","setangkai anggur","bubur ayam","kad semoga cepat sembuh"])}. ${pt.name} rasa lebih baik.`)}}if(e==="balik")balikReturn(s2);if(e==="tempah"){s2.needs.social=clamp(s2.needs.social+10,0,100);openTailor(s2)}if(e==="ambil")collectTailor(s2);if(e==="belibaju")buyClothes(s2);if(e==="pmshop"&&(s2.worn||0)>=50){s2.worn=0;setTimeout(()=>toast(`👕 ${s2.name} juga beli baju harian baharu di pasar malam.`),1200)}if(e==="lopak")s2.dirt=100;if(e==="groceries"){S.pantry=(S.pantry||0)+5;toast(`🛒 ${s2.name} balik dari Kedai Pak Ali dengan barang dapur untuk 5 hidangan.`)}if(e==="pmeat"){s2.needs.hunger=clamp(s2.needs.hunger+60,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);toast(`🍢 ${s2.name} makan ${pick(["satay dengan kuah kacang","apam balik","murtabak","ayam goreng","char kuey teow","roti john"])} dan minum ${pick(["air tebu","air kelapa","teh ais","soya cincau"])} di pasar malam.`)}if(e==="pmgame"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);const win=Math.random()<.4+lvlOf(s2,"logic")*.03;const pr=pick(["teddy bear gergasi","ikan emas dalam plastik","kereta mainan","pedang plastik","sebungkus besar keropok"]);toast(win?`🎯 ${s2.name} menang ${pr} main ${pick(["baling tin","pancing itik","tikam"])}! 🎉`:`🎯 ${s2.name} main ${pick(["baling tin","pancing itik","tikam"])}. Nyaris! Cuba lagi minggu depan.`);if(win)S.lp+=20}if(e==="pmshop"){S.pantry=(S.pantry||0)+3;s2.needs.fun=clamp(s2.needs.fun+15,0,100);let extra="";if(Math.random()<.35){const sp=freeTile(0);if(sp){S.objs.push({id:S.nextId++,type:"plant",x:sp[0],y:sp[1],f:0});extra=" Dapat juga pokok bunga untuk rumah!"}}toast(`🛍️ ${s2.name} beli ${pick(["baju baharu","tudung bawal","sarung telefon","barang dapur"])} dan sayur segar (3 hidangan).${extra}`);diary(`${s2.name} membeli-belah di pasar malam.`)}if(["pmeat","pmgame","pmshop","pmsell"].includes(e)){const nb=pick(S.nb.filter(x=>x.status==="neighbour"));if(nb)nb.rel=clamp(nb.rel+3,-100,100)}if(e==="kutip"){const h0=hourF(),n2=(h0<8.5?4:2)+Math.floor(Math.random()*4);S.durian=(S.durian||0)+n2;s2.needs.fun=clamp(s2.needs.fun+15,0,100);let ouch="";if(Math.random()<.15){s2.needs.fun=clamp(s2.needs.fun-10,0,100);ouch=" Aduh, kena duri! 🩹"}toast(`🧺 ${s2.name} kutip ${n2} biji durian runtuh di dusun${h0<8.5?" (siapa cepat dia dapat lebih!)":""}.${ouch} Kini ${S.durian} biji di rumah.`)}if(e==="jualdurian"){const n2=S.durian||0;let tot=0,mk=0;for(let i=0;i<n2;i++){if(Math.random()<.12){mk++;tot+=36}else tot+=12}S.durian=0;S.money+=tot;sfx("coin");toast(`🛒 ${s2.name} jual ${n2} biji durian tepi jalan dapat RM ${tot}${mk?` (${mk} were Musang King!)`:""}.`);if(n2)famPost(s2.name,`Durian kampung dah habis dijual hari ni! Esok ada lagi 🍈`,"🍈")}if(e==="pestadurian"){for(const[k,v]of[["hunger",40],["social",35],["fun",30]])s2.needs[k]=clamp(s2.needs[k]+v,0,100);for(const x of S.nb.filter(x2=>x2.status==="neighbour").slice(0,4))x.rel=clamp(x.rel+3,-100,100);const win=Math.random()<.3+lvlOf(s2,"charisma")*.03;if(win){S.money+=50;S.lp+=60}toast(win?`🍈 ${s2.name} menang pertandingan makan durian di pesta durian! +RM 50 🏆`:`🍈 ${s2.name} menikmati pesta durian dengan pulut durian dan tempoyak. Persahabatan +3 dengan jiran.`)}if(e==="lopak"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene-35,0,100);toast(`💦 ${s2.name} main lopak air dengan budak kampung. Comot tapi gembira! Masa untuk mandi.`)}if(e==="rtvisit"||e==="rtcook"){const I=S.rtInvite;for(const[k,v]of[["hunger",60],["social",40],["fun",25]])s2.needs[k]=clamp(s2.needs[k]+v,0,100);if(I){const n2=nbSt(I.hostId);if(n2)n2.rel=clamp(n2.rel+6,-100,100)}if(e==="rtvisit")toast(`🏡 ${s2.name} menikmati rumah terbuka ${I?I.host+"'s":"the"}: rendang, ketupat dan berenang di kolam mereka. Persahabatan +6.`);else rtContest(s2)}if(e==="kahwin"){const W2=S.npcWed,a=W2&&nbDef(W2.a),b=W2&&nbDef(W2.b);for(const k of["hunger","social","fun"])s2.needs[k]=clamp(s2.needs[k]+{hunger:50,social:35,fun:20}[k],0,100);if(W2)for(const id of[W2.a,W2.b]){const n2=nbSt(id);if(n2)n2.rel=clamp(n2.rel+6,-100,100)}S.lp+=30;sfx("want");toast(`💐 ${s2.name} menyaksikan ${a?a.name:"pasangan itu"} dan ${b?b.name:""} ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([W2&&W2.a,W2&&W2.b],"see"):"bersanding"} di Balai Raya, ${window.RKHF&&RKHF.wedFood?RKHF.wedFood([W2&&W2.a,W2&&W2.b],"eat"):"makan nasi minyak dan bawa balik bunga telur"}. Persahabatan +6.`);diary(`${s2.name} menghadiri kenduri kahwin di Balai Raya.`)}if(e==="sukan"){s2.needs.social=clamp(s2.needs.social+25,0,100);s2.needs.fun=clamp(s2.needs.fun+25,0,100);S.sukanWatch=dayIdx();toast(`🏅 ${s2.name} bersorak dari tempat duduk di Hari Sukan. Budak-budak berlari lebih laju bila tahu keluarga menonton!`);diary(`${s2.name} pergi ke Hari Sukan.`)}if(e==="terbuka"){const ks=S.sims.filter(x=>CT.includes(x.stage));for(const k of ks)k.grade=clamp(k.grade+4,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);S.terbuka=dayIdx();toast(ks.length?`📒 ${s2.name} berjumpa guru kelas pada Hari Terbuka. ${ks.map(k=>k.name).join(" dan ")} dapat kata semangat: gred +4.`:`📒 ${s2.name} membantu pada Hari Terbuka.`)}if(e==="shift"){const pay=32+lvlOf(s2,"charisma")*3;S.money+=pay;s2.skills.charisma+=60;sfx("coin");toast(`🧾 ${s2.name} habis syif di kedai: +RM ${pay}, karisma naik.`);diary(`${s2.name} bekerja satu syif di Kedai Pak Ali.`)}if(e==="lepak"){s2.needs.social=clamp(s2.needs.social+35,0,100);s2.needs.fun=clamp(s2.needs.fun+20,0,100);const nb=pick(S.nb.filter(n2=>n2.status==="neighbour"));if(nb){nb.rel=clamp(nb.rel+4,-100,100);toast(`☕ ${s2.name} minum teh tarik bersama ${nbDef(nb.id).name} di warung. Persahabatan +4.`)}else toast(`☕ ${s2.name} menikmati teh tarik di warung.`)}if(e==="sellfood"||e==="bazaarsell"||e==="pmsell"){const mult=e==="bazaarsell"?1.4:e==="pmsell"?1.25:1,st=S.stock||[];let tot=0,n2=0;const r=ensureReq();let reqN=0;for(const x of st){const d=DISH[x.dish];if(!d)continue;tot+=Math.round(packetPrice(d,x.q)*x.n*mult);n2+=x.n;if(x.dish===r.dish)reqN+=x.n}S.stock=[];let extra="";if(e==="sellfood"&&!r.done&&reqN>=r.qty){r.done=true;tot+=r.bonus;extra=` Order complete: +RM ${r.bonus} bonus!`;S.lp+=40}if(n2&&S.waHype&&S.t<S.waHype&&e==="sellfood"){const b=Math.round(tot*.15);tot+=b;extra+=` Bonus semangat kumpulan +RM ${b}.`}if(n2&&e!=="sellfood")famPost(s2.name,e==="pmsell"?"Habis licin kat pasar malam! Terima kasih semua yang singgah 🙏":"Habis jual kat bazaar! Terima kasih 🙏","🧺");if(n2){S.money+=tot;sfx("coin");toast(e==="pmsell"?`🧺 ${s2.name} menjual ${n2} bungkus di pasar malam dengan harga RM ${tot}. "${pick(["Habis licin!","Habis sebelum pukul 22:00!","Pelanggan beratur panjang!"])}"`:e==="bazaarsell"?`🏮 ${s2.name} menjual ${n2} bungkus di bazar Ramadan dengan harga RM ${tot}. Malam yang sibuk!`:`🍱 Pak Ali membeli ${n2} bungkus masakan anda dengan harga RM ${tot}. "${pick(["Laku keras!","Pelanggan suka!","Bawa lebih esok ya!"])}"${extra}`);diary(`${s2.name} jual ${n2} bungkus makanan, dapat RM ${tot}.`)}else toast("🍱 Tiada apa untuk dijual. Masak sesuatu dahulu.")}const bumpNb=(k,amt)=>{const n2=k?nbSt(k):pick(S.nb.filter(x=>x.status==="neighbour"));if(n2){n2.rel=clamp(n2.rel+amt,-100,100);return nbDef(n2.id).name}return null};if(e==="jumaat"){s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);const nm=bumpNb("hafiz",4);toast(`🕌 ${s2.name} solat Jumaat di surau${nm?` dan bersembang dengan ${nm} lepas itu`:""}.`)}if(e==="bazaarshop"){S.pantry=(S.pantry||0)+3;s2.needs.fun=clamp(s2.needs.fun+20,0,100);toast(`🏮 ${s2.name} balik dari bazar dengan ${pick(["murtabak","ayam percik","roti john","kuih-muih"])}, ${pick(["air tebu","air kathira","soya cincau"])} dan makanan untuk 3 hidangan.`)}if(e==="tarawih"){s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.hunger=clamp(s2.needs.hunger+15,0,100);for(const n2 of S.nb)if(n2.status==="neighbour")n2.rel=clamp(n2.rel+2,-100,100);toast(`🌙 ${s2.name} pergi tarawih dan tinggal untuk moreh: ${pick(["bubur lambuk","mee hoon goreng","kuih dan teh panas"])}. Persahabatan +2 dengan semua.`)}if(e==="ceramah"){s2.skills.logic+=40;s2.needs.social=clamp(s2.needs.social+15,0,100);toast(`📿 ${s2.name} mendengar ceramah di surau. Logik naik, dan malam yang tenang.`)}if(e==="mesyuarat"){s2.skills.charisma+=50;for(const n2 of S.nb)if(n2.status==="neighbour")n2.rel=clamp(n2.rel+3,-100,100);S.lp+=50;toast(`🗣️ ${s2.name} bercakap dalam mesyuarat kampung. ${pick(["Setuju membaiki longkang sebelum hujan.","Merancang gotong-royong seterusnya.","Mengundi untuk pasang lampu jalan baru."])} Persahabatan +3 dengan semua.`);diary(`${s2.name} menghadiri mesyuarat kampung di balai raya.`)}if(e==="badminton"){s2.needs.fun=clamp(s2.needs.fun+30,0,100);s2.needs.energy=clamp(s2.needs.energy-15,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);const nm=bumpNb(null,3);toast(`🏸 ${s2.name} main badminton di balai raya${nm?` with ${nm}`:""}.`)}if(e==="galah"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.energy=clamp(s2.needs.energy-20,0,100);toast(`🏃 ${s2.name} main galah panjang dengan ${kidFriend(s2)} dan ${pick(KIDS)}. ${pick(["Pasukan mereka menang!","Nyaris!","Semua berpeluh dan gembira."])}`)}if(e==="wau"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.skills.logic+=20;toast(`🪁 Wau ${s2.name} terbang lebih tinggi daripada layang-layang ${kidFriend(s2)}!`)}if(e==="congkak"){s2.needs.fun=clamp(s2.needs.fun+30,0,100);s2.needs.social=clamp(s2.needs.social+20,0,100);s2.skills.logic+=25;toast(`🥥 ${s2.name} main congkak dengan ${kidFriend(s2)}. ${pick(["Menang 3 biji!","Kalah, tapi nak lawan semula.","Seri!"])}`)}emit(s2,"errand",{act:e})}function defOf(c2){if(c2.type==="errand")return ERR[c2.act];return c2.type==="social"?SOC[c2.act]:c2.type==="fam"?FAM[c2.act]:c2.type==="yard"?YARD[c2.act]:ACT[c2.act]}function yardDone(s2,c2){const today=dayIdx();if(c2.act==="chickens"){if(S.fedDay!==today){S.fedDay=today;const e=2+Math.floor(Math.random()*4),rm=e*2;S.money+=rm;s2.needs.fun=clamp(s2.needs.fun+15,0,100);sfx("coin");toast(`🐔 ${s2.name} bagi ayam makan dan kutip ${e} biji telur (dijual RM ${rm}).`)}else{s2.needs.fun=clamp(s2.needs.fun+5,0,100);toast("🐔 Ayam dah kenyang hari ini.")}}if(c2.act==="coconut"){const n2=Math.min(3,S.coconuts||0);if(n2){S.coconuts-=n2;S.money+=n2*4;s2.needs.hunger=clamp(s2.needs.hunger+12,0,100);s2.needs.fun=clamp(s2.needs.fun+10,0,100);sfx("coin");toast(`🥥 ${s2.name} petik ${n2} biji kelapa, minum sebiji dan jual selebihnya (RM ${n2*4}).`)}else toast("🌴 Belum ada kelapa yang masak. Lebih banyak tumbuh setiap hari.")}if(c2.act==="laundry"){const had=S.laundry||0;S.laundry=0;S.hungDay=today;for(const o2 of S.sims)if(!isBaby(o2))o2.needs.hygiene=clamp(o2.needs.hygiene+8,0,100);toast(had?`👕 ${s2.name} sidai ${had} bakul baju. Baju bersih untuk semua!`:"👕 Belum ada apa-apa nak dibasuh.")}if(c2.act==="kuih"){s2.needs.hunger=clamp(s2.needs.hunger+25,0,100);s2.needs.fun=clamp(s2.needs.fun+8,0,100);toast(`🍡 ${s2.name} beli ${pick(["kuih lapis","onde-onde","kuih seri muka","karipap","kuih koci","pulut inti","kuih talam"])} daripada Mak Cik Senah. Sedap!`)}if(c2.act==="wave")toast(`🛵 Pak Cik Ramli hon dan lambai balik kepada ${s2.name}.`)}let YHS=[];function errSub(me,a){const e=ERR[a];if(!e.ages.includes(me.stage))return e.place==="padang"?"budak-budak je":"terlalu muda";if(e.who&&!e.who(me))return e.whoTxt||"bukan untuk orang ini";if(!errOpen(a))return e.whenTxt||"belum dibuka";if(["sellfood","pmsell","bazaarsell","rtcook"].includes(a)){const n2=stockCount();return n2?`${n2} paket · ~RM ${(S.stock||[]).reduce((t,x)=>t+(DISH[x.dish]?packetPrice(DISH[x.dish],x.q)*x.n:0),0)}`:"masak dulu"}if(a==="shift")return`4 jam · lebih kurang RM ${32+lvlOf(me,"charisma")*3}`;const tv=travelOf(a);return(e.cost?`RM ${e.cost} · `:"")+(e.dur>=60?e.dur/60+" jam":e.dur+" min")+(tv.how?tv.how==="car"?" · 🚗 memandu":` · ${tv.how==="bus"?"🚌":"🚆"} RM ${tv.fare}`:"")}function travelOf(a){const pl=PLACES[ERR[a]?.place];if(!pl||ERR[a].place==="kampungasal")return{extra:0,fare:0};const pa=pl.area||"kampung",ha=S.area||"kampung";if(pa===ha||pa==="both")return{extra:0,fare:0};if(S.car)return{extra:30,fare:0,how:"car"};return{extra:60,fare:ha==="bandar"?2:3,how:ha==="bandar"?"LRT":"bus"}}function errOk(me,a){const e=ERR[a];return e.ages.includes(me.stage)&&!(e.who&&!e.who(me))&&errOpen(a)&&!(e.cost&&S.money<e.cost)&&!(["sellfood","pmsell","bazaarsell","rtcook"].includes(a)&&!stockCount())}const errItem=(me,a)=>({label:ERR[a].label,sub:errSub(me,a),dis:!errOk(me,a),fn:()=>enqueue(me,{type:"errand",act:a})});function yardMenu(me,kind,mx,my){if(kind==="car"){openCar();return}if(me.away||isBaby(me)){toast("Pilih Teman yang ada di rumah.");return}if(S.view!==0&&kind!=="kedai"){toast("Pergi ke tingkat bawah dahulu.");return}const it=(act2,sub,dis)=>({label:YARD[act2].label,sub,dis,fn:()=>enqueue(me,{type:"yard",act:act2})});const ok=a=>YARD[a].ages.includes(me.stage);if(kind==="chickens")openMenu(mx,my,"Ayam kampung","3 ekor ayam",[it("chickens",S.fedDay===dayIdx()?"dah diberi makan":"telur nak dijual",false)]);if(kind==="palm")openMenu(mx,my,"Pokok kelapa",`${S.coconuts||0} biji kelapa masak`,[it("coconut",ok("coconut")?"RM 4 each":"remaja ke atas",!ok("coconut"))]);if(kind==="laundry")openMenu(mx,my,"Clothesline",`${S.laundry||0} muatan menunggu`,[it("laundry",ok("laundry")?"baju bersih":"remaja ke atas",!ok("laundry"))]);if(kind==="vendor")openMenu(mx,my,"Mak Cik Senah","Kuih seller · here until "+fmtT(S.vendor?.until||0),[it("kuih","RM 5",S.money<5)]);if(kind==="kedai"){openMenu(mx,my,"Kedai Runcit Pak Ali",`Buka 7:00–22:00 · pantri ${S.pantry||0} · ${stockCount()} bungkus untuk dijual`,PLACES.kedai.acts.map(a=>errItem(me,a)));return}if(kind==="moto")openMenu(mx,my,"Pak Cik Ramli","Lalu dengan motosikalnya",[it("wave","",false)])}function babyIn(o2){return S.sims.find(b=>isBaby(b)&&b.crib===o2.id)}function objBusy(o2,me){return S.sims.some(s2=>s2!==me&&s2.cur&&s2.cur.obj===o2.id)}function canAct(s2,a,o2){const d=ACT[a];if(!d.ages.includes(s2.stage))return`Bukan untuk golongan ${STAGEL[s2.stage].toLowerCase()}`;if(a==="mesra"){const p=simById(s2.partner);if(!p)return"Perlu pasangan";if(!AD.includes(p.stage))return"Pasangan belum dewasa";if(p.away)return"Pasangan tiada di rumah";if(isBaby(p))return"No"}if(a==="trybaby"){const p=simById(s2.partner);if(!p)return"Perlu pasangan";if(p.stage!=="adult")return"Pasangan terlalu tua";if(p.away)return"Pasangan tiada di rumah";if(S.pregnancy)return"Bayi dalam kandungan";if(S.sims.length>=homeCap(S.home))return"Rumah dah penuh"}if(a==="feed"||a==="cuddle"){if(!o2||!babyIn(o2))return"Tiada bayi dalam buaian"}if(a==="adopt"&&S.sims.length+(S.pregnancy?1:0)+(S.adopt?1:0)>=MAXFAM)return"Rumah dah penuh";if(d.cost&&S.money<d.cost)return"RM "+d.cost;return true}function enqueue(s2,q){if(isBaby(s2))return;if(s2.away){toast(`${s2.name} keluar sampai ${s2.away==="school"?"15:00":"17:00"}.`);return}if(s2.queue.length>=5){toast("Senarai tugasan penuh. Batalkan sesuatu dahulu.");return}s2.queue.push(q)}const allVis=()=>[S.visitor,...S.party?S.party.guests:[]].filter(Boolean);const visById=id=>allVis().find(v=>v.id===id);function cancelCur(s2){const c2=s2.cur;if(!c2)return;for(const v of allVis())if(v.busyBy===s2.id)v.busyBy=null;s2.cur=null;s2.path=[]}function startNext(s2){if(s2.cur||!s2.queue.length)return;const c2=Object.assign({},s2.queue.shift(),{t:0,phase:"walk"});if(c2.type==="obj"){let o2=objById(c2.obj);if(!o2)return;const ok=canAct(s2,c2.act,o2);if(ok!==true){toast(`${s2.name}: ${ok}.`);return}if(objBusy(o2,s2)){const alt=S.objs.find(x=>x.type===o2.type&&!objBusy(x,s2));if(!alt){toast(`${ITEMS[o2.type].name.toLowerCase()} sedang digunakan.`);return}o2=alt;c2.obj=o2.id}if(!goTo(s2,o2.f,adjFree(o2.f,o2.x,o2.y))){toast(`${s2.name} tak dapat sampai ke ${ITEMS[o2.type].name.toLowerCase()}.`);return}}else if(c2.type==="social"&&c2.viaSim){const t=simById(c2.viaSim);if(!t||t.away)return;const d=SOC[c2.act];if(d.cost&&S.money<d.cost){toast(`Duit tak cukup (RM ${d.cost}).`);return}t.queue=[];if(t.cur&&t.cur.phase!=="do")cancelCur(t);const[tx,ty]=tileOf(t);const g=adjFree(t.f,tx,ty);g.add(key(tx,ty));if(!goTo(s2,t.f,g)){toast(`Tak dapat mendekati ${t.name}.`);return}}else if(c2.type==="social"){const v=visById(c2.npc);if(!v||v.state==="leave")return;if(v.busyBy&&v.busyBy!==s2.id){s2.queue.unshift(Object.assign({},c2));s2.idle=-5;return}const d=SOC[c2.act];if(d.cost&&S.money<d.cost){toast(`Duit tak cukup (RM ${d.cost}).`);return}v.busyBy=s2.id;v.path=[];const[vx,vy]=tileOf(v);if(!goTo(s2,0,adjFree(0,vx,vy))){v.busyBy=null;toast(`Tak dapat mendekati ${visName(v)}.`);return}}else if(c2.type==="fam"){const t=simById(c2.target);if(!t||t.away||isBaby(t))return;const[tx,ty]=tileOf(t);const g=adjFree(t.f,tx,ty);g.add(key(tx,ty));if(!goTo(s2,t.f,g)){toast(`${s2.name} tak dapat hubungi ${t.name}.`);return}}else if(c2.type==="self"){const ok=c2.act==="passout"?true:canAct(s2,c2.act);if(ok!==true){toast(`${s2.name}: ${ok}.`);return}c2.phase="do";s2.path=[];if(ACT[c2.act].cost)S.money-=ACT[c2.act].cost}else if(c2.type==="walk"){if(!goTo(s2,c2.f,new Set([key(c2.tx,c2.ty)])))return}else if(c2.type==="errand"){const d=ERR[c2.act];if(!d.ages.includes(s2.stage)){toast(d.place==="padang"?"Itu untuk kanak-kanak dan remaja.":`${s2.name} terlalu kecil untuk pergi seorang.`);return}if(!errOpen(c2.act)){toast(`${d.label}: ${d.whenTxt||"buka 7:00–22:00"}.`);return}if((c2.act==="sellfood"||c2.act==="pmsell"||c2.act==="bazaarsell"||c2.act==="rtcook")&&!stockCount()){toast("Belum ada apa untuk dijual. Masak sesuatu dahulu.");return}if(s2.visitFrom&&ERR[c2.act].place!=="estate"){toast("Balik dari lawatan dahulu.");return}if(d.cost&&S.money<d.cost){toast("Duit tak cukup.");return}if(!goTo(s2,0,new Set([key(DOOR.x,DOOR.y)]))){toast(`${s2.name} tak dapat sampai ke pintu.`);return}}else if(c2.type==="yard"){const d=YARD[c2.act];if(!d.ages.includes(s2.stage)){toast(`${s2.name} masih terlalu muda untuk itu.`);return}if(c2.act==="kuih"&&!S.vendor){toast("Mak Cik Senah lalu tepi jalan pukul 16:00.");return}if(d.cost&&S.money<d.cost){toast("Duit tak cukup.");return}if(!d.tile){c2.phase="do";s2.path=[]}else{if(s2.f!==0&&!S.stair){return}const bl=blockedSet(0),g=new Set;for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){const x=d.tile[0]+dx,y=d.tile[1]+dy;if(x>=0&&y>=0&&x<N&&y<N&&!bl.has(key(x,y)))g.add(key(x,y))}if(!goTo(s2,0,g)){toast(`${s2.name} tak dapat keluar.`);return}}}s2.cur=c2}function arrive(s2,c2){if(c2.type==="walk"){s2.cur=null;return}if(c2.type==="errand"){const d2=ERR[c2.act];const dc=errCost(c2.act,d2.cost);if(dc){if(S.money<dc){toast("Duit tak cukup.");s2.cur=null;return}S.money-=dc}const tv=travelOf(c2.act);if(tv.fare){if(S.money<tv.fare){toast("Wang tidak cukup untuk tambang bas.");s2.cur=null;return}S.money-=tv.fare}if(tv.how&&(s2.id===S.active||S.sims.length<3))toast(tv.how==="car"?`🚗 ${s2.name} memandu ke ${PLACES[d2.place].name}.`:`${tv.how==="bus"?"🚌":"🚆"} ${s2.name} naik ${tv.how==="bus"?"bas":tv.how} ke ${PLACES[d2.place].name} (RM ${tv.fare}).`);s2.away="out";s2.errand=c2.act;s2.awayUntil=S.t+d2.dur+tv.extra;s2.cur=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;return}if(c2.type==="leave"){s2.away=c2.dest;s2.leaving=false;s2.cur=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;if(c2.dest==="work")diary(`${s2.name} dah pergi kerja.`);return}const d=defOf(c2);let cost=c2.act==="cook"?dishOf(c2,s2).cost:d.cost;if(c2.act==="cook"&&(S.pantry||0)>0){S.pantry--;cost=0}if(cost){if(S.money<cost){toast("Wang tidak cukup untuk bahan masakan.");cancelCur(s2);return}S.money-=cost}c2.phase="do";c2.t=0;if((c2.act==="mesra"||c2.act==="trybaby")&&c2.type==="obj"){c2.lead=true;const p=simById(s2.partner);if(p&&!p.away&&!isBaby(p)){cancelCur(p);p.queue=[];p.f=s2.f;p.x=s2.x;p.y=s2.y;p.path=[];p.cur={type:"obj",obj:c2.obj,act:c2.act,phase:"do",t:0,follow:true}}}}function skillGain(s2,k,amt){s2.skills[k]+=amt*(mood(s2)>=70?1.25:1)*[1,1.25,1.4,1.6][perkLv("quick")]}function actionTick(s2,gm){if(s2.away||isBaby(s2))return;if(!s2.cur){startNext(s2);return}const c2=s2.cur;if(c2.phase!=="do")return;const d=defOf(c2);if(c2.type==="social"){const v=c2.viaSim?simById(c2.viaSim):visById(c2.npc);if(!v){s2.cur=null;return}if(c2.viaSim)v.needs.social=clamp(v.needs.social+.8*gm,0,100);s2.needs.social+=d.soc*gm;skillGain(s2,"charisma",.45*gm);if(c2.act==="meal")s2.needs.hunger+=1.1*gm}else if(c2.type==="fam"){s2.needs.social+=1.1*gm;if(c2.act==="play")s2.needs.fun+=.8*gm}else{for(const k in d.eff)s2.needs[k]+=d.eff[k]*gm;if(d.skill)skillGain(s2,d.skill[0],d.skill[1]*gm);if(c2.act==="feed"||c2.act==="cuddle"){const b=babyIn(objById(c2.obj));if(b){if(c2.act==="feed")b.needs.hunger+=3.5*gm;else b.needs.social+=3.5*gm;for(const k in b.needs)b.needs[k]=clamp(b.needs[k],0,100)}}if(c2.act==="tidy")S.mess=Math.max(0,S.mess-.2*gm);if(d.pay){const r=.12*(1+.25*lvlOf(s2,"logic"));S.money+=r*gm;c2.earn=(c2.earn||0)+r*gm}}for(const k in s2.needs)s2.needs[k]=clamp(s2.needs[k],0,100);c2.t+=gm;if(c2.t>=cdur(c2)||d.until&&s2.needs[d.until]>=99.5)finish(s2,c2)}function relDelta(s2,a,n2,def){const t=def.trait,r=n2.rel;let d=0;switch(a){case"chat":d=3+rnd(0,3);break;case"joke":d=t==="Playful"?8+rnd(0,4):t==="Grumpy"?rnd(-7,2):rnd(-2,6);break;case"compliment":d=t==="Kind"?8:r>15?5:2;break;case"deep":d=r<25?-3:t==="Thoughtful"?12:t==="Grumpy"?5:8;break;case"hug":d=r>=(t==="Grumpy"?60:40)?9:-9;break;case"meal":d=9;break;case"greet":d=8;break;case"work":d=8;break;case"gift":d=def.id==="melur"?20:10;break;case"call":d=r<-20?-1:2+rnd(0,2);break;case"flirt":d=r>=25?3:-6;break;case"kiss":d=n2.rom>=35?4:-8;break;case"berbaik":d=Math.random()<.55+lvlOf(s2,"charisma")*.04?12+rnd(0,4):-3;break;case"prank":d=t==="Playful"?9:t==="Grumpy"?-10:rnd(-6,6);break;default:{const D=SOC[a]?.relD;if(D)d=r>=D[2]?D[0]+(D[0]>0?rnd(0,2):0):D[1]}}if(d>0){d*=1+lvlOf(s2,"charisma")*.06;if(t==="Grumpy")d*=.7;d*=[1,1.25,1.4,1.6][perkLv("charmer")]}if(s2.needs.hygiene<20&&a!=="call"){d=d>0?d*.5:d-2}return Math.round(d)}function pickDish(s2){const l=lvlOf(s2,"cooking"),ok=DISHES.filter(d=>d.lvl<=l&&d.cost<=S.money&&d.fill>=60&&(!d.secret||learned(d.id)));if(!ok.length)return DISH.nasilemak;const f=festOn(dayIdx());const fs=f?ok.filter(d=>d.fest===f.id):[];return pick((fs.length&&Math.random()<.6?fs:ok).slice(-5))}const dishOf=(c2,s2)=>{if(!c2.dish)c2.dish=pickDish(s2).id;return DISH[c2.dish]||DISH.nasilemak};const cdur=c2=>c2.act==="cook"&&c2.dish&&DISH[c2.dish]?DISH[c2.dish].dur:defOf(c2).dur;function cookDone(s2,c2){if(lvlOf(s2,"cooking")<3&&Math.random()<.025){const dmg=hasObj("pemadam")||S.fireSafe?40:180;S.money-=dmg;S.mess=Math.min(20,(S.mess||0)+5);sfx("sad");if(!hasObj("pemadam")&&!S.fireSafe&&Math.random()<.3){setTimeout(()=>startHouseFire("dapur"),400);return}toast(`🔥 Api! Kuali terbakar semasa ${s2.name} memasak. ${hasObj("pemadam")?"Alat pemadam api padamkan api dengan cepat.":"Bomba sampai dalam 8 minit (hubungi 994)."} Kerosakan RM ${dmg}.`);wa("Bomba Harmoni",`Kebakaran kecil di dapur telah dipadamkan. Pastikan ada alat pemadam api di rumah 🧯`);diary(`Kebakaran kecil di dapur berlaku semasa ${s2.name} memasak.`)}const dsh=dishOf(c2,s2),l=lvlOf(s2,"cooking");const q=clamp(Math.round(2+(l-dsh.lvl)*.6+rnd(-.9,.9)+(mood(s2)>=70?.5:0)),1,5);s2.skills.cooking+=dsh.lvl*8;s2.needs.hunger=clamp(s2.needs.hunger+dsh.fill*(.6+q*.08),0,100);let fam2=0;for(const o2 of S.sims){if(o2===s2||o2.away||isBaby(o2))continue;o2.needs.hunger=clamp(o2.needs.hunger+dsh.fill*.55,0,100);if(dsh.fill>=60){o2.needs.social=clamp(o2.needs.social+6,0,100);fam2++}}S.stock=S.stock||[];if(stockCount()<24){const pk=dsh.fill>=60?4:6;S.stock.push({dish:dsh.id,q,n:pk})}famPostCook(s2,dsh,q);S.cooked=S.cooked||{};S.cooked[dsh.id]=Math.max(S.cooked[dsh.id]||0,q);if(S.party&&!S.party.over){S.party.dishes=S.party.dishes||[];S.party.dishes.push({cook:s2.name,cookId:s2.id,dish:dsh.id,q})}toast(`${dsh.e} ${s2.name} masak ${dsh.name} ${stars(q)}${fam2?` · ${fam2} ahli keluarga makan bersama`:""}${stockCount()?` · ${stockCount()} paket sedia dijual`:""}`);if(q===5&&!S.cooked5?.[dsh.id]){S.cooked5=S.cooked5||{};S.cooked5[dsh.id]=1;diary(`${s2.name} masak ${dsh.name} dengan sempurna.`)}}function finish(s2,c2){s2.cur=null;const d=defOf(c2);if(c2.type==="yard"){yardDone(s2,c2);emit(s2,"yard",{act:c2.act});return}if(c2.type==="social"){const v=visById(c2.npc);if(v&&v.busyBy===s2.id)v.busyBy=null;socResolve(s2,c2,d,v);return}if(c2.type==="fam"){const t=simById(c2.target);if(t){{const nbx=t.nbId&&(s2.visitFrom||t.visitFrom)?t.nbId:s2.nbId&&t.visitFrom?s2.nbId:null;if(nbx){const nn=nbSt(nbx);if(nn){const dl=c2.act==="hug"?nn.rel>=40?8:-6:6;nn.rel=clamp(nn.rel+dl,-100,100);toast(`${nbDef(nbx).name} ${dl>=0?"😊":"😒"} friendship ${dl>=0?"+":""}${dl}`)}}}t.needs.social=clamp(t.needs.social+18,0,100);if(c2.act==="play")t.needs.fun=clamp(t.needs.fun+20,0,100);if(c2.act==="helphw"&&CT.includes(t.stage)){t.grade=clamp(t.grade+8,0,100);t.hwToday=true;skillGain(t,"logic",25)}if(c2.act==="story")t.needs.fun=clamp(t.needs.fun+10,0,100);if(c2.act==="pujuk"){const ok=(t.trust??100)>-1&&Math.random()<.8;t.trust=clamp((t.trust??100)+(ok?15:3),0,100);if(t.trust>=60)t.hurt=0;toast(ok?`💐 ${s2.name} memohon maaf. Hati ${t.name} mula lembut… Kepercayaan ${t.trust}/100.`:`😤 ${t.name} belum bersedia memaafkan. Kepercayaan ${t.trust}/100.`);emit(s2,"f",{act:c2.act});return}if(c2.act==="kiss"&&(t.trust??100)<40){t.needs.social-=10;toast(`🙅 ${t.name} berpaling. Kepercayaan terlalu rendah (${t.trust}/100). Cuba minta maaf dahulu.`);emit(s2,"f",{act:c2.act});return}toast(`${d.icon} ${s2.name} dan ${t.name}: ${d.label.toLowerCase()}.`)}emit(s2,"f",{act:c2.act});return}if(c2.type==="self"&&c2.act==="call"){const n2=nbSt(c2.npc),def=nbDef(c2.npc);const dl=relDelta(s2,"call",n2,def);n2.rel=clamp(n2.rel+dl,-100,100);toast(`📱 ${s2.name} bersembang dengan ${def.name} ${dl>=0?"+":""}${dl}`);emit(s2,"a",{act:"call",npc:c2.npc});return}if(c2.type==="self"&&c2.act==="invite"){const n2=nbSt(c2.npc),def=nbDef(c2.npc);if(n2.rel<-20){toast(`${def.name} tolak.`);return}if(S.visitor){toast(`${visName(S.visitor)} sudah ada di sini.`);return}S.invite={id:c2.npc,at:S.t+30};toast(`${def.name} akan datang dalam 30 minit.`);return}if(c2.type==="self"&&c2.act==="adopt"){S.adopt={at:S.t+120,gen:s2.gen+1,parent:s2.id};toast("🏡 Permohonan anak angkat diluluskan. Anak akan sampai dalam 2 jam.");diary(`${s2.name} memulakan proses anak angkat.`);return}if(c2.type==="self"&&c2.act==="makandurian"){if((S.durian||0)<1){toast("Durian dah habis.");return}S.durian--;s2.needs.hunger=clamp(s2.needs.hunger+25,0,100);s2.needs.energy=clamp(s2.needs.energy-6,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene-6,0,100);toast(`🍈 ${s2.name} makan durian. ${pick(["Lemak manis! 😋","Sedapnya, Musang King!","Satu rumah bau durian sekarang 😂","Durian kampung pun sedap!"])}${S.durian?` (baki ${S.durian})`:""}`);emit(s2,"a",{act:"makandurian"});return}if(c2.type==="self"&&c2.act==="tidy"){toast(`🧹 ${s2.name} kemas rumah.`)}if(c2.type==="self"&&c2.act==="kuihraya")kuihDone(s2);if(c2.type==="self"&&c2.act==="tiktok")tiktokDone(s2,c2.topic||"vlog");if(c2.type==="self"&&c2.act==="ucap"){const b=simById(c2.npc);if(b){b.wishedOn=dayIdx();b.needs.fun=clamp(b.needs.fun+15,0,100);b.needs.social=clamp(b.needs.social+20,0,100);toast(`🎂 ${s2.name} ucap selamat hari jadi kepada ${b.name}${s2.partner===b.id?" dengan pelukan dan hadiah kecil":""}. ${b.name} tersenyum.`)}}if(c2.type==="obj"){const ad=ACT[c2.act];if(ad.mess)S.mess=Math.min(20,S.mess+ad.mess*[1,.5,.33,.2][perkLv("neat")]);if(c2.act==="freelance"){const e=Math.round(c2.earn||0);toast(`💻 Kerja bebas siap: +RM ${e}`);diary(`${s2.name} dapat RM ${e} buat kerja bebas.`);emit(s2,"earn",{amount:e})}if(c2.act==="cook")cookDone(s2,c2);if(c2.act==="shower")clothesWash(s2);if(["dam","boardgame","read","storytime","tv","piano","games"].includes(c2.act)&&hazeOn(dayIdx())){s2.needs.fun=clamp(s2.needs.fun+15,0,100);if(S.hazeFunDay!==dayIdx()){S.hazeFunDay=dayIdx();toast(`🏠 Seronok dalam rumah mengalahkan jerebu! ${s2.name} dapat bonus +15 seronok.`)}}if(c2.act==="boardgame"){const others=S.sims.filter(x=>x!==s2&&!x.away&&!isBaby(x));for(const o2 of others.slice(0,3))o2.needs.fun=clamp(o2.needs.fun+15,0,100),o2.needs.social=clamp(o2.needs.social+15,0,100);toast(`🎲 ${s2.name} anjur main permainan papan${others.length?` with ${others.slice(0,3).map(x=>x.name).join(", ")}`:""}. Laughter all round!`)}if(c2.act==="dam"){s2.damPlays=(s2.damPlays||0)+1}if(c2.act==="dam")toast(`♟️ ${s2.name} main dam haji. ${Math.random()<.5?"Menang! 🏆":"Kalah… next time!"}`);if(c2.act==="read"){if(CT.includes(s2.stage)){s2.grade=clamp((s2.grade||60)+3,0,100);if(hazeOn(dayIdx())){s2.hazeReads=(s2.hazeReads||0)+1;if(s2.hazeReads===3){s2.grade=clamp(s2.grade+8,0,100);S.lp+=50;toast(`🏅 ${s2.name} tamatkan Cabaran Membaca Jerebu (3 buku semasa jerebu)! Sijil dan gred +8.`);diary(`${s2.name} siapkan cabaran membaca jerebu.`)}}}}if(c2.act==="storytime"){const ks=S.sims.filter(x=>CT.includes(x.stage)&&!x.away);for(const k of ks){k.needs.fun=clamp(k.needs.fun+20,0,100);k.needs.social=clamp(k.needs.social+15,0,100)}toast(`📖 ${s2.name} read Hikayat Sang Kancil${ks.length?` to ${ks.map(x=>x.name).join(", ")}`:""}.`)}if(c2.act==="purify")toast(hazeOn(dayIdx())?`🌬️ Mod turbo dihidupkan. Udara dalam rumah segar semula (IPU dalam rumah ~${Math.round(hazeAPI(dayIdx())/4)}).`:"🌬️ Udara sudah bersih.");if(c2.act==="sew"){const pay=30+lvlOf(s2,"charisma")*3;S.money+=pay;sfx("coin");toast(`🧵 ${s2.name} siapkan tempahan baju kurung: +RM ${pay}.`)}if(c2.act==="homework"){s2.hwToday=true;s2.grade=clamp(s2.grade+5,0,100);toast(`✏️ ${s2.name} siap buat kerja rumah.`)}if(c2.act==="mesra"&&c2.lead){const p=simById(s2.partner);s2.buff=S.t+480;if(p){p.buff=S.t+480;p.needs.fun=clamp(p.needs.fun+20,0,100);p.needs.social=clamp(p.needs.social+25,0,100);if(p.trust!=null&&p.trust<100)p.trust=clamp(p.trust+10,0,100)}sfx("want");toast(`💞 ${s2.name} dan ${p?p.name:"pasangannya"} meluangkan masa berdua. Kedua-duanya berseri-seri (+mood selama 8 jam).`);diary(`${s2.name} dan ${p?p.name:""} berkongsi detik romantik.`)}if(c2.act==="trybaby"){const pp=simById(s2.partner);if(!pp)toast(`💞 Pasangan ${s2.name} sudah tiada di sini — cuba lagi bila bersama.`);else if(S.pregnancy){}else if(Math.random()<.65){S.pregnancy={due:S.t+1440*2,parents:[s2.id,pp.id]};toast("🍼 Bayi bakal lahir!");diary(`${s2.name} dan ${pp.name} bakal menimang cahaya mata.`)}else toast("💞 Belum ada rezeki kali ini. Cuba lagi hari lain.")}if(c2.act==="sleep"||c2.act==="nap")toast(`${s2.name} dah bangun.`)}emit(s2,"a",{act:c2.act,npc:c2.npc})}function marry(s2,n2,def){n2.status="family";n2.rom=100;const v=visById(def.id);const sp=mkSim({id:S.nextSim++,name:def.name,stage:"adult",gen:s2.gen,nbId:def.id,ap:JSON.parse(JSON.stringify(nbAp(def.id))),x:v?v.x:DOOR.x+.5,y:v?v.y:DOOR.y+.5,f:0,partner:s2.id,skills:{cooking:120,logic:150,charisma:150},needs:{hunger:70,energy:70,hygiene:80,fun:70,social:90}});let stepKids=[];{const k=npcHome(def.id);if(S.homes&&S.homes[k]){const H2=S.homes[k];const old=H2.sims.find(x=>x.nbId===def.id);if(old)stepKids=H2.sims.filter(x=>(CT.includes(x.stage)||isBaby(x))&&(x.parents||[]).includes(old.id)&&!(x.parents||[]).some(id=>id!==old.id&&H2.sims.some(y=>y.id===id&&AD.includes(y.stage))));H2.sims=H2.sims.filter(x=>x.nbId!==def.id);for(const kd of stepKids)kd.parents=(kd.parents||[]).map(id=>id===old.id?sp.id:id);if(!H2.sims.length)delete S.homes[k];else if(stepKids.length){const room=MAXFAM-S.sims.length-1;stepKids=stepKids.slice(0,Math.max(0,room));if(stepKids.length){S.homes[k]=H2;relocate(stepKids,k,S.home)}}}}s2.partner=sp.id;S.sims.push(sp);if(v){if(S.visitor===v)S.visitor=null;if(S.party)S.party.guests=S.party.guests.filter(g=>g!==v)}sfx("promo");s2.buff=S.t+360;sp.buff=S.t+360;S.lp+=200;toast(`💍 ${def.name} setuju! Mereka akan tinggal bersama${stepKids.length?` with ${stepKids.map(x=>x.name).join(", ")}`:""}.`);diary(`${s2.name} married ${def.name}.`);genWants(sp);regAll();S.wedding={a:s2.id,b:sp.id,started:false};setTimeout(()=>toast(`💐 ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([s2.id,sp.id],"name"):"Majlis bersanding"} diadakan di rumah: bila kedua-duanya ada di rumah antara 10:00 dan 18:00.`),1200)}function needsTick(s2,gm){const n2=s2.needs,c2=s2.cur;if(isBaby(s2)){n2.hunger-=.12*gm;n2.social-=.1*gm;n2.energy=80;n2.hygiene=80;n2.fun=80;for(const k in n2)n2[k]=clamp(n2[k],0,100);return}const hm=[1,.75,.6,.5][perkLv("iron")]*(TA.includes(s2.stage)&&fasting()?.6:1);if(s2.away){n2.hunger-=.08*gm*hm;n2.energy-=.075*gm;n2.hygiene-=.07*gm;n2.fun-=.09*gm;n2.social+=.02*gm}else{const sl=c2&&c2.phase==="do"&&defOf(c2).sleep;for(const k in DECAY){if(sl&&k==="energy")continue;n2[k]-=DECAY[k]*gm*(sl?k==="fun"?0:.45:1)*(k==="hunger"?hm:1)}}for(const k in n2)n2[k]=clamp(n2[k],0,100);if(!s2.away&&!s2.leaving&&n2.energy<=0&&!(c2&&c2.phase==="do"&&defOf(c2).sleep)){cancelCur(s2);s2.cur={type:"self",act:"passout",phase:"do",t:0};sfx("sad");toast(`😵 ${s2.name} pengsan kerana terlalu letih!`);diary(`${s2.name} pengsan kerana terlalu letih.`)}}function schedule(s2){if(s2.away==="trip"||s2.away==="hospital"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);if(S.t>=s2.awayUntil)tripReturn(s2);return}if(isBaby(s2))return;if(s2.away==="asrama"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);const dd=dayIdx()%7,hh=hourF();if(s2.stage!=="teen"||!s2.asrama||dd>=5||dd===4&&hh>=15)asramaHome(s2);return}if(s2.away==="uni"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);if(s2.uni&&dayIdx()>=s2.uni.until&&hourF()>=10)gradUni(s2);return}if(s2.away==="out"||s2.away==="kedai"){if(S.t>=s2.awayUntil)errandReturn(s2);return}const d=dayIdx(),wd=d%7,h=hourF();let dest=null,lv=0,bk=0;if(s2.asrama&&s2.stage==="teen"){if(!s2.away&&!s2.leaving&&(wd===6&&h>=17||wd<4&&h>=6||wd===4&&h>=6&&h<14)){asramaLeave(s2);return}}else if(CT.includes(s2.stage)){dest="school";lv=7.5;bk=15}else if(s2.job&&AD.includes(s2.stage)){dest="work";lv=8;bk=17}if(s2.visitFrom&&dest&&wd<5&&h>=lv-.5&&h<bk-1&&s2.lastOut!==d){S.visitEnd=true;return}if(dest&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){if(dest==="school"&&hazeAPI(d)>200){s2.lastOut=d;toast(`🌫️ Sekolah ${s2.name} ditutup: IPU ${hazeAPI(d)}. Duduk dalam rumah!`);return}const fh=festOn(d);if(fh){s2.lastOut=d;if(dest==="work"&&s2.job){S.money+=CAREERS[s2.job.career].levels[s2.job.level].pay*8}if(s2.id===S.active)toast(`🎉 Cuti umum sempena ${fh.name}! Tiada ${dest==="work"?"kerja":"sekolah"} hari ini${dest==="work"?" (bergaji)":""}.`);return}if(dest==="work"&&(s2.cutiDay===d||(s2.honeyUntil??-1)>=d||(s2.leaveUntil??-1)>=d)&&s2.job){s2.lastOut=d;S.money+=CAREERS[s2.job.career].levels[s2.job.level].pay*8;s2.buff=Math.max(s2.buff||0,S.t+600);toast((s2.leaveUntil??-1)>=d&&!((s2.honeyUntil??-1)>=d)?`👶 ${s2.name} cuti ${s2.leaveKind==="bersalin"?"bersalin":"paterniti"} hari ini (bergaji) — jaga baby di rumah 💕`:(s2.honeyUntil??-1)>=d?`🍯 ${s2.name} cuti bulan madu hari ini (bergaji) 💞`:`🏖️ ${s2.name} bercuti tahunan hari ini (bergaji). Rehat dan bergembira!`);return}}if(dest&&s2.sick&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){s2.lastOut=d;toast(`🤒 ${s2.name} cuti sakit (MC) hari ini.`);return}if(dest&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){s2.lastOut=d;s2.moodAtLeave=mood(s2);if(dest==="work"&&S.area==="bandar"&&!S.car&&!S.bike)S.money-=2;if(dest==="work"){trafficAtLeave(s2);vehLeave(s2)}const c2=s2.cur;if(c2&&c2.phase==="do"&&defOf(c2).sleep)toast(`⏰ ${s2.name} bangun untuk ${dest}.`);cancelCur(s2);s2.queue=[];s2.leaving=true;if(s2.id===S.active||S.sims.length<3)toast(dest==="school"?isTadika(s2)?`🚐 Van Tadika untuk ${s2.name}.`:s2.stage==="teen"?`🚌 Bas ke ${SMKN} untuk ${s2.name}.`:`🚌 Bas sekolah untuk ${s2.name}.`:S.area==="bandar"&&!S.car&&!S.bike?`🚆 ${s2.name} naik LRT (RM 2) ke tempat kerja.`:S.car?`🚗 ${s2.name} memandu ke tempat kerja.`:S.bike&&BIKES[S.bike.m]?`${BIKES[S.bike.m].icon} ${s2.name} menunggang ${BIKES[S.bike.m].n} ke tempat kerja.`:`🚗 Kongsi kereta untuk ${s2.name}. Pergi kerja!`);s2.cur={type:"leave",dest,phase:"walk",t:0};if(!goTo(s2,0,new Set([key(DOOR.x,DOOR.y)])))arrive(s2,s2.cur)}if(s2.away&&(h>=(s2.away==="school"?isTadika(s2)?12.5:15:17)||h<7))returnHome(s2)}function returnHome(s2){if(s2.away==="work"){SH(vehBack,s2);SH(vehReturnPerks,s2)}const was=s2.away;s2.away=null;s2.leaving=false;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;s2.path=[];s2.cur=null;if(was==="school"){clubTick(s2);const m2=s2.moodAtLeave;let dg=m2>=62?6:m2>=42?2:-5;if(s2.hwToday)dg+=4;else dg-=3;s2.grade=clamp(s2.grade+dg,0,100);s2.hwToday=false;toast(`🎒 ${s2.name} dah balik dari sekolah. Gred ${gradeL(s2.grade)} (${dg>=0?"+":""}${dg}).`);alirTick(s2);schoolDay(s2);return}const j=s2.job;if(!j)return;const car=CAREERS[j.career],L=car.levels[j.level],pay=Math.round(L.pay*8*eduPayMul(s2)),taxCut=govTaxCut(pay);S.money+=pay-taxCut;sfx("coin");if(car.sec==="seni"){const gain=Math.round((j.level+1)*(80+Math.random()*320)*(s2.moodAtLeave>=60?1.5:1));s2.followers=(s2.followers||0)+gain;if(Math.random()<.18)setTimeout(()=>toast(pick([`🌟 ${s2.name} trending di media sosial hari ini! +${gain.toLocaleString()} peminat.`,`📸 Peminat menunggu ${s2.name} di luar studio untuk bergambar!`,`🎤 ${s2.name} diundang ke rancangan bual bicara TV malam ini.`,`🏆 ${s2.name} dicalonkan untuk anugerah ${pick(["Anugerah Bintang Popular","Anugerah Juara Lagu","Anugerah Skrin","Anugerah Sukan Negara"])}!`])),1800)}if(ramadanOn(dayIdx())&&S.area==="bandar"&&Math.random()<.5){S.pantry=(S.pantry||0)+2;s2.needs.social=clamp(s2.needs.social+20,0,100);setTimeout(()=>toast(`🍽️ Pejabat ${s2.name} adakan majlis berbuka puasa. ${s2.name} bawa balik kurma, kuih dan bubur lambuk untuk keluarga (2 hidangan).`),1600)}const m=s2.moodAtLeave;let dp=m>=70?25:m>=50?12:m>=30?2:-15;if(s2.needs.energy<15)dp-=8;dp+=S.car?3:S.bike&&BIKES[S.bike.m]?BIKES[S.bike.m].perf:0;dp-=s2.lateJam||0;s2.lateJam=0;if(dp>0&&perk("workaholic"))dp+=[0,5,8,12][perkLv("workaholic")];if(govLaw("cuti"))dp+=3;dp+=eduPerf(s2);j.perf=clamp(j.perf+dp,-60,100);toast(`🏠 ${s2.name} dah balik rumah. +RM ${pay-taxCut}${taxCut?` (cukai negeri RM ${taxCut})`:""}, prestasi ${dp>=0?"+":""}${dp}.`);diary(`${s2.name} pulang dengan RM ${pay}.`);if(j.career==="akademik")SH(academicDay,s2);checkPromo(s2);if(s2.job&&EVENTS[j.career]&&Math.random()<.4&&!S.pendingEvent){const ev=pick(EVENTS[j.career]);S.pendingEvent={sim:s2.id,ev:EVENTS[j.career].indexOf(ev)}}}function checkPromo(s2){const j=s2.job;if(!j)return;const car=CAREERS[j.career],L=car.levels[j.level];if(j.perf>=100&&j.level<car.levels.length-1){const nx=car.levels[j.level+1];if((j.level+1===car.levels.length-1||nx.deg)&&!s2.degree){if(!s2.degNag){s2.degNag=1;toast(`🎓 ${s2.name} perlukan ijazah universiti untuk ${nx.t}. Lihat tab Kerjaya.`)}}else if(nx.car&&!S.car){if(!s2.carNag){s2.carNag=1;toast(`🚗 ${s2.name} perlukan kereta untuk jadi ${nx.t}. Beli di menu 🚗 Kereta.`)}}else if(Object.entries(nx.req).every(([k,v])=>lvlOf(s2,k)>=v)){if(promoRace(s2,nx))return;j.level++;j.perf=25;datoCareer(s2);if(j.career==="kesihatan"&&j.level>=2)s2.ap.work={style:"doctor",c:"#f7f7f5"};sfx("promo");toast(`🎉 ${s2.name} dinaikkan pangkat ke ${nx.t}! RM ${nx.pay}/jam.`);famPost(s2.name,`Alhamdulillah, naik pangkat jadi ${nx.t} hari ni 🎉`,"🎉");diary(`${s2.name} dinaikkan pangkat ke ${nx.t}.`);emit(s2,"promo",{})}}if(j.perf<=-60){diary(`${s2.name} diberhentikan sebagai ${L.t}.`);toast(`😞 ${s2.name} diberhentikan kerja kerana prestasi lemah.`);s2.job=null}}function resolveEvent(choice){const pe=S.pendingEvent;if(!pe)return;S.pendingEvent=null;const s2=simById(pe.sim);if(!s2||!s2.job){renderModal();return}const ev=EVENTS[s2.job.career][pe.ev],opt=ev[choice];const p=evChance(s2,opt[1]);if(Math.random()<p){const bonus=40*(s2.job.level+1);s2.job.perf=clamp(s2.job.perf+15,-60,100);S.money+=bonus;S.lp+=40;toast(`✅ Menjadi! Prestasi +15, bonus RM ${bonus}.`);diary(`${s2.name} berjaya tangani "${ev.t}" dengan baik.`);checkPromo(s2)}else{s2.job.perf=clamp(s2.job.perf-10,-60,100);s2.needs.fun=clamp(s2.needs.fun-15,0,100);toast(`❌ Tak berjalan lancar. −10 prestasi.`);diary(`${s2.name} bergelut dengan "${ev.t}".`)}renderModal()}function evChance(s2,sk){return clamp(.35+lvlOf(s2,sk)*.08+(mood(s2)-50)/200,.1,.95)}function spawnVisitor(id,dur){if(S.party)return;S.visitor={id,x:DOOR.x+.5,y:DOOR.y+.5,f:0,path:[],state:"wander",until:S.t+dur,wait:4,busyBy:null};toast(`🚪 ${nbDef(id).name} singgah.`);diary(`${nbDef(id).name} datang melawat.`)}function anyoneHome(){return walkers().some(s2=>!s2.away)}const PARTY_GUEST_LIMIT = 20;
+   <div class="dishes" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">${body||'<p class="hint">Nothing yet.</p>'}</div>`;$("#schx").onclick=()=>{el.hidden=true}}document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-rep]");if(b)openSchool(b.dataset.kind||"report",[+b.dataset.rep])});function pelaminSpot(){const bl=blockedSet(0);const ok=(x,y)=>x>=0&&y>=0&&x<N&&y<N&&!bl.has(key(x,y))&&!isStair(x,y)&&!(x===DOOR.x&&y===DOOR.y);for(const y of[1,2,3,4,5,6])for(const x of[3,2,4,1,5])if(ok(x,y)&&ok(x+1,y))return[x,y];const t=freeTile(0)||[3,3];return[Math.min(t[0],N-2),t[1]]}function startWedding(){const W2=S.wedding,a=simById(W2.a),b=simById(W2.b);if(!a||!b){S.wedding=null;return false}if(a.away||b.away||a.leaving||b.leaving||isBaby(a))return false;if(!startParty(festById("wedding"),true))return false;W2.started=true;S.party.wed={a:a.id,b:b.id};const sp=pelaminSpot();S.party.pel=sp;[a,b].forEach((x,i)=>{cancelCur(x);x.queue=[];x.f=0;x.x=sp[0]+i+.5;x.y=sp[1]+.5;x.path=[];x.cur={type:"self",act:"bersanding",phase:"do",t:0};x.buff=S.party.end});toast(`💐 Selamat Pengantin Baru! ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"start",S.party.guests.length):`${a.name} dan ${b.name} bersanding di pelamin bagai raja sehari. ${S.party.guests.length} tetamu datang bersalam dengan duit salam dan pulang membawa bunga telur.`}`);diary(window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"diary"):`${a.name} dan ${b.name} mengadakan kenduri kahwin dengan pelamin di rumah.`);return true}function drawPelamin(x,y){const h=.1,top=1.3;poly([P(x-.05,y-.05,h),P(x+2.05,y-.05,h),P(x+2.05,y+1.05,h),P(x-.05,y+1.05,h)],"#8e2a3c","#d9b45a");poly([P(x-.05,y+1.05,h),P(x+2.05,y+1.05,h),P(x+2.05,y+1.05,0),P(x-.05,y+1.05,0)],"#6e1f2e","#d9b45a");poly([P(x+2.05,y-.05,h),P(x+2.05,y+1.05,h),P(x+2.05,y+1.05,0),P(x+2.05,y-.05,0)],"#5a1826","#d9b45a");const[lx,ly]=P(x-.05,y-.05,top),[rx,ry]=P(x+2.05,y-.05,top),[ax,ay]=P(x+1,y-.05,top);ctx.fillStyle="#d9b45a";ctx.beginPath();ctx.moveTo(lx,ly);ctx.quadraticCurveTo(ax,ay-TW*.6,rx,ry);ctx.closePath();ctx.fill();poly([P(x-.05,y-.05,h),P(x+2.05,y-.05,h),P(x+2.05,y-.05,top),P(x-.05,y-.05,top)],"#f4e6c8","#c9a441");poly([P(x+.15,y-.04,h+.08),P(x+1.85,y-.04,h+.08),P(x+1.85,y-.04,top-.08),P(x+.15,y-.04,top-.08)],"#e8b4c8","#c9a441");for(let i=1;i<6;i++){const[a1,b1]=P(x+i/3,y-.03,top-.08),[a2,b2]=P(x+i/3,y-.03,h+.1);ctx.strokeStyle="rgba(201,164,65,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a1,b1);ctx.quadraticCurveTo((a1+a2)/2+3,(b1+b2)/2,a2,b2);ctx.stroke()}for(const cx of[x+.5,x+1.5])poly([P(cx-.28,y+.12,h),P(cx+.28,y+.12,h),P(cx+.28,y+.12,h+.8),P(cx-.28,y+.12,h+.8)],"#d9b45a","#8a6a1a");for(const[fx,fy]of[[x-.2,y+1.15],[x+2.2,y+1.15]]){const[bx,by]=P(fx,fy,0),[tx,ty]=P(fx,fy,1.05);ctx.strokeStyle="#c9a441";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx,ty);ctx.stroke();for(let i=0;i<14;i++){const an=-Math.PI/2+(i-6.5)*.23,len=TW*(.16+.06*(i%3));const ex=tx+Math.cos(an)*len,ey=ty+Math.sin(an)*len*.8+len*.45;ctx.strokeStyle="rgba(201,164,65,.85)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo((tx+ex)/2,ty-len*.35,ex,ey);ctx.stroke();ctx.fillStyle=["#e8577a","#f4f1ea","#f0c040","#7fc8a9"][i%4];ctx.beginPath();ctx.arc(ex,ey,Math.max(1.5,TW*.022),0,7);ctx.fill()}}}function npcPartnered(n2){const H2=S.homes&&S.homes[npcHome(n2.id)];const sm=H2&&H2.sims&&H2.sims.find(x=>x.nbId===n2.id);return!!(sm&&sm.partner)}function npcSingles(){if(!S.npcs)return[];return Object.values(S.npcs).filter(n2=>n2.stage==="adult"&&!n2.spouse&&nbSt(n2.id)?.status==="neighbour"&&nbSt(n2.id).rom<30&&npcHome(n2.id)!==S.home&&!npcPartnered(n2))}function maybeNpcWed(d,force){if(S.npcWed||!force&&Math.random()>.3)return false;const sg=npcSingles(),f=sg.filter(n2=>isFemAp(n2.ap)),m=sg.filter(n2=>!isFemAp(n2.ap));if(!f.length||!m.length)return false;const a=pick(m),b=pick(f);a.spouse=b.id;b.spouse=a.id;S.npcWed={a:a.id,b:b.id,day:d+(force?0:2)};wa(a.name,`${window.RKHF&&RKHF.wedSay?RKHF.wedSay([a.id,b.id],"greet"):"Assalamualaikum semua"} 🙏 Dengan sukacitanya menjemput ke majlis perkahwinan saya dengan ${b.name}, ${force?"hari ini":WD[(d+2)%7]} 11 pagi di Balai Raya. Jemput datang! 💐`,a.id);toast(`💌 Kad jemputan! ${a.name} dan ${b.name} akan berkahwin. Kenduri kahwin di Balai Raya pada ${force?"hari ini":WD[(d+2)%7]}, 11:00–16:00.`);diary(`${a.name} dan ${b.name} bertunang.`);return true}function settleNpcWed(W2){const a=S.npcs?.[W2.a],b=S.npcs?.[W2.b];if(!a||!b)return;diary(`${a.name} dan ${b.name} kini suami isteri.`);const ka=npcHome(a.id),kb=npcHome(b.id),ha=S.homes?.[ka],hb=S.homes?.[kb];if(ha&&hb&&ka!==kb&&ka!==S.home&&kb!==S.home&&!S.rentals?.[ka]&&!S.rentals?.[kb]&&ha.sims.length+hb.sims.length<=MAXFAM){const sa=ha.sims.find(x=>x.nbId===a.id),sb=hb.sims.find(x=>x.nbId===b.id);if(sa&&sb){ha.sims.push(...hb.sims);sa.partner=sb.id;sb.partner=sa.id;for(const n2 of Object.values(S.npcs))if(npcHome(n2.id)===kb)n2.home=ka;delete S.homes[kb];toast(`🏡 Keluarga ${b.name} berpindah ke ${homeName(ka)} selepas majlis kahwin.`)}}else if(!ha&&hb&&kb!==S.home){a.home=kb}else if(ha&&!hb&&ka!==S.home){b.home=ka}}function maybeArrive(d){if(S.noArrivals||nhh||S.visiting||d<2||lotIds().length>=20||Math.random()>.3)return;autoFamily()}function autoFamily(){if(nhh||lotIds().length>=20)return false;const ms=[newPerson("adult")];if(Math.random()<.7){let b;for(let i=0;i<25;i++){b=newPerson("adult");if(isFemAp(b.ap)!==isFemAp(ms[0].ap)&&b.name!==ms[0].name)break}ms.push(b)}const nk=Math.floor(Math.random()*3);for(let i=0;i<nk;i++)ms.push(newPerson(Math.random()<.65?"child":"teen"));if(Math.random()<.2)ms.push(newPerson("elder"));for(let i=1;i<ms.length;i++){let t=0;while(ms.slice(0,i).some(o2=>o2.name===ms[i].name)&&t++<20)ms[i].name=pick(isFemAp(ms[i].ap)?NAMES_F:NAMES_M)}nhh={members:ms,couple:ms.length>1&&ms[1].stage==="adult",play:false};return buildHousehold(true)}const reqTxt=()=>{const r=ensureReq(),d=DISH[r.dish];return r.done?`Pesanan hari ini untuk ${d.name} selesai ✓`:`Pesanan hari ini: ${r.qty} bungkus ${d.e} ${d.name} (+RM ${r.bonus} bonus)`};const stockCount=()=>(S.stock||[]).reduce((a,x)=>a+x.n,0);const packetPrice=(d,q)=>Math.max(2,Math.round(d.cost/4*1.8+q*.9));function errandReturn(s2){let e=s2.errand;if(e==="bazaarshopb")e="bazaarshop";if(e==="bazaarsellb")e="bazaarsell";s2.away=null;s2.errand=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;s2.path=[];s2.cur=null;if(e&&ERR[e]&&ERR[e].place==="estate"){estReturn(s2,e);emit(s2,"errand",{act:e});return}if(e==="beraya")berayaReturn(s2);if(["thaipusam","ponggal","tanglung","limau","kaamatan","gawai","merdeka","ethvisit"].includes(e))festReturn(s2,e);if(["menghadap","santap","lawatistana","tamandiraja","solatistana","beradu","darjah","royalwed","chepuan","gala","sambutdiraja","minumtengku","merisik","pertabalan","aqiqahdiraja","tidurist"].includes(e))istanaReturn(s2,e);outReturn(s2,e);if(e==="evak")toast(`🏠 ${s2.name} dah balik ke rumah. Bau asap masih ada, tetapi sekeluarga bersama.`);if(e==="pps")toast(`🏠 ${s2.name} dah balik dari PPS. Masa untuk membersihkan lumpur.`);if(e==="bizwork"&&S.biz){S.biz.worked=dayIdx();skillGain(s2,"cooking",50);skillGain(s2,"charisma",20);s2.needs.energy=clamp(s2.needs.energy-20,0,100);toast(`🧑‍🍳 ${s2.name} bekerja satu syif di ${S.biz.name}. Kualiti jualan hari ini naik.`)}if(e==="bizclean"&&S.biz){S.biz.clean=clamp(S.biz.clean+45,0,100);if(S.biz.closedUntil>=dayIdx())S.biz.closedUntil=dayIdx();toast(`🧽 ${s2.name} mencuci menyeluruh ${S.biz.name}: permukaan disanitasi, log suhu peti sejuk disemak dan kawalan perosak. Kebersihan ${Math.round(S.biz.clean)}.`)}if(e==="tdam")tourPlay(s2,"dam");if(e==="tcongkak")tourPlay(s2,"congkak");if(e==="congkak")s2.congkakPlays=(s2.congkakPlays||0)+1;if(e==="n95"||e==="n95b"){S.mask=dayIdx()+5;toast(`😷 ${s2.name} beli pelitup N95 untuk sekeluarga. Lebih selamat di luar semasa jerebu.`)}if(HAZEOUT.includes(e)&&hazeAPI(dayIdx())>150&&!masked()){s2.needs.hygiene=clamp(s2.needs.hygiene-15,0,100);toast(`🌫️ ${s2.name} balik berbau asap jerebu.`);if(Math.random()<.25)hazeSick(s2)}if(e==="lrtkl"){s2.needs.fun=clamp(s2.needs.fun+50,0,100);s2.needs.social=clamp(s2.needs.social+20,0,100);s2.needs.energy=clamp(s2.needs.energy-15,0,100);toast(`🚆 ${s2.name} naik LRT ke bandar besar: ${pick(["bergambar di menara berkembar","memburu barang murah di Petaling Street","satay di Jalan Alor","Muzium Negara dan Dataran Merdeka","konsert percuma di taman bandar"])}.`)}if(e==="mallshop"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.worn=0;S.pantry=(S.pantry||0)+2;toast(`🛍️ ${s2.name} membeli-belah di Harmoni Mall: ${pick(["baju baru","kasut baru","beg tangan murah","gajet","skincare"])} dan barang dapur untuk 2 hidangan.`)}if(e==="wayang"){s2.needs.fun=clamp(s2.needs.fun+55,0,100);s2.needs.social=clamp(s2.needs.social+10,0,100);toast(`🎬 ${s2.name} tonton ${pick(["filem seram Melayu 👻","filem adiwira","filem aksi Tamil","tayangan semula filem klasik lama","drama cinta Korea"])} di panggung wayang. Bertih jagung!`)}if(e==="foodcourt"){s2.needs.hunger=clamp(s2.needs.hunger+60,0,100);s2.needs.fun=clamp(s2.needs.fun+10,0,100);toast(`🍜 ${s2.name} makan ${pick(["nasi ayam","laksa","chicken chop","nasi kandar","dim sum","pad thai"])} di medan selera.`)}if(e==="mamak"){s2.needs.hunger=clamp(s2.needs.hunger+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);toast(`☕ ${s2.name} minum teh tarik dan makan ${pick(["roti canai","roti telur","maggi goreng","tosai","nasi lemak"])} di kedai mamak.`)}if(e==="bola"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.energy=clamp(s2.needs.energy-10,0,100);toast(`⚽ ${s2.name} tonton bola sepak di kedai mamak. ${pick(["Harimau Malaya menang! 🐯🎉","Seri 1-1, tension!","Kalah… teh tarik tak manis malam ni 😩"])}`)}if(e==="jogging"){s2.needs.fun=clamp(s2.needs.fun+20,0,100);s2.needs.energy=clamp(s2.needs.energy-12,0,100);s2.dirt=Math.min(100,(s2.dirt||0)+30);s2.buff=Math.max(s2.buff||0,S.t+240);toast(`🏃 ${s2.name} berjoging 5 km keliling tasik. Rasa cergas!`)}if(e==="piknik"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.needs.hunger=clamp(s2.needs.hunger+30,0,100);toast(`🧺 ${s2.name} berkelah di tepi tasik dan memberi ikan makan.`)}if(e&&e.startsWith("tl_"))tlReturn(s2,e);if(["konsertt","konsertp","dramashoot","dramaextra","sukant","sukanp"].includes(e))fameReturn(s2,e);if(["solatmasjid","kelasquran","sembahyangtokong","tilikan","pujakuil","misa","lawatibadah","ziarahkubur"].includes(e))faithReturn(s2,e);if(e==="khidmat")khidmatReturn(s2);if(["lawatkilang","kilangpart","kitarsemula","asramaderma"].includes(e))kilangReturn(s2,e);if(["isiminyak","servis","cucikereta","bengkelmod"].includes(e))stesenReturn(s2,e);if(MJOB[e])mallJobReturn(s2,e);franReturn(s2,e);konvoReturn(s2,e);tadEvReturn(s2,e);slipReturn(s2,e);mallSaleReturn(s2,e);for(const f of RETX)try{f(s2,e)}catch(er){console.error(er)}if(e==="kondoswim"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene+10,0,100);toast(`🏊 ${s2.name} berenang di kolam kondo di tingkat 8.`)}if(e==="gym"){s2.needs.energy=clamp(s2.needs.energy-15,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);s2.buff=Math.max(s2.buff||0,S.t+240);toast(`🏋️ ${s2.name} bersenam di gim kondo.`)}if(e==="klinik"||e==="klinikd")clinicVisit(s2,e==="klinik");if(e==="lawat"){const pt=S.sims.find(x=>x.away==="hospital");s2.needs.social=clamp(s2.needs.social+25,0,100);if(pt){pt.visited=true;pt.needs.fun=clamp(pt.needs.fun+30,0,100);toast(`💐 ${s2.name} melawat ${pt.name} di wad bersama ${pick(["buah tangan","setangkai anggur","bubur ayam","kad semoga cepat sembuh"])}. ${pt.name} rasa lebih baik.`)}}if(e==="balik")balikReturn(s2);if(e==="tempah"){s2.needs.social=clamp(s2.needs.social+10,0,100);openTailor(s2)}if(e==="ambil")collectTailor(s2);if(e==="belibaju")buyClothes(s2);if(e==="pmshop"&&(s2.worn||0)>=50){s2.worn=0;setTimeout(()=>toast(`👕 ${s2.name} juga beli baju harian baharu di pasar malam.`),1200)}if(e==="lopak")s2.dirt=100;if(e==="groceries"){S.pantry=(S.pantry||0)+5;toast(`🛒 ${s2.name} balik dari Kedai Pak Ali dengan barang dapur untuk 5 hidangan.`)}if(e==="pmeat"){s2.needs.hunger=clamp(s2.needs.hunger+60,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);toast(`🍢 ${s2.name} makan ${pick(["satay dengan kuah kacang","apam balik","murtabak","ayam goreng","char kuey teow","roti john"])} dan minum ${pick(["air tebu","air kelapa","teh ais","soya cincau"])} di pasar malam.`)}if(e==="pmgame"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);const win=Math.random()<.4+lvlOf(s2,"logic")*.03;const pr=pick(["teddy bear gergasi","ikan emas dalam plastik","kereta mainan","pedang plastik","sebungkus besar keropok"]);toast(win?`🎯 ${s2.name} menang ${pr} main ${pick(["baling tin","pancing itik","tikam"])}! 🎉`:`🎯 ${s2.name} main ${pick(["baling tin","pancing itik","tikam"])}. Nyaris! Cuba lagi minggu depan.`);if(win)S.lp+=20}if(e==="pmshop"){S.pantry=(S.pantry||0)+3;s2.needs.fun=clamp(s2.needs.fun+15,0,100);let extra="";if(Math.random()<.35){const sp=freeTile(0);if(sp){S.objs.push({id:S.nextId++,type:"plant",x:sp[0],y:sp[1],f:0});extra=" Dapat juga pokok bunga untuk rumah!"}}toast(`🛍️ ${s2.name} beli ${pick(["baju baharu","tudung bawal","sarung telefon","barang dapur"])} dan sayur segar (3 hidangan).${extra}`);diary(`${s2.name} membeli-belah di pasar malam.`)}if(["pmeat","pmgame","pmshop","pmsell"].includes(e)){const nb=pick(S.nb.filter(x=>x.status==="neighbour"));if(nb)nb.rel=clamp(nb.rel+3,-100,100)}if(e==="kutip"){const h0=hourF(),n2=(h0<8.5?4:2)+Math.floor(Math.random()*4);S.durian=(S.durian||0)+n2;s2.needs.fun=clamp(s2.needs.fun+15,0,100);let ouch="";if(Math.random()<.15){s2.needs.fun=clamp(s2.needs.fun-10,0,100);ouch=" Aduh, kena duri! 🩹"}toast(`🧺 ${s2.name} kutip ${n2} biji durian runtuh di dusun${h0<8.5?" (siapa cepat dia dapat lebih!)":""}.${ouch} Kini ${S.durian} biji di rumah.`)}if(e==="jualdurian"){const n2=S.durian||0;let tot=0,mk=0;for(let i=0;i<n2;i++){if(Math.random()<.12){mk++;tot+=36}else tot+=12}S.durian=0;S.money+=tot;sfx("coin");toast(`🛒 ${s2.name} jual ${n2} biji durian tepi jalan dapat RM ${tot}${mk?` (${mk} were Musang King!)`:""}.`);if(n2)famPost(s2.name,`Durian kampung dah habis dijual hari ni! Esok ada lagi 🍈`,"🍈")}if(e==="pestadurian"){for(const[k,v]of[["hunger",40],["social",35],["fun",30]])s2.needs[k]=clamp(s2.needs[k]+v,0,100);for(const x of S.nb.filter(x2=>x2.status==="neighbour").slice(0,4))x.rel=clamp(x.rel+3,-100,100);const win=Math.random()<.3+lvlOf(s2,"charisma")*.03;if(win){S.money+=50;S.lp+=60}toast(win?`🍈 ${s2.name} menang pertandingan makan durian di pesta durian! +RM 50 🏆`:`🍈 ${s2.name} menikmati pesta durian dengan pulut durian dan tempoyak. Persahabatan +3 dengan jiran.`)}if(e==="lopak"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene-35,0,100);toast(`💦 ${s2.name} main lopak air dengan budak kampung. Comot tapi gembira! Masa untuk mandi.`)}if(e==="rtvisit"||e==="rtcook"){const I=S.rtInvite;for(const[k,v]of[["hunger",60],["social",40],["fun",25]])s2.needs[k]=clamp(s2.needs[k]+v,0,100);if(I){const n2=nbSt(I.hostId);if(n2)n2.rel=clamp(n2.rel+6,-100,100)}if(e==="rtvisit")toast(`🏡 ${s2.name} menikmati rumah terbuka ${I?I.host+"'s":"the"}: rendang, ketupat dan berenang di kolam mereka. Persahabatan +6.`);else rtContest(s2)}if(e==="kahwin"){const W2=S.npcWed,a=W2&&nbDef(W2.a),b=W2&&nbDef(W2.b);for(const k of["hunger","social","fun"])s2.needs[k]=clamp(s2.needs[k]+{hunger:50,social:35,fun:20}[k],0,100);if(W2)for(const id of[W2.a,W2.b]){const n2=nbSt(id);if(n2)n2.rel=clamp(n2.rel+6,-100,100)}S.lp+=30;sfx("want");toast(`💐 ${s2.name} menyaksikan ${a?a.name:"pasangan itu"} dan ${b?b.name:""} ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([W2&&W2.a,W2&&W2.b],"see"):"bersanding"} di Balai Raya, ${window.RKHF&&RKHF.wedFood?RKHF.wedFood([W2&&W2.a,W2&&W2.b],"eat"):"makan nasi minyak dan bawa balik bunga telur"}. Persahabatan +6.`);diary(`${s2.name} menghadiri kenduri kahwin di Balai Raya.`)}if(e==="sukan"){s2.needs.social=clamp(s2.needs.social+25,0,100);s2.needs.fun=clamp(s2.needs.fun+25,0,100);S.sukanWatch=dayIdx();toast(`🏅 ${s2.name} bersorak dari tempat duduk di Hari Sukan. Budak-budak berlari lebih laju bila tahu keluarga menonton!`);diary(`${s2.name} pergi ke Hari Sukan.`)}if(e==="terbuka"){const ks=S.sims.filter(x=>CT.includes(x.stage));for(const k of ks)k.grade=clamp(k.grade+4,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);S.terbuka=dayIdx();toast(ks.length?`📒 ${s2.name} berjumpa guru kelas pada Hari Terbuka. ${ks.map(k=>k.name).join(" dan ")} dapat kata semangat: gred +4.`:`📒 ${s2.name} membantu pada Hari Terbuka.`)}if(e==="shift"){const pay=32+lvlOf(s2,"charisma")*3;S.money+=pay;s2.skills.charisma+=60;sfx("coin");toast(`🧾 ${s2.name} habis syif di kedai: +RM ${pay}, karisma naik.`);diary(`${s2.name} bekerja satu syif di Kedai Pak Ali.`)}if(e==="lepak"){s2.needs.social=clamp(s2.needs.social+35,0,100);s2.needs.fun=clamp(s2.needs.fun+20,0,100);const nb=pick(S.nb.filter(n2=>n2.status==="neighbour"));if(nb){nb.rel=clamp(nb.rel+4,-100,100);toast(`☕ ${s2.name} minum teh tarik bersama ${nbDef(nb.id).name} di warung. Persahabatan +4.`)}else toast(`☕ ${s2.name} menikmati teh tarik di warung.`)}if(e==="sellfood"||e==="bazaarsell"||e==="pmsell"){const mult=e==="bazaarsell"?1.4:e==="pmsell"?1.25:1,st=S.stock||[];let tot=0,n2=0;const r=ensureReq();let reqN=0;for(const x of st){const d=DISH[x.dish];if(!d)continue;tot+=Math.round(packetPrice(d,x.q)*x.n*mult);n2+=x.n;if(x.dish===r.dish)reqN+=x.n}S.stock=[];let extra="";if(e==="sellfood"&&!r.done&&reqN>=r.qty){r.done=true;tot+=r.bonus;extra=` Order complete: +RM ${r.bonus} bonus!`;S.lp+=40}if(n2&&S.waHype&&S.t<S.waHype&&e==="sellfood"){const b=Math.round(tot*.15);tot+=b;extra+=` Bonus semangat kumpulan +RM ${b}.`}if(n2&&e!=="sellfood")famPost(s2.name,e==="pmsell"?"Habis licin kat pasar malam! Terima kasih semua yang singgah 🙏":"Habis jual kat bazaar! Terima kasih 🙏","🧺");if(n2){S.money+=tot;sfx("coin");toast(e==="pmsell"?`🧺 ${s2.name} menjual ${n2} bungkus di pasar malam dengan harga RM ${tot}. "${pick(["Habis licin!","Habis sebelum pukul 22:00!","Pelanggan beratur panjang!"])}"`:e==="bazaarsell"?`🏮 ${s2.name} menjual ${n2} bungkus di bazar Ramadan dengan harga RM ${tot}. Malam yang sibuk!`:`🍱 Pak Ali membeli ${n2} bungkus masakan anda dengan harga RM ${tot}. "${pick(["Laku keras!","Pelanggan suka!","Bawa lebih esok ya!"])}"${extra}`);diary(`${s2.name} jual ${n2} bungkus makanan, dapat RM ${tot}.`)}else toast("🍱 Tiada apa untuk dijual. Masak sesuatu dahulu.")}const bumpNb=(k,amt)=>{const n2=k?nbSt(k):pick(S.nb.filter(x=>x.status==="neighbour"));if(n2){n2.rel=clamp(n2.rel+amt,-100,100);return nbDef(n2.id).name}return null};if(e==="jumaat"){s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.fun=clamp(s2.needs.fun+15,0,100);const nm=bumpNb("hafiz",4);toast(`🕌 ${s2.name} solat Jumaat di surau${nm?` dan bersembang dengan ${nm} lepas itu`:""}.`)}if(e==="bazaarshop"){S.pantry=(S.pantry||0)+3;s2.needs.fun=clamp(s2.needs.fun+20,0,100);toast(`🏮 ${s2.name} balik dari bazar dengan ${pick(["murtabak","ayam percik","roti john","kuih-muih"])}, ${pick(["air tebu","air kathira","soya cincau"])} dan makanan untuk 3 hidangan.`)}if(e==="tarawih"){s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.hunger=clamp(s2.needs.hunger+15,0,100);for(const n2 of S.nb)if(n2.status==="neighbour")n2.rel=clamp(n2.rel+2,-100,100);toast(`🌙 ${s2.name} pergi tarawih dan tinggal untuk moreh: ${pick(["bubur lambuk","mee hoon goreng","kuih dan teh panas"])}. Persahabatan +2 dengan semua.`)}if(e==="ceramah"){s2.skills.logic+=40;s2.needs.social=clamp(s2.needs.social+15,0,100);toast(`📿 ${s2.name} mendengar ceramah di surau. Logik naik, dan malam yang tenang.`)}if(e==="mesyuarat"){s2.skills.charisma+=50;for(const n2 of S.nb)if(n2.status==="neighbour")n2.rel=clamp(n2.rel+3,-100,100);S.lp+=50;toast(`🗣️ ${s2.name} bercakap dalam mesyuarat kampung. ${pick(["Setuju membaiki longkang sebelum hujan.","Merancang gotong-royong seterusnya.","Mengundi untuk pasang lampu jalan baru."])} Persahabatan +3 dengan semua.`);diary(`${s2.name} menghadiri mesyuarat kampung di balai raya.`)}if(e==="badminton"){s2.needs.fun=clamp(s2.needs.fun+30,0,100);s2.needs.energy=clamp(s2.needs.energy-15,0,100);s2.needs.social=clamp(s2.needs.social+15,0,100);const nm=bumpNb(null,3);toast(`🏸 ${s2.name} main badminton di balai raya${nm?` with ${nm}`:""}.`)}if(e==="galah"){s2.needs.fun=clamp(s2.needs.fun+40,0,100);s2.needs.social=clamp(s2.needs.social+30,0,100);s2.needs.energy=clamp(s2.needs.energy-20,0,100);toast(`🏃 ${s2.name} main galah panjang dengan ${kidFriend(s2)} dan ${pick(KIDS)}. ${pick(["Pasukan mereka menang!","Nyaris!","Semua berpeluh dan gembira."])}`)}if(e==="wau"){s2.needs.fun=clamp(s2.needs.fun+35,0,100);s2.skills.logic+=20;toast(`🪁 Wau ${s2.name} terbang lebih tinggi daripada layang-layang ${kidFriend(s2)}!`)}if(e==="congkak"){s2.needs.fun=clamp(s2.needs.fun+30,0,100);s2.needs.social=clamp(s2.needs.social+20,0,100);s2.skills.logic+=25;toast(`🥥 ${s2.name} main congkak dengan ${kidFriend(s2)}. ${pick(["Menang 3 biji!","Kalah, tapi nak lawan semula.","Seri!"])}`)}emit(s2,"errand",{act:e})}function defOf(c2){if(c2.type==="errand")return ERR[c2.act];return c2.type==="social"?SOC[c2.act]:c2.type==="fam"?FAM[c2.act]:c2.type==="yard"?YARD[c2.act]:ACT[c2.act]}function yardDone(s2,c2){const today=dayIdx();if(c2.act==="chickens"){if(S.fedDay!==today){S.fedDay=today;const e=2+Math.floor(Math.random()*4),rm=e*2;S.money+=rm;s2.needs.fun=clamp(s2.needs.fun+15,0,100);sfx("coin");toast(`🐔 ${s2.name} bagi ayam makan dan kutip ${e} biji telur (dijual RM ${rm}).`)}else{s2.needs.fun=clamp(s2.needs.fun+5,0,100);toast("🐔 Ayam dah kenyang hari ini.")}}if(c2.act==="coconut"){const n2=Math.min(3,S.coconuts||0);if(n2){S.coconuts-=n2;S.money+=n2*4;s2.needs.hunger=clamp(s2.needs.hunger+12,0,100);s2.needs.fun=clamp(s2.needs.fun+10,0,100);sfx("coin");toast(`🥥 ${s2.name} petik ${n2} biji kelapa, minum sebiji dan jual selebihnya (RM ${n2*4}).`)}else toast("🌴 Belum ada kelapa yang masak. Lebih banyak tumbuh setiap hari.")}if(c2.act==="laundry"){const had=S.laundry||0;S.laundry=0;S.hungDay=today;for(const o2 of S.sims)if(!isBaby(o2))o2.needs.hygiene=clamp(o2.needs.hygiene+8,0,100);toast(had?`👕 ${s2.name} sidai ${had} bakul baju. Baju bersih untuk semua!`:"👕 Belum ada apa-apa nak dibasuh.")}if(c2.act==="kuih"){s2.needs.hunger=clamp(s2.needs.hunger+25,0,100);s2.needs.fun=clamp(s2.needs.fun+8,0,100);toast(`🍡 ${s2.name} beli ${pick(["kuih lapis","onde-onde","kuih seri muka","karipap","kuih koci","pulut inti","kuih talam"])} daripada Mak Cik Senah. Sedap!`)}if(c2.act==="wave")toast(`🛵 Pak Cik Ramli hon dan lambai balik kepada ${s2.name}.`)}let YHS=[];function errSub(me,a){const e=ERR[a];if(!e.ages.includes(me.stage))return e.place==="padang"?"budak-budak je":"terlalu muda";if(e.who&&!e.who(me))return e.whoTxt||"bukan untuk orang ini";if(!errOpen(a))return e.whenTxt||"belum dibuka";if(["sellfood","pmsell","bazaarsell","rtcook"].includes(a)){const n2=stockCount();return n2?`${n2} paket · ~RM ${(S.stock||[]).reduce((t,x)=>t+(DISH[x.dish]?packetPrice(DISH[x.dish],x.q)*x.n:0),0)}`:"masak dulu"}if(a==="shift")return`4 jam · lebih kurang RM ${32+lvlOf(me,"charisma")*3}`;const tv=travelOf(a);return(e.cost?`RM ${e.cost} · `:"")+(e.dur>=60?e.dur/60+" jam":e.dur+" min")+(tv.how?tv.how==="car"?" · 🚗 memandu":` · ${tv.how==="bus"?"🚌":"🚆"} RM ${tv.fare}`:"")}function travelOf(a){const pl=PLACES[ERR[a]?.place];if(!pl||ERR[a].place==="kampungasal")return{extra:0,fare:0};const pa=pl.area||"kampung",ha=S.area||"kampung";if(pa===ha||pa==="both")return{extra:0,fare:0};if(S.car)return{extra:30,fare:0,how:"car"};return{extra:60,fare:ha==="bandar"?2:3,how:ha==="bandar"?"LRT":"bus"}}function errOk(me,a){const e=ERR[a];return e.ages.includes(me.stage)&&!(e.who&&!e.who(me))&&errOpen(a)&&!(e.cost&&S.money<e.cost)&&!(["sellfood","pmsell","bazaarsell","rtcook"].includes(a)&&!stockCount())}const errItem=(me,a)=>({label:ERR[a].label,sub:errSub(me,a),dis:!errOk(me,a),fn:()=>enqueue(me,{type:"errand",act:a})});function yardMenu(me,kind,mx,my){if(kind==="car"){openCar();return}if(me.away||isBaby(me)){toast("Pilih Teman yang ada di rumah.");return}if(S.view!==0&&kind!=="kedai"){toast("Pergi ke tingkat bawah dahulu.");return}const it=(act2,sub,dis)=>({label:YARD[act2].label,sub,dis,fn:()=>enqueue(me,{type:"yard",act:act2})});const ok=a=>YARD[a].ages.includes(me.stage);if(kind==="chickens")openMenu(mx,my,"Ayam kampung","3 ekor ayam",[it("chickens",S.fedDay===dayIdx()?"dah diberi makan":"telur nak dijual",false)]);if(kind==="palm")openMenu(mx,my,"Pokok kelapa",`${S.coconuts||0} biji kelapa masak`,[it("coconut",ok("coconut")?"RM 4 each":"remaja ke atas",!ok("coconut"))]);if(kind==="laundry")openMenu(mx,my,"Clothesline",`${S.laundry||0} muatan menunggu`,[it("laundry",ok("laundry")?"baju bersih":"remaja ke atas",!ok("laundry"))]);if(kind==="vendor")openMenu(mx,my,"Mak Cik Senah","Kuih seller · here until "+fmtT(S.vendor?.until||0),[it("kuih","RM 5",S.money<5)]);if(kind==="kedai"){openMenu(mx,my,"Kedai Runcit Pak Ali",`Buka 7:00–22:00 · pantri ${S.pantry||0} · ${stockCount()} bungkus untuk dijual`,PLACES.kedai.acts.map(a=>errItem(me,a)));return}if(kind==="moto")openMenu(mx,my,"Pak Cik Ramli","Lalu dengan motosikalnya",[it("wave","",false)])}function babyIn(o2){return S.sims.find(b=>isBaby(b)&&b.crib===o2.id)}function objBusy(o2,me){return S.sims.some(s2=>s2!==me&&s2.cur&&s2.cur.obj===o2.id)}function canAct(s2,a,o2){const d=ACT[a];if(!d.ages.includes(s2.stage))return`Bukan untuk golongan ${STAGEL[s2.stage].toLowerCase()}`;if(a==="mesra"){const p=simById(s2.partner);if(!p)return"Perlu pasangan";if(!AD.includes(p.stage))return"Pasangan belum dewasa";if(p.away)return"Pasangan tiada di rumah";if(isBaby(p))return"No"}if(a==="trybaby"){const p=simById(s2.partner);if(!p)return"Perlu pasangan";if(p.stage!=="adult")return"Pasangan terlalu tua";if(p.away)return"Pasangan tiada di rumah";if(S.pregnancy)return"Bayi dalam kandungan";if(S.sims.length>=homeCap(S.home))return"Rumah dah penuh"}if(a==="feed"||a==="cuddle"){if(!o2||!babyIn(o2))return"Tiada bayi dalam buaian"}if(a==="adopt"&&S.sims.length+(S.pregnancy?1:0)+(S.adopt?1:0)>=MAXFAM)return"Rumah dah penuh";if(d.cost&&S.money<d.cost)return"RM "+d.cost;return true}function enqueue(s2,q){if(isBaby(s2))return;if(s2.away){toast(`${s2.name} keluar sampai ${s2.away==="school"?"15:00":"17:00"}.`);return}if(s2.queue.length>=5){toast("Senarai tugasan penuh. Batalkan sesuatu dahulu.");return}s2.queue.push(q)}const allVis=()=>[S.visitor,...S.party?S.party.guests:[]].filter(Boolean);const visById=id=>allVis().find(v=>v.id===id);function cancelCur(s2){const c2=s2.cur;if(!c2)return;for(const v of allVis())if(v.busyBy===s2.id)v.busyBy=null;s2.cur=null;s2.path=[]}function startNext(s2){if(s2.cur||!s2.queue.length)return;const c2=Object.assign({},s2.queue.shift(),{t:0,phase:"walk"});if(c2.type==="obj"){let o2=objById(c2.obj);if(!o2)return;const ok=canAct(s2,c2.act,o2);if(ok!==true){toast(`${s2.name}: ${ok}.`);return}if(objBusy(o2,s2)){const alt=S.objs.find(x=>x.type===o2.type&&!objBusy(x,s2));if(!alt){toast(`${ITEMS[o2.type].name.toLowerCase()} sedang digunakan.`);return}o2=alt;c2.obj=o2.id}if(!goTo(s2,o2.f,adjFree(o2.f,o2.x,o2.y))){toast(`${s2.name} tak dapat sampai ke ${ITEMS[o2.type].name.toLowerCase()}.`);return}}else if(c2.type==="social"&&c2.viaSim){const t=simById(c2.viaSim);if(!t||t.away)return;const d=SOC[c2.act];if(d.cost&&S.money<d.cost){toast(`Duit tak cukup (RM ${d.cost}).`);return}t.queue=[];if(t.cur&&t.cur.phase!=="do")cancelCur(t);const[tx,ty]=tileOf(t);const g=adjFree(t.f,tx,ty);g.add(key(tx,ty));if(!goTo(s2,t.f,g)){toast(`Tak dapat mendekati ${t.name}.`);return}}else if(c2.type==="social"){const v=visById(c2.npc);if(!v||v.state==="leave")return;if(v.busyBy&&v.busyBy!==s2.id){s2.queue.unshift(Object.assign({},c2));s2.idle=-5;return}const d=SOC[c2.act];if(d.cost&&S.money<d.cost){toast(`Duit tak cukup (RM ${d.cost}).`);return}v.busyBy=s2.id;v.path=[];const[vx,vy]=tileOf(v);if(!goTo(s2,0,adjFree(0,vx,vy))){v.busyBy=null;toast(`Tak dapat mendekati ${visName(v)}.`);return}}else if(c2.type==="fam"){const t=simById(c2.target);if(!t||t.away||isBaby(t))return;const[tx,ty]=tileOf(t);const g=adjFree(t.f,tx,ty);g.add(key(tx,ty));if(!goTo(s2,t.f,g)){toast(`${s2.name} tak dapat hubungi ${t.name}.`);return}}else if(c2.type==="self"){const ok=c2.act==="passout"?true:canAct(s2,c2.act);if(ok!==true){toast(`${s2.name}: ${ok}.`);return}c2.phase="do";s2.path=[];if(ACT[c2.act].cost)S.money-=ACT[c2.act].cost}else if(c2.type==="walk"){if(!goTo(s2,c2.f,new Set([key(c2.tx,c2.ty)])))return}else if(c2.type==="errand"){const d=ERR[c2.act];if(!d.ages.includes(s2.stage)){toast(d.place==="padang"?"Itu untuk kanak-kanak dan remaja.":`${s2.name} terlalu kecil untuk pergi seorang.`);return}if(!errOpen(c2.act)){toast(`${d.label}: ${d.whenTxt||"buka 7:00–22:00"}.`);return}if((c2.act==="sellfood"||c2.act==="pmsell"||c2.act==="bazaarsell"||c2.act==="rtcook")&&!stockCount()){toast("Belum ada apa untuk dijual. Masak sesuatu dahulu.");return}if(s2.visitFrom&&ERR[c2.act].place!=="estate"){toast("Balik dari lawatan dahulu.");return}if(d.cost&&S.money<d.cost){toast("Duit tak cukup.");return}if(!goTo(s2,0,new Set([key(DOOR.x,DOOR.y)]))){toast(`${s2.name} tak dapat sampai ke pintu.`);return}}else if(c2.type==="yard"){const d=YARD[c2.act];if(!d.ages.includes(s2.stage)){toast(`${s2.name} masih terlalu muda untuk itu.`);return}if(c2.act==="kuih"&&!S.vendor){toast("Mak Cik Senah lalu tepi jalan pukul 16:00.");return}if(d.cost&&S.money<d.cost){toast("Duit tak cukup.");return}if(!d.tile){c2.phase="do";s2.path=[]}else{if(s2.f!==0&&!S.stair){return}const bl=blockedSet(0),g=new Set;for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){const x=d.tile[0]+dx,y=d.tile[1]+dy;if(x>=0&&y>=0&&x<N&&y<N&&!bl.has(key(x,y)))g.add(key(x,y))}if(!goTo(s2,0,g)){toast(`${s2.name} tak dapat keluar.`);return}}}s2.cur=c2}function arrive(s2,c2){if(c2.type==="walk"){s2.cur=null;return}if(c2.type==="errand"){const d2=ERR[c2.act];const dc=errCost(c2.act,d2.cost);if(dc){if(S.money<dc){toast("Duit tak cukup.");s2.cur=null;return}S.money-=dc}const tv=travelOf(c2.act);if(tv.fare){if(S.money<tv.fare){toast("Wang tidak cukup untuk tambang bas.");s2.cur=null;return}S.money-=tv.fare}if(tv.how&&(s2.id===S.active||S.sims.length<3))toast(tv.how==="car"?`🚗 ${s2.name} memandu ke ${PLACES[d2.place].name}.`:`${tv.how==="bus"?"🚌":"🚆"} ${s2.name} naik ${tv.how==="bus"?"bas":tv.how} ke ${PLACES[d2.place].name} (RM ${tv.fare}).`);s2.away="out";s2.errand=c2.act;s2.awayUntil=S.t+d2.dur+tv.extra;s2.cur=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;return}if(c2.type==="leave"){s2.away=c2.dest;s2.leaving=false;s2.cur=null;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;if(c2.dest==="work")diary(`${s2.name} dah pergi kerja.`);return}const d=defOf(c2);let cost=c2.act==="cook"?dishOf(c2,s2).cost:d.cost;if(c2.act==="cook"&&(S.pantry||0)>0){S.pantry--;cost=0}if(cost){if(S.money<cost){toast("Wang tidak cukup untuk bahan masakan.");cancelCur(s2);return}S.money-=cost}c2.phase="do";c2.t=0;if((c2.act==="mesra"||c2.act==="trybaby")&&c2.type==="obj"){c2.lead=true;const p=simById(s2.partner);if(p&&!p.away&&!isBaby(p)){cancelCur(p);p.queue=[];p.f=s2.f;p.x=s2.x;p.y=s2.y;p.path=[];p.cur={type:"obj",obj:c2.obj,act:c2.act,phase:"do",t:0,follow:true}}}}function skillGain(s2,k,amt){s2.skills[k]+=amt*(mood(s2)>=70?1.25:1)*[1,1.25,1.4,1.6][perkLv("quick")]}function actionTick(s2,gm){if(s2.away||isBaby(s2))return;if(!s2.cur){startNext(s2);return}const c2=s2.cur;if(c2.phase!=="do")return;const d=defOf(c2);if(c2.type==="social"){const v=c2.viaSim?simById(c2.viaSim):visById(c2.npc);if(!v){s2.cur=null;return}if(c2.viaSim)v.needs.social=clamp(v.needs.social+.8*gm,0,100);s2.needs.social+=d.soc*gm;skillGain(s2,"charisma",.45*gm);if(c2.act==="meal")s2.needs.hunger+=1.1*gm}else if(c2.type==="fam"){s2.needs.social+=1.1*gm;if(c2.act==="play")s2.needs.fun+=.8*gm}else{for(const k in d.eff)s2.needs[k]+=d.eff[k]*gm;if(d.skill)skillGain(s2,d.skill[0],d.skill[1]*gm);if(c2.act==="feed"||c2.act==="cuddle"){const b=babyIn(objById(c2.obj));if(b){if(c2.act==="feed")b.needs.hunger+=3.5*gm;else b.needs.social+=3.5*gm;for(const k in b.needs)b.needs[k]=clamp(b.needs[k],0,100)}}if(c2.act==="tidy")S.mess=Math.max(0,S.mess-.2*gm);if(d.pay){const r=.12*(1+.25*lvlOf(s2,"logic"));S.money+=r*gm;c2.earn=(c2.earn||0)+r*gm}}for(const k in s2.needs)s2.needs[k]=clamp(s2.needs[k],0,100);c2.t+=gm;if(c2.t>=cdur(c2)||d.until&&s2.needs[d.until]>=99.5)finish(s2,c2)}function relDelta(s2,a,n2,def){const t=def.trait,r=n2.rel;let d=0;switch(a){case"chat":d=3+rnd(0,3);break;case"joke":d=t==="Playful"?8+rnd(0,4):t==="Grumpy"?rnd(-7,2):rnd(-2,6);break;case"compliment":d=t==="Kind"?8:r>15?5:2;break;case"deep":d=r<25?-3:t==="Thoughtful"?12:t==="Grumpy"?5:8;break;case"hug":d=r>=(t==="Grumpy"?60:40)?9:-9;break;case"meal":d=9;break;case"greet":d=8;break;case"work":d=8;break;case"gift":d=def.id==="melur"?20:10;break;case"call":d=r<-20?-1:2+rnd(0,2);break;case"flirt":d=r>=25?3:-6;break;case"kiss":d=n2.rom>=35?4:-8;break;case"berbaik":d=Math.random()<.55+lvlOf(s2,"charisma")*.04?12+rnd(0,4):-3;break;case"prank":d=t==="Playful"?9:t==="Grumpy"?-10:rnd(-6,6);break;default:{const D=SOC[a]?.relD;if(D)d=r>=D[2]?D[0]+(D[0]>0?rnd(0,2):0):D[1]}}if(d>0){d*=1+lvlOf(s2,"charisma")*.06;if(t==="Grumpy")d*=.7;d*=[1,1.25,1.4,1.6][perkLv("charmer")]}if(s2.needs.hygiene<20&&a!=="call"){d=d>0?d*.5:d-2}return Math.round(d)}function pickDish(s2){const l=lvlOf(s2,"cooking"),ok=DISHES.filter(d=>d.lvl<=l&&d.cost<=S.money&&d.fill>=60&&(!d.secret||learned(d.id)));if(!ok.length)return DISH.nasilemak;const f=festOn(dayIdx());const fs=f?ok.filter(d=>d.fest===f.id):[];return pick((fs.length&&Math.random()<.6?fs:ok).slice(-5))}const dishOf=(c2,s2)=>{if(!c2.dish)c2.dish=pickDish(s2).id;return DISH[c2.dish]||DISH.nasilemak};const cdur=c2=>c2.act==="cook"&&c2.dish&&DISH[c2.dish]?DISH[c2.dish].dur:defOf(c2).dur;function cookDone(s2,c2){if(lvlOf(s2,"cooking")<3&&Math.random()<.025){const dmg=hasObj("pemadam")||S.fireSafe?40:180;S.money-=dmg;S.mess=Math.min(20,(S.mess||0)+5);sfx("sad");if(!hasObj("pemadam")&&!S.fireSafe&&Math.random()<.3){setTimeout(()=>startHouseFire("dapur"),400);return}toast(`🔥 Api! Kuali terbakar semasa ${s2.name} memasak. ${hasObj("pemadam")?"Alat pemadam api padamkan api dengan cepat.":"Bomba sampai dalam 8 minit (hubungi 994)."} Kerosakan RM ${dmg}.`);wa("Bomba Harmoni",`Kebakaran kecil di dapur telah dipadamkan. Pastikan ada alat pemadam api di rumah 🧯`);diary(`Kebakaran kecil di dapur berlaku semasa ${s2.name} memasak.`)}const dsh=dishOf(c2,s2),l=lvlOf(s2,"cooking");const q=clamp(Math.round(2+(l-dsh.lvl)*.6+rnd(-.9,.9)+(mood(s2)>=70?.5:0)),1,5);if(c2.hfFamilyRecipe!=null)c2.hfFamilyCooked=true;s2.skills.cooking+=dsh.lvl*8;s2.needs.hunger=clamp(s2.needs.hunger+dsh.fill*(.6+q*.08),0,100);let fam2=0;for(const o2 of S.sims){if(o2===s2||o2.away||isBaby(o2))continue;o2.needs.hunger=clamp(o2.needs.hunger+dsh.fill*.55,0,100);if(dsh.fill>=60){o2.needs.social=clamp(o2.needs.social+6,0,100);fam2++}}S.stock=S.stock||[];if(stockCount()<24){const pk=dsh.fill>=60?4:6;S.stock.push({dish:dsh.id,q,n:pk})}famPostCook(s2,dsh,q);S.cooked=S.cooked||{};S.cooked[dsh.id]=Math.max(S.cooked[dsh.id]||0,q);if(S.party&&!S.party.over){S.party.dishes=S.party.dishes||[];S.party.dishes.push({cook:s2.name,cookId:s2.id,dish:dsh.id,q})}toast(`${dsh.e} ${s2.name} masak ${dsh.name} ${stars(q)}${fam2?` · ${fam2} ahli keluarga makan bersama`:""}${stockCount()?` · ${stockCount()} paket sedia dijual`:""}`);if(q===5&&!S.cooked5?.[dsh.id]){S.cooked5=S.cooked5||{};S.cooked5[dsh.id]=1;diary(`${s2.name} masak ${dsh.name} dengan sempurna.`)}}function finish(s2,c2){s2.cur=null;const d=defOf(c2);if(c2.type==="yard"){yardDone(s2,c2);emit(s2,"yard",{act:c2.act});return}if(c2.type==="social"){const v=visById(c2.npc);if(v&&v.busyBy===s2.id)v.busyBy=null;socResolve(s2,c2,d,v);return}if(c2.type==="fam"){const t=simById(c2.target);if(t){{const nbx=t.nbId&&(s2.visitFrom||t.visitFrom)?t.nbId:s2.nbId&&t.visitFrom?s2.nbId:null;if(nbx){const nn=nbSt(nbx);if(nn){const dl=c2.act==="hug"?nn.rel>=40?8:-6:6;nn.rel=clamp(nn.rel+dl,-100,100);toast(`${nbDef(nbx).name} ${dl>=0?"😊":"😒"} friendship ${dl>=0?"+":""}${dl}`)}}}t.needs.social=clamp(t.needs.social+18,0,100);if(c2.act==="play")t.needs.fun=clamp(t.needs.fun+20,0,100);if(c2.act==="helphw"&&CT.includes(t.stage)){t.grade=clamp(t.grade+8,0,100);t.hwToday=true;skillGain(t,"logic",25)}if(c2.act==="story")t.needs.fun=clamp(t.needs.fun+10,0,100);if(c2.act==="pujuk"){const ok=(t.trust??100)>-1&&Math.random()<.8;t.trust=clamp((t.trust??100)+(ok?15:3),0,100);if(t.trust>=60)t.hurt=0;toast(ok?`💐 ${s2.name} memohon maaf. Hati ${t.name} mula lembut… Kepercayaan ${t.trust}/100.`:`😤 ${t.name} belum bersedia memaafkan. Kepercayaan ${t.trust}/100.`);emit(s2,"f",{act:c2.act});return}if(c2.act==="kiss"&&(t.trust??100)<40){t.needs.social-=10;toast(`🙅 ${t.name} berpaling. Kepercayaan terlalu rendah (${t.trust}/100). Cuba minta maaf dahulu.`);emit(s2,"f",{act:c2.act});return}toast(`${d.icon} ${s2.name} dan ${t.name}: ${d.label.toLowerCase()}.`)}emit(s2,"f",{act:c2.act});return}if(c2.type==="self"&&c2.act==="call"){const n2=nbSt(c2.npc),def=nbDef(c2.npc);const dl=relDelta(s2,"call",n2,def);n2.rel=clamp(n2.rel+dl,-100,100);toast(`📱 ${s2.name} bersembang dengan ${def.name} ${dl>=0?"+":""}${dl}`);emit(s2,"a",{act:"call",npc:c2.npc});return}if(c2.type==="self"&&c2.act==="invite"){const n2=nbSt(c2.npc),def=nbDef(c2.npc);if(n2.rel<-20){toast(`${def.name} tolak.`);return}if(S.visitor){toast(`${visName(S.visitor)} sudah ada di sini.`);return}S.invite={id:c2.npc,at:S.t+30};toast(`${def.name} akan datang dalam 30 minit.`);return}if(c2.type==="self"&&c2.act==="adopt"){S.adopt={at:S.t+120,gen:s2.gen+1,parent:s2.id};toast("🏡 Permohonan anak angkat diluluskan. Anak akan sampai dalam 2 jam.");diary(`${s2.name} memulakan proses anak angkat.`);return}if(c2.type==="self"&&c2.act==="makandurian"){if((S.durian||0)<1){toast("Durian dah habis.");return}S.durian--;s2.needs.hunger=clamp(s2.needs.hunger+25,0,100);s2.needs.energy=clamp(s2.needs.energy-6,0,100);s2.needs.hygiene=clamp(s2.needs.hygiene-6,0,100);toast(`🍈 ${s2.name} makan durian. ${pick(["Lemak manis! 😋","Sedapnya, Musang King!","Satu rumah bau durian sekarang 😂","Durian kampung pun sedap!"])}${S.durian?` (baki ${S.durian})`:""}`);emit(s2,"a",{act:"makandurian"});return}if(c2.type==="self"&&c2.act==="tidy"){toast(`🧹 ${s2.name} kemas rumah.`)}if(c2.type==="self"&&c2.act==="kuihraya")kuihDone(s2);if(c2.type==="self"&&c2.act==="tiktok")tiktokDone(s2,c2.topic||"vlog");if(c2.type==="self"&&c2.act==="ucap"){const b=simById(c2.npc);if(b){b.wishedOn=dayIdx();b.needs.fun=clamp(b.needs.fun+15,0,100);b.needs.social=clamp(b.needs.social+20,0,100);toast(`🎂 ${s2.name} ucap selamat hari jadi kepada ${b.name}${s2.partner===b.id?" dengan pelukan dan hadiah kecil":""}. ${b.name} tersenyum.`)}}if(c2.type==="obj"){const ad=ACT[c2.act];if(ad.mess)S.mess=Math.min(20,S.mess+ad.mess*[1,.5,.33,.2][perkLv("neat")]);if(c2.act==="freelance"){const e=Math.round(c2.earn||0);toast(`💻 Kerja bebas siap: +RM ${e}`);diary(`${s2.name} dapat RM ${e} buat kerja bebas.`);emit(s2,"earn",{amount:e})}if(c2.act==="cook")cookDone(s2,c2);if(c2.act==="shower")clothesWash(s2);if(["dam","boardgame","read","storytime","tv","piano","games"].includes(c2.act)&&hazeOn(dayIdx())){s2.needs.fun=clamp(s2.needs.fun+15,0,100);if(S.hazeFunDay!==dayIdx()){S.hazeFunDay=dayIdx();toast(`🏠 Seronok dalam rumah mengalahkan jerebu! ${s2.name} dapat bonus +15 seronok.`)}}if(c2.act==="boardgame"){const others=S.sims.filter(x=>x!==s2&&!x.away&&!isBaby(x));for(const o2 of others.slice(0,3))o2.needs.fun=clamp(o2.needs.fun+15,0,100),o2.needs.social=clamp(o2.needs.social+15,0,100);toast(`🎲 ${s2.name} anjur main permainan papan${others.length?` with ${others.slice(0,3).map(x=>x.name).join(", ")}`:""}. Laughter all round!`)}if(c2.act==="dam"){s2.damPlays=(s2.damPlays||0)+1}if(c2.act==="dam")toast(`♟️ ${s2.name} main dam haji. ${Math.random()<.5?"Menang! 🏆":"Kalah… next time!"}`);if(c2.act==="read"){if(CT.includes(s2.stage)){s2.grade=clamp((s2.grade||60)+3,0,100);if(hazeOn(dayIdx())){s2.hazeReads=(s2.hazeReads||0)+1;if(s2.hazeReads===3){s2.grade=clamp(s2.grade+8,0,100);S.lp+=50;toast(`🏅 ${s2.name} tamatkan Cabaran Membaca Jerebu (3 buku semasa jerebu)! Sijil dan gred +8.`);diary(`${s2.name} siapkan cabaran membaca jerebu.`)}}}}if(c2.act==="storytime"){const ks=S.sims.filter(x=>CT.includes(x.stage)&&!x.away);for(const k of ks){k.needs.fun=clamp(k.needs.fun+20,0,100);k.needs.social=clamp(k.needs.social+15,0,100)}toast(`📖 ${s2.name} read Hikayat Sang Kancil${ks.length?` to ${ks.map(x=>x.name).join(", ")}`:""}.`)}if(c2.act==="purify")toast(hazeOn(dayIdx())?`🌬️ Mod turbo dihidupkan. Udara dalam rumah segar semula (IPU dalam rumah ~${Math.round(hazeAPI(dayIdx())/4)}).`:"🌬️ Udara sudah bersih.");if(c2.act==="sew"){const pay=30+lvlOf(s2,"charisma")*3;S.money+=pay;sfx("coin");toast(`🧵 ${s2.name} siapkan tempahan baju kurung: +RM ${pay}.`)}if(c2.act==="homework"){s2.hwToday=true;s2.grade=clamp(s2.grade+5,0,100);toast(`✏️ ${s2.name} siap buat kerja rumah.`)}if(c2.act==="mesra"&&c2.lead){const p=simById(s2.partner);s2.buff=S.t+480;if(p){p.buff=S.t+480;p.needs.fun=clamp(p.needs.fun+20,0,100);p.needs.social=clamp(p.needs.social+25,0,100);if(p.trust!=null&&p.trust<100)p.trust=clamp(p.trust+10,0,100)}sfx("want");toast(`💞 ${s2.name} dan ${p?p.name:"pasangannya"} meluangkan masa berdua. Kedua-duanya berseri-seri (+mood selama 8 jam).`);diary(`${s2.name} dan ${p?p.name:""} berkongsi detik romantik.`)}if(c2.act==="trybaby"){const pp=simById(s2.partner);if(!pp)toast(`💞 Pasangan ${s2.name} sudah tiada di sini — cuba lagi bila bersama.`);else if(S.pregnancy){}else if(Math.random()<.65){S.pregnancy={due:S.t+1440*2,parents:[s2.id,pp.id]};toast("🍼 Bayi bakal lahir!");diary(`${s2.name} dan ${pp.name} bakal menimang cahaya mata.`)}else toast("💞 Belum ada rezeki kali ini. Cuba lagi hari lain.")}if(c2.act==="sleep"||c2.act==="nap")toast(`${s2.name} dah bangun.`)}emit(s2,"a",{act:c2.act,npc:c2.npc})}function marry(s2,n2,def){n2.status="family";n2.rom=100;const v=visById(def.id);const sp=mkSim({id:S.nextSim++,name:def.name,stage:"adult",gen:s2.gen,nbId:def.id,ap:JSON.parse(JSON.stringify(nbAp(def.id))),x:v?v.x:DOOR.x+.5,y:v?v.y:DOOR.y+.5,f:0,partner:s2.id,skills:{cooking:120,logic:150,charisma:150},needs:{hunger:70,energy:70,hygiene:80,fun:70,social:90}});let stepKids=[];{const k=npcHome(def.id);if(S.homes&&S.homes[k]){const H2=S.homes[k];const old=H2.sims.find(x=>x.nbId===def.id);if(old)stepKids=H2.sims.filter(x=>(CT.includes(x.stage)||isBaby(x))&&(x.parents||[]).includes(old.id)&&!(x.parents||[]).some(id=>id!==old.id&&H2.sims.some(y=>y.id===id&&AD.includes(y.stage))));H2.sims=H2.sims.filter(x=>x.nbId!==def.id);for(const kd of stepKids)kd.parents=(kd.parents||[]).map(id=>id===old.id?sp.id:id);if(!H2.sims.length)delete S.homes[k];else if(stepKids.length){const room=MAXFAM-S.sims.length-1;stepKids=stepKids.slice(0,Math.max(0,room));if(stepKids.length){S.homes[k]=H2;relocate(stepKids,k,S.home)}}}}s2.partner=sp.id;S.sims.push(sp);if(v){if(S.visitor===v)S.visitor=null;if(S.party)S.party.guests=S.party.guests.filter(g=>g!==v)}sfx("promo");s2.buff=S.t+360;sp.buff=S.t+360;S.lp+=200;toast(`💍 ${def.name} setuju! Mereka akan tinggal bersama${stepKids.length?` with ${stepKids.map(x=>x.name).join(", ")}`:""}.`);diary(`${s2.name} married ${def.name}.`);genWants(sp);regAll();S.wedding={a:s2.id,b:sp.id,started:false};setTimeout(()=>toast(`💐 ${window.RKHF&&RKHF.wedSay?RKHF.wedSay([s2.id,sp.id],"name"):"Majlis bersanding"} diadakan di rumah: bila kedua-duanya ada di rumah antara 10:00 dan 18:00.`),1200)}function needsTick(s2,gm){const n2=s2.needs,c2=s2.cur;if(isBaby(s2)){n2.hunger-=.12*gm;n2.social-=.1*gm;n2.energy=80;n2.hygiene=80;n2.fun=80;for(const k in n2)n2[k]=clamp(n2[k],0,100);return}const hm=[1,.75,.6,.5][perkLv("iron")]*(TA.includes(s2.stage)&&fasting()?.6:1);if(s2.away){n2.hunger-=.08*gm*hm;n2.energy-=.075*gm;n2.hygiene-=.07*gm;n2.fun-=.09*gm;n2.social+=.02*gm}else{const sl=c2&&c2.phase==="do"&&defOf(c2).sleep;for(const k in DECAY){if(sl&&k==="energy")continue;n2[k]-=DECAY[k]*gm*(sl?k==="fun"?0:.45:1)*(k==="hunger"?hm:1)}}for(const k in n2)n2[k]=clamp(n2[k],0,100);if(!s2.away&&!s2.leaving&&n2.energy<=0&&!(c2&&c2.phase==="do"&&defOf(c2).sleep)){cancelCur(s2);s2.cur={type:"self",act:"passout",phase:"do",t:0};sfx("sad");toast(`😵 ${s2.name} pengsan kerana terlalu letih!`);diary(`${s2.name} pengsan kerana terlalu letih.`)}}function schedule(s2){if(s2.away==="trip"||s2.away==="hospital"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);if(S.t>=s2.awayUntil)tripReturn(s2);return}if(isBaby(s2))return;if(s2.away==="asrama"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);const dd=dayIdx()%7,hh=hourF();if(s2.stage!=="teen"||!s2.asrama||dd>=5||dd===4&&hh>=15)asramaHome(s2);return}if(s2.away==="uni"){for(const k in s2.needs)s2.needs[k]=Math.max(s2.needs[k],70);if(s2.uni&&dayIdx()>=s2.uni.until&&hourF()>=10)gradUni(s2);return}if(s2.away==="out"||s2.away==="kedai"){if(S.t>=s2.awayUntil)errandReturn(s2);return}const d=dayIdx(),wd=d%7,h=hourF();let dest=null,lv=0,bk=0;if(s2.asrama&&s2.stage==="teen"){if(!s2.away&&!s2.leaving&&(wd===6&&h>=17||wd<4&&h>=6||wd===4&&h>=6&&h<14)){asramaLeave(s2);return}}else if(CT.includes(s2.stage)){dest="school";lv=7.5;bk=15}else if(s2.job&&AD.includes(s2.stage)){dest="work";lv=8;bk=17}if(s2.visitFrom&&dest&&wd<5&&h>=lv-.5&&h<bk-1&&s2.lastOut!==d){S.visitEnd=true;return}if(dest&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){if(dest==="school"&&hazeAPI(d)>200){s2.lastOut=d;toast(`🌫️ Sekolah ${s2.name} ditutup: IPU ${hazeAPI(d)}. Duduk dalam rumah!`);return}const fh=festOn(d);if(fh){s2.lastOut=d;if(dest==="work"&&s2.job){S.money+=CAREERS[s2.job.career].levels[s2.job.level].pay*8}if(s2.id===S.active)toast(`🎉 Cuti umum sempena ${fh.name}! Tiada ${dest==="work"?"kerja":"sekolah"} hari ini${dest==="work"?" (bergaji)":""}.`);return}if(dest==="work"&&(s2.cutiDay===d||(s2.honeyUntil??-1)>=d||(s2.leaveUntil??-1)>=d)&&s2.job){s2.lastOut=d;S.money+=CAREERS[s2.job.career].levels[s2.job.level].pay*8;s2.buff=Math.max(s2.buff||0,S.t+600);toast((s2.leaveUntil??-1)>=d&&!((s2.honeyUntil??-1)>=d)?`👶 ${s2.name} cuti ${s2.leaveKind==="bersalin"?"bersalin":"paterniti"} hari ini (bergaji) — jaga baby di rumah 💕`:(s2.honeyUntil??-1)>=d?`🍯 ${s2.name} cuti bulan madu hari ini (bergaji) 💞`:`🏖️ ${s2.name} bercuti tahunan hari ini (bergaji). Rehat dan bergembira!`);return}}if(dest&&s2.sick&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){s2.lastOut=d;toast(`🤒 ${s2.name} cuti sakit (MC) hari ini.`);return}if(dest&&!s2.away&&!s2.leaving&&wd<5&&h>=lv&&h<bk-1&&s2.lastOut!==d){s2.lastOut=d;s2.moodAtLeave=mood(s2);if(dest==="work"&&S.area==="bandar"&&!S.car&&!S.bike)S.money-=2;if(dest==="work"){trafficAtLeave(s2);vehLeave(s2)}const c2=s2.cur;if(c2&&c2.phase==="do"&&defOf(c2).sleep)toast(`⏰ ${s2.name} bangun untuk ${dest}.`);cancelCur(s2);s2.queue=[];s2.leaving=true;if(s2.id===S.active||S.sims.length<3)toast(dest==="school"?isTadika(s2)?`🚐 Van Tadika untuk ${s2.name}.`:s2.stage==="teen"?`🚌 Bas ke ${SMKN} untuk ${s2.name}.`:`🚌 Bas sekolah untuk ${s2.name}.`:S.area==="bandar"&&!S.car&&!S.bike?`🚆 ${s2.name} naik LRT (RM 2) ke tempat kerja.`:S.car?`🚗 ${s2.name} memandu ke tempat kerja.`:S.bike&&BIKES[S.bike.m]?`${BIKES[S.bike.m].icon} ${s2.name} menunggang ${BIKES[S.bike.m].n} ke tempat kerja.`:`🚗 Kongsi kereta untuk ${s2.name}. Pergi kerja!`);s2.cur={type:"leave",dest,phase:"walk",t:0};if(!goTo(s2,0,new Set([key(DOOR.x,DOOR.y)])))arrive(s2,s2.cur)}if(s2.away&&(h>=(s2.away==="school"?isTadika(s2)?12.5:15:17)||h<7))returnHome(s2)}function returnHome(s2){if(s2.away==="work"){SH(vehBack,s2);SH(vehReturnPerks,s2)}const was=s2.away;s2.away=null;s2.leaving=false;s2.f=0;s2.x=DOOR.x+.5;s2.y=DOOR.y+.5;s2.path=[];s2.cur=null;if(was==="school"){clubTick(s2);const m2=s2.moodAtLeave;let dg=m2>=62?6:m2>=42?2:-5;if(s2.hwToday)dg+=4;else dg-=3;s2.grade=clamp(s2.grade+dg,0,100);s2.hwToday=false;toast(`🎒 ${s2.name} dah balik dari sekolah. Gred ${gradeL(s2.grade)} (${dg>=0?"+":""}${dg}).`);alirTick(s2);schoolDay(s2);return}const j=s2.job;if(!j)return;const car=CAREERS[j.career],L=car.levels[j.level],pay=Math.round(L.pay*8*eduPayMul(s2)),taxCut=govTaxCut(pay);S.money+=pay-taxCut;sfx("coin");if(car.sec==="seni"){const gain=Math.round((j.level+1)*(80+Math.random()*320)*(s2.moodAtLeave>=60?1.5:1));s2.followers=(s2.followers||0)+gain;if(Math.random()<.18)setTimeout(()=>toast(pick([`🌟 ${s2.name} trending di media sosial hari ini! +${gain.toLocaleString()} peminat.`,`📸 Peminat menunggu ${s2.name} di luar studio untuk bergambar!`,`🎤 ${s2.name} diundang ke rancangan bual bicara TV malam ini.`,`🏆 ${s2.name} dicalonkan untuk anugerah ${pick(["Anugerah Bintang Popular","Anugerah Juara Lagu","Anugerah Skrin","Anugerah Sukan Negara"])}!`])),1800)}if(ramadanOn(dayIdx())&&S.area==="bandar"&&Math.random()<.5){S.pantry=(S.pantry||0)+2;s2.needs.social=clamp(s2.needs.social+20,0,100);setTimeout(()=>toast(`🍽️ Pejabat ${s2.name} adakan majlis berbuka puasa. ${s2.name} bawa balik kurma, kuih dan bubur lambuk untuk keluarga (2 hidangan).`),1600)}const m=s2.moodAtLeave;let dp=m>=70?25:m>=50?12:m>=30?2:-15;if(s2.needs.energy<15)dp-=8;dp+=S.car?3:S.bike&&BIKES[S.bike.m]?BIKES[S.bike.m].perf:0;dp-=s2.lateJam||0;s2.lateJam=0;if(dp>0&&perk("workaholic"))dp+=[0,5,8,12][perkLv("workaholic")];if(govLaw("cuti"))dp+=3;dp+=eduPerf(s2);j.perf=clamp(j.perf+dp,-60,100);toast(`🏠 ${s2.name} dah balik rumah. +RM ${pay-taxCut}${taxCut?` (cukai negeri RM ${taxCut})`:""}, prestasi ${dp>=0?"+":""}${dp}.`);diary(`${s2.name} pulang dengan RM ${pay}.`);if(j.career==="akademik")SH(academicDay,s2);checkPromo(s2);if(s2.job&&EVENTS[j.career]&&Math.random()<.4&&!S.pendingEvent){const ev=pick(EVENTS[j.career]);S.pendingEvent={sim:s2.id,ev:EVENTS[j.career].indexOf(ev)}}}function checkPromo(s2){const j=s2.job;if(!j)return;const car=CAREERS[j.career],L=car.levels[j.level];if(j.perf>=100&&j.level<car.levels.length-1){const nx=car.levels[j.level+1];if((j.level+1===car.levels.length-1||nx.deg)&&!s2.degree){if(!s2.degNag){s2.degNag=1;toast(`🎓 ${s2.name} perlukan ijazah universiti untuk ${nx.t}. Lihat tab Kerjaya.`)}}else if(nx.car&&!S.car){if(!s2.carNag){s2.carNag=1;toast(`🚗 ${s2.name} perlukan kereta untuk jadi ${nx.t}. Beli di menu 🚗 Kereta.`)}}else if(Object.entries(nx.req).every(([k,v])=>lvlOf(s2,k)>=v)){if(promoRace(s2,nx))return;j.level++;j.perf=25;datoCareer(s2);if(j.career==="kesihatan"&&j.level>=2)s2.ap.work={style:"doctor",c:"#f7f7f5"};sfx("promo");toast(`🎉 ${s2.name} dinaikkan pangkat ke ${nx.t}! RM ${nx.pay}/jam.`);famPost(s2.name,`Alhamdulillah, naik pangkat jadi ${nx.t} hari ni 🎉`,"🎉");diary(`${s2.name} dinaikkan pangkat ke ${nx.t}.`);emit(s2,"promo",{})}}if(j.perf<=-60){diary(`${s2.name} diberhentikan sebagai ${L.t}.`);toast(`😞 ${s2.name} diberhentikan kerja kerana prestasi lemah.`);s2.job=null}}function resolveEvent(choice){const pe=S.pendingEvent;if(!pe)return;S.pendingEvent=null;const s2=simById(pe.sim);if(!s2||!s2.job){renderModal();return}const ev=EVENTS[s2.job.career][pe.ev],opt=ev[choice];const p=evChance(s2,opt[1]);if(Math.random()<p){const bonus=40*(s2.job.level+1);s2.job.perf=clamp(s2.job.perf+15,-60,100);S.money+=bonus;S.lp+=40;toast(`✅ Menjadi! Prestasi +15, bonus RM ${bonus}.`);diary(`${s2.name} berjaya tangani "${ev.t}" dengan baik.`);checkPromo(s2)}else{s2.job.perf=clamp(s2.job.perf-10,-60,100);s2.needs.fun=clamp(s2.needs.fun-15,0,100);toast(`❌ Tak berjalan lancar. −10 prestasi.`);diary(`${s2.name} bergelut dengan "${ev.t}".`)}renderModal()}function evChance(s2,sk){return clamp(.35+lvlOf(s2,sk)*.08+(mood(s2)-50)/200,.1,.95)}function spawnVisitor(id,dur){if(S.party)return;S.visitor={id,x:DOOR.x+.5,y:DOOR.y+.5,f:0,path:[],state:"wander",until:S.t+dur,wait:4,busyBy:null};toast(`🚪 ${nbDef(id).name} singgah.`);diary(`${nbDef(id).name} datang melawat.`)}function anyoneHome(){return walkers().some(s2=>!s2.away)}const PARTY_GUEST_LIMIT = 20;
 const GUEST_ANIMATION_LIMIT = 16;
 const partySpace = party => Math.max(0, PARTY_GUEST_LIMIT - party.guests.length - (party.crowd || 0));
 function addPartyRelative(relative, wait) {
@@ -412,7 +412,7 @@ Jumlah dimasukkan ke akaun: RM ${tot.toLocaleString()}.`);diary(`Pendapatan fran
   <rect x="905" y="625" width="420" height="365" rx="22" fill="#e9f3dc" opacity=".8"/>`;for(let i=0;i<5;i++)s2+=`<rect x="${610+i*30}" y="700" width="26" height="200" fill="${i%2?"#c9d86a":"#b4cc5a"}" opacity=".95"/>`;const road=(d,w2=18)=>`<path d="${d}" stroke="#f4ead2" stroke-width="${w2}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#d8c9a6" stroke-width="1.5" stroke-dasharray="12 10" fill="none"/>`;s2+=road("M0 200H1800");s2+=road("M140 200V700",10)+road("M660 200V700",10);for(const y of[330,440,550,660])s2+=road(`M140 ${y}H660`,9);s2+=road("M140 700C260 720 420 700 560 720",10);s2+=road("M890 200V1000",14)+road("M1355 200V1000",14)+road("M1780 200V1000",10)+road("M890 615H1780",14)+road("M890 1000H1780",12);s2+=`<rect x="925" y="576" width="380" height="22" rx="6" fill="#cfd6dd"/>`+[...Array(12)].map((_,i)=>`<path d="M${935+i*31} 578v18" stroke="#fff" stroke-width="1.5"/>`).join("")+`<text x="1115" y="592" text-anchor="middle" font-size="10" font-weight="800" fill="#5a6a7a">🅿️ PARKIR BERSAMA</text>`;for(const y of[700,788,876])s2+=road(`M905 ${y}H1325`,7);for(const y of[360,480,610,740,870])s2+=road(`M1355 ${y}H1780`,8);s2+=`<rect x="776" y="186" width="84" height="28" rx="4" fill="#b98a5a" stroke="#7a5a3a"/><path d="M780 186V214M856 186V214" stroke="#7a5a3a" stroke-width="3"/>`;s2+=`<path d="M700 228H1590" stroke="#8a5cc0" stroke-width="5" opacity=".8"/>`+[...Array(9)].map((_,i)=>`<rect x="${720+i*100}" y="228" width="4" height="10" fill="#8a5cc0" opacity=".6"/>`).join("")+`<text x="736" y="224" font-size="13">🚝</text>`;s2+=`<rect x="975" y="606" width="280" height="18" rx="9" fill="#4a6a8a" stroke="#fff"/><text x="1115" y="619" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" letter-spacing="1">🏢 FLAT · APARTMENT · KONDOMINIUM</text><rect x="945" y="991" width="340" height="18" rx="9" fill="#4a6a3a" stroke="#fff"/><text x="1115" y="1004" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" letter-spacing="1">🏡 TAMAN PERUMAHAN · TERES · SEMI-D · BANGLO</text>`;const occ=[...KSLOT,...TSLOT,...Object.values(WMPL)];for(let i=0;i<260;i++){const h=wmHash("t"+i),x=h%W2,y=60+(h>>>8)%880;if(occ.some(([a,b])=>Math.abs(a-x)<48&&Math.abs(b-y)<50))continue;if(Math.abs(y-200)<18||x>740&&x<905||x>600&&x<760&&y>690&&y<910)continue;if(x>890&&x<1330&&y>245&&y<995)continue;if(x>1350&&y>180&&y<1e3&&i%3)continue;s2+=x<760&&i%4===0?wmPalm(x,y):wmTree(x,y,8+h%7,["#3a8a3a","#2f7a3a","#4c9a42","#f2a7bb"][h%11===0?3:h%3])}s2+=`<text x="380" y="52" text-anchor="middle" font-size="28" font-weight="900" fill="#fff" stroke="#2f6a2a" stroke-width="6" paint-order="stroke" letter-spacing="2">🌴 KAMPUNG HARMONI</text><text x="1340" y="52" text-anchor="middle" font-size="28" font-weight="900" fill="#fff" stroke="#2a4a6a" stroke-width="6" paint-order="stroke" letter-spacing="2">🏙️ BANDAR HARMONI</text>`;for(const[pk,[x,y]]of Object.entries(WMPL)){const P2=PLACES[pk];if(!P2)continue;const sel=wmSel==="pl:"+pk;s2+=`<g class="wmp" data-wm-place="${pk}" role="button" tabindex="0" aria-label="${esc(P2.name)}"><title>${esc(P2.name)}</title>${wmDecor(pk,x,y)}<circle cx="${x}" cy="${y}" r="21" fill="#fff" stroke="${sel?"#e46a5a":"#d9a520"}" stroke-width="${sel?4:3}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="21">${P2.icon||"📍"}</text><text x="${x}" y="${y+38}" text-anchor="middle" font-size="11" font-weight="800" fill="#3a2a10" stroke="#fff" stroke-width="3" paint-order="stroke">${esc(WMN[pk]||wmShort(P2.name,18))}</text></g>`}if(typeof bunianOk==="function"&&bunianOk())s2+=`<g class="wmp" data-wm-place="bunian" role="button" tabindex="0"><title>Kampung Bunian</title><ellipse cx="420" cy="905" rx="70" ry="30" fill="rgba(220,255,235,.6)"/><circle cx="420" cy="900" r="20" fill="#e8fff0" stroke="#3fae6e" stroke-width="3"/><text x="420" y="907" text-anchor="middle" font-size="20">🌿</text><text x="420" y="936" text-anchor="middle" font-size="11" font-weight="800" fill="#1f5a34" stroke="#fff" stroke-width="3" paint-order="stroke">Kampung Bunian</text></g>`;KSLOT.forEach((p,i)=>{s2+=i<k.length?wmHouseSVG(p[0],p[1],k[i],false):wmLotSVG(p[0],p[1],"kampung",i)});const hi=[],lo=[];for(const id of t)(WM_HIGH.includes(wmHT(id))?hi:lo).push(id);while(lo.length>LSLOT.length)hi.push(lo.pop());const full=t.length>=25;for(const b of WMBLD)s2+=wmBldSVG(b,hi.filter(id=>(wmHT(id)||"apartment")===b.t||b.t==="apartment"&&!WM_HIGH.includes(wmHT(id))));LSLOT.forEach((p,i)=>{s2+=i<lo.length?wmHouseSVG(p[0],p[1],lo[i],true):full?"":wmLotSVG(p[0],p[1],"landed",i)});return s2+"</svg>"}const WMBLD=[{t:"flat",x:985,y:545,w:120,f:5,n:"Blok PPR Harmoni",ic:"🏢",note:"flat kos rendah, jiran sebelah-menyebelah",bg:"#efe0c0",st:"#8a7a60",win:"#7fb4d6"},{t:"apartment",x:1120,y:545,w:110,f:8,n:"Apartment Seri Harmoni",ic:"🏬",note:"apartment dengan lif, balkoni & pemandangan bandar",bg:"#dbe8f2",st:"#6a7a90",win:"#5f9ed0"},{t:"kondo",x:1250,y:545,w:96,f:11,n:"The Harmoni Residences",ic:"🏙️",note:"kondominium — kolam renang, gim & pengawal",bg:"#7fbde6",st:"#2a5a80",win:"#e8f6ff"}];function wmBldUnits(t){return townIds().filter(id=>{const h=wmHT(id);return t==="apartment"?h==="apartment"||!h&&false:h===t})}function wmUnitNo(k,t){const h=wmHash(k);return t==="flat"?`Blok ${"ABCD"[h%4]}-${1+h%5}-${String(1+(h>>>3)%12).padStart(2,"0")}`:t==="apartment"?`Unit ${1+(h>>>2)%8}-${String(1+h%8).padStart(2,"0")}`:`Tingkat ${1+(h>>>2)%11} · Unit ${String(1+h%6).padStart(2,"0")}`}function wmBldSVG(B,ids){const{x,y,w:w2,f}=B,fh=B.t==="kondo"?24:B.t==="apartment"?26:30,H2=f*fh,top=y-H2,cur=ids.includes(S.home),sel=wmSel==="bld:"+B.t,n2=ids.length;const lit=new Set(ids.map(k=>wmHash(k)%(f*4)));let o2="";for(let r=0;r<f;r++)for(let c2=0;c2<4;c2++){const i=r*4+c2,wx=x-w2/2+10+c2*((w2-20)/4),wy=top+8+r*fh;o2+=`<rect x="${wx.toFixed(1)}" y="${wy}" width="${((w2-20)/4-6).toFixed(1)}" height="${fh-12}" rx="2" fill="${lit.has(i)?"#ffd86b":B.win}" ${lit.has(i)?"":'opacity=".85"'}/>`;if(B.t==="flat"&&i*7%5===1)o2+=`<path d="M${wx+2} ${wy+fh-10}h${(w2-20)/4-10}" stroke="${["#e46a5a","#3a7cb6","#e0a23b"][i%3]}" stroke-width="2"/>`}const roof=B.t==="kondo"?`<rect x="${x-w2/2+8}" y="${top-14}" width="${w2-16}" height="14" rx="3" fill="#2a5a80"/><rect x="${x-18}" y="${top-24}" width="36" height="10" fill="#5ec4e0"/>`:B.t==="apartment"?`<rect x="${x-w2/2-4}" y="${top-8}" width="${w2+8}" height="10" rx="3" fill="#c4436c"/>`:`<rect x="${x-w2/2-3}" y="${top-6}" width="${w2+6}" height="8" fill="#e46a5a"/>`;const ring=cur?`<rect x="${x-w2/2-8}" y="${top-30}" width="${w2+16}" height="${H2+40}" rx="12" fill="none" stroke="#ffd23f" stroke-width="4"/><text x="${x}" y="${top-34}" text-anchor="middle" font-size="18">📍</text>`:sel?`<rect x="${x-w2/2-7}" y="${top-28}" width="${w2+14}" height="${H2+38}" rx="12" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`:"";return`<g class="wmh wmb" data-wm-bld="${B.t}" tabindex="0" role="button" aria-label="${B.n}"><title>${B.n} — ${n2} unit</title>${ring}<ellipse cx="${x}" cy="${y+4}" rx="${w2/2+10}" ry="8" fill="rgba(0,0,0,.18)"/><rect x="${x-w2/2}" y="${top}" width="${w2}" height="${H2+2}" rx="3" fill="${B.bg}" stroke="${B.st}" stroke-width="1.5"/>${roof}${o2}<rect x="${x-10}" y="${y-16}" width="20" height="18" fill="#4a3a2a"/>${B.t==="kondo"?`<ellipse cx="${x+w2/2+8}" cy="${y-2}" rx="12" ry="6" fill="#5ec4e0" stroke="#fff"/>`:""}
    <rect x="${x-w2/2+4}" y="${y-36}" width="${w2-8}" height="16" rx="8" fill="#fff" stroke="${B.st}"/><text x="${x}" y="${y-24}" text-anchor="middle" font-size="10" font-weight="800" fill="#333">${B.ic} ${n2} unit · ${ids.reduce((a,k)=>a+(homeArr(k)||[]).filter(z=>!z.visitFrom).length,0)} orang</text>
    <text x="${x}" y="${y+22}" text-anchor="middle" font-size="11" font-weight="800" fill="#1f3a1f" stroke="#fff" stroke-width="3" paint-order="stroke">${B.n}</text></g>`}const WMHTN={flat:"🏢 Flat PPR",apartment:"🏬 Apartment",kondo:"🏙️ Kondominium",teres:"🏘️ Rumah teres",semid:"🏠 Semi-D",banglo:"🏡 Banglo"};function wmInfoHTML(){if(!wmSel)return`<p class="hint" style="margin:6px 2px">Tekan mana-mana rumah untuk lihat penghuni, main atau ziarah. Tekan ＋ untuk keluarga baru, atau tekan tempat untuk pilihan di sana.</p>`;if(wmSel.startsWith("bld:")){const B=WMBLD.find(b=>b.t===wmSel.slice(4));if(!B)return"";const me2=act(),canVisit2=me2&&!isBaby(me2)&&!me2.away&&!S.visiting&&!(S.party&&!S.party.over);const U=wmBldUnits(B.t);return`<div class="wminfo"><b>${B.ic} ${B.n}</b> <span class="sm">· ${U.length} unit didiami · ${B.note}</span>${typeof wmBldExtra==="function"?wmBldExtra(B,U):""}<div class="wmunits">${U.map(k2=>{const arr2=(homeArr(k2)||[]).filter(x=>!x.visitFrom),cur2=k2===S.home;return`<div class="wmunit${cur2?" cur":""}"><div class="wmuh"><b>${cur2?"📍 ":""}${esc(wmUnitNo(k2,B.t))}</b><span class="sm">${esc(wmShort(homeName(k2),22))}</span></div><div class="wmppl">${arr2.slice(0,6).map(x=>`<span class="wmav" title="${esc(x.name)}"><span class="av pt">${portrait(x.ap,x.stage,"thumb","casual","wm"+x.id)}</span><small>${esc(x.name).split(" ")[0]}</small></span>`).join("")||'<span class="sm">Keluarga jiran</span>'}</div><div class="acts">${cur2?'<span class="sm">Unit yang sedang dimainkan</span>':`<button class="btn pri" data-wmplay="${k2}">🏠 Main</button>${canVisit2?`<button class="btn" data-wmvisit="${k2}">🚶 Ziarah</button>`:""}`}</div></div>`}).join("")||'<p class="sm">Belum ada penghuni.</p>'}</div><div class="acts" style="margin-top:8px">${townIds().length>=25?'<span class="sm">Bandar penuh (25 keluarga).</span>':`<button class="btn" data-wmnew="bandar" data-wmht="${B.t}">＋ Keluarga baru pindah masuk</button>`}</div></div>`}if(wmSel.startsWith("new:")){const z=wmSel.split(":")[1];if(z==="kampung")return`<div class="wminfo"><b>🌴 Tanah kosong di kampung</b><p class="sm">Bina rumah kampung baru dan cipta keluarga untuk tinggal di sini.</p><div class="acts"><button class="btn pri" data-wmnew="kampung">＋ Bina rumah baru</button></div></div>`;const L=z==="tinggi"?["flat","apartment","kondo"]:["teres","semid","banglo"];return`<div class="wminfo"><b>${z==="tinggi"?"🏢 Unit kosong — kawasan flat, apartment & kondo":"🏡 Lot kosong — taman perumahan"}</b><p class="sm">Pilih jenis kediaman untuk keluarga baru.</p><div class="acts">${L.map(h=>`<button class="btn${h===L[1]?" pri":""}" data-wmnew="bandar" data-wmht="${h}">${WMHTN[h]}</button>`).join("")}</div></div>`}if(wmSel.startsWith("pl:")){const pk=wmSel.slice(3),P2=PLACES[pk];if(!P2)return"";return`<div class="wminfo" data-wmpk="${pk}"><b>${P2.icon} ${esc(P2.name)}</b><div class="wmlot"><p class="sm">${esc(P2.note||"")}</p><div class="acts">${OUTV[pk]?`<button class="btn pri" data-wmview="${pk}">👀 Lihat</button>`:""}${pk==="bunian"?'<button class="btn" data-wmbunian="1">🌿 Bawa keluarga</button>':""}</div></div></div>`}const k=wmSel,arr=(homeArr(k)||[]).filter(x=>!x.visitFrom),me=act(),cur=k===S.home,canVisit=me&&!isBaby(me)&&!me.away&&!S.visiting&&!(S.party&&!S.party.over),ht=areaOf(k)==="bandar"&&wmHT(k);return`<div class="wminfo"><b>${areaOf(k)==="bandar"?"🏙️":"🏡"} ${esc(homeName(k))}</b>${ht&&WMHTN[ht]&&!homeName(k).includes("·")?` <span class="sm">· ${WMHTN[ht]}</span>`:""}${cur?' <span class="sm">· rumah yang sedang dimainkan</span>':""}<div class="wmppl">${arr.slice(0,8).map(x=>`<span class="wmav" title="${esc(x.name)}"><span class="av pt">${portrait(x.ap,x.stage,"thumb","casual","wm"+x.id)}</span><small>${esc(x.name).split(" ")[0]}</small></span>`).join("")||'<span class="sm">Keluarga jiran — tekan Main untuk masuk ke rumah mereka.</span>'}</div>
-   <div class="acts">${cur?"":`<button class="btn pri" data-wmplay="${k}">🏠 Main rumah ini</button>`}${!cur&&canVisit?`<button class="btn" data-wmvisit="${k}">🚶 Ziarah</button>`:""}</div></div>`}const renderMap_wm=renderMap;renderMap=function(){renderMap_wm();const el=$("#kmap");if(!el||el.hidden)return;const head=el.querySelector(".sheet-head");if(!head)return;const body=[...el.children].filter(c2=>c2!==head);const wrap=document.createElement("div");wrap.className="wmwrap";wrap.innerHTML=`<div class="seg" role="group" style="margin:0 12px 8px"><button data-wmtab="map" aria-pressed="${!wmShowList}">🗺️ Peta Dunia</button><button data-wmtab="list" aria-pressed="${wmShowList}">📋 Senarai & tetapan</button></div><div class="wmmap" ${wmShowList?"hidden":""}><div class="wmscroll">${worldMapSVG()}</div><div class="wminfo-wrap">${wmInfoHTML()}</div></div>`;head.after(wrap);if(!wmShowList)body.forEach(c2=>c2.hidden=true);const pkBox=wrap.querySelector(".wminfo[data-wmpk]");if(pkBox&&!wmShowList){const P2=PLACES[pkBox.dataset.wmpk];const lot=P2&&[...el.querySelectorAll(".lot")].find(l=>{const b=l.querySelector("b");return b&&b.textContent.includes(P2.name)});if(lot){const own=pkBox.querySelector(".wmlot");const keep=own.querySelector("[data-wmview],[data-wmbunian]");own.innerHTML="";lot.querySelector("b")?.remove();own.appendChild(lot);lot.classList.add("wmmoved");if(keep&&!lot.querySelector("[data-viewplace],[data-viewschool]"))own.appendChild(keep)}}wrap.querySelectorAll("[data-wmtab]").forEach(b=>b.onclick=()=>{wmShowList=b.dataset.wmtab==="list";renderMap()});const pickH=g=>{wmSel=g.dataset.wmBld?"bld:"+g.dataset.wmBld:g.dataset.wmHome?g.dataset.wmHome:g.dataset.wmLot?"new:"+g.dataset.wmLot+":"+g.dataset.wmI:"pl:"+g.dataset.wmPlace;const sc0=el.querySelector(".wmscroll"),L=sc0.scrollLeft,T=sc0.scrollTop;renderMap();const sc2=$("#kmap .wmscroll");if(sc2){sc2.scrollLeft=L;sc2.scrollTop=T}const inf=$("#kmap .wminfo");inf&&inf.scrollIntoView&&inf.scrollIntoView({block:"nearest",behavior:"smooth"})};wrap.querySelectorAll("[data-wm-home],[data-wm-place],[data-wm-lot],[data-wm-bld]").forEach(g=>{g.addEventListener("click",()=>pickH(g));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")pickH(g)})});wrap.querySelectorAll("[data-wmnew]").forEach(b=>b.onclick=()=>{wmSel=null;openNewHH(b.dataset.wmnew,b.dataset.wmht)});wrap.querySelectorAll("[data-wmplay]").forEach(b=>b.onclick=()=>{el.hidden=true;const k=b.dataset.wmplay;wmSel=null;switchHome(k)});wrap.querySelectorAll("[data-wmvisit]").forEach(b=>b.onclick=()=>{el.hidden=true;const k=b.dataset.wmvisit;wmSel=null;startVisit(k)});wrap.querySelectorAll("[data-wmerr]").forEach(b=>b.onclick=()=>{const me=act();if(!me||me.away){toast("Pilih Teman yang ada di rumah dulu.");return}el.hidden=true;enqueue(me,{type:"errand",act:b.dataset.wmerr});toast(`${b.dataset.wmerr==="gym"?"🏋️":"🏊"} ${me.name} turun ke kemudahan kondo.`)});wrap.querySelectorAll("[data-wmview]").forEach(b=>b.onclick=()=>{el.hidden=true;S.outScene=b.dataset.wmview;S.view=4;resize();renderFloors()});wrap.querySelectorAll("[data-wmbunian]").forEach(b=>b.onclick=()=>{el.hidden=true;if(!TRIPW(dayIdx(),hourF())){toast("🌿 Lorong ke Kampung Bunian hanya terbuka waktu pagi (7:00–11:00).");return}const G=tripGroup();for(const s2 of G)enqueue(s2,{type:"errand",act:pick(["bunianistana","bunianhutan"])});toast(`🌿 Keluarga bertolak ke Kampung Bunian melalui lorong berbunga…`)});const sc=wrap.querySelector(".wmscroll");if(sc&&!wmSel)requestAnimationFrame(()=>{sc.scrollLeft=areaOf(S.home)==="bandar"?sc.scrollWidth:0})};{const st=document.createElement("style");st.textContent=`.wmscroll{overflow:auto;margin:0 12px;border-radius:16px;border:2px solid #4c9a42;box-shadow:inset 0 0 0 3px rgba(255,255,255,.4);-webkit-overflow-scrolling:touch;max-height:70vh}
+   <div class="acts">${cur?"":`<button class="btn pri" data-wmplay="${k}">🏠 Main rumah ini</button>`}${!cur&&canVisit?`<button class="btn" data-wmvisit="${k}">🚶 Ziarah</button>`:""}</div></div>`}const renderMap_wm=renderMap;renderMap=function(){renderMap_wm();const el=$("#kmap");if(!el||el.hidden)return;const head=el.querySelector(".sheet-head");if(!head)return;const body=[...el.children].filter(c2=>c2!==head);const wrap=document.createElement("div");wrap.className="wmwrap";wrap.innerHTML=`<div class="seg" role="group" style="margin:0 12px 8px"><button data-wmtab="map" aria-pressed="${!wmShowList}">🗺️ Peta Dunia</button><button data-wmtab="list" aria-pressed="${wmShowList}">📋 Senarai & tetapan</button></div><div class="wmmap" ${wmShowList?"hidden":""}><div class="wmscroll">${worldMapSVG()}</div><div class="wminfo-wrap">${wmInfoHTML()}</div></div>`;head.after(wrap);if(!wmShowList)body.forEach(c2=>c2.hidden=true);const pkBox=wrap.querySelector(".wminfo[data-wmpk]");if(pkBox&&!wmShowList){const P2=PLACES[pkBox.dataset.wmpk];const lot=P2&&[...el.querySelectorAll(".lot")].find(l=>{const b=l.querySelector("b");return b&&b.textContent.includes(P2.name)});if(lot){const own=pkBox.querySelector(".wmlot");const keep=own.querySelector("[data-wmview],[data-wmbunian]");own.innerHTML="";lot.querySelector("b")?.remove();own.appendChild(lot);lot.classList.add("wmmoved");if(keep&&!lot.querySelector("[data-viewplace],[data-viewschool]"))own.appendChild(keep)}}wrap.querySelectorAll("[data-wmtab]").forEach(b=>b.onclick=()=>{wmShowList=b.dataset.wmtab==="list";renderMap()});const pickH=g=>{const _o=wmSel;wmSel=g.dataset.wmBld?"bld:"+g.dataset.wmBld:g.dataset.wmHome?g.dataset.wmHome:g.dataset.wmLot?"new:"+g.dataset.wmLot+":"+g.dataset.wmI:"pl:"+g.dataset.wmPlace;const sc0=el.querySelector(".wmscroll"),L=sc0.scrollLeft,T=sc0.scrollTop;if(!(window.RKHF&&RKHF.mapPick&&RKHF.mapPick(g,_o)))renderMap();const sc2=$("#kmap .wmscroll");if(sc2){sc2.scrollLeft=L;sc2.scrollTop=T}const inf=$("#kmap .wminfo");inf&&inf.scrollIntoView&&inf.scrollIntoView({block:"nearest",behavior:"smooth"})};wrap.querySelectorAll("[data-wm-home],[data-wm-place],[data-wm-lot],[data-wm-bld]").forEach(g=>{g.addEventListener("click",()=>pickH(g));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")pickH(g)})});wrap.querySelectorAll("[data-wmnew]").forEach(b=>b.onclick=()=>{wmSel=null;openNewHH(b.dataset.wmnew,b.dataset.wmht)});wrap.querySelectorAll("[data-wmplay]").forEach(b=>b.onclick=()=>{el.hidden=true;const k=b.dataset.wmplay;wmSel=null;switchHome(k)});wrap.querySelectorAll("[data-wmvisit]").forEach(b=>b.onclick=()=>{el.hidden=true;const k=b.dataset.wmvisit;wmSel=null;startVisit(k)});wrap.querySelectorAll("[data-wmerr]").forEach(b=>b.onclick=()=>{const me=act();if(!me||me.away){toast("Pilih Teman yang ada di rumah dulu.");return}el.hidden=true;enqueue(me,{type:"errand",act:b.dataset.wmerr});toast(`${b.dataset.wmerr==="gym"?"🏋️":"🏊"} ${me.name} turun ke kemudahan kondo.`)});wrap.querySelectorAll("[data-wmview]").forEach(b=>b.onclick=()=>{el.hidden=true;S.outScene=b.dataset.wmview;S.view=4;resize();renderFloors()});wrap.querySelectorAll("[data-wmbunian]").forEach(b=>b.onclick=()=>{el.hidden=true;if(!TRIPW(dayIdx(),hourF())){toast("🌿 Lorong ke Kampung Bunian hanya terbuka waktu pagi (7:00–11:00).");return}const G=tripGroup();for(const s2 of G)enqueue(s2,{type:"errand",act:pick(["bunianistana","bunianhutan"])});toast(`🌿 Keluarga bertolak ke Kampung Bunian melalui lorong berbunga…`)});const sc=wrap.querySelector(".wmscroll");if(sc&&!wmSel)requestAnimationFrame(()=>{sc.scrollLeft=areaOf(S.home)==="bandar"?sc.scrollWidth:0})};{const st=document.createElement("style");st.textContent=`.wmscroll{overflow:auto;margin:0 12px;border-radius:16px;border:2px solid #4c9a42;box-shadow:inset 0 0 0 3px rgba(255,255,255,.4);-webkit-overflow-scrolling:touch;max-height:70vh}
 .wmsvg{display:block;width:100%;min-width:1150px;height:auto}.wmh,.wmp{cursor:pointer}.wmh:hover rect,.wmh:hover path{filter:brightness(1.1)}.wmp:hover circle{filter:brightness(1.08)}.wmh:focus,.wmp:focus{outline:none}
 .wminfo-wrap{margin:8px 12px}.wminfo{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--card,#fff)}.wminfo .acts{display:flex;flex-wrap:wrap;gap:6px}.wmppl{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.wmav{display:flex;flex-direction:column;align-items:center;font-size:.7rem}.wmav .av{width:42px;height:42px}
 .wmunits{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:8px;max-height:46vh;overflow:auto}.wmunit{border:1px solid var(--line);border-radius:12px;padding:8px}.wmunit.cur{border-color:#ffd23f;box-shadow:0 0 0 2px #ffd23f55}.wmuh{display:flex;flex-direction:column}.wmunit .wmppl{margin:6px 0}
@@ -11721,7 +11721,35 @@ window.__rk={_ev:s=>eval(s),openGuide,GUIDE,bsStep,bsCand,movedKinFix,storyParen
   try { for (const e of PNT.idx) { const F = typeof e.faces === "string" && e.faces.includes("#") && e.faces.split("#")[0]; if (F && !PNT.ff[F]) PNT.ff[F] = fetch("img/orang-hf/" + F + "?v=" + encodeURIComponent(PNTV)).then(r => r.ok ? r.json() : null).catch(() => null) } } catch (e) { }
  }).catch(() => { if (n < 2) setTimeout(() => getIdx(n + 1), 2500); else HF.pntFail = 1 });
  getIdx(0);
- const pntImg = f => { let im = PNT.img[f]; if (!im) { im = PNT.img[f] = new Image(); im.onerror = () => { im._bad = 1 }; im.src = "img/orang-hf/" + f; im.onload = () => { try { draw(performance.now()) } catch (e) { } } } return im };
+ /* rk-ringan (hf144, cache imej watak): every painted sheet asked for was kept in PNT.img for ever (a phone's 12.5 MB each once decoded, a full one 50 MB; the Melur
+    clothes sheet 45 / 181 MB). Now a budget of estimated RGBA bytes (width x height x 4, counted when a sheet has loaded): over it, the sheets used longest ago are let go
+    (their <img> dropped from PNT.img and from whatever else holds it, PNT.onDrop; asked for again they load again, from the browser's cache). Never let go of a sheet that
+    is still loading, one asked for in the last 8 s (drawn this moment, or a request in flight) or one a person of the family in play is drawn from (HF.filesOf). */
+ PNT.bytes = 0; PNT.cap = (PNT.low ? 260 : 700) * 1048576; PNT.onDrop = []; PNT.drop = 0; PNT.dropB = 0; PNT.keepMs = 8000; PNT.gone = new Set(); PNT.reload = 0; PNT.reloadMs = 0;
+ try { const w = +localStorage.getItem("rkhf_imgcap"); if (w >= 0 && localStorage.getItem("rkhf_imgcap") !== null) PNT.cap = w * 1048576 } catch (e) { }   /* (tests: rkhf_imgcap = MB, 0 = let go of everything not needed) */
+ const pntTrim = () => {
+  try {
+   if (PNT.bytes <= PNT.cap) return;
+   const now = performance.now(); let keep = null; try { keep = HF.filesOf ? HF.filesOf(S.sims) : null } catch (e) { }
+   const L = Object.entries(PNT.img).filter(([f, im]) => im._b && now - im._t > PNT.keepMs && !(keep && keep.has(f))).sort((a, b) => a[1]._t - b[1]._t);
+   for (const [f, im] of L) {
+    if (PNT.bytes <= PNT.cap * .85) break;
+    delete PNT.img[f]; PNT.bytes -= im._b; PNT.drop++; PNT.dropB += im._b; PNT.gone.add(f); for (const fn of PNT.onDrop) try { fn(f) } catch (e) { }
+   }
+  } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+ };
+ HF.pntStat = () => { const L = Object.values(PNT.img); return { n: L.length, loaded: L.filter(i => i._b).length, mb: Math.round(PNT.bytes / 1048576), capMB: Math.round(PNT.cap / 1048576), drop: PNT.drop, dropMB: Math.round(PNT.dropB / 1048576), reload: PNT.reload, reloadMs: Math.round(PNT.reloadMs), big: Object.entries(PNT.img).filter(([f, i]) => i._b).sort((a, b) => b[1]._b - a[1]._b).slice(0, 6).map(([f, i]) => f + ' ' + Math.round(i._b / 1048576) + 'MB') } };
+ HF.pntCap = mb => { PNT.cap = mb * 1048576; pntTrim() };   /* (tests) */
+ const pntImg = f => {
+  let im = PNT.img[f];
+  if (!im) {
+   im = PNT.img[f] = new Image(); im._t = performance.now(); im.onerror = () => { im._bad = 1 }; im.src = "img/orang-hf/" + f;
+   if (PNT.gone.delete(f)) { PNT.reload++; im._rt = im._t }
+   im.onload = () => { try { if (im._rt) { PNT.reloadMs += performance.now() - im._rt; im._rt = 0 } if (!im._b) { im._b = (im.naturalWidth * im.naturalHeight * 4) || 0; if (PNT.img[f] === im) PNT.bytes += im._b; else im._b = 0 } draw(performance.now()) } catch (e) { } pntTrim() }
+  } else im._t = performance.now();
+  return im
+ };
+ HF.pntImg = pntImg; HF.pntFiles = () => (PNT.idx || []).map(e => e.file); HF.pntIdx = () => PNT.idx;   /* (tests) */
  const hjOn = h => !!h && h !== "none";
  /* (C3, owner 26 Okt: tudung renda + sulaman) tudung styles with a trim of their own: the lace or the embroidery that
     tools/hf/renda.py lays on every painted tudung frame (the sheet's "trim" image, in the atlas's own layout; renda and
@@ -12963,7 +12991,7 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
  const LABB = { sekolah: "Sekolah", surau: "Surau", balai: "Balai", klinikdesa: "Klinik", kedai: "Kedai", jahit: "Jahit", warung: "Warung", tadika: "Tadika", pasar: "Pasar", bazaar: "Bazar", padang: "Padang", tamanrek: "Taman", dusun: "Dusun", pantai: "Pantai", hospital: "Hospital", bomba: "Bomba", balaipolis: "Polis", kerajaan: "Kerajaan", istana: "Istana", mall: "Mall", lrt: "LRT", kafe: "Kafe", mamak: "Mamak", taman: "Tasik", ibadah: "Ibadah", arena: "Arena", stadium: "Stadium", studio: "Studio", zoo: "Zoo", stesen: "Minyak", kubur: "Kubur", kilangir: "Kilang", restoran: "Jeti", kebun: "Kebun", bakeri: "Roti", airport: "Lapangan", bunian: "Bunian" };
  function wmLabels(ws) {
   try {
-   const sv = ws.querySelector("svg.wmsvg"); if (!sv) return;
+   const sv = ws.querySelector("svg.wmsvg"); if (!sv || sv.dataset.rkstub) return;
    const T = [...sv.querySelectorAll("g.wmp text[paint-order], g.wmh text[paint-order]")];
    const rest = t => { const o = JSON.parse(t.dataset.o0); t.setAttribute("x", o[4]); t.setAttribute("font-size", o[0]); t.setAttribute("y", o[1]); t.setAttribute("stroke-width", o[2]); t.textContent = o[3]; t.style.display = "" };
    for (const t of T) { if (t.dataset.o0 === undefined) t.dataset.o0 = JSON.stringify([t.getAttribute("font-size"), t.getAttribute("y"), t.getAttribute("stroke-width"), t.textContent, t.getAttribute("x")]); else rest(t) }
@@ -13002,32 +13030,15 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
    if (lc.size >= 8) lc.delete(lc.keys().next().value); lc.set(lk, T.map(t => [t.getAttribute("x"), t.getAttribute("font-size"), t.getAttribute("y"), t.getAttribute("stroke-width"), t.innerHTML, t.style.display]));
   } catch (e) { fail(e) }
  }
- /* rk-ringan: tapping a house, lot or place on the Peta drew the whole map again before anything showed (~0.5 s on a phone). Now the tap answers in the same frame
-    (the pin lights up and the card shows the name), and the real redraw — the same click, unchanged — runs right after that frame. A drag that ends on a pin is left alone. */
+ /* rk-ringan: a tap on a house, lot or place on the Peta answers in the same frame: the pin is lit while the finger is down (pointerdown), and the real click (not
+    a copy of it sent a frame later, as before) runs pickH, which now only changes the card under the map (HF.mapPick, in the openMap section). A drag that ends on a pin is not a tap. */
  {
-  let pd = null, busy = false, go = false;
   const SEL = "#kmap g[data-wm-home],#kmap g[data-wm-place],#kmap g[data-wm-lot],#kmap g[data-wm-bld]";
-  document.addEventListener("pointerdown", e => { pd = [e.clientX, e.clientY] }, true);
-  document.addEventListener("click", e => {
-   try {
-    if (go || busy || !e.target.closest) return;
-    const g = e.target.closest(SEL); if (!g || !e.isTrusted) return;
-    if (pd && Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) > 5) return;
-    e.stopImmediatePropagation(); e.preventDefault(); busy = true;
-    try {
-     g.style.filter = "brightness(1.12)";
-     const w = document.querySelector("#kmap .wminfo-wrap"), t = g.querySelector("title"), nm = (t && t.textContent) || g.getAttribute("aria-label") || (g.querySelector("text") || {}).textContent || "";
-     if (w) w.innerHTML = '<div class="wminfo"><b>' + String(nm).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])) + "</b></div>"
-    } catch (e2) { fail(e2) }
-    const key = ["wmHome", "wmPlace", "wmLot", "wmBld", "wmI"].map(k => k + "=" + (g.dataset[k] || "")).join("&");
-    requestAnimationFrame(() => setTimeout(() => {
-     try {
-      let h = g; if (!h.isConnected) h = [...document.querySelectorAll(SEL)].find(x => ["wmHome", "wmPlace", "wmLot", "wmBld", "wmI"].map(k => k + "=" + (x.dataset[k] || "")).join("&") === key);
-      if (h) { go = true; h.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true })) }
-     } catch (e3) { fail(e3) } finally { go = false; busy = false }
-    }, 0))
-   } catch (e) { fail(e) }
-  }, true)
+  let lit = null; const off = () => { if (lit) { lit.classList.remove("rk-press"); lit = null } };
+  const st = document.createElement("style"); st.textContent = ".rk-press{filter:brightness(1.18)}.rk-ring{pointer-events:none}"; (document.head || document.documentElement).appendChild(st);
+  document.addEventListener("pointerdown", e => { try { off(); const g = e.target.closest && e.target.closest(SEL); if (g) { g.classList.add("rk-press"); lit = g } } catch (e2) { } }, true);
+  for (const t of ["pointerup", "pointercancel", "click", "dragstart"]) document.addEventListener(t, () => { if (lit) setTimeout(off, 0) }, true);
+  addEventListener("blur", off); document.addEventListener("scroll", off, true)
  }
  /* peta-zoom: zoom state for the session (not saved: old saves and the old 'mapfit' setting are simply ignored) */
  const WMZ = { z: 1, min: .6, max: 2.5, t: 0 };
@@ -13050,7 +13061,7 @@ canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
   addEventListener("pointerup", () => { const dg = WMD.dg, ws = WMD.ws; if (ws && dg && dg.on) { const stop = ev => { ev.stopPropagation(); ev.preventDefault() }; ws.addEventListener("click", stop, { capture: true, once: true }); setTimeout(() => ws.removeEventListener("click", stop, true), 50) } WMD.dg = null; if (ws) ws.classList.remove("wmdrag") })
  } };
  function wmSetup(ws) {
-  if (!ws || ws.dataset.hf) return; ws.dataset.hf = "1";
+  if (!ws || ws.dataset.hf || ws.querySelector("svg[data-rkstub]")) return; ws.dataset.hf = "1";
   ws.style.setProperty("--wmz", WMZ.z.toFixed(3));
   ws.insertAdjacentHTML("beforebegin", `<div class="wmfit"><span>Seret untuk gerak · cubit atau roda tetikus untuk zum</span><div class="wmz"><button class="btn" type="button" data-wmz="-" aria-label="Kecilkan peta">➖</button><button class="btn wmzp" type="button" data-wmz="0" aria-label="Saiz biasa">${Math.round(WMZ.z * 100)}%</button><button class="btn" type="button" data-wmz="+" aria-label="Besarkan peta">➕</button></div></div>`);
   const bar = ws.previousElementSibling;
@@ -13619,6 +13630,7 @@ button.item[data-buy] canvas.hfth{position:absolute;right:6px;top:50%;transform:
  if (typeof nbAvatar === "function") { const nv0 = nbAvatar; nbAvatar = function (id) { const o = PCUR; const n = S.npcs && S.npcs[id]; PCUR = { name: n && n.name, id: "n" + id }; try { return nv0.apply(this, arguments) } finally { PCUR = o } } }
  const PH = new Map(), PHC = new Map();   /* finished portraits; portraits being cut */
  const BMP = new Map();   /* painted sheets decoded for portraits (the last few) */
+ PNT.onDrop.push(f => BMP.delete(f));   /* (hf144) a sheet let go of by the budget is not held by its portrait cuts either */
  const bmpOf = file => {
   let p = BMP.get(file);
   if (!p) {
@@ -22635,6 +22647,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf143", "28 Nov 2026", ["🏠 Baru: Bilik Sewa Murah kini rumah 3D, dengan perabot model dan dinding hangat; simpanan Bilik Murah lama dipindahkan sendiri", "🏡 Baru: Kampung & Keluarga di Keperluan: Projek Kampung (pagar, buaian, bangku, kebun, Balai Raya), Janji Keluarga, Resipi Turun-Temurun, Pesanan Sekampung dan Jejak Kenangan Atuk, dilukis sebagai diorama", "🛠️ Baiki: meja dan bangku lukisan lama tidak lagi muncul di atas perabot 3D, termasuk semasa digunakan", "⚡ Lebih pantas: ketik pin pada Peta kini terus memberi respons, dan imej watak menggunakan memori lebih sedikit pada telefon"]],
    ["hf142", "28 Nov 2026", ["🏠 Rumah 3D baharu: Kampung, Teres, Banglo, Rumah Panjang Sarawak, Flat PPR, Rumah Bunian, Istana (3 tingkat), Apartmen dupleks, Berkembar Impian Emas (Unit A dan B) serta Bilik Sewa Sederhana dan Mewah; perabot dirender 3D, boleh digerak, diputar dan dijual dalam Bina", "❄️ Baru: penyaman udara perabot yang tergantung pada dinding", "🛠️ Baiki: perabot, katil, tandas dan pokok tidak lagi terkeluar atau salah lapisan pada dinding"]],
    ["hf141", "26 Nov 2026", ["💬 Baru: Gosip dengan Melur di Spa Ratu Cantik, percuma; pilih topik dan jenis cerita (panas, baik, buruk atau santai)", "📣 Baru: Khabar Kampung; lepaskan satu khabar dan lihat ia merebak dari mulut ke mulut, malah Sim keluarga pergi ke tempat yang disebut"]],
    ["hf140", "24 Nov 2026", ["🛠️ Baiki: Peta tidak lagi menyimpan peta lama dalam memori setiap kali dibuka (punca telefon kadang-kadang terkeluar ke menu utama)"]],
@@ -26139,6 +26152,7 @@ ${P.n > 0 ? `<p class="cap2">Ambil duit</p><div class="bjc">${outs.map(v => `<bu
    }
    return F
   };
+  HF.filesOf = filesOf;
   const warm = () => { try { if (!PNT.idx) return; PNT.go = true; for (const f of filesOf(S.sims)) pntImg(f) } catch (e) { fail(e) } };
   const redraw = () => { try { draw(performance.now()) } catch (e) { } };
   const decodeAll = () => {
@@ -26151,7 +26165,10 @@ ${P.n > 0 ? `<p class="cap2">Ambil duit</p><div class="bjc">${outs.map(v => `<bu
      with a frame between, so the portraits are cut, the pictures decoded and the code warm before the first tap. Nothing is kept from it
      (no cached HTML: the next tap draws the panel again, from the data of that moment, so nothing stale); the tab, the page position and
      every sheet are put back. It stops at HF.warmMax ms (what is left is cut later in the quiet, as before) or at "Langkau". ---- */
-  HF.warmMax = 3500; try { const w = +localStorage.getItem("rkhf_warmmax"); if (w >= 0 && localStorage.getItem("rkhf_warmmax") !== null) HF.warmMax = w } catch (e) { }   /* (tests: rkhf_warmmax = ms, 0 = no warm-up) */
+  /* (hf144) 3500 -> 1000 ms: on the throttled phone (4x CPU) the warm-up held the loading screen 2.9-3.9 s for three panels; with 1000 only the first step (Matlamat, the one a first tap
+     cost most without: 586 ms cold against ~130 warm) runs on a slow phone and the rest are left for the first tap (Telefon 139-175 ms, Bina 236-267, Panduan 281-297 measured with
+     1000, no worse than with 3500); a fast device (steps cost a quarter of that) still runs all three. A data saver skips the warm-up (it fetches the panels' pictures early). */
+  HF.warmMax = (navigator.connection && navigator.connection.saveData) ? 0 : 1000; try { const w = +localStorage.getItem("rkhf_warmmax"); if (w >= 0 && localStorage.getItem("rkhf_warmmax") !== null) HF.warmMax = w } catch (e) { }   /* (tests: rkhf_warmmax = ms, 0 = no warm-up) */
   { const dr0 = draw; draw = function () { if (HF.warmQuiet) return; return dr0.apply(this, arguments) } }   /* the house is not drawn behind the loading screen while the panels are warmed */
   const warmAll = tok => new Promise(done => {
    const t0 = performance.now(); let skip = 0, i = 0, fin = 0, tab0 = null; const Y0 = scrollY;
@@ -31346,7 +31363,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
       const p0 = D.pn || 0;
       ctx.save(); if (busy === "basuh") ctx.translate(Math.sin((ts || 0) / 40) * 1.1, 0);
       try { di2.apply(this, arguments) } finally { ctx.restore() }
-      if ((D.pn || 0) !== p0) { if (busy === "basuh") tubMoving(o2, ts || 0); ctx.globalAlpha = 1; return }
+      if (((D.pn || 0) !== p0 || !!(window.RKHF && RKHF.paintedHouse && RKHF.paintedHouse()))) { if (busy === "basuh") tubMoving(o2, ts || 0); ctx.globalAlpha = 1; return }
      }
      duaTub(o2, busy, ts || 0)
     } catch (e) { fail(e) }
@@ -31485,7 +31502,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
      const D = window.RKDal;
      if (D && D.lukisan && D.lukisan(o2)) {
       const p0 = D.pn || 0; di3.apply(this, arguments);
-      if ((D.pn || 0) !== p0) { moving(o2, busy, ts || 0); ctx.globalAlpha = 1; return }
+      if (((D.pn || 0) !== p0 || !!(window.RKHF && RKHF.paintedHouse && RKHF.paintedHouse()))) { moving(o2, busy, ts || 0); ctx.globalAlpha = 1; return }
      }
      drawNew(o2, busy, ts || 0)
     } catch (e) { fail(e) }
@@ -31659,7 +31676,7 @@ ${trees}${lamps}${N.map((n, i) => dot("hfjn" + i, (nbDef(n.id) || {}).name ? nbD
       const p0 = D.pn || 0;
       ctx.save(); if (busy === "goyang") ctx.translate(Math.sin((ts || 0) / 450) * 3, 0);
       try { di5.apply(this, arguments) } finally { ctx.restore() }
-      if ((D.pn || 0) !== p0) { moving(o2, busy, ts || 0); ctx.globalAlpha = 1; return }
+      if (((D.pn || 0) !== p0 || !!(window.RKHF && RKHF.paintedHouse && RKHF.paintedHouse()))) { moving(o2, busy, ts || 0); ctx.globalAlpha = 1; return }
      }
      drawNew(o2, busy, ts || 0)
     } catch (e) { fail(e) }
@@ -31972,6 +31989,7 @@ try {
  };
  const deliver = i => {
   const B = cur(), o = B.ord[i]; if (!o) return false;
+  if (!(HF.kenduriCanDeliver ? HF.kenduriCanDeliver(o) : true)) return false;
   const x = B.stok[o.id];
   if (!x || x.n < o.n) { toast(`Stok tak cukup: perlu ${o.n} ${PROD[o.id].u}, ada ${x ? x.n : 0}.`); return false }
   if (x.q < o.mq) { toast(`Mutu ${PROD[o.id].nm.toLowerCase()} belum cukup (perlu ${o.mq}+, stok ${x.q}). Buat yang lebih baik dulu.`); return false }
@@ -31980,6 +31998,7 @@ try {
   B.ord.splice(i, 1); S.money += pay - (o.dp || 0); inc(pay - (o.dp || 0)); try { HF.k6walk && HF.k6walk({ nm: o.nm, id: o.ks || o.kb, line: `Ambil tempahan: ${o.n} ${PROD[o.id].u} ${SN[o.id]}.`, pay, tip: 0, say: o.ks || o.kb ? "Terima kasih, nak." : "Terima kasih, sedap!" }) } catch (e) { fail(e) } addRep(B, o.ks || o.kb ? 7 : 5);
   if (B.sdd !== day()) { B.sdd = day(); B.sd++ }
   try { sfx("coin") } catch (e) { }
+  if (o.hfKenduri) HF.kenduriDelivery("bakery", o);
   toast(`🧾 Tempahan dihantar kepada ${o.nm}: ${o.n} ${PROD[o.id].u} = ${rm(pay)}${o.dp ? " (deposit " + rm(o.dp) + " sudah diterima)" : ""}, masuk dompet.`);
   try {
    if (o.ks && STORY[o.ks]) { B.alb[o.ks] = { d: day(), nm: STORY[o.ks].nm }; B.rt.push({ id: o.ks, due: day() + 2 }); setTimeout(() => toast(`📖 ${STORY[o.ks].nm}: "${STORY[o.ks].ok}" (masuk Album kenangan)`), 400) }
@@ -34205,12 +34224,15 @@ try {
  { const oh = onHour; onHour = function () { const r = oh.apply(this, arguments); try { hourly() } catch (e) { fail(e) } return r } }
  /* ---- deliver ---- */
  const deliver = i => {
-  const B = BH(), o = B.ord[i]; if (!o) return false; const p = plan(o);
+  const B = BH(), o = B.ord[i]; if (!o) return false;
+  if (!(HF.kenduriCanDeliver ? HF.kenduriCanDeliver(o) : true)) return false;
+  const p = plan(o);
   if (!p.ok) { toast(`Stok belum cukup untuk ${o.nm}: kurang ${p.miss.map(r => `${r.short} ${FR[r.f][1].toLowerCase()}`).join(", ")} (mutu ${GR[o.g].toLowerCase()}+).`); return false }
   for (const r of p.rows) for (const [c, k] of r.take) { if (c.raga) ragaTake(r.f, k); else c.b.n -= k }
   for (const f of Object.keys(B.s)) { B.s[f] = B.s[f].filter(b => b.n > 0); if (!B.s[f].length) delete B.s[f] }
   const tip = p.above ? Math.round(o.rm * .08 * 20) / 20 : 0, pay = Math.round((o.rm + tip) * 100) / 100;
   dpt(); S.money += pay; B.ord.splice(i, 1); B.done++; B.earn += pay;
+  if (o.hfKenduri) HF.kenduriDelivery("fruit", o);
   const rp = o.t === "h" ? 6 : o.t === "k" ? 4 : 3, fr = o.t === "h" ? 5 : o.t === "k" ? 4 : 3; B.rep = clamp(B.rep + rp, 0, 100); if (o.nb != null) rel(o.nb, fr);
   try { sfx("coin") } catch (e) { }
   toast(`${TYPE[o.t][0]} Tempahan ${o.nm} dihantar: ${sumTx(o)} = ${rm(pay)}${tip ? ` (tip ${rm(tip)}: buah lebih segar)` : ""}.${o.nb != null ? ` Persahabatan dengan ${o.nm} +${fr}.` : ""} Nama pembekal +${rp}.`);
@@ -35706,6 +35728,7 @@ ${R.ord ? `<div class="gbk"><span>Upah<b>${rm(R.upah)}</b></span><span>Tip & var
  const begin = (ord, n) => { G.ord = ord; G.n = n; G.d = []; G.cur = null; G.sel = null; G.tab = "u"; sPick() };
  const accept = i => {
   const B = cur(), o = B.ord[i]; if (!o || !G) return false;
+  if (!(HF.kenduriCanDeliver ? HF.kenduriCanDeliver(o) : true)) return false;
   if (!o.acc) { if (S.money < o.kos) { pop(`👛 Bahan ${rm(o.kos)} tak cukup.`, 1); return false } dpt(); S.money -= o.kos; o.acc = 1; B.wk.kos += o.kos; try { sfx("coin") } catch (e) { } }
   begin(o, o.n); return true
  };
@@ -35740,6 +35763,7 @@ ${R.ord ? `<div class="gbk"><span>Upah<b>${rm(R.upah)}</b></span><span>Tip & var
   B.pic.push({ nm: ord ? o.nm : "sendiri", n: G.n, st: sc.st, g: G.d.map(d => d.g), tl: G.d[0].tl, rb: G.d[0].rb, d: day() }); B.pic = B.pic.slice(-6);
   try { skillGain(s2, "craft", 8 + 4 * sc.st) } catch (e) { fail(e) }
   try { if (s2 && s2.needs) { s2.needs.fun = Math.min(100, (s2.needs.fun || 0) + 6); s2.needs.energy = Math.max(0, (s2.needs.energy || 0) - 4) } } catch (e) { }
+  if (o?.hfKenduri) HF.kenduriDelivery("gifts", o);
   G.res = { st: sc.st, ord, nm: o ? o.nm : "", upah, tip, kos, net, xp, up: t1 > t0 ? TIER[t1][1] : "" }; G.mins = Math.min(180, (G.mins || 0) + G.n * 20);
   if (t1 > t0) setTimeout(() => { try { toast(`🏅 ${first(s2)} kini ${TIER[t1][1]} menggubah hantaran!`); diary(`${s2.name} kini ${TIER[t1][1]} menggubah hantaran.`) } catch (e) { } }, 300);
   sDone()
@@ -42064,22 +42088,22 @@ try {
 /* hf135: the pieces offered are the painted sprites of the owner's reference (tools/hf/bilik_perabot.py, img/dalaman/bilik-perabot.webp, one sheet of 17 cells of 120 px,
     6 per row, loaded only when a room is opened): Murah (r_) = Retro Malaysia, Sederhana (j_) = Japandi, Mewah (b_) = Butik Moden. Older pieces stay in CATL
     (rooms saved with them still show and sell them) but are no longer offered. [category, price, points, name] */
- const SPRN = ["r_tilam", "r_almari", "r_kipas", "r_meja", "r_bangku", "r_bilikair", "j_katil", "j_almari", "j_meja", "j_kerusi", "j_kipasdingin", "j_bilikair", "b_katil", "b_sofa", "b_peti", "b_tv", "b_bilikair", "a_aircond", "j_dapur", "b_dapur", "b_makan", "b_kerusi", "b_pc", "b_kerusipc"];
+ const SPRN = ["j_katil", "j_almari", "j_meja", "j_kerusi", "j_kipasdingin", "j_bilikair", "b_katil", "b_sofa", "b_peti", "b_tv", "b_bilikair", "a_aircond", "j_dapur", "b_dapur", "b_makan", "b_kerusi", "b_pc", "b_kerusipc"];
  const NEWC = {
-  r_tilam: ["tidur", 60, 5, "Tilam lantai"], j_katil: ["tidur", 220, 12, "Katil kayu (Japandi)"], b_katil: ["tidur", 1100, 22, "Katil besar bingkai kayu"],
-  r_almari: ["simpan", 130, 5, "Almari kayu"], j_almari: ["simpan", 200, 10, "Almari kayu cerah"],
-  r_meja: ["meja", 45, 4, "Meja lipat"], r_bangku: ["meja", 25, 3, "Bangku plastik merah"], j_meja: ["meja", 260, 11, "Meja tulis + monitor"], j_kerusi: ["meja", 70, 5, "Kerusi putih"], b_sofa: ["meja", 800, 16, "Sofa L kulit"],
-  r_bilikair: ["air", 300, 7, "Bilik air sudut (jubin putih)"], j_bilikair: ["air", 450, 15, "Bilik air sudut (Japandi)"], b_bilikair: ["air", 1100, 20, "Bilik air mewah (tab mandi)"],
-  a_aircond: ["elektrik", 650, 10, "Aircond dinding (split)"], b_makan: ["meja", 900, 8, "Meja makan marmar"], b_kerusi: ["meja", 150, 3, "Kerusi makan"], b_pc: ["meja", 700, 10, "Meja komputer (PC + monitor)"], b_kerusipc: ["meja", 220, 4, "Kerusi pejabat"], j_dapur: ["dapur", 380, 5, "Dapur kecil (kabinet, sinki, hob)"], b_dapur: ["dapur", 1500, 14, "Dapur mewah (peti sejuk, hob, sinki)"], r_kipas: ["elektrik", 70, 6, "Kipas berdiri"], j_kipasdingin: ["elektrik", 150, 8, "Kipas siling + rasuk"], b_peti: ["elektrik", 500, 8, "Peti sejuk keluli"], b_tv: ["elektrik", 900, 14, "TV besar + kabinet"]
+  j_katil: ["tidur", 220, 12, "Katil kayu (Japandi)"], b_katil: ["tidur", 1100, 22, "Katil besar bingkai kayu"],
+  j_almari: ["simpan", 200, 10, "Almari kayu cerah"],
+  j_meja: ["meja", 260, 11, "Meja tulis + monitor"], j_kerusi: ["meja", 70, 5, "Kerusi putih"], b_sofa: ["meja", 800, 16, "Sofa L kulit"],
+  j_bilikair: ["air", 450, 15, "Bilik air sudut (Japandi)"], b_bilikair: ["air", 1100, 20, "Bilik air mewah (tab mandi)"],
+  a_aircond: ["elektrik", 650, 10, "Aircond dinding (split)"], b_makan: ["meja", 900, 8, "Meja makan marmar"], b_kerusi: ["meja", 150, 3, "Kerusi makan"], b_pc: ["meja", 700, 10, "Meja komputer (PC + monitor)"], b_kerusipc: ["meja", 220, 4, "Kerusi pejabat"], j_dapur: ["dapur", 380, 5, "Dapur kecil (kabinet, sinki, hob)"], b_dapur: ["dapur", 1500, 14, "Dapur mewah (peti sejuk, hob, sinki)"], j_kipasdingin: ["elektrik", 150, 8, "Kipas siling + rasuk"], b_peti: ["elektrik", 500, 8, "Peti sejuk keluli"], b_tv: ["elektrik", 900, 14, "TV besar + kabinet"]
  };
  /* footprint (cells along i, along j; r = 1 mirrors the picture and swaps them), 0 = hangs above (a ceiling or wall piece takes no floor cell) */
- const FP = { r_tilam: [1, 2], r_almari: [1, 1], r_kipas: [1, 1], r_meja: [1, 1], r_bangku: [1, 1], r_bilikair: [2, 2], j_katil: [1, 2], j_almari: [2, 1], j_meja: [2, 1], j_kerusi: [1, 1], j_kipasdingin: [0, 0], j_bilikair: [2, 2], b_katil: [2, 2], b_sofa: [2, 2], b_peti: [1, 1], b_tv: [2, 1], b_bilikair: [2, 2], a_aircond: [0, 0], j_dapur: [2, 1], b_dapur: [2, 1], b_makan: [2, 1], b_kerusi: [1, 1], b_pc: [2, 1], b_kerusipc: [1, 1] };
+ const FP = { j_katil: [1, 2], j_almari: [2, 1], j_meja: [2, 1], j_kerusi: [1, 1], j_kipasdingin: [0, 0], j_bilikair: [2, 2], b_katil: [2, 2], b_sofa: [2, 2], b_peti: [1, 1], b_tv: [2, 1], b_bilikair: [2, 2], a_aircond: [0, 0], j_dapur: [2, 1], b_dapur: [2, 1], b_makan: [2, 1], b_kerusi: [1, 1], b_pc: [2, 1], b_kerusipc: [1, 1] };
  /* the pieces are 3D models rendered with one fixed isometric camera (tools/hf/bilik_3d.mjs, packed by tools/hf/bilik_3d_pek.py): sprite table { cell, w, h, s: { "type|k": [x, y, w, h, ax, ay] } },
     k = quarter-turns of the front (0 +Z, 1 +X, 2 -Z, 3 -X); (ax, ay) = the footprint's front-bottom corner in the sprite. The footprint is fx along i and fz along j at k = 0; odd k swaps. */
- const SPT = /*SPR3D*/{"cell":80,"w":1024,"h":2561,"s":{"r_bilikair|0":[0,0,170,200,84.8,196.5],"r_bilikair|1":[172,0,170,200,84.8,196.5],"r_bilikair|3":[344,0,170,200,84.8,196.5],"j_bilikair|0":[516,0,170,200,84.8,196.5],"j_bilikair|1":[688,0,170,200,84.8,196.5],"j_bilikair|3":[0,202,170,200,84.8,196.5],"b_bilikair|0":[172,202,170,200,84.8,196.5],"b_bilikair|1":[344,202,170,200,84.8,196.5],"b_bilikair|3":[516,202,170,200,84.8,196.5],"j_almari|0":[688,202,130,165,84.8,161.7],"j_almari|1":[820,202,130,165,44.8,161.7],"j_almari|2":[0,404,130,165,84.8,161.7],"j_almari|3":[132,404,130,165,44.8,161.7],"b_dapur|0":[264,404,130,164,84.8,160.5],"b_dapur|3":[396,404,130,164,44.8,160.5],"j_dapur|0":[528,404,130,162,84.8,158.5],"j_dapur|1":[660,404,130,162,44.8,158.5],"b_dapur|1":[792,404,130,162,44.8,158.1],"b_dapur|2":[0,571,130,158,84.8,154.1],"b_katil|0":[132,571,170,156,84.8,152.1],"b_katil|1":[304,571,170,156,84.8,152.1],"b_sofa|0":[476,571,170,154,84.8,150.1],"b_sofa|1":[648,571,170,154,84.8,150.1],"b_sofa~l|0":[820,571,170,154,84.8,150.1],"b_sofa~l|1":[0,731,170,154,84.8,150.1],"b_sofa~s|0":[172,731,170,154,84.8,150.1],"b_sofa~s|1":[344,731,170,154,84.8,150.1],"b_sofa_bk|0":[516,731,170,154,84.8,150.1],"b_sofa_bk|1":[688,731,170,154,84.8,150.1],"j_dapur|2":[860,731,130,152,84.8,148.1],"j_dapur|3":[0,887,130,152,44.8,148.1],"r_bilikair|2":[132,887,170,148,84.8,144.9],"j_bilikair|2":[304,887,170,148,84.8,144.9],"b_bilikair|2":[476,887,170,148,84.8,144.9],"b_sofa|3":[648,887,170,143,84.8,139.7],"b_sofa~l|3":[820,887,170,143,84.8,139.7],"b_sofa~s|3":[0,1041,170,143,84.8,139.7],"b_sofa_nb|3":[172,1041,170,143,84.8,139.7],"b_peti|0":[344,1041,90,136,44.8,132.5],"b_peti|1":[436,1041,90,136,44.8,132.5],"b_peti|2":[528,1041,90,136,44.8,132.5],"b_peti|3":[620,1041,90,136,44.8,132.5],"b_katil|2":[712,1041,170,135,84.8,131.7],"b_katil|3":[0,1186,170,135,84.8,131.7],"b_sofa_nb|0":[172,1186,170,135,84.8,131.7],"b_sofa_nb|1":[344,1186,170,135,84.8,131.7],"r_almari|0":[516,1186,90,134,44.8,130.1],"r_almari|1":[608,1186,90,134,44.8,130.1],"r_almari|2":[700,1186,90,134,44.8,130.1],"r_almari|3":[792,1186,90,134,44.8,130.1],"b_tv|0":[884,1186,130,131,84.8,127.3],"b_tv|1":[0,1323,130,131,44.8,127.3],"b_tv|2":[132,1323,130,127,84.8,123.3],"b_tv|3":[264,1323,130,127,44.8,123.3],"b_pc|0":[396,1323,130,122,84.8,118.5],"b_sofa~l|2":[528,1323,170,121,84.8,117.3],"b_sofa~s|2":[700,1323,170,120,84.8,116.9],"b_pc|1":[872,1323,130,119,44.8,115.7],"b_pc|2":[0,1456,130,119,84.8,115.7],"b_pc|3":[132,1456,130,119,44.8,115.7],"j_katil|0":[264,1456,130,118,44.8,114.5],"j_katil|1":[396,1456,130,118,84.8,114.5],"b_makan|0":[528,1456,130,118,84.8,114.5],"b_makan|1":[660,1456,130,118,44.8,114.5],"b_makan|2":[792,1456,130,118,84.8,114.5],"b_makan|3":[0,1577,130,118,44.8,114.5],"j_meja|0":[132,1577,130,116,84.8,112.9],"j_meja|1":[264,1577,130,116,44.8,112.9],"j_meja|2":[396,1577,130,116,84.8,112.9],"j_meja|3":[528,1577,130,116,44.8,112.9],"b_sofa|2":[660,1577,170,116,84.8,112.5],"b_sofa_nb|2":[832,1577,170,116,84.8,112.5],"b_sofa_bk|2":[0,1697,170,116,84.8,112.5],"b_sofa_bk|3":[172,1697,170,116,84.8,112.5],"r_kipas|2":[344,1697,90,115,44.8,111.7],"r_kipas|3":[436,1697,90,115,44.8,111.7],"r_kipas|0":[528,1697,90,111,44.8,107.7],"r_kipas|1":[620,1697,90,111,44.8,107.7],"j_katil|2":[712,1697,130,105,44.8,101.3],"j_katil|3":[844,1697,130,105,84.8,101.3],"j_kerusi~l|0":[0,1815,90,105,44.8,101.3],"j_kerusi~l|1":[92,1815,90,105,44.8,101.3],"b_kerusi~s|0":[184,1815,90,104,44.8,100.5],"b_kerusi~s|1":[276,1815,90,104,44.8,100.5],"b_kerusi~l|0":[368,1815,90,104,44.8,100.9],"b_kerusi~l|1":[460,1815,90,104,44.8,100.9],"b_kerusi~l|2":[552,1815,90,104,44.8,100.1],"b_kerusi~l|3":[644,1815,90,104,44.8,100.1],"b_kerusipc~s|0":[736,1815,90,104,44.8,100.1],"b_kerusipc~s|1":[828,1815,90,104,44.8,100.1],"b_kerusipc~l|0":[920,1815,90,104,44.8,100.5],"b_kerusipc~l|1":[0,1922,90,104,44.8,100.5],"j_kerusi~s|0":[92,1922,90,104,44.8,100.9],"j_kerusi~s|1":[184,1922,90,104,44.8,100.9],"j_kerusi~s|2":[276,1922,90,104,44.8,100.1],"j_kerusi~s|3":[368,1922,90,104,44.8,100.1],"j_kerusi~l|2":[460,1922,90,104,44.8,100.5],"j_kerusi~l|3":[552,1922,90,104,44.8,100.5],"b_kerusi~s|2":[644,1922,90,103,44.8,99.7],"b_kerusi~s|3":[736,1922,90,103,44.8,99.7],"b_kerusipc~s|2":[828,1922,90,103,44.8,99.3],"b_kerusipc~s|3":[920,1922,90,103,44.8,99.3],"b_kerusipc~l|2":[0,2028,90,103,44.8,99.7],"b_kerusipc~l|3":[92,2028,90,103,44.8,99.7],"r_bangku~l|0":[184,2028,90,102,44.8,98.1],"r_bangku~l|1":[276,2028,90,102,44.8,98.1],"r_bangku~s|0":[368,2028,90,101,44.8,97.3],"r_bangku~s|1":[460,2028,90,101,44.8,97.3],"r_bangku~l|2":[552,2028,90,101,44.8,97.3],"r_bangku~l|3":[644,2028,90,101,44.8,97.3],"r_bangku~s|2":[736,2028,90,100,44.8,96.9],"r_bangku~s|3":[828,2028,90,100,44.8,96.9],"b_kerusipc|0":[920,2028,90,99,44.8,95.7],"b_kerusipc|1":[0,2133,90,99,44.8,95.7],"b_kerusipc_bk|0":[92,2133,90,99,44.8,95.7],"b_kerusipc_bk|1":[184,2133,90,99,44.8,95.7],"b_kerusi|0":[276,2133,90,94,44.8,90.1],"b_kerusi|1":[368,2133,90,94,44.8,90.1],"b_kerusi_bk|0":[460,2133,90,94,44.8,90.1],"b_kerusi_bk|1":[552,2133,90,94,44.8,90.1],"j_kerusi|0":[644,2133,90,91,44.8,87.3],"j_kerusi|1":[736,2133,90,91,44.8,87.3],"j_kerusi_bk|0":[828,2133,90,91,44.8,87.3],"j_kerusi_bk|1":[920,2133,90,91,44.8,87.3],"r_tilam|0":[0,2234,130,90,44.8,86.5],"r_tilam|1":[132,2234,130,90,84.8,86.5],"r_tilam|2":[264,2234,130,90,44.8,86.5],"r_tilam|3":[396,2234,130,90,84.8,86.5],"r_meja|0":[528,2234,90,88,44.8,84.1],"r_meja|1":[620,2234,90,88,44.8,84.1],"r_meja|2":[712,2234,90,88,44.8,84.1],"r_meja|3":[804,2234,90,88,44.8,84.1],"j_kipasdingin|0":[896,2234,103,83,53.2,28.9],"b_kerusipc|2":[0,2326,90,83,44.8,79.3],"b_kerusipc|3":[92,2326,90,83,44.8,79.3],"b_kerusipc_bk|2":[184,2326,90,83,44.8,79.3],"b_kerusipc_bk|3":[276,2326,90,83,44.8,79.3],"b_kerusi|2":[368,2326,90,77,44.8,73.7],"b_kerusi|3":[460,2326,90,77,44.8,73.7],"b_kerusi_bk|2":[552,2326,90,77,44.8,73.7],"b_kerusi_bk|3":[644,2326,90,77,44.8,73.7],"j_kerusi|2":[736,2326,90,76,44.8,72.5],"j_kerusi|3":[828,2326,90,76,44.8,72.5],"j_kerusi_bk|2":[920,2326,90,76,44.8,72.5],"j_kerusi_bk|3":[0,2411,90,76,44.8,72.5],"b_kerusipc_nb|0":[92,2411,90,75,44.8,71.3],"b_kerusipc_nb|1":[184,2411,90,75,44.8,71.3],"b_kerusipc_nb|2":[276,2411,90,73,44.8,69.7],"b_kerusipc_nb|3":[368,2411,90,73,44.8,69.7],"b_kerusi_nb|0":[460,2411,90,70,44.8,66.5],"b_kerusi_nb|1":[552,2411,90,70,44.8,66.5],"b_kerusi_nb|2":[644,2411,90,70,44.8,66.5],"b_kerusi_nb|3":[736,2411,90,70,44.8,66.5],"j_kerusi_nb|0":[828,2411,90,70,44.8,66.1],"j_kerusi_nb|1":[920,2411,90,70,44.8,66.1],"j_kerusi_nb|2":[0,2489,90,70,44.8,66.1],"j_kerusi_nb|3":[92,2489,90,70,44.8,66.1],"r_bangku|0":[184,2489,90,62,44.8,58.1],"r_bangku|1":[276,2489,90,62,44.8,58.1],"r_bangku|2":[368,2489,90,62,44.8,58.1],"r_bangku|3":[460,2489,90,62,44.8,58.1],"a_aircond|1":[552,2489,64,58,26.8,25.7]}}/*END:SPR3D*/;
+ const SPT = /*SPR3D*/{"cell":80,"w":1024,"h":2561,"s":{"j_bilikair|0":[516,0,170,200,84.8,196.5],"j_bilikair|1":[688,0,170,200,84.8,196.5],"j_bilikair|3":[0,202,170,200,84.8,196.5],"b_bilikair|0":[172,202,170,200,84.8,196.5],"b_bilikair|1":[344,202,170,200,84.8,196.5],"b_bilikair|3":[516,202,170,200,84.8,196.5],"j_almari|0":[688,202,130,165,84.8,161.7],"j_almari|1":[820,202,130,165,44.8,161.7],"j_almari|2":[0,404,130,165,84.8,161.7],"j_almari|3":[132,404,130,165,44.8,161.7],"b_dapur|0":[264,404,130,164,84.8,160.5],"b_dapur|3":[396,404,130,164,44.8,160.5],"j_dapur|0":[528,404,130,162,84.8,158.5],"j_dapur|1":[660,404,130,162,44.8,158.5],"b_dapur|1":[792,404,130,162,44.8,158.1],"b_dapur|2":[0,571,130,158,84.8,154.1],"b_katil|0":[132,571,170,156,84.8,152.1],"b_katil|1":[304,571,170,156,84.8,152.1],"b_sofa|0":[476,571,170,154,84.8,150.1],"b_sofa|1":[648,571,170,154,84.8,150.1],"b_sofa~l|0":[820,571,170,154,84.8,150.1],"b_sofa~l|1":[0,731,170,154,84.8,150.1],"b_sofa~s|0":[172,731,170,154,84.8,150.1],"b_sofa~s|1":[344,731,170,154,84.8,150.1],"b_sofa_bk|0":[516,731,170,154,84.8,150.1],"b_sofa_bk|1":[688,731,170,154,84.8,150.1],"j_dapur|2":[860,731,130,152,84.8,148.1],"j_dapur|3":[0,887,130,152,44.8,148.1],"j_bilikair|2":[304,887,170,148,84.8,144.9],"b_bilikair|2":[476,887,170,148,84.8,144.9],"b_sofa|3":[648,887,170,143,84.8,139.7],"b_sofa~l|3":[820,887,170,143,84.8,139.7],"b_sofa~s|3":[0,1041,170,143,84.8,139.7],"b_sofa_nb|3":[172,1041,170,143,84.8,139.7],"b_peti|0":[344,1041,90,136,44.8,132.5],"b_peti|1":[436,1041,90,136,44.8,132.5],"b_peti|2":[528,1041,90,136,44.8,132.5],"b_peti|3":[620,1041,90,136,44.8,132.5],"b_katil|2":[712,1041,170,135,84.8,131.7],"b_katil|3":[0,1186,170,135,84.8,131.7],"b_sofa_nb|0":[172,1186,170,135,84.8,131.7],"b_sofa_nb|1":[344,1186,170,135,84.8,131.7],"b_tv|0":[884,1186,130,131,84.8,127.3],"b_tv|1":[0,1323,130,131,44.8,127.3],"b_tv|2":[132,1323,130,127,84.8,123.3],"b_tv|3":[264,1323,130,127,44.8,123.3],"b_pc|0":[396,1323,130,122,84.8,118.5],"b_sofa~l|2":[528,1323,170,121,84.8,117.3],"b_sofa~s|2":[700,1323,170,120,84.8,116.9],"b_pc|1":[872,1323,130,119,44.8,115.7],"b_pc|2":[0,1456,130,119,84.8,115.7],"b_pc|3":[132,1456,130,119,44.8,115.7],"j_katil|0":[264,1456,130,118,44.8,114.5],"j_katil|1":[396,1456,130,118,84.8,114.5],"b_makan|0":[528,1456,130,118,84.8,114.5],"b_makan|1":[660,1456,130,118,44.8,114.5],"b_makan|2":[792,1456,130,118,84.8,114.5],"b_makan|3":[0,1577,130,118,44.8,114.5],"j_meja|0":[132,1577,130,116,84.8,112.9],"j_meja|1":[264,1577,130,116,44.8,112.9],"j_meja|2":[396,1577,130,116,84.8,112.9],"j_meja|3":[528,1577,130,116,44.8,112.9],"b_sofa|2":[660,1577,170,116,84.8,112.5],"b_sofa_nb|2":[832,1577,170,116,84.8,112.5],"b_sofa_bk|2":[0,1697,170,116,84.8,112.5],"b_sofa_bk|3":[172,1697,170,116,84.8,112.5],"j_katil|2":[712,1697,130,105,44.8,101.3],"j_katil|3":[844,1697,130,105,84.8,101.3],"j_kerusi~l|0":[0,1815,90,105,44.8,101.3],"j_kerusi~l|1":[92,1815,90,105,44.8,101.3],"b_kerusi~s|0":[184,1815,90,104,44.8,100.5],"b_kerusi~s|1":[276,1815,90,104,44.8,100.5],"b_kerusi~l|0":[368,1815,90,104,44.8,100.9],"b_kerusi~l|1":[460,1815,90,104,44.8,100.9],"b_kerusi~l|2":[552,1815,90,104,44.8,100.1],"b_kerusi~l|3":[644,1815,90,104,44.8,100.1],"b_kerusipc~s|0":[736,1815,90,104,44.8,100.1],"b_kerusipc~s|1":[828,1815,90,104,44.8,100.1],"b_kerusipc~l|0":[920,1815,90,104,44.8,100.5],"b_kerusipc~l|1":[0,1922,90,104,44.8,100.5],"j_kerusi~s|0":[92,1922,90,104,44.8,100.9],"j_kerusi~s|1":[184,1922,90,104,44.8,100.9],"j_kerusi~s|2":[276,1922,90,104,44.8,100.1],"j_kerusi~s|3":[368,1922,90,104,44.8,100.1],"j_kerusi~l|2":[460,1922,90,104,44.8,100.5],"j_kerusi~l|3":[552,1922,90,104,44.8,100.5],"b_kerusi~s|2":[644,1922,90,103,44.8,99.7],"b_kerusi~s|3":[736,1922,90,103,44.8,99.7],"b_kerusipc~s|2":[828,1922,90,103,44.8,99.3],"b_kerusipc~s|3":[920,1922,90,103,44.8,99.3],"b_kerusipc~l|2":[0,2028,90,103,44.8,99.7],"b_kerusipc~l|3":[92,2028,90,103,44.8,99.7],"b_kerusipc|0":[920,2028,90,99,44.8,95.7],"b_kerusipc|1":[0,2133,90,99,44.8,95.7],"b_kerusipc_bk|0":[92,2133,90,99,44.8,95.7],"b_kerusipc_bk|1":[184,2133,90,99,44.8,95.7],"b_kerusi|0":[276,2133,90,94,44.8,90.1],"b_kerusi|1":[368,2133,90,94,44.8,90.1],"b_kerusi_bk|0":[460,2133,90,94,44.8,90.1],"b_kerusi_bk|1":[552,2133,90,94,44.8,90.1],"j_kerusi|0":[644,2133,90,91,44.8,87.3],"j_kerusi|1":[736,2133,90,91,44.8,87.3],"j_kerusi_bk|0":[828,2133,90,91,44.8,87.3],"j_kerusi_bk|1":[920,2133,90,91,44.8,87.3],"j_kipasdingin|0":[896,2234,103,83,53.2,28.9],"b_kerusipc|2":[0,2326,90,83,44.8,79.3],"b_kerusipc|3":[92,2326,90,83,44.8,79.3],"b_kerusipc_bk|2":[184,2326,90,83,44.8,79.3],"b_kerusipc_bk|3":[276,2326,90,83,44.8,79.3],"b_kerusi|2":[368,2326,90,77,44.8,73.7],"b_kerusi|3":[460,2326,90,77,44.8,73.7],"b_kerusi_bk|2":[552,2326,90,77,44.8,73.7],"b_kerusi_bk|3":[644,2326,90,77,44.8,73.7],"j_kerusi|2":[736,2326,90,76,44.8,72.5],"j_kerusi|3":[828,2326,90,76,44.8,72.5],"j_kerusi_bk|2":[920,2326,90,76,44.8,72.5],"j_kerusi_bk|3":[0,2411,90,76,44.8,72.5],"b_kerusipc_nb|0":[92,2411,90,75,44.8,71.3],"b_kerusipc_nb|1":[184,2411,90,75,44.8,71.3],"b_kerusipc_nb|2":[276,2411,90,73,44.8,69.7],"b_kerusipc_nb|3":[368,2411,90,73,44.8,69.7],"b_kerusi_nb|0":[460,2411,90,70,44.8,66.5],"b_kerusi_nb|1":[552,2411,90,70,44.8,66.5],"b_kerusi_nb|2":[644,2411,90,70,44.8,66.5],"b_kerusi_nb|3":[736,2411,90,70,44.8,66.5],"j_kerusi_nb|0":[828,2411,90,70,44.8,66.1],"j_kerusi_nb|1":[920,2411,90,70,44.8,66.1],"j_kerusi_nb|2":[0,2489,90,70,44.8,66.1],"j_kerusi_nb|3":[92,2489,90,70,44.8,66.1],"a_aircond|1":[552,2489,64,58,26.8,25.7]}}/*END:SPR3D*/;
  const CEIL = { j_kipasdingin: "siling", a_aircond: "dinding" };
  /* the room's size goes with its package (the smallest that holds it with a way through): Murah 5 x 5, Sederhana 6 x 6, Mewah 6 x 6; i = cells along the right wall, j = along the left wall */
- const DIMS = { s: [5, 5], m: [6, 6], l: [6, 6] }, DEF = [6, 6];
+ const DIMS = { m: [6, 6], l: [6, 6] }, DEF = [6, 6];
  const dimsOf = u => u && u.gx && u.gy ? [u.gx, u.gy] : u && u.pk && DIMS[u.pk] ? DIMS[u.pk] : DEF;   /* the room: 6 cells along the right wall (i) by 5 along the left wall (j): the smallest that holds the three packages with a way through */
  const fp = (t, r) => { const a = FP[t] || [1, 1]; return (r & 1) && a[0] ? [a[1], a[0]] : a };
 
@@ -42111,7 +42135,6 @@ try {
  };
 
  const PK = {   /* laid as in the owner's reference "Rumah Kita - Bilik 101" (grid i = along the right wall, j = along the left wall; the bathroom in the right-back corner) */
-  s: { n: "Murah", sub: "Retro Malaysia", ico: "🪵", d: "Dinding hijau pudina, lantai kayu oren: tilam lantai di tepi dinding, almari kayu, kipas berdiri, meja lipat dengan bangku dan bilik air sudut. Sewa Murah.", it: [["r_almari", 0, 0, 0], ["r_kipas", 2, 2, 0], ["r_bilikair", 3, 0, 0], ["r_tilam", 0, 2, 0], ["r_meja", 4, 3, 0], ["r_bangku", 3, 3, 0]] },
   m: { n: "Sederhana", sub: "Japandi", ico: "🛋️", d: "Bilik 6 x 6, dinding krim, lantai kayu cerah: katil kayu cadar sage di sudut, almari dan dapur kecil (kabinet, sinki, hob) di dinding kiri, meja tulis + monitor dengan kerusi di dinding kanan (jauh dari dapur), kipas siling tergantung di atas dan bilik air sudut; tengah bilik lapang untuk berjalan. Sewa Biasa.", it: [["j_katil", 0, 0, 0], ["j_almari", 0, 2, 1], ["j_dapur", 0, 4, 1], ["j_meja", 1, 0, 0], ["j_kerusi", 2, 1, 2], ["j_bilikair", 4, 0, 0], ["j_kipasdingin", 3, 3, 0]] },
   l: { n: "Mewah", sub: "Butik Moden", ico: "👑", d: "Bilik 6 x 6 dalam empat zon: tidur (katil besar di sudut), tonton (TV di dinding kiri, sofa L dengan jarak tonton dua petak), dapur mewah dengan meja makan dan dua kerusi di sebelahnya, dan kerja (meja komputer dengan kerusi pejabat, jauh dari dapur); aircond dinding dan bilik air mewah dengan tab mandi. Layak sewa Mahal.", it: [["b_katil", 0, 0, 0], ["b_pc", 2, 0, 0], ["b_kerusipc", 2, 1, 2], ["b_bilikair", 4, 0, 0], ["b_tv", 0, 2, 1], ["b_dapur", 0, 4, 1], ["b_sofa", 4, 2, 3], ["b_makan", 2, 4, 1], ["b_kerusi", 3, 4, 3], ["b_kerusi", 3, 5, 3], ["a_aircond", 0, 2, 1]] }
  };
@@ -42120,7 +42143,11 @@ try {
  const pkCost = k => Math.round(price(pkItems(k)) * .8 / 10) * 10;
  H.PK = PK; H.pkCost = pkCost; H.CATL = CATL;
  const qsum = f => { const seen = {}; let sm = 0; for (const o of f) { const d = CATL[o.t]; if (!d) continue; const n = seen[o.t] = (seen[o.t] || 0) + 1; sm += d[2] * (n === 1 ? 1 : n === 2 ? .5 : 0) } return sm };
- B.Qf = u => Array.isArray(u.fur) ? Math.round(Math.min(80, qsum(u.fur)) * .8 + cl(u.clean, 0, 100) * .2 - (u.brk ? 15 : 0)) : null;
+ /* §176: the Murah package ("s", Retro Malaysia) and its r_ pieces are gone (the Bilik Sewa Murah is now the 3D house sewamr, section 176). A room saved with them is mapped once, on first sight, to the plain classic pieces of the same kind (nothing is lost, the room keeps its size, its tenant, its rate and about the same quality): r_tilam -> tilam, r_almari -> gerobok, r_kipas -> kipas, r_meja -> mejalipat, r_bangku -> bangku, r_bilikair -> bilikair; the package mark is dropped */
+ const MRMAP = { r_tilam: "tilam", r_almari: "gerobok", r_kipas: "kipas", r_meja: "mejalipat", r_bangku: "bangku", r_bilikair: "bilikair" };
+ const mapMr = u => { try { if (!u) return; const has = Array.isArray(u.fur) && u.fur.some(f => f && MRMAP[f.t]); if (!has && u.pk !== "s") return; if (has) for (const f of u.fur) if (f && MRMAP[f.t]) f.t = MRMAP[f.t]; if (u.pk === "s") u.pk = null; if (!u.g8 && Array.isArray(u.fur)) u.g8 = 1 } catch (e) { fail(e) } };
+ H.mapMr = mapMr;
+ B.Qf = u => { mapMr(u); return Array.isArray(u.fur) ? Math.round(Math.min(80, qsum(u.fur)) * .8 + cl(u.clean, 0, 100) * .2 - (u.brk ? 15 : 0)) : null };
  const legacy = u => u.furn >= 2 ? [{ t: "bed", x: 2, y: 0, r: 0 }, { t: "almari", x: 0, y: 0, r: 0 }, { t: "kipas", x: 0, y: 2, r: 0 }, { t: "mejalipat", x: 3, y: 1, r: 0 }] : u.furn === 1 ? [{ t: "bed", x: 2, y: 0, r: 0 }, { t: "almari", x: 0, y: 0, r: 0 }] : [];
  const fitsIn = (list, t, r, x, y, ig, dm) => { const [NX, NY] = dm || DEF; const d = fp(t, r); if (!d[0]) return true; if (x < 0 || y < 0 || x + d[0] > NX || y + d[1] > NY) return false; return !list.some((o, i) => { if (i === ig) return false; const e = fp(o.t, o.r); return e[0] && x < o.x + e[0] && o.x < x + d[0] && y < o.y + e[1] && o.y < y + d[1] }) };
  /* a person must be able to walk in: from the open front edges (i = N-1 or j = N-1) to a free cell beside every bed, mattress, seat, table and desk */
@@ -42150,7 +42177,7 @@ try {
    for (const f of u.fur) { if (!fitsIn(done, f.t, f.r, f.x, f.y, -1, dm)) { const q = spot(done, f.t, f.r, -1, dm); if (q) { f.x = q[0]; f.y = q[1] } } done.push(f) }
   } catch (e) { fail(e) }
  };
- const itemsOf = u => { if (Array.isArray(u.fur)) { if (!u.g8) migr(u); return u.fur } return legacy(u).filter(o => okT(o.t)) };
+ const itemsOf = u => { mapMr(u); if (Array.isArray(u.fur)) { if (!u.g8) migr(u); return u.fur } return legacy(u).filter(o => okT(o.t)) };
  H.pathOk = pathOk; H.pathStats = pathStats; H.SPT = SPT; H.itemsOf = itemsOf; H.fp = fp; H.fits = (u, t, r, x, y) => fitsIn(itemsOf(u), t, r, x, y, -1, dimsOf(u)); H.DIMS = DIMS; H.dimsOf = dimsOf;
  const unit = () => B.room ? B.U(B.room) : null;
  const spend = n => { if (S.money < n) { toast(`Duit tidak cukup: perlu ${rm(n)}.`); return false } S.money -= n; return true };
@@ -42385,8 +42412,8 @@ try {
   defs(its.map(o => o.t).concat(B.pk ? [] : []));
   let h = `<div class="pk"><button type="button" class="x" data-x="1" aria-label="Tutup">✕</button><div class="row" style="margin:0 0 4px"><button type="button" class="b o" data-a="rback">← ${B.BD[B.cur].short}</button></div><h2>🚪 Bilik ${u.n}</h2>`;
   if (B.pk) {
-   h += `<p class="nt">Pilih pakej untuk dipasang dalam bilik ${u.n} dengan satu ketik. ${its.length ? "Perabot lama dijual separuh harga." : "Bilik ini masih kosong."} Selepas itu anda boleh alih, putar, buang atau tambah perabot satu demi satu.</p>`;
-   for (const k of ["s", "m", "l"]) {
+   h += `<p class="nt">Pilih pakej untuk dipasang dalam bilik ${u.n} dengan satu ketik. ${its.length ? "Perabot lama dijual separuh harga." : "Bilik ini masih kosong."} Selepas itu anda boleh alih, putar, buang atau tambah perabot satu demi satu. Bilik Sewa Murah kini rumah 3D sendiri (Bandar, rumah baharu).</p>`;
+   for (const k of ["m", "l"]) {
     const its2 = pkItems(k), cost = pkCost(k), clean = u.clean, est = Math.round(Math.min(80, qsum(its2)) * .8 + clean * .2 - (u.brk ? 15 : 0)), R = roomSVG({ nx: DIMS[k][0], ny: DIMS[k][1], tier: { s: 0, m: 1, l: 2 }[k], fem: !!b.fem, n: u.n, clean: 100, items: its2, mini: true, label: "Pakej " + PK[k].n });
     defs(its2.map(o => o.t));
     h += `<div class="pkc"><h3>${PK[k].ico} ${PK[k].n} <span class="sm">${PK[k].sub}</span></h3>${R.svg}<div class="sm">${PK[k].d}</div><div class="sm"><b>${its2.length} perabot</b> · mutu ≈ ${est} (${est >= 75 ? "boleh sewa Mahal" : est >= 40 ? "boleh sewa Biasa" : "sewa Murah"})</div><button type="button" class="b${B.cf === k ? " r" : ""}" data-a="rpkgo" data-n="${k}" ${S.money + rf(price(its)) < cost ? "disabled" : ""}>${B.cf === k ? "Sahkan: ganti perabot lama" : "Pasang · " + rm(cost)}</button></div>`
@@ -42401,7 +42428,7 @@ try {
   else if (u.t) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%">${B.face(u.t)}<small>${esc(u.t.name)}${u.t.owe ? " ⏳" : ""}${sp0.txt ? " · " + sp0.txt : ""}</small></div>` }
   else if (u.self) { const sp0 = tSpot(its, dimsOf(u)), p = R.P(sp0.c[0], sp0.c[1], 8 + sp0.z); who = `<div class="tn" style="left:${(p[0] / R.VW * 100).toFixed(1)}%;top:${(p[1] / R.VH * 100).toFixed(1)}%"><small>🏠 Anda tinggal di sini</small></div>` }
   const nx = q < B.RATES.biasa.need ? `Sewa Biasa perlu mutu ${B.RATES.biasa.need}+` : q < B.RATES.mahal.need ? `Sewa Mahal perlu mutu ${B.RATES.mahal.need}+` : "Layak sewa Mahal";
-  h += `<div class="uh" style="margin:2px 0"><span class="sm">${u.pk ? PK[u.pk].ico + " Pakej " + PK[u.pk].n + " (" + PK[u.pk].sub + ") · " : ""}Gaya ${TIERN[tier]} · ${b.fem ? "bangunan perempuan" : "bangunan lelaki"}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span><b>${q}</b></span></div><div class="sm">${nx} · Perabot ${its.length} · Kebersihan ${Math.round(u.clean)}%</div>`;
+  h += `<div class="uh" style="margin:2px 0"><span class="sm">${u.pk && PK[u.pk] ? PK[u.pk].ico + " Pakej " + PK[u.pk].n + " (" + PK[u.pk].sub + ") · " : ""}Gaya ${TIERN[tier]} · ${b.fem ? "bangunan perempuan" : "bangunan lelaki"}</span><span class="sm">Mutu <span class="q"><i style="width:${cl(q, 0, 100)}%"></i></span><b>${q}</b></span></div><div class="sm">${nx} · Perabot ${its.length} · Kebersihan ${Math.round(u.clean)}%</div>`;
   h += `<div class="rm">${R.svg}${who}</div>`;
   if (u.t) h += `<div class="sm">${esc(u.t.name)} tinggal di sini (${B.rm(u.t.amt)} seminggu). Perabot milik tuan rumah: penyewa tidak boleh mengambil atau menjualnya.</div>`;
   else if (u.pl) h += `<div class="sm">🔑 Keluarga anda menyewa bilik ini. Perabot milik tuan rumah.</div>`;
@@ -42438,11 +42465,11 @@ try {
  const B = HF.h159, H = HF.h160; if (!B || !H || !H.fp) throw new Error("h160 missing");
  const GK = 2.2, FV = [[0, 1], [1, 0], [0, -1], [-1, 0]];   /* the front of a piece after k quarter-turns: +j, +i, -j, -i */
  const CACHE = new Map(), hash = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 997; return h + 1 };
- const SEATH = { b_sofa: .5, r_bangku: .4, b_kerusi: .5, j_kerusi: .5, b_kerusipc: .5 }, SEATLOC = { b_sofa: [1.0, .62] };   /* seat height (world units) and the middle of the seat cushion in the piece's own frame (the L sofa: its main cushion, between the arms, not the middle of the footprint) */
+ const SEATH = { b_sofa: .5, b_kerusi: .5, j_kerusi: .5, b_kerusipc: .5 }, SEATLOC = { b_sofa: [1.0, .62] };   /* seat height (world units) and the middle of the seat cushion in the piece's own frame (the L sofa: its main cushion, between the arms, not the middle of the footprint) */
  const rotLocal = (f, lx, lz) => { const d0 = H.fp(f.t, 0), d = H.fp(f.t, f.r), th = ((f.r | 0) & 3) * Math.PI / 2, x = lx - d0[0] / 2, z = lz - d0[1] / 2; return [f.x + d[0] / 2 + x * Math.cos(th) + z * Math.sin(th), f.y + d[1] / 2 - x * Math.sin(th) + z * Math.cos(th)] };
- const kind = t => /kerusi|bangku|sofa/.test(t) ? "seat" : /katil|tilam/.test(t) ? "bed" : /bilikair/.test(t) ? "bath" : /dapur/.test(t) ? "kitchen" : /makan|r_meja/.test(t) ? "dine" : /j_meja|b_pc/.test(t) ? "desk" : "";
+ const kind = t => /kerusi|bangku|sofa/.test(t) ? "seat" : /katil|tilam/.test(t) ? "bed" : /bilikair/.test(t) ? "bath" : /dapur/.test(t) ? "kitchen" : /makan/.test(t) ? "dine" : /j_meja|b_pc/.test(t) ? "desk" : "";
  const hourNow = () => { try { return Math.floor((S.t % 1440) / 60) } catch (e) { return 12 } };
- const COMBO = { b_sofa: 1, b_kerusi: 1, b_kerusipc: 1, j_kerusi: 1, r_bangku: 1 };   /* seats rendered with a seated mannequin (tools/hf/bilik_3d.mjs, `~s` short hair, `~l` long hair / headscarf) */
+ const COMBO = { b_sofa: 1, b_kerusi: 1, b_kerusipc: 1, j_kerusi: 1 };   /* seats rendered with a seated mannequin (tools/hf/bilik_3d.mjs, `~s` short hair, `~l` long hair / headscarf) */
  const ctrOf = f => { const d = H.fp(f.t, f.r); return [f.x + d[0] / 2, f.y + d[1] / 2] };
  /* what the tenant does now, and with which piece: a list tried in order */
  const wants = hr => hr >= 22 || hr < 6 ? ["tidur"] : hr < 7 ? ["mandi", "duduk"] : hr < 8 || hr === 12 || hr === 19 ? ["makan", "duduk"] : hr >= 17 && hr < 19 ? ["masak", "duduk"] : hr >= 20 ? ["tonton", "duduk"] : ["kerja", "duduk"];
@@ -42650,12 +42677,56 @@ try {
  const HF = window.RKHF || (window.RKHF = { err: 0 });
  if (typeof openMap === "function" && typeof renderMap === "function") {
   const om = openMap, rm = renderMap;
-  const sigM = () => { try { const ar = mapArea || areaOf(S.home); return [S.home, ar, wmSel || "", wmShowList ? 1 : 0, Math.floor(S.t / 60), S.money, S.visiting ? 1 : 0, S.sims.length, (ar === "bandar" ? townIds() : lotIds()).map(k => k + ":" + homeName(k)).join(",")].join("|") } catch (e) { return null } };
+  const sigM = sel => { try { const ar = mapArea || areaOf(S.home); return [S.home, ar, (sel === undefined ? wmSel : sel) || "", wmShowList ? 1 : 0, Math.floor(S.t / 60), S.money, S.visiting ? 1 : 0, S.sims.length, (ar === "bandar" ? townIds() : lotIds()).map(k => k + ":" + homeName(k)).join(",")].join("|") } catch (e) { return null } };
   renderMap = function () { const r = rm.apply(this, arguments); try { const el = document.getElementById("kmap"); if (el && !el.hidden && el.querySelector(".wmscroll")) el._rkS = sigM() } catch (e) { } return r };
   let tm = 0, tr = 0;
   const run = () => { tm = 0; tr = 0; try { const el = document.getElementById("kmap"); if (el && !el.hidden) renderMap() } catch (e) { fail(e) } finally { const e2 = document.getElementById("kmap"); if (e2) e2.classList.remove("rk-upd") } };
   const quiet = n => { tm = 0; const el = document.getElementById("kmap"); if (!el || el.hidden) return; if (n < 8 && HF.sinceInput && HF.sinceInput() < 700) { tm = setTimeout(() => quiet(n + 1), 400); return } run() };
   HF.mapOpen = { quick: 0, full: 0, cold: 0 };
+  /* rk-ringan (hf144): tapping a pin on the open Peta no longer draws the whole map again. The card under the map is made by the very same chain of renderMap wrappers
+     as before (panel text, the place's actions, buttons, extra cards, every handler), but on a scratch copy of the sheet placed just before the real one (so #kmap finds it
+     first) with the 700 KB SVG stubbed out; only the finished card (.wminfo-wrap) is then moved into the real sheet. The SVG on screen is not touched at all: no
+     new nodes, no layout, scroll and zoom stay. A handler that closes the sheet (el.hidden = true) reaches the real one through the scratch's `hidden`.
+     Used only when nothing but the selection changed since the last drawing (same signature); otherwise, or on any doubt, the caller draws as before. The selection
+     mark is a ring added to the pin (the SVG is not drawn again to show it). */
+  HF.mapPickN = { fast: 0, full: 0 };
+  const STUB = '<svg class="wmsvg" data-rkstub="1" viewBox="0 0 1800 1100" xmlns="http://www.w3.org/2000/svg"></svg>';
+  const pinOf = (sv, k) => { if (!sv || !k) return null; try { const q = k.startsWith("bld:") ? "g[data-wm-bld=\"" + k.slice(4) + "\"]" : k.startsWith("new:") ? (a => "g[data-wm-lot=\"" + a[1] + "\"][data-wm-i=\"" + a[2] + "\"]")(k.split(":")) : k.startsWith("pl:") ? "g[data-wm-place=\"" + k.slice(3) + "\"]" : "g[data-wm-home=\"" + CSS.escape(k) + "\"]"; return sv.querySelector(q) } catch (e) { return null } };
+  HF.mapRing = () => {
+   try {
+    const el = document.getElementById("kmap"), sv = el && !el.hidden && el.querySelector("svg.wmsvg:not([data-rkstub])"); if (!sv) return;
+    sv.querySelectorAll(".rk-ring").forEach(r => r.remove());
+    const g = pinOf(sv, wmSel); if (!g) return;
+    const b = g.getBBox(), p = 4, NS = "http://www.w3.org/2000/svg", mk = (st, w) => { const r = document.createElementNS(NS, "rect"); r.setAttribute("class", "rk-ring"); r.setAttribute("x", b.x - p); r.setAttribute("y", b.y - p); r.setAttribute("width", b.width + 2 * p); r.setAttribute("height", b.height + 2 * p); r.setAttribute("rx", 10); r.setAttribute("fill", "none"); r.setAttribute("stroke", st); r.setAttribute("stroke-width", w); r.setAttribute("pointer-events", "none"); if (w < 5) r.setAttribute("stroke-dasharray", "6 4"); return r };
+    g.appendChild(mk("rgba(60,40,10,.55)", 6)); g.appendChild(mk("#fff", 3))
+   } catch (e) { fail(e) }
+  };
+  { const w0 = worldMapSVG; worldMapSVG = function () { const s0 = wmSel; wmSel = null; try { return w0.apply(this, arguments) } finally { wmSel = s0 } } }   /* the SVG itself shows no selection: the ring does */
+  { const r0 = renderMap; renderMap = function () { const r = r0.apply(this, arguments); try { if (!HF.mapStub) HF.mapRing() } catch (e) { fail(e) } return r } }
+  HF.mapPick = (g, old) => {
+   const el = document.getElementById("kmap");
+   let sc = null;
+   try {
+    if (!el || el.hidden || wmShowList || HF.warmQuiet || HF.mapStub || !el._rkS) return false;
+    const ws = el.querySelector(".wmwrap .wmscroll"), sv = ws && ws.querySelector("svg.wmsvg:not([data-rkstub])"), iw = el.querySelector(".wmwrap .wminfo-wrap");
+    if (!sv || !iw || !g || !sv.contains(g) || sigM(old) !== el._rkS) { HF.mapPickN.full++; return false }
+    sc = document.createElement(el.tagName); sc.className = el.className; sc.id = "kmap"; sc.style.display = "none";
+    Object.defineProperty(sc, "hidden", { get() { return false }, set(v) { el.hidden = v }, configurable: true });
+    el.parentNode.insertBefore(sc, el);   /* two #kmap for a moment: the first in the document (the scratch) is the one every $("#kmap") finds */
+    const w0 = worldMapSVG; HF.mapStub = 1; worldMapSVG = function () { return STUB };
+    try { renderMap() } finally { worldMapSVG = w0; HF.mapStub = 0 }
+    const ni = sc.querySelector(".wmwrap .wminfo-wrap");
+    if (!ni) throw new Error("mapPick: no card");
+    iw.replaceChildren(...ni.childNodes);
+    sc.remove(); sc = null;
+    el._rkS = sigM(); HF.mapPickN.fast++;
+    requestAnimationFrame(() => { if (!el.hidden) HF.mapRing() });
+    return true
+   } catch (e) {
+    fail(e); HF.mapStub = 0; if (sc) { try { sc.remove() } catch (e2) { } }
+    try { renderMap() } catch (e3) { fail(e3) } return true
+   }
+  };
   openMap = function () {
    const el = document.getElementById("kmap");
    if (!el || HF.warmQuiet) return om.apply(this, arguments);
@@ -43188,7 +43259,7 @@ try {
    return { cv: c, ox: e[4] - D.PB.OX + dx, oy: e[5] - D.PB.OY + dy, pt: (u, v) => [u, v] }
   } catch (e) { return null }
  };
- if (D && D.PB) for (const g in PB3D) { const t = PB3D[g]; if (!t || !t.s) continue; D.PB.atlas[g] = t.s; window.RK3D[g] = g === "k3d" ? "k3d1" : "3d1"; if (D.WMIR && D.WMIR[g]) D.WMIR[g] = {}; if (D.SKEW && D.SKEW[g]) D.SKEW[g].length = 0; D.TVQ = D.TVQ || {}; D.TVQ[g] = D.TVQ[g] || {}; if (t.tvq) for (const k in t.tvq) D.TVQ[g][k] = t.tvq[k] }
+ if (D && D.PB) for (const g in PB3D) { const t = PB3D[g]; if (!t || !t.s) continue; D.PB.atlas[g] = t.s; window.RK3D[g] = g === "k3d" ? "k3d1" : "3d1"; if (D.WMIR && D.WMIR[g]) D.WMIR[g] = {}; if (D.SKEW && D.SKEW[g]) D.SKEW[g].length = 0; D.TVQ = D.TVQ || {}; D.TVQ[g] = D.TVQ[g] || {}; if (t.tvq) for (const k in t.tvq) D.TVQ[g][k] = t.tvq[k]; for (const k in t.s) { if (!(k in D.TVQ[g]) && !/^tv\|/.test(k)) D.TVQ[g][k] = 0 } }   /* (a piece in use keeps its sprite, see section 165) */
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 /* ---------- §164. Rumah Kampung 3D (26 Nov, owner: "masukkan model Rumah Kampung ... potongan terbuka isometrik seperti PNG rujukan ... laluan/halangan watak diselaraskan"). A kampung house with
@@ -43443,6 +43514,7 @@ try {
  const IMG = {};
  const cur = () => { try { for (const k in MH.houses) { const h = MH.houses[k]; if (h.use()) return h } } catch (e) { } return null };
  MH.cur = cur; MH.gaya = () => { const h = cur(); return h ? h.gaya : "" };
+ HF.paintedHouse = () => { try { if (cur()) return true; return !!(HF.k3d && HF.k3d.state && HF.k3d.state().on) } catch (e) { return false } };   /* a house whose furniture is all sprites rendered from 3D (a model house or the Kampung 3D): the drawing wrappers of the NEW pieces never lay their code drawing over the sprite there */
  MH.f4 = t => { const h = cur(); return !!(h && h.F4.has(t)) };   /* a piece that stands four ways (o.kr y+ / x+ / y- / x-) in the house on, the town's two (o.rot) elsewhere */
  const imgOf = (h, n) => { const k = h.pic + n; let e = IMG[k]; if (!e) { e = IMG[k] = new Image(); e.decoding = "async"; e.onload = () => { try { LCACHE.clear() } catch (x) { } try { redrawNow() } catch (x) { } }; e.onerror = () => { e._bad = true }; e.src = "img/rumah/" + h.pic + "-" + n + ".webp?v=" + MH.v } return e.complete && e.naturalWidth && !e._bad ? e : null };
  MH.house = function (def) {
@@ -43489,13 +43561,13 @@ try {
    if (mode !== "free") { toast(`${def.ico} ${def.name} siap dipasang · ${mode === "auto" || S.freeBuild ? "percuma" : "RM " + pl.net.toLocaleString("en-MY")}.`); try { sfx("coin") } catch (er) { } try { diary(`Pasang ${def.name} (model 3D).`) } catch (er) { } }
    redrawNow(); return true
   };
-  h.syncDoor = () => { try { if (on()) { if (DOOR.x !== def.door[0] || DOOR.y !== def.door[1]) { DOOR.x = def.door[0]; DOOR.y = def.door[1] } } else if (DOOR.x === def.door[0] && DOOR.y === def.door[1]) { DOOR.x = 0; DOOR.y = 5 } } catch (e) { } };
+  h.syncDoor = () => { try { if (on()) { if (DOOR.x !== def.door[0] || DOOR.y !== def.door[1]) { DOOR.x = def.door[0]; DOOR.y = def.door[1] } } else if (DOOR.x === def.door[0] && DOOR.y === def.door[1] && !Object.keys(MH.houses).some(k => MH.houses[k] !== h && MH.houses[k].on())) { DOOR.x = 0; DOOR.y = 5 } } catch (e) { } };   /* (§176: three Bilik Sewa types share the two door tiles of the gap: a house that is not on leaves the door alone while another model house is on) */
   setInterval(h.syncDoor, 250);
   /* the pictures and the atlas */
   try {
    const D = window.RKDal; window.RK3D = window.RK3D || {};
    if (def.shift && def.pb) for (const t in def.shift) for (const k in def.pb.s) if (k === t + "|-" || k.indexOf(t + "|-|") === 0 || k === t + "|y+" || k === t) { const e = def.pb.s[k].slice(), q = def.shift[t]; e[4] += (q[0] - q[1]) * 72; e[5] += (q[0] + q[1]) * 36; def.pb.s[k] = e }   /* a piece's picture slid by [dx, dy] tiles (the render stood it on the middle of its tile; here it is flush with the end of the counter) */
-   if (D && D.PB && def.pb) { D.PB.atlas[def.gaya] = def.pb.s; window.RK3D[def.gaya] = def.gaya + MH.v; D.TVQ = D.TVQ || {}; D.TVQ[def.gaya] = D.TVQ[def.gaya] || {}; if (def.pb.tvq) for (const k in def.pb.tvq) D.TVQ[def.gaya][k] = def.pb.tvq[k]; for (const t of def.f4 || []) if (t === "tv") for (const f of ["y-", "x-"]) D.TVQ[def.gaya][t + "|" + f] = 0 }   /* turned away: no screen in sight, it stays painted */
+   if (D && D.PB && def.pb) { D.PB.atlas[def.gaya] = def.pb.s; window.RK3D[def.gaya] = def.gaya + MH.v; D.TVQ = D.TVQ || {}; D.TVQ[def.gaya] = D.TVQ[def.gaya] || {}; if (def.pb.tvq) for (const k in def.pb.tvq) D.TVQ[def.gaya][k] = def.pb.tvq[k]; for (const k in def.pb.s) { if (!(k in D.TVQ[def.gaya]) && !/^tv\|/.test(k)) D.TVQ[def.gaya][k] = 0 }   /* a piece in use keeps its sprite (base: a sprite key not in TVQ is redrawn by the old code drawing while someone uses it: the oval table became a square one) */ for (const t of def.f4 || []) if (t === "tv") for (const f of ["y-", "x-"]) D.TVQ[def.gaya][t + "|" + f] = 0 }   /* turned away: no screen in sight, it stays painted */
   } catch (e) { fail(e) }
   /* Bina: the card beside the Gaya */
   h.card = () => {
@@ -44179,9 +44251,9 @@ try {
   only: "Rumah ini hanya untuk Berkembar Impian Emas Unit " + U.u + " (model 3D).", oneFloor: "Rumah ini hanya untuk Berkembar Impian Emas dua tingkat."
  });
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
-/* ---------- §175. Bilik Sewa Sederhana 3D dan Bilik Sewa Mewah 3D (28 Nov, owner: "Bilik Sewa Sederhana dan Bilik Sewa Mewah daripada model ChatGPT sebagai rumah boleh dimain, perabot dibakar 3D", Apartmen / Berkembar / Flat PPR as the pattern; the Bilik Sewa MURAH is NOT touched: it stays the old room package of the rental building, §159-§160). TWO new house TYPES "sewasd" (Sederhana) and "sewamw" (Mewah): HT.sewasd / HT.sewamw, out of Object.keys(HT) like the apartmen, the berkembar, the flatppr, the bunian and the istana (no random town family; the "rumah baharu" picker, the town buttons and the rental table add them by hand), and their model houses (RKHF.mh.house, ids sd3d and mw3d, one storey).
+/* ---------- §175. Bilik Sewa Sederhana 3D dan Bilik Sewa Mewah 3D (28 Nov, owner: "Bilik Sewa Sederhana dan Bilik Sewa Mewah daripada model ChatGPT sebagai rumah boleh dimain, perabot dibakar 3D", Apartmen / Berkembar / Flat PPR as the pattern; the Bilik Sewa MURAH followed in §176 as a third 3D type and the old Murah package of the rental building editor, §159-§160, is gone). TWO new house TYPES "sewasd" (Sederhana) and "sewamw" (Mewah): HT.sewasd / HT.sewamw, out of Object.keys(HT) like the apartmen, the berkembar, the flatppr, the bunian and the istana (no random town family; the "rumah baharu" picker, the town buttons and the rental table add them by hand), and their model houses (RKHF.mh.house, ids sd3d and mw3d, one storey).
    A rented room is ONE room of 4.94 x 5.2 m: it is laid on a finer grid than the other houses (7 x 7 tiles of 0.7057 x 0.7429 m inside the game's usual 10 x 10 board, tools/hf/rumah12/gen_bilikSewa.py, render.mjs, pek.py; only the webp pictures are published; the heights keep the game's camera, so people keep their size). Every tile outside the room, but the two door tiles in front of the gap of the low front facade, is blocked (outs). The room (floor, the tall back and left walls with their windows, the low right wall and front facade) is the picture img/rumah/<pic>-bg.webp; the bathroom (the model's tiled corner, back right, cols 5-6, rows 0-2) has its partition on the edge v,5 (rows 0-2, pieces "w_v_5_<row>_<up|low>" of img/rumah/<pic>-sp.webp) and its tiles on the grid, open to the south; the doorstep in front of the gap (gap cols 2-3; door tile (2, 7) of the Sederhana, (3, 7) of the Mewah: the factory resets the shared DOOR of a house that is not on, so the two types must not share a door tile). Furniture img/perabot/sd3d.webp, mw3d.webp.
-   Sederhana: kitchen zone along the back wall (kitchen = a 1.5 m slice of the Apartmen counter with hob and sink, type stove, at (2, 1); fridge (3, 1) touching the stove (both stand on row 1 and their default picture is slid 0.95 tile back, def.shift, so that they stand against the back wall: a turned piece is drawn on its own tile); small dining table with stools (3, 3): pieces rendered from the Apartmen, Flat PPR and Mewah models), air conditioner hung on the left wall (0, 0), wardrobe (0, 2) on the left wall facing the room, single bed (1, 4) in the front-left zone (three tiles from the kitchen), desk with its chair (5, 5), toilet (5, 1), shower (5, 0). Mewah: the same back zone (stove (2, 1), fridge (3, 1) touching the stove, dining (3, 3), air conditioner hung on the left wall (0, 0), wardrobe (0, 4)), king bed (1, 4) with a lamp on a bedside table each side ((0, 3), (2, 4): Banglo pieces), front-right zone: L sofa (3, 5) facing the TV (5, 5) with a coffee table between (4, 5) in one straight line, plant (5, 3), bath tub (5, 2), toilet (5, 1), shower (5, 0). The sofa and the TV face each other: measured from the model nodes (the model sofa faces -x, its back to the TV, and its chaise sticks out behind the backrest: turned 180 degrees and the chaise moved to the front; the TV screen faces -x), the sprite keys sofa|x+ and tv|x- are what the game draws, seatOf makes the person sit facing x+. Every piece is an ordinary game object (movable, turnable, sellable); no fixed piece (the air conditioner is a piece of its own, type aircond, RM 650, HUNG on the wall 1.27 m up as in the model: it takes no floor, is set only on a tile of the back row or the left column, the wall follows the tile (corner: the turn picks it); default on the left wall at (0, 0); the Mewah walls are repainted warm). The floor shadow baked into the sprites is dropped (a baked shadow reached past the back wall and the pixel check counted it as part of the piece) and no floor piece stands on the corner tile (0, 0); every piece, in all four turns, keeps 0.25 tile from the right and front outer walls. Price, tax and rent are in the house types below: Sederhana RM 3,500, tax RM 9, rent RM 200 a week; Mewah RM 10,500, tax RM 22, rent RM 350 a week (the Murah package pays RM 90 a week in the rental building). ---------- */
+   Sederhana: kitchen zone along the back wall (kitchen = a 1.5 m slice of the Apartmen counter with hob and sink, type stove, at (2, 1); fridge (3, 1) touching the stove (both stand on row 1 and their default picture is slid 0.95 tile back, def.shift, so that they stand against the back wall: a turned piece is drawn on its own tile); small dining table with stools (3, 3): pieces rendered from the Apartmen, Flat PPR and Mewah models), air conditioner hung on the left wall (0, 0), wardrobe (0, 2) on the left wall facing the room, single bed (1, 4) in the front-left zone (three tiles from the kitchen), desk with its chair (5, 5), toilet (5, 1), shower (5, 0). Mewah: the same back zone (stove (2, 1), fridge (3, 1) touching the stove, dining (3, 3), air conditioner hung on the left wall (0, 0), wardrobe (0, 4)), king bed (1, 4) with a lamp on a bedside table each side ((0, 3), (2, 4): Banglo pieces), front-right zone: L sofa (3, 5) facing the TV (5, 5) with a coffee table between (4, 5) in one straight line, plant (5, 3), bath tub (5, 2), toilet (5, 1), shower (5, 0). The sofa and the TV face each other: measured from the model nodes (the model sofa faces -x, its back to the TV, and its chaise sticks out behind the backrest: turned 180 degrees and the chaise moved to the front; the TV screen faces -x), the sprite keys sofa|x+ and tv|x- are what the game draws, seatOf makes the person sit facing x+. Every piece is an ordinary game object (movable, turnable, sellable); no fixed piece (the air conditioner is a piece of its own, type aircond, RM 650, HUNG on the wall 1.27 m up as in the model: it takes no floor, is set only on a tile of the back row or the left column, the wall follows the tile (corner: the turn picks it); default on the left wall at (0, 0); the Mewah walls are repainted warm). The floor shadow baked into the sprites is dropped (a baked shadow reached past the back wall and the pixel check counted it as part of the piece) and no floor piece stands on the corner tile (0, 0); every piece, in all four turns, keeps 0.25 tile from the right and front outer walls. Price, tax and rent are in the house types below: Sederhana RM 3,500, tax RM 9, rent RM 200 a week; Mewah RM 10,500, tax RM 22, rent RM 350 a week (the Murah 3D room of §176: RM 1,500, tax RM 4, rent RM 90 a week). ---------- */
 try {
  const HF = window.RKHF, MH = HF && HF.mh; if (!MH) throw new Error("mh");
  const VS = [
@@ -44251,6 +44323,46 @@ try {
   desc: V.k === "sd" ? "Bilik sewa sederhana seperti model: satu bilik dengan katil bujang, almari, meja belajar dan kerusi, bilik air di sudut belakang kanan dengan tandas dan pancuran, pintu di hadapan. Semua perabot boleh dialih, dipusing dan dijual dalam Bina." : "Bilik sewa mewah seperti model: satu bilik dengan katil besar, almari, dapur kecil (dapur gas, peti sejuk, meja makan), sofa L menghadap TV dengan meja kopi, dua lampu sisi katil, pokok hiasan, bilik air di sudut belakang kanan dengan tab mandi, tandas dan pancuran, pintu di hadapan. Semua perabot boleh dialih, dipusing dan dijual dalam Bina.",
   only: "Rumah ini hanya untuk " + V.n + " (model 3D).", oneFloor: "Rumah ini hanya untuk " + V.n + " setingkat."
  });
+} catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+
+/* ---------- §176. Bilik Sewa Murah 3D (28 Nov, owner: "Bilik Sewa Murah daripada model ChatGPT sebagai rumah boleh dimain, perabot dibakar 3D; Murah diganti dengan 3D", the Bilik Sewa Sederhana / Mewah of §175 as the pattern). A third house TYPE "sewamr" (HT.sewamr, out of Object.keys(HT) like sewasd and sewamw: no random town family; the "rumah baharu" picker, the town buttons and the rental table add it by hand) and its model house (RKHF.mh.house, id mr3d, one storey). The shell is the SAME as the Sederhana (the three owner models share the room 4.94 x 5.2 m on a 7 x 7 grid of 0.7057 x 0.7429 m tiles inside the game's 10 x 10 board, the bathroom corner back right cols 5-6 rows 0-2 with its partition on the edge v,5, the low front facade with its gap at cols 2-3 and the doorstep), tools/hf/rumah12/gen_bilikSewa.py murah, render.mjs, pek.py; only the webp pictures are published: img/rumah/sewamr3d-bg.webp and -sp.webp, furniture img/perabot/mr3d.webp. The walls are repainted a warm butter-sand (the model's sage green is cool: owner, warm colours); the door tile is (2, 7) like the Sederhana: the factory's syncDoor now leaves the shared DOOR alone while another model house is on (three types share the two door tiles of the gap).
+   ONLY the pieces of the Murah model (the owner: add nothing the model does not have): a small wardrobe (almari, against the back wall at (1, 0), facing the room), the floor mattress (the "bed" type: it sleeps, RKBed stretches it; at (1, 2) on the left), the standing fan (kipas, (3, 1)), the low oval table (mejalipat, (4, 4)) with its stool (bangku, (5, 5)), toilet (5, 1) and shower (5, 0) in the bathroom corner. No kitchen, no fridge, no air conditioner, no sofa or TV in this room. Every piece is an ordinary game object (movable, turnable, sellable in Bina); every piece, in all four turns, keeps 0.25 tile from the right and front outer walls and never passes through a wall (tools/qa modelrumah_kotak / _katil_potong / _bilikair / _semua cover mr3d). Price: RM 1,500 to buy, tax RM 4 a week, rent (RENT) RM 90 a week (Sederhana RM 3,500 / 9 / 200, Mewah RM 10,500 / 22 / 350; the old Murah room of the rental building paid RM 90 a week and cost about RM 750 of the RM 12,000 building of 16 rooms). The old Murah room PACKAGE of the rental building editor (§160: package "s" and its r_ pieces) is gone: see the migration there (an old save's Murah room keeps its pieces as the plain classic pieces and its quality). ---------- */
+try {
+ const HF = window.RKHF, MH = HF && HF.mh; if (!MH) throw new Error("mh");
+ const V = { k: "mr", ht: "sewamr", id: "mr3d", pic: "sewamr3d", n: "Bilik Sewa Murah", ico: "🪵", price: 1500, tax: 4, rent: 90, tint: "#e3c36f", adr: n => `Bilik ${n}, Rumah Sewa Murah Seri Harmoni`,
+  d: "BARU: bilik sewa murah model 3D (satu bilik 4.9 x 5.2 m): tilam lantai, almari kecil, kipas berdiri, meja rendah dengan bangku, bilik air dengan tandas dan pancuran. Cukai RM 4/minggu." };
+ try {
+  if (!HT[V.ht]) Object.defineProperty(HT, V.ht, { enumerable: false, configurable: true, writable: true, value: { n: V.n + " (model 3D)", ico: V.ico, price: V.price, rent: V.tax, d: V.d, tint: V.tint } });
+  if (typeof TLA !== "undefined" && !TLA[V.ht]) { TLA[V.ht] = ["tl_borak", "tl_play", "tl_takraw", "tl_gerai"]; try { TLN[V.ht] = "Kawasan rumah sewa"; TLB[V.ht] = V.ico + " Kawasan" } catch (e) { } }
+  if (typeof WMHTN !== "undefined" && !WMHTN[V.ht]) WMHTN[V.ht] = V.ico + " " + V.n + " (model 3D)";
+  if (typeof RENT !== "undefined" && !RENT[V.ht]) RENT[V.ht] = V.rent;
+  if (typeof NEWHOUSE !== "undefined" && !NEWHOUSE.some(x => x[1] === V.ht)) NEWHOUSE.push(["bandar", V.ht, V.ico + " " + V.n + " (model 3D)", HT[V.ht].price]);
+  { const ga = genAddr; genAddr = function (t) { if (t === V.ht) return V.adr(1 + Math.floor(Math.random() * 40)); return ga.apply(this, arguments) } }
+  { const mb = wmMoveBtns; wmMoveBtns = function (L) { try { if (Array.isArray(L) && L.includes("banglo") && L.includes("semid") && !L.includes(V.ht)) L = L.concat([V.ht]) } catch (e) { } return mb.call(this, L) } }
+ } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+ const TAB = /*H3D:sewamr3d*/{"S":128,"bg":[0,0,916,648,-460.0,-180.5],"s":{"w_v_5_0_up":[0,0,80,123,248.0,73.5],"w_v_5_1_up":[82,0,80,123,184.0,105.5],"w_v_5_2_up":[164,0,80,123,120.0,137.5],"w_v_5_0_low":[246,0,80,78,248.0,118.5],"w_v_5_1_low":[328,0,80,78,184.0,150.5],"w_v_5_2_low":[410,0,80,78,120.0,182.5]}}/*END:H3D:sewamr3d*/, PB = /*PB3D:mr3d*/{"s":{"almari|y-":[0,0,90,158,98.0,99.5],"almari|x-":[92,0,90,157,100.5,100.0],"almari|x+":[184,0,90,156,98.0,98.5],"almari|y+":[276,0,90,156,100.5,98.5],"bed|-|P":[368,0,271,148,-39.5,190.5],"shower|-":[641,0,29,146,128.0,91.0],"bed|-|P|1x2.65":[672,0,250,137,-40.0,190.0],"bed|-|P|1.32x2":[924,0,227,126,6.0,189.5],"kipas|x+":[1153,0,48,117,120.0,134.0],"kipas|x-":[1203,0,48,117,120.0,134.0],"kipas|y+":[1253,0,48,117,120.0,134.0],"kipas|y-":[1303,0,48,117,120.0,134.0],"bed|-|P|1x2":[0,160,205,116,5.5,189.0],"mejalipat|x-":[207,160,142,104,72.0,148.5],"mejalipat|y-":[351,160,142,104,73.5,148.5],"mejalipat|x+":[495,160,142,103,73.5,149.0],"mejalipat|y+":[639,160,142,103,72.0,149.0],"bed|-":[783,160,180,102,40.5,188.5],"toilet|-":[965,160,76,102,111.5,154.0],"bangku|-":[1043,160,57,85,116.0,167.0],"bed|-|P|1.32x2.65":[368,0,271,148,-39.5,190.5]},"tvq":{},"ol":1}/*END:PB3D:mr3d*/, FP = /*FP:mr3d*/{"almari|y+":[0.746,0.523],"almari|x+":[0.523,0.746],"almari|y-":[0.746,0.523],"almari|x-":[0.523,0.746],"bed|-":[1.12,1.5],"kipas|y+":[0.528,0.436],"kipas|x+":[0.436,0.528],"kipas|y-":[0.528,0.436],"kipas|x-":[0.436,0.528],"mejalipat|y+":[1.783,0.827],"mejalipat|x+":[0.827,1.783],"mejalipat|y-":[1.783,0.827],"mejalipat|x-":[0.827,1.783],"bangku|-":[0.451,0.448],"shower|-":[0.258,0.298],"toilet|-":[0.548,0.675]}/*END:FP:mr3d*/;
+ const R = (x0, y0, x1, y1) => { const a = []; for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) a.push([x, y]); return a };
+ const rg = (n, f) => Array.from({ length: n }, (_, i) => f(i));
+ /* the bathroom partition (the model's side wall, open to the south); the outer walls are in the picture (as the Sederhana, §175) */
+ const WALLS0 = ["v,5,0", "v,5,1", "v,5,2"];
+ const HID0 = rg(7, a => "h," + a + ",0").concat(rg(7, b => "v,0," + b), rg(7, b => "v,7," + b), rg(7, a => a).filter(a => a !== 2 && a !== 3).map(a => "h," + a + ",7"));
+ const IN = new Set(R(0, 0, 6, 6).map(a => a.join(",")));
+ const OUT0 = R(0, 0, 9, 9).filter(a => !IN.has(a.join(",")) && !(a[1] === 7 && (a[0] === 2 || a[0] === 3)));
+ /* [type, x, y, facing (a string = four-way piece, 1 = turned bed), mh, floor] */
+ const LAY = [["almari", 1, 0, "y+"], ["bed", 1, 2], ["kipas", 3, 1, "y+"], ["mejalipat", 4, 4, "y+"], ["bangku", 5, 5], ["toilet", 5, 1], ["shower", 5, 0]];
+ /* a toilet or a shower is not set on a tile of the back row or the left column (its picture reaches the wall), as in §175 */
+ { const po = placeOk; placeOk = function (i, j) { const r = po.apply(this, arguments);
+   try { if (r === true && S.view === 0 && typeof placing !== "undefined" && placing && /^(toilet|shower)$/.test(placing.type) && (i === 0 || j === 0)) { const h = MH.houses[V.id]; if (h && h.on()) return "Terlalu rapat dinding belakang atau kiri: tandas dan pancuran tak muat di petak tepi. Pilih petak lebih ke dalam." } } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
+   return r } }
+ MH.house({
+  id: V.id, gaya: V.id, fp: FP, pscale: .82, htype: V.ht, pic: V.pic, tab: TAB, pb: PB, cam: [.5, 1], walls: WALLS0, hid: HID0, lay: LAY, N: 10, W: 10, rev: 1,
+  outs: [OUT0], noPlace: [], f4: ["almari", "kipas", "mejalipat"], margin: .25, shift: {}, door: [2, 7], spare: [[3, 3], [3, 2], [4, 3], [2, 4]], autoZoom: [2, [3, 3]],
+  name: V.n + " 3D", ico: V.ico, cardTitle: V.n + ", potongan terbuka",
+  desc: "Bilik sewa murah seperti model: satu bilik dengan tilam lantai, almari kecil, kipas berdiri, meja rendah dengan bangku, bilik air di sudut belakang kanan dengan tandas dan pancuran, pintu di hadapan. Semua perabot boleh dialih, dipusing dan dijual dalam Bina.",
+  only: "Rumah ini hanya untuk " + V.n + " (model 3D).", oneFloor: "Rumah ini hanya untuk " + V.n + " setingkat."
+ });
+ /* a piece in use keeps its painted sprite (base: a piece of a house whose sprite key is not in RKDal.TVQ is redrawn by the old code drawing while someone uses it: the oval table became a square one, the toilet a cubicle) */
+ try { const D = window.RKDal; if (D && D.TVQ) { const g = D.TVQ[V.id] = D.TVQ[V.id] || {}; for (const k in PB.s) { const t = k.split("|")[0]; if (/^(almari|kipas|mejalipat|toilet|shower|bangku)$/.test(t) && !(k in g)) g[k] = 0 } } } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 } catch (e) { try { console.warn("RKHF", e) } catch (e2) { } }
 
 /* ---------- §171. 💬 Gosip dengan Melur at Spa Ratu Cantik (hf141, 26 Nov 2026; ported from draft PR #11 zuraidah94/public-doc "codex/spa-ratu-cantik-gosip" + its handover note serahan-gosip-melur.md, written for this layer instead of copying that game.js).
@@ -44607,5 +44719,1421 @@ try {
  Object.assign(K, { SEED, PL, MS, BL, NMS, poolKeys, nameOf, plain, sent, open, close, draw, poll, st });
  HF.khabar = K;
 } catch (e) { try { console.warn("RKHF §172", e); window.RKHF && (RKHF.err = (RKHF.err || 0) + 1) } catch (e2) { } }
+
+/* ---------- §177. 🏡 Kampung & Keluarga (hf146, 28 Nov 2026; owner: "Tambah feature ni"; ported from public-doc PR #14 "Kampung & Keluarga", written for the game.js RESULT, here moved into the layer: the PR's text edits of the bakery / fruit / gift order code are small guards in §? of this layer and one patch.py line).
+   Projek Kampung (Balai Raya: taman permainan or kebun komuniti, with the Cat Pagar, Baiki Buaian, Pasang Bangku, Gelongsor, Kotak Pasir, Pokok Teduh and Uji Taman mini-games), Janji Keluarga (+ Cari Masa Bersama), Resipi Turun-Temurun (Buku Warisan), Pesanan Sekampung (Bungkus Bekalan Kenduri; the kuih, buah and hantaran books, RM 60 bonus), Jejak Kenangan Atuk. All 13 mini-games open from Keperluan -> Kampung & Keluarga -> Aktiviti.
+   Save: only OPTIONAL fields, each created on first use (S.hfFamilyActivities per house via HOMEF, S.hfVillageProject, S.hfHallDecoration); an old save has none and nothing reads them until used. Order books get one extra key (o.hfKenduri) on the new orders only. The panel is the <dialog id="hfkf">, its CSS is injected the first time the panel (or a map card) is shown. Errands (hf_project, hf_playground, ...) are the game's own errand list (place "balai" / "padang"): a Sim walks to the town place like for any errand, nothing of the 3D houses is touched. */
+try {
+ const HF = window.RKHF; if (!HF) throw new Error("RKHF");
+ /* the panel's CSS (was in the PR's index.html): one <style>, injected the first time the panel, a map card or the Buku Warisan card is shown */
+ const KKCSS = `/* Kampung & Keluarga */
+#hfkf{width:min(44rem,calc(100% - 1.25rem));max-height:calc(100dvh - 1.25rem);padding:0;overflow:auto;color:var(--ink);background:var(--panel);background-image:var(--lt-paper);border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 68px #21180e70}
+#hfkf::backdrop{background:#2c211bb0}
+#hfkf .kf-cover{min-height:10rem;position:relative;isolation:isolate;display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:3rem 1.1rem 1rem;color:#fff9e8;background:#304f35 url("img/rumah/kampung.webp") center 48%/cover}
+#hfkf .kf-cover::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#182f22f2,#253a2f42 90%)}
+#hfkf .kf-cover-copy p{margin:0 0 .25rem;font-size:.9rem;font-weight:700}
+#hfkf .kf-cover h2{margin:0;font:750 clamp(1.45rem,5vw,2.2rem)/1.05 'Fraunces',Georgia,serif;text-wrap:balance}
+#hfkf [data-kf="close"]{position:absolute;top:.6rem;right:.7rem;min-height:2.5rem}
+#hfkf .kf-host{display:grid;justify-items:center;gap:.25rem;text-align:center;font-size:.86rem;font-weight:700;max-width:9rem}
+#hfkf .kf-face{display:inline-grid;place-items:center;flex:none;width:2.85rem;height:2.85rem;border:1px solid var(--line);border-radius:50%;background:var(--panel);overflow:hidden}
+#hfkf .kf-host .kf-face{width:4.25rem;height:4.25rem;border:2px solid #fff2d5;background:#f0d9ae}
+#hfkf .kf-face .av,#hfkf .kf-face svg,#hfkf .kf-face img{width:100%;height:100%;display:block;object-fit:cover}
+#hfkf .kf-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
+#hfkf .kf-nav button{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25rem .4rem;white-space:normal;min-height:3.5rem;padding:.35rem;font-size:.86rem;line-height:1.2}
+#hfkf .kf-nav button[aria-pressed="true"]{background:#285b42;color:#fffcf1;border-color:#285b42}
+#hfkf .kf-content{padding:.75rem 1rem 1rem;line-height:1.5}
+#hfkf .kf-content>p:first-child{margin-top:.2rem}
+#hfkf form{display:flex;flex-wrap:wrap;align-items:end;gap:.75rem;margin:.5rem 0 1rem}
+#hfkf form>label{display:grid;gap:.2rem;font-weight:650}
+#hfkf form>p,#hfkf fieldset{flex-basis:100%;min-width:0;margin:0}
+#hfkf fieldset{border:0;padding:.25rem 0}
+#hfkf legend{font-weight:700}
+#hfkf input[type="number"],#hfkf select{min-height:2.5rem;max-width:100%;padding:.35rem .5rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:.5rem;font:inherit}
+#hfkf .kf-people{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.45rem}
+#hfkf .kf-person{display:flex;align-items:center;gap:.45rem;min-height:3.4rem;padding:.35rem .5rem;border:1px solid var(--line);border-radius:.8rem;cursor:pointer}
+#hfkf .kf-person:has(input:checked){border-color:#498562;background:color-mix(in srgb,var(--panel) 91%,#498562)}
+#hfkf .kf-person span:last-child{overflow-wrap:anywhere}
+#hfkf progress{width:100%;accent-color:#498562}
+#hfkf .kf-content .card{margin-top:.5rem}
+/* Cat Pagar Padang */
+.kf-fence{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:clamp(2px,1vw,7px);position:relative;padding:1rem .65rem .75rem;background:linear-gradient(#d4e0ce 64%,#9cab75 64%);border:1px solid #758661;border-radius:1rem;isolation:isolate}
+.kf-fence::before{content:"";position:absolute;inset:33% .45rem 26%;z-index:-1;background:linear-gradient(#856047 0 14%,transparent 14% 82%,#856047 82%)}
+.kf-fence button,.kf-fence .kf-plank{display:grid;place-items:center;min-width:0;height:clamp(4rem,21vw,7rem);padding:0;color:#fff;border:1px solid #574735;border-radius:.55rem .55rem .18rem .18rem;background:repeating-linear-gradient(87deg,#0000 0 7px,#432c1a26 8px 9px),#ad875f;font:800 1.05rem system-ui}
+.kf-fence button{touch-action:none;cursor:pointer}
+.kf-fence button:focus-visible{outline:3px solid #fff;outline-offset:-4px}
+.kf-fence button[aria-pressed="true"],.kf-fence [data-painted="true"]{background:repeating-linear-gradient(87deg,#0000 0 7px,#19282320 8px 9px),var(--kf-paint)}
+[data-kf-map-fence] .kf-fence .kf-plank{height:2rem}
+#hfkf .kf-paint-tools .acts{flex-wrap:wrap;gap:.35rem}
+#hfkf .kf-paint-tools [aria-pressed="true"].btn{outline:2px solid #498562;outline-offset:1px}
+#hfkf .kf-swatch{display:inline-block;width:.85rem;height:.85rem;margin-right:.35rem;border:1px solid #3c4e41;border-radius:50%}
+#hfkf .kf-paint-result{font-weight:700}
+/* Baiki Buaian */
+.kf-swing{position:relative;height:9rem;margin:.4rem 0;border:1px solid #758661;border-radius:1rem;overflow:hidden;background:linear-gradient(#d4e0ce 72%,#9cab75 72%)}
+.kf-swing-frame{position:absolute;top:15%;bottom:9%;left:24%;right:24%;border:7px solid #725340;border-bottom:0;border-radius:12px 12px 0 0}
+.kf-swing-hanging{position:absolute;top:20%;bottom:21%;left:40%;right:40%;transform-origin:top center}
+.kf-rope{position:absolute;top:0;bottom:0;left:8%;width:4px;background:#635342}
+.kf-rope.right{left:auto;right:8%}
+.kf-swing-seat{position:absolute;bottom:-5px;left:0;right:0;height:12px;border-radius:4px;background:var(--kf-seat);box-shadow:0 3px #493924}
+.kf-swing.swinging .kf-swing-hanging{animation:kf-swing-test 1.5s ease-in-out}
+@keyframes kf-swing-test{0%,100%{transform:rotate(0)}24%{transform:rotate(16deg)}61%{transform:rotate(-12deg)}84%{transform:rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.kf-swing.swinging .kf-swing-hanging{animation:none}}
+[data-kf-map-swing] .kf-swing{height:5rem}
+/* Pasang Bangku Rehat */
+.kf-bench{position:relative;height:8rem;margin:.4rem 0;border:1px solid #758661;border-radius:1rem;overflow:hidden;background:linear-gradient(#d4e0ce 68%,#9cab75 68%)}
+.kf-bench-shadow{position:absolute;inset:80% 16% 8%;border-radius:50%;background:#48573744}
+.kf-bench-leg{position:absolute;width:.55rem;background:#574536;left:27%;top:55%;bottom:12%;transform:skewX(-13deg)}
+.kf-bench-leg.right{left:auto;right:27%;transform:none}
+.kf-bench-slat{position:absolute;left:17%;right:17%;top:49%;height:.85rem;border-radius:.35rem;background:#a77043;box-shadow:0 .2rem #795132}
+[data-kf-map-bench] .kf-bench{height:4.5rem}
+/* Tanam Kebun Komuniti */
+#hfkf .kf-seeds{flex-wrap:wrap}
+#hfkf .kf-seeds [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+#hfkf .kf-garden{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem;margin-top:.75rem}
+#hfkf .kf-plot{display:grid;align-content:start;min-width:0;gap:.25rem;padding:.4rem;border:1px solid var(--line);border-radius:.8rem}
+#hfkf .kf-plot small{min-height:2.7em;font-size:.8rem}
+#hfkf .kf-soil{display:grid;place-items:center;min-height:3.5rem;border-radius:.5rem;background:repeating-linear-gradient(4deg,#745238 0 7px,#674832 8px 10px);font-size:1.5rem}
+#hfkf .kf-plot button{min-height:2.5rem;padding:.3rem}
+/* Hias Balai Raya */
+.kf-hall{position:relative;height:9rem;margin:.5rem 0;border:1px solid #8a7059;border-radius:1rem;overflow:hidden;background:linear-gradient(#e5d5b7 54%,#b08b66 54%)}
+.kf-hall-stage{position:absolute;inset:22% 26% 47%;border:1px solid #72533d;border-radius:.6rem .6rem .15rem .15rem;background:#9b684b}
+.kf-hall-flags{position:absolute;inset:12% 5% 60%;background:repeating-linear-gradient(90deg,var(--kf-flags) 0 12px,#fbefcf 12px 22px);clip-path:polygon(0 0,100% 0,100% 50%,90% 100%,80% 50%,70% 100%,60% 50%,50% 100%,40% 50%,30% 100%,20% 50%,10% 100%,0 50%)}
+.kf-hall-tables,.kf-hall-pots{position:absolute;inset:60% 13% 14%;display:flex;justify-content:space-between;align-items:center}
+.kf-hall.centre .kf-hall-tables{justify-content:center}
+.kf-hall-tables span{width:40%;height:90%;border:1px solid #857253;border-radius:.4rem;background:#f6e6c6;box-shadow:0 .25rem #7e5d44}
+.kf-hall-pots{inset:70% 4% 8%;pointer-events:none}
+.kf-hall.stage .kf-hall-pots{inset:31% 18% 48%}
+#hfkf .kf-hall-options{margin:.5rem 0}
+#hfkf .kf-hall-options [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+[data-kf-map-hall] .kf-hall{height:5.5rem}
+/* Cari Masa Bersama */
+#hfkf .kf-calendar{flex-basis:100%;min-width:0;padding:.65rem;border:1px solid var(--line);border-radius:.8rem}
+#hfkf .kf-calendar summary{font-weight:750;cursor:pointer}
+#hfkf .kf-slots fieldset{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0}
+#hfkf .kf-slots button{flex:1 1 5rem;white-space:normal;min-height:2.75rem}
+#hfkf .kf-slots small,#hfkf .kf-slot-people small{display:block;font-size:.83rem}
+#hfkf .kf-slots [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+/* Masak bersama dan bungkus bekalan */
+#hfkf .kf-lesson-guide{display:flex;align-items:center;gap:.7rem}
+#hfkf .kf-lesson-guide p{margin:.15rem 0}
+#hfkf .kf-pot{display:grid;place-items:center;min-height:6rem;margin:.4rem 0;border-radius:.9rem;background:linear-gradient(#ecdfc8 64%,#bc9574 64%);font-size:3rem}
+#hfkf .kf-pack-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:.4rem;margin:.65rem 0}
+#hfkf .kf-pack-boxes section{padding:.6rem;border:1px solid var(--line);border-radius:.65rem;background:color-mix(in srgb,var(--panel) 91%,#bc9574)}
+#hfkf .kf-pack [aria-pressed="true"]{background:#285b42;color:#fffcf1}
+/* Jejak Kenangan Atuk */
+#hfkf .kf-atuk{width:3.5rem;height:3.5rem;flex:none;object-fit:cover;border:1px solid var(--line);border-radius:50%;background:#ead8b7}
+#hfkf .kf-memory-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem}
+#hfkf .kf-memory-choices button{min-width:0;padding:.3rem;white-space:normal}
+#hfkf .kf-memory-choices img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:.4rem;margin-bottom:.25rem}
+.kf-memory{display:flex;align-items:flex-start;gap:.7rem;margin:.7rem 0;padding:.6rem;border:1px solid var(--line);border-radius:.8rem}
+.kf-memory img{width:clamp(4rem,20vw,8rem);aspect-ratio:1;object-fit:cover;border-radius:.5rem}
+.kf-memory h3,.kf-memory p{margin:0 0 .25rem}
+/* Menu aktiviti */
+#hfkf .kf-activities{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:.55rem}
+#hfkf .kf-activity{display:grid;grid-template-rows:auto auto 1fr auto;gap:.35rem;padding:.65rem;background:color-mix(in srgb,var(--panel) 92%,#bd9a63);border:1px solid var(--line);border-radius:.85rem}
+#hfkf .kf-activity-icon{display:grid;place-items:center;min-height:3rem;background:color-mix(in srgb,var(--panel) 80%,#7f9c6a);border-radius:.55rem;font-size:1.7rem}
+#hfkf .kf-activity h3,#hfkf .kf-activity p{margin:0}
+#hfkf .kf-activity h3{font:750 1rem/1.2 'Fraunces',Georgia,serif}
+#hfkf .kf-activity p{font-size:.9rem}
+#hfkf .kf-activity .btn{min-height:2.6rem;white-space:normal}
+/* Papan Projek Balai Raya */
+#hfkf .kf-project-board{margin-top:1rem}
+#hfkf .kf-project-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:.4rem}
+#hfkf .kf-project-tasks .card{display:grid;gap:.35rem;align-content:start}
+#hfkf .kf-project-tasks small{font-size:.84rem}
+.kf-park-art{display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:1px solid #8b9c6d;border-radius:.75rem;background:#dce8cc;color:#2c4626}
+.kf-park-picture{display:block;width:min(100%,30rem);height:auto;border-radius:.65rem}
+.kf-park-art span{padding:.25rem .45rem;background:#f8f3df;border-radius:.45rem}
+.kf-slide-demo,.kf-sand-demo,.kf-tree-demo{position:relative;display:grid;place-items:center;height:8rem;border:1px solid #8b9c6d;border-radius:.8rem;background:linear-gradient(#d4e0ce 72%,#9cab75 72%);font-size:3rem}
+.kf-sand-demo{background:radial-gradient(ellipse,#edd69a 55%,#9cab75 56%)}
+.kf-slide-ladder{position:absolute;left:24%;top:22%;bottom:15%;width:20%;display:flex;flex-direction:column;justify-content:space-around;border-inline:.4rem solid #785437}
+.kf-slide-ladder i{height:.28rem;background:#aa744c}
+.kf-slide-track{position:absolute;left:42%;top:32%;width:34%;height:.8rem;border-radius:.5rem;background:#50859b;transform:rotate(39deg);transform-origin:left center}
+.kf-slide-ball{position:absolute;left:42%;top:24%;width:1rem;height:1rem;border-radius:50%;background:#aa513d;opacity:0}
+.kf-slide-demo.rolling .kf-slide-ball{animation:kf-roll 1s ease-in forwards}
+@keyframes kf-roll{0%{left:42%;top:24%;opacity:1}100%{left:75%;top:63%;opacity:1}}
+@media(prefers-reduced-motion:reduce){.kf-slide-demo.rolling .kf-slide-ball{animation:none;left:75%;top:63%;opacity:1}}
+@media(max-width:480px){#hfkf .kf-nav{grid-template-columns:repeat(2,minmax(0,1fr))}#hfkf .kf-nav button{min-height:2.75rem}#hfkf .kf-cover{min-height:8.5rem}}
+/* diorama scenes (hf146): a painted background with sprites over it, positions in % of a 4:3 stage */
+.kf-stage{position:relative;width:100%;max-width:34rem;aspect-ratio:4/3;margin:.5rem auto;overflow:hidden;border:1px solid #8b7a52;border-radius:1rem;background:#cfe0b8 center/cover no-repeat;box-shadow:0 2px 0 #0002;isolation:isolate}
+.kf-sp{position:absolute;transform:translate(-50%,-100%);height:auto;max-width:none;pointer-events:none;user-select:none;filter:drop-shadow(0 2px 2px rgba(58,40,20,.28))}
+.kf-sp.kf-hl{filter:drop-shadow(0 0 6px #ffe27a) drop-shadow(0 0 2px #fff)}
+.kf-rail{position:absolute;left:11%;right:11%;height:2.4%;border-radius:3px;background:linear-gradient(#c9a374,#8e6c47);box-shadow:0 2px 2px #3a2a1a50}
+.kf-pb{position:absolute;display:block;transform:translate(-50%,-100%);width:9.4%;height:46%;padding:0;border:0;background:none;margin:0}
+button.kf-pb{touch-action:none;cursor:pointer;min-height:0}
+button.kf-pb:focus-visible{outline:3px solid #fff;outline-offset:-2px;box-shadow:0 0 0 5px #285b42}
+.kf-pw{position:absolute;left:50%;top:0;height:100%;aspect-ratio:24/150;transform:translateX(-50%)}
+.kf-pw img{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 2px rgba(58,40,20,.3))}
+.kf-coat{position:absolute;inset:0;background:var(--kf-paint);mix-blend-mode:multiply;opacity:0;transition:opacity .25s;-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+[aria-pressed="true"]>.kf-pw .kf-coat,[data-painted="true"] .kf-coat{opacity:.9}
+.kf-tick{position:absolute;left:50%;bottom:4%;z-index:2;transform:translateX(-50%);min-width:1.15rem;height:1.15rem;border-radius:50%;background:#2f6b45;color:#fff;font:700 .75rem/1.15rem system-ui;text-align:center}
+.kf-tick:empty{display:none}
+.kf-sw2-hang{position:absolute;inset:0}
+.kf-sw2.swinging .kf-sw2-hang{animation:kf-swing-test 1.5s ease-in-out}
+@media(prefers-reduced-motion:reduce){.kf-sw2.swinging .kf-sw2-hang{animation:none}}
+.kf-screw{position:absolute;width:3%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #6c6455;background:#d8d2c2;box-shadow:0 1px 2px #0005}
+.kf-screw.on{background:radial-gradient(circle at 35% 30%,#fff3b8,#b88a2a 70%);border-color:#7a5a16}
+.kf-sl2 .kf-ball2{transform:translate(-50%,-100%)}
+.kf-sl2.rolling .kf-ball2{animation:kf-ball2 1s ease-in forwards}
+@keyframes kf-ball2{0%{left:62%;top:47%}100%{left:51.6%;top:77%}}
+@media(prefers-reduced-motion:reduce){.kf-sl2.rolling .kf-ball2{animation:none}}
+.kf-spot{position:absolute;width:11%;aspect-ratio:2/1;transform:translate(-50%,-50%);border:3px dashed #fff;border-radius:50%;background:#ffffff40}
+.kf-spot.on{border-color:#6bd08a}
+[data-kf-map-fence] .kf-stage,[data-kf-map-swing] .kf-stage,[data-kf-map-bench] .kf-stage,[data-kf-map-hall] .kf-stage,[data-kf-map-park] .kf-stage{max-width:20rem}
+#hfkf .kf-ga .kf-soil{display:none}
+#hfkf .kf-ic{display:block;height:3.8rem;width:auto;max-width:100%;object-fit:contain}
+#hfkf .kf-nic{width:1.5rem;height:1.5rem;object-fit:contain;flex:none}
+#hfkf .kf-activity-icon:has(.kf-ic){min-height:4.2rem;padding:.2rem}`;
+ const ensureCss = () => { if (document.getElementById("hfkf-css")) return; const st = document.createElement("style"); st.id = "hfkf-css"; st.textContent = KKCSS; document.head.appendChild(st) };
+ /* the painted diorama art (tools/hf/kampungkeluarga.py, Hugging Face FLUX.2-klein-4B): backgrounds img/kk/bg-<name>.webp (CSS background, fetched when a scene is shown) and one sprite atlas img/kk/kk-1.webp cut by HF.atlas into blob URLs on first use */
+ const KKT = /*ATLAS:kk*/ {"s":["kk-1.webp","kk-2.webp"],"k":{"buaian-rangka":[0,2,2,170,200],"pokok-teduh":[0,174,2,189,200],"gelongsor":[0,365,2,158,190],"kotak-pasir":[0,525,2,209,170],"papan":[0,736,2,24,150],"tali":[0,2,204,9,150],"periuk-kosong":[0,13,204,269,150],"periuk-isi":[0,284,204,163,150],"bangku-siap":[0,449,204,127,130],"cili":[0,578,204,114,130],"serai":[0,2,356,87,130],"pandan":[0,91,356,135,130],"kaki-serong":[0,228,356,88,120],"kaki-tegak":[0,318,356,89,120],"pasu":[0,409,356,95,110],"tong-kompos":[0,506,356,84,110],"bakul-batu":[0,592,356,119,110],"tong-sampah":[0,2,488,91,110],"petak":[0,95,488,147,100],"meja-balai":[0,244,488,152,100],"kotak-kuih":[0,398,488,104,100],"bakul-buah":[0,504,488,97,100],"dulang-hantaran":[0,603,488,106,100],"hantaran":[0,2,600,95,100],"anak-pokok":[0,99,600,101,90],"kuih":[0,202,600,72,90],"mangga":[0,276,600,134,90],"bunting-kuning":[0,412,600,159,70],"bunting-hijau":[0,573,600,177,70],"bunting-merah":[0,2,702,154,70],"daun":[0,158,702,85,70],"batu":[0,245,702,141,70],"sampah":[0,388,702,87,70],"seat-kayu":[0,477,702,149,56],"seat-hijau":[0,2,774,143,56],"seat-biru":[0,147,774,138,56],"papan-duduk":[0,287,774,96,56],"anak-tangga":[0,385,774,179,46],"bola":[0,566,774,44,44],"ik-pagar":[1,2,2,94,112],"ik-buaian":[1,98,2,77,112],"ik-bangku":[1,177,2,106,112],"ik-kebun":[1,285,2,79,112],"ik-kalendar":[1,366,2,105,112],"ik-masak":[1,2,116,75,112],"ik-pokok":[1,79,116,80,112],"ik-bungkus":[1,161,116,112,109],"ik-gelongsor":[1,275,116,112,105],"ik-balai":[1,389,116,112,103],"ik-kenangan":[1,2,230,112,100],"ik-uji":[1,116,230,112,80],"ik-pasir":[1,230,230,112,73]},"v":34327} /*END:kk*/;
+ /* ---- the painted diorama scenes (a clean painted background + separate sprites over it; every scene falls back to the PR's CSS pictures until the atlas is in, or if it failed) ---- */
+ const KKV = 1;
+ const ART = HF.atlas ? HF.atlas(KKT, "img/kk/", () => {
+  try { if (dialog.open) render(); else if ($("#kmap [data-kf-map],#kmap [data-kf-map-hall]") && typeof renderMap === "function") renderMap() } catch (e) { }
+ }) : null;
+ const U = k => { try { return (ART && ART.url(k)) || "" } catch (e) { return "" } };
+ const warm = () => { try { if (ART && Object.keys(KKT.k).length) ART.when(() => { }) } catch (e) { } };
+ const artOn = () => !!(ART && Object.keys(KKT.k).length && U("papan"));
+ const SW = k => (KKT.k[k] ? KKT.k[k][3] : 0);
+ /* a sprite on a 640 x 480 stage: x, y in % of the stage, anchored bottom-centre (o.top: top-centre); o.z scales the painted size, o.w / o.h set the size in stage pixels */
+ const sp = (k, x, y, o = {}) => {
+  const u = U(k); if (!u) return "";
+  const w = (o.w || SW(k) * (o.z || 1)) / 6.4;
+  return `<img class="kf-sp${o.cls ? " " + o.cls : ""}" src="${u}" alt="" draggable="false" style="left:${x}%;top:${y}%;width:${w}%;${o.h ? `height:${o.h / 4.8}%;` : ""}${o.top ? "transform:translateX(-50%);" : ""}${o.css || ""}">`;
+ };
+ const stage = (bg, inner, cls = "", o = {}) => `<div class="kf-stage ${cls}" style="background-image:url(img/kk/bg-${bg}.webp?v=${KKV})${o.style ? ";" + o.style : ""}" ${o.attrs || 'aria-hidden="true"'}>${inner}</div>`;
+ /* fence: eight planks in a row, painted with a multiply layer cut by the plank's own picture (so one wood sprite takes any colour) */
+ const fenceStage = (f, interactive) => {
+  const u = U("papan"), pw = (i, done) => `<span class="kf-pw" style="--m:url(&quot;${u}&quot;)"><img src="${u}" alt="" draggable="false"><i class="kf-coat"></i></span>`;
+  const rails = '<i class="kf-rail" style="top:54%"></i><i class="kf-rail" style="top:70%"></i>';
+  const planks = Array.from({ length: plankCount }, (_, i) => {
+   const done = painted(f, i), x = 16 + i * 9.7;
+   return interactive ?
+    `<button type="button" class="kf-pb" style="left:${x}%;top:86%" data-kf-plank="${i}" aria-pressed="${done}" aria-label="Papan ${i + 1}"><span class="kf-tick" aria-hidden="true">${done ? "✓" : ""}</span>${pw(i)}</button>` :
+    `<span class="kf-pb" style="left:${x}%;top:86%" data-painted="${done}">${pw(i)}</span>`;
+  }).join("");
+  return stage("padang", rails + planks, "kf-fence2", { style: "--kf-paint:" + coat(f), attrs: interactive ? 'data-kf-fence role="group" aria-label="Papan pagar"' : 'aria-hidden="true"' });
+ };
+ /* swing: the frame, two ropes and a seat; the ropes hang from the beam (geometry measured on the painted frame), the seat lies on the grass until both ropes are on */
+ const swingParts = (swing, cx, by, z, hang) => {
+  const Wf = 170 * z, Hf = 200 * z, left = cx * 6.4 - Wf / 2, top = by * 4.8 - Hf;
+  const L = [(left + .30 * Wf) / 6.4, (top + .20 * Hf) / 4.8], R = [(left + .64 * Wf) / 6.4, (top + .12 * Hf) / 4.8], sy = (top + .60 * Hf) / 4.8, sw = .42 * Wf;
+  const seatKey = { wood: "seat-kayu", green: "seat-hijau", blue: "seat-biru" }[swing.seat], both = swing.left && swing.right;
+  const rope = (p, on) => on ? sp("tali", p[0], p[1], { top: 1, w: 17 * Math.max(.7, z / 1.55), h: (sy - p[1]) * 4.8 }) : "";
+  const seat = !seatKey ? "" : both ? sp(seatKey, (L[0] + R[0]) / 2, sy, { top: 1, w: sw }) : sp(seatKey, cx, by + 2, { w: sw });
+  return { frame: sp("buaian-rangka", cx, by, { z }), hang: rope(L, swing.left) + rope(R, swing.right) + (both ? seat : ""), seat: both ? "" : seat, pivot: `${((L[0] + R[0]) / 2).toFixed(1)}% ${((L[1] + R[1]) / 2).toFixed(1)}%` };
+ };
+ const swingStage = (swing, moving) => {
+  const g = swingParts(swing, 50, 90, 1.55);
+  return stage("buaian", g.frame + `<div class="kf-sw2-hang" style="transform-origin:${g.pivot}">${g.hang}</div>` + g.seat, "kf-sw2" + (moving ? " swinging" : ""));
+ };
+ /* bench: legs and seat laid out like a kit; the finished bench is one picture */
+ const benchStage = b => {
+  const done = b.left && b.right && b.slat;
+  return stage("teduh", done ? sp("bangku-siap", 50, 88, { z: 2 }) : (b.left ? sp("kaki-serong", 30, 86, { z: 1.5 }) : "") + (b.right ? sp("kaki-tegak", 70, 86, { z: 1.5 }) : "") + (b.slat ? sp("papan-duduk", 50, 90, { z: 1.7 }) : ""), "kf-bn2");
+ };
+ /* garden: three plots on the bare soil of the painted plot */
+ const gardenStage = p => {
+  const key = { chili: "cili", serai: "serai", pandan: "pandan" };
+  return stage("kebun", gardenPlots(p).map((plot, i) => {
+   const x = 28 + i * 22, mature = plot.watered != null && dayIdx() >= plot.watered + 2, base = sp("petak", x, 72, { z: 1.1 });
+   if (!plot.seed) return base;
+   if (mature) return base + sp(key[plot.seed], x, 70, { z: 1.2 });
+   return plot.watered == null ? base + sp("anak-pokok", x, 68, { z: .55 }) : sp("anak-pokok", x, 72, { z: 1 });
+  }).join(""), "kf-gd2");
+ };
+ /* hall: tables, bunting and pots over the empty painted hall */
+ const hallStage = hall => {
+  const flag = { gold: "bunting-kuning", green: "bunting-hijau", red: "bunting-merah" }[hall.flags];
+  return stage("balai", (flag ? sp(flag, 27, 6, { top: 1, z: 1.75 }) + sp(flag, 73, 6, { top: 1, z: 1.75 }) : "") +
+   (hall.pots === "stage" ? sp("pasu", 31, 62, { z: 1 }) + sp("pasu", 69, 62, { z: 1 }) : hall.pots === "door" ? sp("pasu", 9, 96, { z: 1.15 }) + sp("pasu", 91, 96, { z: 1.15 }) : "") +
+   (hall.tables === "centre" ? sp("meja-balai", 50, 86, { z: 1.7 }) : hall.tables === "sides" ? sp("meja-balai", 27, 90, { z: 1.4 }) + sp("meja-balai", 73, 90, { z: 1.4 }) : ""), "kf-hl2");
+ };
+ /* the finished park: what has been repaired so far, in one scene (Uji Taman, the map card of the padang) */
+ const parkStage = p => {
+  const d = p.park || {}, s = p.swing || {}, g = s.tested ? swingParts(s, 58, 66, .85) : null;
+  return stage("taman", (treeReady(d.tree || {}) && d.tree.planted ? sp("pokok-teduh", 13, 60, { z: .8 }) : d.tree?.planted ? sp("anak-pokok", 13, 60, { z: .6 }) : "") +
+   (d.sand?.done ? sp("kotak-pasir", 26, 90, { z: .6 }) : "") + (p.bench?.spot ? sp("bangku-siap", 36, 66, { z: .75 }) : "") +
+   (g ? g.frame + g.hang : "") + (d.slide?.done ? sp("gelongsor", 84, 82, { z: .85 }) : ""), "kf-pk2");
+ };
+ const slideStage = data => {
+  const count = data.rungs || 0, rz = [.33, .45, .56];
+  const rungs = Array.from({ length: count }, (_, i) => sp("anak-tangga", 82, 84 - i * 12, { z: rz[i] })).join("");
+  const screw = (on, x, y) => `<i class="kf-screw${on ? " on" : ""}" style="left:${x}%;top:${y}%"></i>`;
+  return stage("taman", sp("gelongsor", 62, 84, { z: 1.5 }) + rungs + (count === 3 ? screw(data.left, 46.5, 35) + screw(data.right, 73.8, 31.5) : "") +
+   sp("bola", data.done ? 51.6 : 62, data.done ? 77 : 47, { z: .55, cls: "kf-ball2" }), "kf-sl2");
+ };
+ const sandStage = (data, item) => {
+  const k = { leaf: "daun", stone: "batu", litter: "sampah" }[item];
+  return stage("taman", sp("kotak-pasir", 42, 80, { z: 1.4 }) + (k ? sp(k, 42, 62, { z: 1.1 }) : "") + (data.done ? sp("ik-pasir", 42, 66, { z: 1 }) : "") +
+   sp("tong-kompos", 85, 42, { z: .9 }) + sp("bakul-batu", 85, 64, { z: .9 }) + sp("tong-sampah", 85, 86, { z: .9 }), "kf-sd2");
+ };
+ const treeStage = data => stage("teduh", sp("bangku-siap", 24, 86, { z: 1.1 }) + (!data.spot ? '<i class="kf-spot" style="left:48%;top:80%"></i><i class="kf-spot" style="left:72%;top:80%"></i>' : "") +
+  (data.planted ? (treeReady(data) ? sp("pokok-teduh", 48, 92, { z: 1.3 }) : sp("anak-pokok", 48, 88, { z: 1 })) : data.spot ? '<i class="kf-spot on" style="left:48%;top:80%"></i>' : ""), "kf-tr2");
+ const potStage = step => stage("dapur", step ? sp("periuk-isi", 50, 56, { z: .9 }) : sp("periuk-kosong", 50, 54, { z: .6 }), "kf-pot2");
+ const packStage = o => {
+  const on = k => o?.boxes?.[k], hl = k => pickedPackage === k ? " kf-hl" : "";
+  return stage("meja", sp("kotak-kuih", 25, 70, { z: 1.5, cls: hl("bakery") }) + sp("bakul-buah", 50, 70, { z: 1.5, cls: hl("fruit") }) + sp("dulang-hantaran", 75, 70, { z: 1.5, cls: hl("gifts") }) +
+   (on("bakery") ? sp("kuih", 25, 64, { z: .75 }) : "") + (on("fruit") ? sp("mangga", 50, 62, { z: .8 }) : "") + (on("gifts") ? sp("hantaran", 75, 64, { z: .8 }) : ""), "kf-pk3");
+ };
+ const fenceArt = (f, i) => artOn() ? fenceStage(f, i) : fenceArtCss(f, i);
+ const swingArt = (s, m) => artOn() ? swingStage(s, m) : swingArtCss(s, m);
+ const benchArt = b => artOn() ? benchStage(b) : benchArtCss(b);
+ const hallArt = h => artOn() ? hallStage(h) : hallArtCss(h);
+ const parkArt = p => artOn() && (p.park || p.swing?.tested || p.bench?.spot) ? parkStage(p) : parkArtCss(p);
+ const ICONS = { fence: "ik-pagar", swing: "ik-buaian", bench: "ik-bangku", garden: "ik-kebun", hall: "ik-balai", calendar: "ik-kalendar", cook: "ik-masak", packing: "ik-bungkus", memories: "ik-kenangan", slide: "ik-gelongsor", sand: "ik-pasir", tree: "ik-pokok", trial: "ik-uji",
+  activities: "ik-uji", project: "ik-balai", plans: "ik-kalendar", recipes: "ik-masak", order: "ik-bungkus" };
+ const iconImg = (key, fallback, cls = "kf-ic") => { const u = U(ICONS[key]); return u ? `<img class="${cls}" src="${u}" alt="" draggable="false">` : fallback };
+ const plans = { lunch: ["Makan bersama di rumah", null], park: ["Berkelah di taman", "piknik"], play: ["Bermain di padang", "hf_playground"] };
+ const projects = { play: "Pulihkan taman permainan", garden: "Bina kebun komuniti" };
+ const parts = { bakery: "16 keping kuih lapis", fruit: "12 biji mangga", gifts: "3 dulang hantaran" };
+ const recipes = ["nasilemak", "nasiayam", "buburlambuk", "asampedas"];
+ if (!HOMEF.includes("hfFamilyActivities")) HOMEF.push("hfFamilyActivities");
+ const household = () => S.hfFamilyActivities || (S.hfFamilyActivities = { plans: [], recipes: [], order: null });
+ const family = () => S.sims.filter(s => !s.visitFrom && !s.dead && !isBaby(s) && s.stage !== "toddler");
+ const available = s => family().includes(s) && !s.away && !s.leaving && (!s.cur || s.cur.hfAuto);
+ const button = (key, label, disabled = false) => `<button type="button" class="btn" data-kf="${key}" ${disabled ? "disabled" : ""}>${esc(label)}</button>`;
+ const notify = message => { diary(message); toast(message); save() };
+ const when = t => `Hari ${Math.floor(t / 1440) + 1}, ${fmtT(t)}`;
+ const timeField = t => fmtT(t);
+ const project = () => S.hfVillageProject;
+ const openHours = (lo, hi) => (d, h) => h >= lo && h < hi;
+ const ages = ["child", "teen", "adult", "elder"];
+ ERR.hf_project = { label: "Bantu Projek Kampung", icon: "🤝", place: "balai", dur: 60, ages, eff: { energy: -8, social: 10 },
+  when: (d, h) => h >= 8 && h < 17 && !!project() && !project().done && project().work !== d };
+ ERR.hf_playground = { label: "Bermain di taman permainan", icon: "🛝", place: "padang", dur: 60, ages, eff: { fun: 28, social: 10 },
+  when: (d, h) => project()?.kind === "play" && project().done && openHours(8, 18)(d, h) };
+ ERR.hf_communityGarden = { label: "Petik hasil kebun komuniti", icon: "🌱", place: "balai", dur: 45, ages, eff: { fun: 15, social: 12 },
+  when: (d, h) => project()?.kind === "garden" && project().done && project().harvest !== d && openHours(8, 17)(d, h) };
+
+ const progress = (p, n) => {
+  p.points = Math.min(100, p.points + n);
+  if (p.points < 100 || dayIdx() < p.start + 2) return;
+  p.done = true;
+  notify(p.kind === "play" ? "🛝 Taman permainan dibuka! Pilih Padang pada peta." : "🌱 Kebun komuniti dibuka! Pilih Balai Raya pada peta.");
+ };
+ const queueErrand = (s, key) => {
+  if (!available(s) || !errOk(s, key) || s.queue.length >= 5) return false;
+  enqueue(s, { type: "errand", act: key });
+  return true;
+ };
+ const emitOriginal = emit;
+ emit = function (s, event, data) {
+  const result = emitOriginal.apply(this, arguments);
+  if (event !== "errand" || !family().includes(s)) return result;
+  const p = project();
+  if (data?.act === "hf_project" && p && !p.done && p.work !== dayIdx()) {
+   p.work = dayIdx();
+   recordHelper(p, "sesi kerja", s);
+   progress(p, 25);
+   save();
+  }
+  if (data?.act === "hf_communityGarden" && p?.done && p.harvest !== dayIdx()) {
+   p.harvest = dayIdx();
+   const count = HF.buah.add("pisang", 1, 4);
+   notify(`🌱 ${s.name} berkebun bersama jiran. ${count} biji pisang masuk ke stok buah.`);
+  }
+  return result;
+ };
+
+ function conflict(s, t) {
+  const d = Math.floor(t / 1440), h = t % 1440 / 60;
+  if (s.asrama && s.stage === "teen" && (d % 7 < 4 || (d % 7 === 4 && h < 15) || (d % 7 === 6 && h >= 17))) return "asrama";
+  if (d % 7 < 5 && !festOn(d) && !s.sick) {
+   if (CT.includes(s.stage) && h >= 7.5 && h < (isTadika(s) ? 12.5 : 15) && hazeAPI(d) <= 200) return "sekolah";
+   if (s.job && AD.includes(s.stage) && h >= 8 && h < 17 &&
+       s.cutiDay !== d && (s.honeyUntil ?? -1) < d && (s.leaveUntil ?? -1) < d) return "kerja";
+  }
+  if (d === dayIdx() && t < S.t + 60 && !available(s)) return "sedang sibuk";
+  return "";
+ }
+ function runPlans() {
+  const list = S.hfFamilyActivities?.plans || [];
+  for (const p of list) {
+   if (p.status || S.t < p.at) continue;
+   const guests = family().filter(s => p.guests.includes(s.id));
+   if (S.t >= p.at + 60) { p.status = "missed"; save(); continue }
+   const errand = plans[p.kind][1];
+   if (errand && S.money < (ERR[errand].cost || 0) * guests.length) continue;
+   if (guests.length !== p.guests.length || guests.some(s => !available(s) || conflict(s, p.at) ||
+       (errand && (!errOk(s, errand) || s.queue.length >= 5)))) continue;
+   p.status = errand ? "sent" : "done";
+   for (const s of guests) {
+    if (errand) queueErrand(s, errand);
+    else {
+     s.needs.hunger = clamp(s.needs.hunger + 18, 0, 100);
+     s.needs.social = clamp(s.needs.social + 20, 0, 100);
+    }
+   }
+   notify(`📅 ${plans[p.kind][0]} bersama ${guests.map(s => s.name).join(", ")}.`);
+  }
+ }
+ HOURX.push(() => {
+  const p = project();
+  if (p && !p.done && p.last < dayIdx()) {
+   p.last = dayIdx();
+   progress(p, 12);
+   save();
+  }
+ });
+ let checkedMinute, checkedState;
+ const tickOriginal = tick;
+ tick = function () {
+  const result = tickOriginal.apply(this, arguments);
+  const minute = Math.floor(S.t);
+  if (S.hfFamilyActivities && !S.visiting && (minute !== checkedMinute || S !== checkedState)) {
+   checkedMinute = minute; checkedState = S;
+   runPlans();
+  }
+  return result;
+ };
+
+ const cookOriginal = cookDone;
+ cookDone = function (s, action) {
+  const stars = action.hfMk || 0;
+  const result = cookOriginal.apply(this, arguments);
+  if (!action.hfFamilyCooked) return result;
+  const lesson = household().recipes.find(r => r.dish === action.dish && r.student === s.id && r.teacher === action.hfFamilyRecipe);
+  const teacher = family().find(x => x.id === lesson?.teacher);
+  if (!lesson || !available(teacher) || lesson.learned) return result;
+  lesson.learned = { day: dayIdx(), stars };
+  teacher.needs.social = clamp(teacher.needs.social + 15, 0, 100);
+  skillGain(s, "cooking", 12);
+  notify(`📖 ${s.name} mewarisi resipi ${DISH[lesson.dish].name} daripada ${teacher.name}.`);
+  return result;
+ };
+
+ function orderBooks() {
+  return { bakery: HF.kedai.cur().ord, fruit: HF.buah.BH().ord, gifts: HF.gubah.cur().ord };
+ }
+ function recordDelivery(part, nativeOrder) {
+  const o = S.hfFamilyActivities?.order;
+  if (!o || o.id !== nativeOrder?.hfKenduri || o.done[part] || dayIdx() > o.due) return;
+  o.done[part] = true;
+  if (Object.keys(parts).every(k => o.done[k])) {
+   S.money += 60;
+   notify("🎉 Semua bekalan kenduri dihantar. Bonus bersama RM 60 masuk ke dompet.");
+  } else save();
+ }
+ HF.kenduriDelivery = recordDelivery;
+ HF.kenduriCanDeliver = nativeOrder => {
+  if (!nativeOrder.hfKenduri) return true;
+  const order = S.hfFamilyActivities?.order;
+  if (order?.id !== nativeOrder.hfKenduri || dayIdx() > order.due) {
+   toast("Tempoh pesanan kenduri ini sudah tamat."); return false;
+  }
+  if (!order.needsPacking || order.packed) return true;
+  toast("Buka Pesanan Sekampung dan siapkan kotak kenduri dahulu.");
+  return false;
+ };
+ function newOrder() {
+  const shop = HF.kedai.TYPES[HF.kedai.cur().type];
+  if (!shop?.ord || !shop.prod.includes("kuih") || !HF.gubah.cur().on) {
+   toast("Buka kedai yang membuat kuih lapis dan mulakan Gubah Hantaran dahulu.");
+   return;
+  }
+  const h = household(), previous = h.order;
+  if (previous && dayIdx() <= previous.due) return;
+  const books = orderBooks();
+  if (books.bakery.length >= 6 || books.fruit.length >= 8 || books.gifts.length >= 3) {
+   toast("Kosongkan satu ruang tempahan pada setiap perniagaan dahulu.");
+   return;
+  }
+  const id = String(S.home || "main") + ":" + dayIdx(), due = dayIdx() + 3, nm = "Kenduri Balai Raya";
+  h.order = { id, due, done: {}, needsPacking: true };
+  books.bakery.unshift({ hfKenduri: id, id: "kuih", n: 16, mq: 30, rm: 24, due, nm, w: "Pesanan Sekampung" });
+  books.fruit.unshift({ hfKenduri: id, t: "k", li: [["mangga", 12]], g: 1, rm: 36, due, nm });
+  books.gifts.unshift({ hfKenduri: id, n: 3, tl: "putih", rb: "emas", upah: 60, kos: 18, tip: 8, due, nm, w: "Pesanan Sekampung" });
+  notify("🍲 Pesanan Sekampung diterima. Semak tiga buku tempahan sebelum tarikh tutup.");
+ }
+
+ const dialog = document.createElement("dialog");
+ dialog.id = "hfkf";
+ dialog.setAttribute("aria-labelledby", "hfkf-title");
+ document.body.append(dialog);
+ const titles = { activities: "Aktiviti", project: "Projek Kampung", plans: "Janji Keluarga", recipes: "Resipi Turun-Temurun", order: "Pesanan Sekampung" };
+ const icons = { activities: "🎮", project: "🌱", plans: "📅", recipes: "🍲", order: "🧺" };
+ const face = sim => `<span class="kf-face" data-kf-face="${sim.id}" aria-hidden="true">${avatar(sim)}</span>`;
+ let portraitTimer;
+ let page = "project", edit = null, returnTo = null;
+ const fenceColours = {
+  green: ["Hijau daun", "#52784d"],
+  blue: ["Biru laut", "#437d8f"],
+  red: ["Merah bata", "#a85540"]
+ };
+ const plankCount = 8;
+ let painting = false, paintPointer = null, paintDirty = false;
+ const fence = p => p.fence || (p.fence = { colour: "green", boards: 0 });
+ const painted = (f, i) => !!(f.boards & (1 << i));
+ const countBoards = f => Array.from({ length: plankCount }, (_, i) => painted(f, i)).filter(Boolean).length;
+ const coat = f => (fenceColours[f.colour] || fenceColours.green)[1];
+ const fenceArtCss = (f, interactive) => `<div class="kf-fence" style="--kf-paint:${coat(f)}"${interactive ? ' data-kf-fence role="group" aria-label="Papan pagar"' : ' aria-hidden="true"'}>
+  ${Array.from({ length: plankCount }, (_, i) => {
+   const done = painted(f, i);
+   return interactive ?
+    `<button type="button" data-kf-plank="${i}" aria-pressed="${done}" aria-label="Papan ${i + 1}"><span aria-hidden="true">${done ? "✓" : ""}</span></button>` :
+    `<span class="kf-plank" data-painted="${done}"></span>`;
+  }).join("")}</div>`;
+ function fenceView(p) {
+  const f = fence(p);
+  const n = countBoards(f);
+  return `<div class="kf-paint-tools">
+   <div class="acts" role="group" aria-label="Warna cat">${Object.entries(fenceColours).map(([id, [name, colour]]) =>
+    `<button type="button" class="btn" data-kf="colour-${id}" aria-pressed="${id === f.colour}"><span class="kf-swatch" aria-hidden="true" style="background:${colour}"></span>${name}</button>`).join("")}</div>
+   <p>Ketik atau leret merentasi papan. Papan bertanda ✓ sudah dicat.</p>
+   ${fenceArt(f, true)}
+   <p class="kf-paint-result" data-kf-paint-status role="status">${fenceStatus(f, n)}</p>
+   ${button("paint-back", "Kembali ke projek")}
+  </div>`;
+ }
+ function fenceStatus(f, count) {
+  return count === plankCount ? "Pagar siap dicat!" : `${count} daripada ${plankCount} papan siap. Boleh sambung bila-bila masa.`;
+ }
+ function paintBoard(board) {
+  const p = project();
+  if (!painting || p?.kind !== "play" || S.visiting || !board) return;
+  const f = fence(p);
+  const i = Number(board.dataset.kfPlank);
+  if (painted(f, i)) return;
+  f.boards |= 1 << i;
+  recordHelper(p, "fence");
+  paintDirty = true;
+  board.setAttribute("aria-pressed", "true");
+  board.firstElementChild.textContent = "✓";
+  const count = countBoards(f);
+  dialog.querySelector("[data-kf-paint-status]").textContent = fenceStatus(f, count);
+  sfx("tap");
+  if (count === plankCount) {
+   if (!p.done) progress(p, 25);
+   diary("Pagar taman permainan siap dicat " + fenceColours[f.colour][0].toLowerCase() + ".");
+   flushPaint();
+  }
+ }
+ function flushPaint() {
+  paintPointer = null;
+  if (!paintDirty) return;
+  paintDirty = false;
+  save();
+ }
+ dialog.addEventListener("pointerdown", event => {
+  const board = event.target.closest("[data-kf-plank]");
+  if (!board || event.button !== 0 || !event.isPrimary) return;
+  paintPointer = event.pointerId;
+  paintBoard(board);
+ });
+ dialog.addEventListener("pointermove", event => {
+  if (event.pointerId !== paintPointer) return;
+  paintBoard(document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-kf-plank]"));
+ });
+ window.addEventListener("pointerup", event => { if (event.pointerId === paintPointer) flushPaint() });
+ window.addEventListener("pointercancel", event => { if (event.pointerId === paintPointer) flushPaint() });
+ window.addEventListener("blur", flushPaint);
+ const swingSeats = { wood: ["Kayu", "#9c6846"], green: ["Hijau", "#547c54"], blue: ["Biru", "#437d8f"] };
+ let repairing = false;
+ ERR.hf_swing = { label: "Main buaian", icon: "🛝", place: "padang", dur: 30, ages, eff: { fun: 22, social: 8 },
+  when: (d, h) => project()?.kind === "play" && project().done && project().swing?.tested && openHours(8, 18)(d, h) };
+ function swingArtCss(swing, moving = false) {
+  const colour = swingSeats[swing.seat]?.[1] || "#9c6846";
+  return `<div class="kf-swing${moving ? " swinging" : ""}" style="--kf-seat:${colour}" aria-hidden="true"><div class="kf-swing-frame"></div>
+   <div class="kf-swing-hanging">${swing.left ? '<span class="kf-rope"></span>' : ''}${swing.right ? '<span class="kf-rope right"></span>' : ''}
+   ${swing.seat ? '<span class="kf-swing-seat"></span>' : ''}</div></div>`;
+ }
+ function swingView(p) {
+  const swing = p.swing || {};
+  const ready = swing.left && swing.right;
+  return `${swingArt(swing)}
+   <p>${swing.tested ? "Buaian siap dan selamat digunakan." : !swing.seat ? "Pilih tempat duduk." : !ready ? "Pasang tali kiri dan kanan." : "Tolak buaian untuk mengujinya."}</p>
+   <div class="acts">${Object.entries(swingSeats).map(([id, [label]]) => button("seat-" + id, label, !!swing.seat)).join(" ")}
+   ${button("rope-left", swing.left ? "Tali kiri dipasang" : "Pasang tali kiri", !swing.seat || swing.left)}
+   ${button("rope-right", swing.right ? "Tali kanan dipasang" : "Pasang tali kanan", !swing.seat || swing.right)}
+   ${button("swing-test", swing.tested ? "Tolak sekali lagi" : "Uji buaian", !ready)}</div>
+   <p>${button("swing-back", "Kembali ke projek")}</p>`;
+ }
+ const benchSpots = { tree: "Bawah pokok rendang", porch: "Bawah wakaf padang" };
+ let buildingBench = false;
+ ERR.hf_bench = { label: "Duduk dan bersembang", icon: "🪑", place: "padang", dur: 30, ages, eff: { energy: 8, social: 20 },
+  when: (d, h) => project()?.kind === "play" && project().done && !!project().bench?.spot && openHours(8, 18)(d, h) };
+ function benchArtCss(b) {
+  return `<div class="kf-bench" aria-hidden="true"><div class="kf-bench-shadow"></div>
+   ${b.left ? '<span class="kf-bench-leg"></span>' : ''}${b.right ? '<span class="kf-bench-leg right"></span>' : ''}
+   ${b.slat ? '<span class="kf-bench-slat"></span>' : ''}</div>`;
+ }
+ function benchView(p) {
+  const b = p.bench || {};
+  const hasLegs = b.left && b.right;
+  return `${benchArt(b)}
+   <p role="status">${b.spot ? "Bangku siap. " + benchSpots[b.spot] + "." : !hasLegs ? "Padankan kaki serong ke kiri dan kaki tegak ke kanan." : !b.slat ? "Pasang papan tempat duduk." : "Pilih tempat teduh untuk bangku."}</p>
+   <div class="acts">
+   ${!hasLegs ? ["left", "right"].filter(side => !b[side]).map(side => `<fieldset><legend>${side === "left" ? "Bahagian kiri" : "Bahagian kanan"}</legend>
+    ${button("bench-" + side + "-angled", "Kaki serong")} ${button("bench-" + side + "-straight", "Kaki tegak")}</fieldset>`).join("") : ""}
+   ${hasLegs && !b.slat ? button("bench-slat", "Pasang papan") : ""}
+   ${b.slat && !b.spot ? Object.entries(benchSpots).map(([id, label]) => button("bench-spot-" + id, label)).join(" ") : ""}
+   </div><p>${button("bench-back", "Kembali ke projek")}</p>`;
+ }
+ const gardenSeeds = { chili: ["Cili", "🌶️"], serai: ["Serai", "🌾"], pandan: ["Pandan", "🌿"] };
+ let gardening = false, selectedSeed = "chili";
+ const gardenPlots = p => p.plots || (p.plots = [{}, {}, {}]);
+ const harvestReady = (p, plot) => p.done && plot.watered != null && dayIdx() >= plot.watered + 2;
+ function gardenView(p) {
+  return `<p>Pilih benih, tanam dan siram. Selepas disiram, tanaman matang dalam dua hari permainan. Kutip hasil apabila kebun dibuka.</p>
+   <div class="acts kf-seeds" role="group" aria-label="Benih">${Object.entries(gardenSeeds).map(([id, [name, icon]]) =>
+    `<button type="button" class="btn" data-kf="seed-${id}" aria-pressed="${id === selectedSeed}">${icon} ${name}</button>`).join("")}</div>
+   ${artOn() ? gardenStage(p) : ""}<div class="kf-garden${artOn() ? " kf-ga" : ""}">${gardenPlots(p).map((plot, i) => {
+    const seed = gardenSeeds[plot.seed], mature = plot.watered != null && dayIdx() >= plot.watered + 2;
+    const status = !seed ? "Petak kosong" : plot.watered == null ? "Belum disiram" : mature ? (p.done ? "Sedia dipetik" : "Tunggu kebun dibuka") : `Matang hari ${plot.watered + 3}`;
+    return `<section class="kf-plot"><div class="kf-soil" aria-hidden="true">${mature ? seed[1] : seed ? "🌱" : ""}</div>
+     <b>${seed ? seed[0] : "Petak " + (i + 1)}</b><small>${status}</small>
+     ${!seed ? button("plant-" + i, "Tanam") : plot.watered == null ? button("water-" + i, "Siram") : button("harvest-" + i, "Petik", !harvestReady(p, plot))}</section>`;
+   }).join("")}</div><p>${button("garden-refresh", "Semak petak")} ${button("garden-back", "Kembali ke projek")}</p>`;
+ }
+ const hallOptions = {
+  tables: { sides: ["Dua baris di tepi"], centre: ["Meja tengah"] },
+  flags: { gold: ["Kuning", "#bf8c3c"], green: ["Hijau", "#497954"], red: ["Merah", "#a55141"] },
+  pots: { door: ["Di sisi pintu"], stage: ["Di tepi pentas"] }
+ };
+ let decoratingHall = false;
+ const hallDecoration = () => S.hfHallDecoration;
+ function hallArtCss(hall) {
+  const count = hall.tables === "centre" ? 1 : 2;
+  return `<div class="kf-hall ${hall.tables || ""} ${hall.pots || ""}" style="--kf-flags:${hallOptions.flags[hall.flags]?.[1] || "transparent"}" aria-hidden="true">
+   <div class="kf-hall-stage"></div>
+   ${hall.flags ? '<div class="kf-hall-flags"></div>' : ''}
+   ${hall.tables ? '<div class="kf-hall-tables">' + "<span></span>".repeat(count) + "</div>" : ""}
+   ${hall.pots ? '<div class="kf-hall-pots"><span>🪴</span><span>🪴</span></div>' : ''}</div>`;
+ }
+ function hallView() {
+  const hall = hallDecoration() || {};
+  const labels = { tables: "Susunan meja", flags: "Warna bendera", pots: "Kedudukan pasu" };
+  return `${hallArt(hall)}
+   <p role="status">${hall.saved ? "Susunan disimpan untuk kenduri." : "Pilih susunan meja, bendera dan pasu."}</p>
+   ${Object.entries(hallOptions).map(([kind, options]) => `<fieldset class="kf-hall-options"><legend>${labels[kind]}</legend>
+    ${Object.entries(options).map(([id, [label]]) => `<button type="button" class="btn" data-kf="hall-${kind}-${id}" aria-pressed="${hall[kind] === id}">${label}</button>`).join(" ")}</fieldset>`).join("")}
+   <div class="acts">${button("hall-save", "Siapkan balai", !hall.tables || !hall.flags || !hall.pots || hall.saved)}
+   ${button("hall-back", "Kembali")}</div>`;
+ }
+ const hallButton = () => button("hall-open", hallDecoration()?.saved ? "Ubah hiasan balai" : "Hias Balai Raya");
+ const parkJobs = {
+  slide: ["Baiki Gelongsor", "🛝", "Padankan anak tangga, ketatkan skru dan uji dengan bola."],
+  sand: ["Bersihkan Kotak Pasir", "🏰", "Asingkan daun, batu dan sampah, kemudian ratakan pasir."],
+  tree: ["Tanam Pokok Teduh", "🌳", "Pilih tempat berhampiran bangku, tanam dan siram."],
+  trial: ["Uji Taman Bersama Jiran", "📷", "Cuba buaian, bangku dan gelongsor dengan jiran."]
+ };
+ let parkJob = null;
+ const parkStates = p => p.park || (p.park = {});
+ const parkState = (p, job) => parkStates(p)[job] || (parkStates(p)[job] = {});
+ const treeReady = data => data.watered != null && dayIdx() >= data.watered + 2;
+ const trialReady = p => p.done && p.swing?.tested && p.bench?.spot && p.park?.slide?.done;
+ const recordHelper = (p, key, sim = act()) => {
+  if (!sim) return;
+  const helpers = p.helpers || (p.helpers = {});
+  const names = helpers[key] || (helpers[key] = {});
+  names[sim.id] = sim.name;
+ };
+ const parkStatus = (p, key) => {
+  if (key === "fence") return p.fence?.boards === (1 << plankCount) - 1 ? 2 : p.fence?.boards ? 1 : 0;
+  if (key === "swing") return p.swing?.tested ? 2 : p.swing?.seat ? 1 : 0;
+  if (key === "bench") return p.bench?.spot ? 2 : p.bench?.left || p.bench?.right ? 1 : 0;
+  const d = p.park?.[key];
+  if (!d) return 0;
+  if (key === "tree" ? treeReady(d) : d.done) return 2;
+  return Object.keys(d).length ? 1 : 0;
+ };
+ function projectBoard(p) {
+  const entries = [["fence", "Cat Pagar Padang", "paint"], ["swing", "Baiki Buaian", "swing"], ["bench", "Pasang Bangku Rehat", "bench-open"],
+   ...Object.entries(parkJobs).map(([key, [name]]) => [key, name, "park-open-" + key])];
+  const done = entries.filter(([key]) => parkStatus(p, key) === 2).length;
+  const names = [...new Set(Object.values(p.helpers || {}).flatMap(group => Object.values(group)))];
+  return `<section class="kf-project-board"><h3>Papan Projek Balai Raya</h3>
+   <p><b>${done}/${entries.length} kerja siap</b> · ${p.points}% kemajuan pembukaan taman</p>
+   <p>Jiran membantu setiap hari.${names.length ? " Teman yang membantu: " + names.map(esc).join(", ") + "." : ""}</p>
+   <div class="kf-project-tasks">${entries.map(([key, title, action]) => {
+    const status = parkStatus(p, key);
+    return `<div class="card"><b>${title}</b><small>${key === "trial" && !trialReady(p) ? "Perlu taman dibuka, buaian, bangku dan gelongsor siap" :
+     key === "tree" && status === 1 && p.park?.tree?.watered != null ? "Pokok sedang membesar" : ["Belum mula", "Sedang dibuat", "Siap"][status]}</small>
+    ${button(action, status === 2 ? "Lihat hasil · " + title : status ? "Sambung · " + title : "Mula · " + title)}</div>`;
+   }).join("")}</div></section>`;
+ }
+ const parkArtCss = p => {
+  const data = p.park || {}, d = data.trial;
+  return `<div class="kf-park-art" aria-label="Pemandangan taman permainan">
+   ${data.slide?.done ? "<span>🛝 Gelongsor</span>" : ""}${data.sand?.done ? "<span>🏰 Kotak pasir</span>" : ""}
+   ${data.tree?.planted ? `<span>${treeReady(data.tree) ? "🌳 Pokok teduh" : "🌱 Anak pokok"}</span>` : ""}
+   ${p.swing?.tested ? "<span>🪁 Buaian</span>" : ""}${p.bench?.spot ? "<span>🪑 Bangku</span>" : ""}
+   ${d?.done ? "<span>📷 Hari bersama jiran</span>" : ""}</div>`;
+ };
+ const rungs = ["Pendek", "Sederhana", "Panjang"];
+ const sandItems = { leaf: ["Daun kering", "Kompos"], stone: ["Batu kecil", "Bakul batu"], litter: ["Pembungkus", "Tong sampah"] };
+ const sortBins = { compost: "Kompos", stones: "Bakul batu", waste: "Tong sampah" };
+ const trialStops = { swing: "Buaian", bench: "Bangku", slide: "Gelongsor" };
+ function parkView(p) {
+  const data = parkState(p, parkJob), back = button("park-back", "Kembali ke Papan Projek");
+  if (parkJob === "slide") {
+   const count = data.rungs || 0, secured = data.left && data.right;
+   return `${artOn() ? slideStage(data) : `<div class="kf-slide-demo" aria-hidden="true"><div class="kf-slide-ladder">${"<i></i>".repeat(count)}</div>
+    <div class="kf-slide-track"></div><i class="kf-slide-ball"></i></div>`}
+    <p role="status">${data.done ? "Bola meluncur dengan lancar. Gelongsor siap." : count < 3 ? "Padankan anak tangga dari pendek ke panjang." : secured ? "Luncurkan bola untuk menguji gelongsor." : "Ketatkan kedua-dua skru."}</p>
+    <div class="acts">${count < 3 ? [2, 0, 1].map(i => button("park-rung-" + i, rungs[i], i < count)).join("") :
+     secured ? button("park-slide-test", data.done ? "Luncurkan bola lagi" : "Uji dengan bola") :
+     button("park-screw-left", "Ketatkan skru kiri", data.left) + button("park-screw-right", "Ketatkan skru kanan", data.right)} ${back}</div>`;
+  }
+  if (parkJob === "sand") {
+   const item = Object.keys(sandItems)[data.sorted || 0];
+   return `${artOn() ? sandStage(data, item) : `<div class="kf-sand-demo" aria-hidden="true">${data.done ? "🏰" : item === "leaf" ? "🍂" : item === "stone" ? "🪨" : item ? "🧃" : ""}</div>`}
+    <p role="status">${data.done ? "Kotak pasir sudah bersih dan rata." : item ? "Asingkan " + sandItems[item][0].toLowerCase() + "." : "Semua barang sudah dialihkan. Ratakan pasir."}</p>
+    <div class="acts">${item ? Object.entries(sortBins).map(([k, label]) => button("park-sort-" + k, label)).join("") : !data.done ? button("park-level", "Ratakan pasir") : ""} ${back}</div>`;
+  }
+  if (parkJob === "tree") {
+   return `${artOn() ? treeStage(data) : `<div class="kf-tree-demo" aria-hidden="true">${treeReady(data) ? "🌳" : data.planted ? "🌱" : "🪴"}</div>`}
+    <p role="status">${treeReady(data) ? "Pokok sudah memberi teduh." : data.watered != null ? `Pokok membesar pada hari ${data.watered + 3}.` : data.planted ? "Siram anak pokok." : data.spot ? "Tempat sudah dipilih. Tanam anak pokok." : "Pilih petak berhampiran bangku supaya laluan kekal lapang."}</p>
+    <div class="acts">${!data.spot ? button("park-tree-path", "Tengah laluan") + button("park-tree-bench", "Tepi bangku") :
+     !data.planted ? button("park-tree-plant", "Tanam") : data.watered == null ? button("park-tree-water", "Siram") : button("park-refresh", "Semak pokok")} ${back}</div>`;
+  }
+  return `${parkArt(p)}<p role="status">${data.done ? "Jiran pesan supaya keluarga datang bermain lagi. Kenangan disimpan dalam Buku Warisan." :
+   trialReady(p) ? "Cuba ketiga-tiga kemudahan bersama jiran." : "Buka taman dan siapkan buaian, bangku serta gelongsor dahulu."}</p>
+   <div class="acts">${Object.entries(trialStops).map(([key, name]) => button("park-try-" + key, (data[key] ? "✓ " : "Cuba ") + name, !trialReady(p) || data[key])).join("")}
+   ${!data.done ? button("park-photo", "Ambil gambar kenangan", !Object.keys(trialStops).every(k => data[k])) : ""} ${back}</div>`;
+ }
+ const parkErrands = { slide: ["Main gelongsor", "🛝"], sand: ["Bina istana pasir", "🏰"] };
+ for (const [key, [label, icon]] of Object.entries(parkErrands)) {
+  ERR["hf_park_" + key] = { label, icon, place: "padang", dur: 30, ages: ["child"], eff: { fun: 24, social: 8 },
+   when: (d, h) => project()?.done && project().park?.[key]?.done && openHours(8, 18)(d, h) };
+ }
+ function parkPicture(p) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 480;
+  canvas.height = 240;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+  const sky = ctx.createLinearGradient(0, 0, 0, 154);
+  sky.addColorStop(0, "#c4ddd8");
+  sky.addColorStop(1, "#f7eaca");
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, 480, 154);
+  ctx.fillStyle = "#91aa72"; ctx.fillRect(0, 154, 480, 86);
+  ctx.fillStyle = "#ead6a9"; ctx.beginPath(); ctx.ellipse(240, 219, 192, 20, 0, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = "#253f2e"; ctx.font = "bold 24px Georgia, serif"; ctx.textAlign = "center";
+  ctx.fillText("Hari di taman bersama jiran", 240, 53);
+  ctx.font = "42px system-ui";
+  const icons = [treeReady(p.park.tree || {}) ? "🌳" : "🌿", "🪑", "🛝", p.park.sand?.done ? "🏰" : "🌼"];
+  icons.forEach((icon, i) => ctx.fillText(icon, 90 + i * 100, 178));
+  ctx.font = "18px system-ui"; ctx.fillText("Taman Harmoni · Hari " + (dayIdx() + 1), 240, 222);
+  return canvas.toDataURL("image/jpeg", .78);
+ }
+ function parkAction(p, key) {
+  const data = parkState(p, parkJob), count = data.rungs || 0;
+  let points = 0, animate = false, feedback = "";
+  if (parkJob === "slide") {
+   if (key === "park-rung-" + count && count < 3) data.rungs = count + 1;
+   else if (key.startsWith("park-rung-")) feedback = "Anak tangga ini belum sepadan. Cuba saiz lain.";
+   else if (count === 3 && key === "park-screw-left" && !data.left) data.left = true;
+   else if (count === 3 && key === "park-screw-right" && !data.right) data.right = true;
+   else if (key === "park-slide-test" && data.left && data.right) {
+    animate = true;
+    if (!data.done) { data.done = true; points = 20 }
+   } else return;
+  } else if (parkJob === "sand") {
+   const item = Object.values(sandItems)[data.sorted || 0];
+   if (item && key.startsWith("park-sort-")) {
+    if (sortBins[key.slice(10)] !== item[1]) feedback = "Bekas ini tidak sepadan. Cuba bekas lain.";
+    else data.sorted = (data.sorted || 0) + 1;
+   } else if (!item && key === "park-level" && !data.done) { data.done = true; points = 15 }
+   else return;
+  } else if (parkJob === "tree") {
+   if (key === "park-tree-path" && !data.spot) feedback = "Laluan perlu kosong. Cuba petak di tepi bangku.";
+   else if (key === "park-tree-bench" && !data.spot) data.spot = true;
+   else if (key === "park-tree-plant" && data.spot && !data.planted) data.planted = true;
+   else if (key === "park-tree-water" && data.planted && data.watered == null) { data.watered = dayIdx(); points = 15 }
+   else if (key !== "park-refresh") return;
+  } else {
+   if (!trialReady(p)) return;
+   const stop = key.slice(9);
+   if (key.startsWith("park-try-") && Object.hasOwn(trialStops, stop) && !data[stop]) data[stop] = true;
+   else if (key === "park-photo" && !data.done && Object.keys(trialStops).every(k => data[k])) {
+    data.done = true;
+    const h = household();
+    h.parkMemory = { day: dayIdx(), names: family().map(sim => sim.name), picture: parkPicture(p) };
+    addAlbum("📷", "Uji Taman Bersama Jiran", false);
+    diary("Keluarga dan jiran mencuba taman permainan yang dibaiki.");
+   } else return;
+  }
+  if (feedback) { dialog.querySelector(".kf-content [role=status]").textContent = feedback; return }
+  if (points && !p.done) progress(p, points);
+  recordHelper(p, parkJob);
+  save();
+  render();
+  if (animate) dialog.querySelector(".kf-slide-demo,.kf-sl2")?.classList.add("rolling");
+  dialog.querySelector(".kf-content button:not([disabled])")?.focus();
+ }
+ function projectView() {
+  const p = project();
+  if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>${artOn() ? hallStage(hallDecoration() || {}) : ""}
+   <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)} ${hallButton()}</div>`;
+  const gardenButton = p.kind === "garden" ? button("garden-open", "Tanam Kebun Komuniti") : "";
+  if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>${artOn() ? (p.kind === "garden" ? gardenStage(p) : parkStage(p)) : ""}
+   <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
+   ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${gardenButton} ${hallButton()} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}
+   ${p.park?.slide?.done ? button("park-out-slide", "Main gelongsor") : ""}
+   ${p.park?.sand?.done ? button("park-out-sand", "Bina istana pasir") : ""}</div>
+   ${p.kind === "play" ? projectBoard(p) : ""}`;
+  return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>${artOn() ? (p.kind === "garden" ? gardenStage(p) : parkStage(p)) : ""}
+   <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
+   <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
+   <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
+   ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
+   ${button("cash", "Sumbang RM 40", p.cash)} ${gardenButton} ${hallButton()}</div>
+   ${p.kind === "play" ? projectBoard(p) : ""}`;
+ }
+ function plansView() {
+  const h = household(), p = edit;
+  const people = family(), min = Math.floor(S.t / 60) * 60 + 60;
+  const at = p?.at >= min ? p.at : min;
+  return `<form id="hfkf-plan">
+   <label>Aktiviti <select name="kind">${Object.entries(plans).map(([k, v]) => `<option value="${k}" ${p?.kind === k ? "selected" : ""} ${k === "play" && !(project()?.done && project().kind === "play") ? "disabled" : ""}>${v[0]}</option>`).join("")}</select></label>
+   <label>Hari <input name="day" type="number" min="${Math.floor(min / 1440) + 1}" max="${dayIdx() + 15}" value="${Math.floor(at / 1440) + 1}" required></label>
+   <label>Jam <input name="hour" type="number" min="0" max="23" value="${Math.floor(at % 1440 / 60)}" required></label>
+   <fieldset><legend>Ahli keluarga</legend><div class="kf-people">${people.map(s => `
+    <label class="kf-person"><input type="checkbox" name="guest" value="${s.id}" ${(p ? p.guests.includes(s.id) : s === act()) ? "checked" : ""}>
+     ${face(s)} <span>${esc(s.name)}</span></label>`).join("")}</div></fieldset>
+   <details class="kf-calendar" data-kf-calendar>
+    <summary>Cari Masa Bersama</summary>
+    <p>Ketik waktu untuk lihat jadual Teman. Pilih waktu yang lapang, kemudian simpan janji.</p>
+    <div class="kf-slots" data-kf-slots></div><div class="kf-slot-people" data-kf-slot-people aria-live="polite"></div>
+   </details>
+   <p class="hint" data-kf-conflicts aria-live="polite"></p>
+   <button class="btn pri" type="submit">${p ? "Simpan jadual baharu" : "Buat janji"}</button>
+   ${p ? button("stop-edit", "Batal sunting") : ""}
+   </form>
+   ${h.plans.length ? "<h3>Janji keluarga</h3>" : ""}
+   ${h.plans.map((p, i) => `<div class="card"><b>${plans[p.kind][0]}</b><br>${when(p.at)} ·
+   ${esc(p.guests.map(id => people.find(s => s.id === id)?.name || "Ahli keluarga").join(", "))}
+   ${p.status === "done" ? " · Selesai" : p.status === "sent" ? " · Masuk giliran tindakan" : p.status === "missed" ? " · Terlepas" : ""}
+   <div class="acts">${p.status !== "done" && p.status !== "sent" ? button("edit-" + i, "Jadual semula") : ""}${button("remove-" + i, "Padam")}</div></div>`).join("")}`;
+ }
+ const ingredientLists = {
+  nasilemak: ["Beras", "Santan", "Daun pandan"], nasiayam: ["Beras", "Stok ayam", "Halia"],
+  buburlambuk: ["Beras", "Air", "Rempah"], asampedas: ["Pes cili", "Air asam jawa", "Ikan"]
+ };
+ let activeLesson = null, packing = false, pickedPackage = null;
+ const containers = { bakery: "Kotak kuih", fruit: "Bakul buah", gifts: "Kotak hantaran" };
+ function lessonView(lesson) {
+  const ingredients = ingredientLists[lesson.dish], step = lesson.prep || 0;
+  const teacher = family().find(sim => sim.id === lesson.teacher);
+  const hint = step < 3 ? "Masukkan " + ingredients[step].toLowerCase() + "." : step < 6 ? "Kacau perlahan hingga sebati." : "Bahan siap. Sambung memasak di dapur.";
+  return `<div class="kf-lesson-guide">${teacher ? face(teacher) : ""}<div><b>${esc(lesson.teacherName)} · ${esc(DISH[lesson.dish].name)}</b><p role="status">${hint}</p></div></div>
+   ${artOn() ? potStage(step) : `<div class="kf-pot" aria-hidden="true">${step ? "🥘" : "🍲"}</div>`}<progress max="6" value="${step}" aria-label="Persediaan resipi"></progress>
+   <div class="acts">${step < 3 ? [2, 0, 1].map(i => button("lesson-add-" + i, ingredients[i], i < step)).join(" ") : ""}
+   ${step >= 3 && step < 6 ? button("lesson-stir", `Kacau (${step - 3}/3)`) : ""}
+   ${step === 6 ? button("lesson-start", "Masak di dapur") : ""} ${button("lesson-back", "Kembali ke resipi")}</div>`;
+ }
+ function packingView(o) {
+  if (!o || dayIdx() > o.due) return `<p>Tempoh pesanan sudah tamat.</p>${button("pack-back", "Kembali ke pesanan")}`;
+  const done = k => o.boxes?.[k];
+  return `<p>Pilih bekalan dan padankan dengan bekas. Sediakan stok sebenar melalui perniagaan masing-masing.</p>
+   ${artOn() ? packStage(o) : ""}
+   <div class="acts kf-pack" role="group" aria-label="Bekalan kenduri">${Object.entries(parts).map(([k, label]) =>
+    `<button type="button" class="btn" data-kf="pack-item-${k}" aria-pressed="${pickedPackage === k}" ${o.packed || done(k) ? "disabled" : ""}>${esc(label)}</button>`).join("")}</div>
+   <div class="kf-pack-boxes">${Object.entries(containers).map(([k, label]) => `<section><b>${label}</b><p>${done(k) ? esc(parts[k]) : "Kosong"}</p>
+    ${done(k) ? button("pack-clear-" + k, "Keluarkan", o.packed) : button("pack-box-" + k, "Letak di sini", o.packed)}</section>`).join("")}</div>
+   <p role="status">${o.packed ? "Bekas siap dilabel. Buka buku tempahan untuk penghantaran." : "Semak semua bekas sebelum mengesahkan."}</p>
+   <div class="acts">${button("pack-confirm", "Sahkan bungkusan", o.packed || !Object.keys(parts).every(done))} ${button("pack-back", "Kembali ke pesanan")}</div>`;
+ }
+ const memories = [
+  { place: "padang", title: "Wau yang terbang tinggi", image: "img/wau/wau.webp", photo: "Wau",
+   clue: "Cari tanah lapang tempat angin boleh angkat wau tinggi-tinggi.",
+   story: "Atuk pernah bawa wau buatan sendiri. Talinya putus, tetapi jiran sebelah tolong kejar sampai ke hujung padang. Sejak itu kami selalu bawa segulung tali tambahan." },
+  { place: "warung", title: "Sarapan sebelum sekolah", image: "img/drama/lauk.webp", photo: "Hidangan pagi",
+   clue: "Cari tempat orang singgah untuk sarapan dan minum teh sebelum memulakan hari.",
+   story: "Dahulu Atuk singgah sarapan sebelum sekolah. Mak Jah selalu kenal kami melalui bunyi loceng basikal, lalu menyimpan satu bungkus untuk dibawa pulang." },
+  { place: "balai", title: "Kenduri satu kampung", image: "img/drama/duakenduri.webp", photo: "Kenduri",
+   clue: "Cari tempat jiran berkumpul untuk mesyuarat dan menyediakan kenduri bersama.",
+   story: "Waktu kenduri di balai, hujan turun ketika meja baru disusun. Jiran angkat hidangan bersama-sama ke bawah bumbung. Akhirnya semua makan sambil dengar hujan." }
+ ];
+ let matchingMemory = false;
+ const memoryCount = () => S.hfFamilyActivities?.memories?.length || 0;
+ function memoryCard(m) {
+  return `<article class="kf-memory"><img src="${m.image}" alt="${m.photo}" loading="lazy"><div><h3>${m.title}</h3><p>${m.story}</p></div></article>`;
+ }
+ function memoriesView() {
+  const count = memoryCount(), next = memories[count];
+  const photos = [memories[2], memories[0], memories[1]];
+  return `<div class="kf-lesson-guide"><img class="kf-atuk" src="img/orang-hf/muka/atuk-casual.webp" alt=""><div>
+   <b>Atuk</b><p>${next ? next.clue : "Semua kenangan telah dikumpulkan dalam Buku Warisan Keluarga."}</p></div></div>
+   <p><b>${count}/${memories.length} kenangan ditemui</b></p>
+   ${next ? (matchingMemory ? `<p>Padankan tempat ini dengan gambar dalam album.</p>
+    <div class="kf-memory-choices">${photos.map(m => `<button type="button" class="btn" data-kf="memory-photo-${m.place}"><img src="${m.image}" alt="" loading="lazy">${m.photo}</button>`).join("")}</div>
+    <p role="status" data-kf-memory-feedback></p>` : button("memory-map", "Cari tempat di peta")) : ""}
+   ${count ? memoryCard(memories[count - 1]) : ""}`;
+ }
+ const activityCards = [
+  ["fence", "🎨", "Cat Pagar Padang", "Pilih warna dan cat lapan papan."],
+  ["swing", "🛝", "Baiki Buaian", "Pasang tempat duduk dan kedua-dua tali."],
+  ["bench", "🪑", "Pasang Bangku Rehat", "Padankan kaki bangku dan pilih tempat teduh."],
+  ["garden", "🌱", "Tanam Kebun Komuniti", "Tanam, siram dan tukar hasil kepada bekalan memasak."],
+  ["hall", "🎏", "Hias Balai Raya", "Susun meja, bendera dan pasu untuk kenduri."],
+  ["calendar", "📅", "Cari Masa Bersama", "Bandingkan waktu lapang untuk satu janji keluarga."],
+  ["cook", "🍲", "Masak Bersama Guru", "Ikut petua keluarga dan simpan resipi warisan."],
+  ["packing", "🧺", "Bungkus Bekalan Kenduri", "Padankan tiga jenis bekalan dengan bekasnya."],
+  ["memories", "📷", "Jejak Kenangan Atuk", "Cari tiga tempat dan padankan gambar album."],
+  ...Object.entries(parkJobs).map(([key, [title, icon, description]]) => [key, icon, title, description])
+ ];
+ function activitiesView() {
+  const p = project(), h = S.hfFamilyActivities, order = h?.order;
+  const sold = order && dayIdx() <= order.due && order.needsPacking;
+  const lesson = h?.recipes.find(r => r.student === S.active && !r.learned);
+  const ready = { fence: p?.kind === "play", swing: p?.kind === "play", bench: p?.kind === "play", garden: p?.kind === "garden", packing: sold, cook: !!lesson };
+  const state = { fence: p?.fence?.boards, swing: p?.swing?.seat, bench: p?.bench?.left || p?.bench?.right,
+   garden: p?.plots?.some(x => x.seed), hall: hallDecoration()?.tables || hallDecoration()?.flags || hallDecoration()?.pots,
+   packing: order?.boxes && Object.keys(order.boxes).length, cook: lesson?.prep, memories: memoryCount() };
+  const done = { fence: p?.fence?.boards === (1 << plankCount) - 1, swing: p?.swing?.tested, bench: p?.bench?.spot,
+   hall: hallDecoration()?.saved, packing: sold && order.packed, memories: memoryCount() === memories.length };
+  for (const key of Object.keys(parkJobs)) {
+   ready[key] = p?.kind === "play";
+   state[key] = ready[key] && parkStatus(p, key) === 1;
+   done[key] = ready[key] && parkStatus(p, key) === 2;
+  }
+  return `<div class="kf-activities">${activityCards.map(([key, icon, title, description]) => {
+   const access = Object.hasOwn(ready, key) && !ready[key];
+   const prompt = access ? key === "packing" ? "Lihat pesanan" : key === "cook" ? "Pilih resipi" : "Lihat projek"
+    : done[key] ? "Lihat hasil" : state[key] ? "Sambung" : "Mula";
+   return `<article class="kf-activity"><div class="kf-activity-icon" aria-hidden="true">${iconImg(key, icon)}</div>
+    <h3>${title}</h3><p>${description}</p>
+    <button type="button" class="btn" data-kf="activity-${key}" aria-label="${prompt}: ${title}">${prompt}</button></article>`;
+  }).join("")}</div>`;
+ }
+ function openActivity(key) {
+  const p = project(), h = S.hfFamilyActivities, order = h?.order;
+  const lesson = h?.recipes.find(r => r.student === S.active && !r.learned);
+  page = "project";
+  if (Object.hasOwn(parkJobs, key) && p?.kind === "play") parkJob = key;
+  if (key === "fence") painting = p?.kind === "play";
+  if (key === "swing") repairing = p?.kind === "play";
+  if (key === "bench") buildingBench = p?.kind === "play";
+  if (key === "garden") gardening = p?.kind === "garden";
+  if (key === "hall") decoratingHall = true;
+  if (key === "calendar") page = "plans";
+  if (key === "cook") { page = "recipes"; activeLesson = lesson || null }
+  if (key === "packing") { page = "order"; packing = !!(order?.needsPacking && dayIdx() <= order.due) }
+  if (key === "memories") { page = "memories"; matchingMemory = false }
+  render();
+  if (key === "calendar") dialog.querySelector("[data-kf-calendar]").open = true;
+  dialog.querySelector(".kf-content button:not([disabled]), .kf-content summary")?.focus();
+ }
+ function recipeView() {
+  const student = act(), teachers = family().filter(s => s !== student && ["adult", "elder"].includes(s.stage));
+  const h = household();
+  return `<p>Pilih Teman yang mahu belajar, kemudian minta ahli keluarga dewasa mengajarnya. Masak di dapur dan simpan resipi dalam Buku Warisan.</p>
+   ${!teachers.length ? "<p class=hint>Perlu seorang lagi ahli keluarga dewasa di rumah.</p>" : ""}
+   <form id="hfkf-lesson">
+   <label>Guru <select name="teacher" required>${teachers.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join("")}</select></label>
+   <label>Resipi <select name="dish">${recipes.map(id => `<option value="${id}">${esc(DISH[id].name)} · tahap ${DISH[id].lvl}</option>`).join("")}</select></label>
+   <button class="btn pri" type="submit" ${!teachers.length || !available(student) ? "disabled" : ""}>Minta diajar</button></form>
+   ${h.recipes.map((r, i) => `<div class="card"><b>${esc(DISH[r.dish].name)}</b><br>${esc(r.teacherName)} mengajar ${esc(r.studentName)}
+    ${r.learned ? ` · Dipelajari pada hari ${r.learned.day + 1}` : button("cook-" + i, "Masak bersama", r.student !== student?.id)}</div>`).join("")}`;
+ }
+ function orderView() {
+  const o = household().order;
+  const status = o && (Object.keys(parts).every(k => o.done[k]) ? "Selesai" : dayIdx() > o.due ? "Tempoh tamat" : "Sedang berjalan");
+  return `<p>Satu kenduri, tiga perniagaan. Hantar melalui buku tempahan masing-masing. Semua penghantaran tepat masa memberi bonus RM 60.</p>
+   ${o ? `<p><b>${status}</b> · Tarikh tutup hari ${o.due + 1}</p>` : ""}
+   <ul>${Object.entries(parts).map(([k, label]) => `<li>${label}${o ? (o.done[k] ? " · Dihantar" : " · Belum dihantar") : ""}</li>`).join("")}</ul>
+   ${!o || dayIdx() > o.due ? button("order-start", "Terima pesanan Balai Raya") : ""}
+   ${o?.needsPacking && dayIdx() <= o.due ? button("pack-open", o.packed ? "Lihat bungkusan kenduri" : "Bungkus Bekalan Kenduri") : ""}
+   <section><h3>Persiapan Balai Raya</h3>${o && hallDecoration()?.published ? hallArt(hallDecoration().published) : ""}${hallButton()}</section>
+   <p class="hint">Perlu Kedai Kecil yang menjual kuih lapis dan bisnes Gubah Hantaran. Bekalan buah boleh dibeli atau dipetik.</p>`;
+ }
+ function render() {
+  const me = act();
+  const memoryPage = page === "memories";
+  dialog.innerHTML = `<header class="kf-cover">
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : memoryPage ? "Jejak Kenangan Atuk" : parkJob ? parkJobs[parkJob][0] : titles[page]}</h2></div>
+    ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
+    ${button("close", "Tutup")}</header>
+    <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
+    ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${iconImg(k, icons[k], "kf-nic")}</span>${titles[k]}</button>`).join("")}</nav>
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : memoryPage ? memoriesView() : parkJob ? parkView(project()) : ({ activities: activitiesView, project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}
+    ${page === "project" && !painting && !repairing && !buildingBench && !gardening && !decoratingHall ? `<p>${button("memory-open", "Jejak Kenangan Atuk")}</p>` : ""}
+    </div>`;
+  previewConflicts();
+ }
+ function show(next, source) {
+  if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
+  ensureCss(); warm();
+  flushPaint();
+  painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null;
+  page = next;
+  parkJob = null;
+  matchingMemory = false;
+  edit = null;
+  returnTo = source || document.activeElement;
+  render();
+  if (!dialog.open) {
+   dialog.showModal();
+   // Painted portraits can finish loading after the panel renders.
+   clearInterval(portraitTimer);
+   portraitTimer = setInterval(() => {
+    for (const node of dialog.querySelectorAll("[data-kf-face]")) {
+     const sim = simById(Number(node.dataset.kfFace));
+     if (!sim) continue;
+     const html = avatar(sim);
+     if (node._portrait !== html) { node._portrait = html; node.innerHTML = html }
+    }
+   }, 850);
+  }
+ }
+ function readPlan(form) {
+  const data = new FormData(form);
+  return { kind: data.get("kind"), at: (Number(data.get("day")) - 1) * 1440 + Number(data.get("hour")) * 60,
+   guests: data.getAll("guest").map(Number) };
+ }
+ function appointmentConflict(sim, at) {
+  if (household().plans.some(p => p !== edit && !p.status && Math.abs(p.at - at) < 60 && p.guests.includes(sim.id))) return "janji lain";
+  return conflict(sim, at);
+ }
+ function planIssues(p) {
+  return family().filter(sim => p.guests.includes(sim.id)).map(sim => {
+   const why = appointmentConflict(sim, p.at);
+   return why ? `${sim.name} (${why})` : "";
+  }).filter(Boolean);
+ }
+ function venueOpen(p) {
+  const errand = plans[p.kind]?.[1], hour = p.at % 1440 / 60;
+  return !errand || (ERR[errand].when?.(Math.floor(p.at / 1440), hour) ?? (hour >= 7 && hour < 22));
+ }
+ function refreshCalendar(form, keepSlots = false) {
+  const calendar = form.querySelector("[data-kf-calendar]");
+  if (!calendar.open) return;
+  const p = readPlan(form);
+  const days = Array.from({ length: 3 }, (_, i) => dayIdx() + i);
+  const people = family().filter(sim => p.guests.includes(sim.id));
+  const slots = calendar.querySelector("[data-kf-slots]");
+  if (!keepSlots) slots.innerHTML = days.map(day => {
+   const options = [9, 12, 16, 18].map(hour => day * 1440 + hour * 60).filter(at => at > S.t);
+   if (!options.length) return "";
+   return `<fieldset><legend>Hari ${day + 1}</legend>${options.map(at => {
+    const total = people.filter(sim => !appointmentConflict(sim, at)).length;
+    const label = !venueOpen({ kind: p.kind, at }) ? "Tempat tutup" : people.length ? `${total}/${people.length} lapang` : "Pilih Teman";
+    return `<button class="btn" type="button" data-kf-slot="${at}"><b>${fmtT(at)}</b><small>${label}</small></button>`;
+   }).join("")}</fieldset>`;
+  }).join("");
+  slots.querySelectorAll("[data-kf-slot]").forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.kfSlot) === p.at)));
+  const review = calendar.querySelector("[data-kf-slot-people]");
+  review.innerHTML = people.length ? `<p><b>${when(p.at)}</b>${venueOpen(p) ? "" : " · Tempat tutup"}</p><div class="kf-people">${people.map(sim => {
+   const why = appointmentConflict(sim, p.at);
+   return `<div class="kf-person">${face(sim)}<span>${esc(sim.name)}<small>${why ? esc(why) : "Lapang"}</small></span></div>`;
+  }).join("")}</div>` : "<p>Pilih sekurang-kurangnya seorang Teman.</p>";
+ }
+ function previewConflicts(keepSlots = false) {
+  const form = dialog.querySelector("#hfkf-plan");
+  if (!form) return;
+  const p = readPlan(form), issues = planIssues(p);
+  form.querySelector("[data-kf-conflicts]").textContent = issues.length ? "Pertindihan jadual: " + issues.join(", ") : "";
+  refreshCalendar(form, keepSlots);
+ }
+ dialog.addEventListener("input", () => previewConflicts());
+ dialog.addEventListener("toggle", event => {
+  if (event.target.matches("[data-kf-calendar]")) previewConflicts();
+ }, true);
+ dialog.addEventListener("close", () => {
+  if (dialog.open) return;
+  flushPaint();
+  clearInterval(portraitTimer);
+  if (returnTo?.isConnected) returnTo.focus();
+ });
+ dialog.addEventListener("submit", event => {
+  event.preventDefault();
+  const form = event.target, h = household();
+  if (form.id === "hfkf-plan") {
+   const p = readPlan(form);
+   if (!Object.hasOwn(plans, p.kind) || !Number.isFinite(p.at) || p.at <= S.t || !p.guests.length) {
+    toast("Pilih masa akan datang dan sekurang-kurangnya seorang ahli keluarga."); return;
+   }
+   if (!venueOpen(p)) {
+    toast("Tempat ini tidak dibuka pada masa yang dipilih."); return;
+   }
+   if (planIssues(p).length) { toast("Pilih masa yang sesuai untuk semua ahli keluarga."); return }
+   if (edit) Object.assign(edit, p, { status: null });
+   else {
+    if (h.plans.length >= 12) { toast("Padam janji lama dahulu."); return }
+    h.plans.push(p);
+   }
+   edit = null;
+   save();
+   syncWeek();
+  } else if (form.id === "hfkf-lesson") {
+   const data = new FormData(form), student = act();
+   const teacher = family().find(s => s.id === Number(data.get("teacher")));
+   const dish = data.get("dish");
+   if (!available(student) || !available(teacher) || teacher === student || !recipes.includes(dish)) {
+    toast("Pilih dua ahli keluarga yang lapang di rumah."); return;
+   }
+   if (h.recipes.some(r => r.dish === dish && r.student === student.id)) { toast("Resipi ini sudah ada dalam senarai Teman."); return }
+   if (h.recipes.length >= 32) { toast("Buku resipi keluarga sudah penuh."); return }
+   h.recipes.push({ dish, student: student.id, teacher: teacher.id, studentName: student.name, teacherName: teacher.name });
+   save();
+  }
+  render();
+ });
+ dialog.addEventListener("click", event => {
+  const slot = event.target.closest("[data-kf-slot]");
+  if (slot) {
+   const at = Number(slot.dataset.kfSlot), form = slot.closest("form");
+   form.elements.day.value = Math.floor(at / 1440) + 1;
+   form.elements.hour.value = Math.floor(at % 1440 / 60);
+   previewConflicts(true);
+   return;
+  }
+  const board = event.target.closest("[data-kf-plank]");
+  if (board) { paintBoard(board); flushPaint(); return }
+  const key = event.target.closest("button[data-kf]")?.dataset.kf;
+  if (!key) return;
+  if (key === "close") { dialog.close(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; matchingMemory = false; parkJob = null; page = key; edit = null; render(); return }
+  if (key === "paint-back") { flushPaint(); painting = false; render(); return }
+  if (key === "paint" && project()?.kind === "play") {
+   painting = true;
+   render();
+   dialog.querySelector("[data-kf-plank]")?.focus();
+   return;
+  }
+  if (painting && key.startsWith("colour-")) {
+   const colour = key.slice(7), f = fence(project());
+   if (!Object.hasOwn(fenceColours, colour)) return;
+   f.colour = colour;
+   save();
+   dialog.querySelector("[data-kf-fence]").style.setProperty("--kf-paint", coat(f));
+   dialog.querySelectorAll('[data-kf^="colour-"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.kf === key)));
+   return;
+  }
+  const p = project();
+  if (page === "activities" && key.startsWith("activity-")) { openActivity(key.slice(9)); return }
+  if (key === "memory-open") { page = "memories"; matchingMemory = false; render(); return }
+  if (key === "memory-map" && page === "memories" && memories[memoryCount()]) {
+   const h = household();
+   h.memoryTrail = true;
+   save();
+   returnTo = null;
+   dialog.close();
+   openMap();
+   return;
+  }
+  if (matchingMemory && key.startsWith("memory-photo-")) {
+   const h = household(), next = memories[memoryCount()];
+   if (!next || key.slice(13) !== next.place) {
+    dialog.querySelector("[data-kf-memory-feedback]").textContent = "Cuba gambar lain yang sepadan dengan petunjuk Atuk.";
+    return;
+   }
+   (h.memories || (h.memories = [])).push(next.place);
+   h.memoryTrail = false;
+   matchingMemory = false;
+   notify("📖 Kenangan Atuk disimpan: " + next.title + ".");
+   render();
+   return;
+  }
+  if (key === "pack-open") { packing = true; pickedPackage = null; render(); return }
+  if (key === "pack-back") { packing = false; pickedPackage = null; render(); return }
+  if (packing && key.startsWith("pack-")) {
+   const o = household().order;
+   if (!o?.needsPacking || o.packed || dayIdx() > o.due) { render(); return }
+   const [, action, part] = key.split("-");
+   const boxes = o.boxes || (o.boxes = {});
+   if (action === "confirm" && Object.keys(parts).every(k => boxes[k])) o.packed = true;
+   else if (!Object.hasOwn(parts, part)) return;
+   else if (action === "item" && !boxes[part]) pickedPackage = part;
+   else if (action === "box" && !boxes[part]) {
+    if (pickedPackage !== part) {
+     dialog.querySelector(".kf-content [role=status]").textContent = pickedPackage ? "Bekas ini tidak sepadan. Cuba bekas lain." : "Pilih bekalan dahulu.";
+     return;
+    }
+    boxes[part] = true; pickedPackage = null;
+   } else if (action === "clear") delete boxes[part];
+   else return;
+   save();
+   render();
+   dialog.querySelector(`[data-kf="${key}"]:not([disabled])`)?.focus();
+   return;
+  }
+  if (key === "lesson-back") { activeLesson = null; render(); return }
+  if (activeLesson && key.startsWith("lesson-") && key !== "lesson-start") {
+   const step = activeLesson.prep || 0;
+   if ((step < 3 && key === "lesson-add-" + step) || (step >= 3 && step < 6 && key === "lesson-stir")) {
+    activeLesson.prep = step + 1;
+    sfx("tap"); save(); render();
+    dialog.querySelector('.kf-content button:not([disabled])')?.focus();
+   } else if (step < 3) dialog.querySelector(".kf-content [role=status]").textContent = "Ikut petua guru: masukkan " + ingredientLists[activeLesson.dish][step].toLowerCase() + " dahulu.";
+   return;
+  }
+  if (key === "hall-open") { decoratingHall = true; render(); return }
+  if (key === "hall-back") { decoratingHall = false; render(); return }
+  if (decoratingHall && key.startsWith("hall-")) {
+   const hall = hallDecoration() || (S.hfHallDecoration = {});
+   if (key === "hall-save" && hall.tables && hall.flags && hall.pots && !hall.saved) {
+    hall.saved = true;
+    hall.published = { tables: hall.tables, flags: hall.flags, pots: hall.pots };
+    if (!hall.rewarded) {
+     hall.rewarded = true;
+     if (p && !p.done) progress(p, 15);
+    }
+    notify("Balai Raya siap dihias untuk kenduri.");
+   } else {
+    const [, kind, choice] = key.split("-");
+    if (!Object.hasOwn(hallOptions, kind) || !Object.hasOwn(hallOptions[kind], choice) || hall[kind] === choice) return;
+    hall[kind] = choice;
+    hall.saved = false;
+    save();
+   }
+   render();
+   dialog.querySelector(`[data-kf="${key}"]:not([disabled])`)?.focus();
+   return;
+  }
+  if (key === "park-back") { parkJob = null; render(); return }
+  if (key.startsWith("park-open-") && p?.kind === "play" && Object.hasOwn(parkJobs, key.slice(10))) {
+   parkJob = key.slice(10); render(); return;
+  }
+  if (key.startsWith("park-out-") && p?.kind === "play" && Object.hasOwn(parkErrands, key.slice(9))) {
+   if (!queueErrand(act(), "hf_park_" + key.slice(9))) { toast("Pilih kanak-kanak yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (parkJob && key.startsWith("park-") && p?.kind === "play") { parkAction(p, key); return }
+  if (key === "garden-open" && p?.kind === "garden") { gardening = true; render(); return }
+  if (key === "garden-back") { gardening = false; render(); return }
+  if (gardening && p?.kind === "garden") {
+   if (key === "garden-refresh") { render(); return }
+   const [action, id] = key.split("-");
+   if (action === "seed" && Object.hasOwn(gardenSeeds, id)) {
+    selectedSeed = id;
+    dialog.querySelectorAll('[data-kf^="seed-"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.kf === key)));
+    return;
+   }
+   const plot = gardenPlots(p)[Number(id)];
+   if (!plot) return;
+   if (action === "plant" && !plot.seed) plot.seed = selectedSeed;
+   else if (action === "water" && plot.seed && plot.watered == null) {
+    plot.watered = dayIdx();
+    if (!plot.contributed) {
+     plot.contributed = true;
+     if (!p.done) progress(p, 8);
+    }
+   } else if (action === "harvest" && harvestReady(p, plot)) {
+    const name = gardenSeeds[plot.seed][0];
+    delete plot.seed;
+    delete plot.watered;
+    S.pantry = (S.pantry || 0) + 1;
+    notify(`${name} dipetik. Satu bekalan memasak ditambah.`);
+   } else return;
+   save();
+   render();
+   dialog.querySelectorAll(".kf-plot")[Number(id)]?.querySelector("button:not([disabled])")?.focus();
+   return;
+  }
+  if (key === "bench-open" && p?.kind === "play") { buildingBench = true; render(); return }
+  if (key === "bench-back") { buildingBench = false; render(); return }
+  if (key === "bench-outing") {
+   if (!queueErrand(act(), "hf_bench")) { toast("Pilih Teman yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (buildingBench && key.startsWith("bench-") && p?.kind === "play") {
+   const b = p.bench || (p.bench = {});
+   if (key === "bench-left-angled" && !b.left) b.left = true;
+   else if (key === "bench-right-straight" && !b.right) b.right = true;
+   else if (key === "bench-left-straight" || key === "bench-right-angled") {
+    dialog.querySelector(".kf-content [role=status]").textContent = "Kaki ini belum sepadan. Cuba bentuk yang satu lagi.";
+    return;
+   } else if (key === "bench-slat" && b.left && b.right && !b.slat) b.slat = true;
+   else if (key.startsWith("bench-spot-") && b.slat && !b.spot && Object.hasOwn(benchSpots, key.slice(11))) {
+    b.spot = key.slice(11);
+    recordHelper(p, "bench");
+    if (!p.done) progress(p, 25);
+    notify("Bangku rehat siap dipasang di padang.");
+   } else return;
+   save();
+   render();
+   dialog.querySelector(".kf-content button")?.focus();
+   return;
+  }
+  if (p?.kind === "play" && key === "swing") { repairing = true; render(); return }
+  if (key === "swing-back") { repairing = false; render(); return }
+  if (key === "swing-outing") {
+   if (!queueErrand(act(), "hf_swing")) { toast("Pilih Teman yang lapang antara 8 pagi dan 6 petang."); return }
+   dialog.close();
+   return;
+  }
+  if (repairing && p?.kind === "play") {
+   const swing = p.swing || (p.swing = {});
+   const seat = key.slice(5);
+   if (key.startsWith("seat-") && Object.hasOwn(swingSeats, seat) && !swing.seat) swing.seat = seat;
+   else if (swing.seat && key === "rope-left") swing.left = true;
+   else if (swing.seat && key === "rope-right") swing.right = true;
+   else if (key === "swing-test" && swing.left && swing.right) {
+    if (!swing.tested) {
+     swing.tested = true;
+     recordHelper(p, "swing");
+     if (!p.done) progress(p, 25);
+     notify("Buaian padang siap dibaiki.");
+    }
+    render();
+    dialog.querySelector(".kf-swing,.kf-sw2")?.classList.add("swinging");
+    dialog.querySelector('[data-kf="swing-test"]')?.focus();
+    return;
+   } else return;
+   save();
+   render();
+   dialog.querySelector('.kf-content button:not([disabled])')?.focus();
+   return;
+  }
+  const h = household();
+  if (key.startsWith("vote-") && !p) {
+   S.hfVillageProject = { kind: key.slice(5), points: 0, start: dayIdx(), last: dayIdx() };
+   notify("🤝 Jiran bersetuju memulakan " + projects[S.hfVillageProject.kind].toLowerCase() + ".");
+  } else if (key === "work" || key === "outing") {
+   const activity = key === "work" ? "hf_project" : p?.kind === "play" ? "hf_playground" : "hf_communityGarden";
+   if (!queueErrand(act(), activity)) { toast("Pilih Teman yang lapang dan semak waktu buka (8 pagi)."); return }
+   dialog.close();
+   return;
+  } else if ((key === "supplies" || key === "cash") && p && !p.done && !p[key]) {
+   const price = key === "cash" ? 40 : 25;
+   if (S.money < price) { toast("Wang tidak mencukupi."); return }
+   S.money -= price;
+   p[key] = true;
+   recordHelper(p, key);
+   progress(p, key === "cash" ? 20 : 18);
+   save();
+  } else if (key === "order-start") newOrder();
+  else if (key === "stop-edit") edit = null;
+  else if (key.startsWith("edit-")) edit = h.plans[Number(key.slice(5))];
+  else if (key.startsWith("remove-")) {
+   h.plans.splice(Number(key.slice(7)), 1);
+   edit = null;
+   save();
+   syncWeek();
+  } else if (key.startsWith("cook-") || key === "lesson-start") {
+   const lesson = key === "lesson-start" ? activeLesson : h.recipes[Number(key.slice(5))], student = act();
+   const teacher = family().find(s => s.id === lesson?.teacher);
+   const stove = S.objs.find(o => ["stove", "island", "dapurkayu"].includes(o.type));
+   if (!lesson || lesson.learned || !stove || student?.id !== lesson.student ||
+       !available(student) || !available(teacher) || student.queue.length >= 5) {
+    toast("Pilih pelajar dan pastikan guru lapang serta dapur tersedia."); return;
+   }
+   const dish = DISH[lesson.dish];
+   if (lvlOf(student, "cooking") < dish.lvl || S.money < dish.cost) {
+    toast(`Perlu Memasak tahap ${dish.lvl} dan RM ${dish.cost} untuk bahan.`); return;
+   }
+   if (key !== "lesson-start") { activeLesson = lesson; render(); return }
+   if (lesson.prep !== 6 || [student.cur, ...student.queue].some(c => c?.hfFamilyRecipe === teacher.id && c.dish === lesson.dish)) {
+    toast("Semak persediaan resipi dan senarai tugasan Teman."); return;
+   }
+   enqueue(student, { type: "obj", obj: stove.id, act: "cook", dish: lesson.dish, hfFamilyRecipe: teacher.id });
+   save();
+   renderNow();
+   dialog.close();
+   return;
+  }
+  render();
+ });
+ function syncWeek() {
+  const week = $("#hfminggu"), box = week?.querySelector(".bx");
+  if (!box || week.hidden) return;
+  box.querySelectorAll("[data-kf-week-row]").forEach(el => el.remove());
+  if (!box.querySelector("[data-kf-entry]")) {
+   box.insertAdjacentHTML("beforeend", '<button type="button" class="btn" data-kf-entry="plans">📅 Janji Keluarga</button>');
+  }
+  const monday = dayIdx() - dayIdx() % 7;
+  const days = box.querySelectorAll(".dy ul");
+  for (const p of S.hfFamilyActivities?.plans || []) {
+   const ul = days[Math.floor(p.at / 1440) - monday];
+   if (ul) ul.insertAdjacentHTML("beforeend", `<li data-kf-week-row>📅 ${plans[p.kind][0]} · ${timeField(p.at)}${p.status === "missed" ? " · Terlepas" : ""}</li>`);
+  }
+ }
+ const week = $("#hfminggu");
+ if (week) new MutationObserver(records => {
+  if (records.some(r => r.target === week)) syncWeek();
+ }).observe(week, { childList: true });
+ const mapOriginal = renderMap;
+ renderMap = function () {
+  const result = mapOriginal.apply(this, arguments);
+  const info = $("#kmap .wminfo"), p = project();
+  info?.querySelector("[data-kf-map]")?.remove();
+  info?.querySelector("[data-kf-map-fence]")?.remove();
+  info?.querySelector("[data-kf-map-swing]")?.remove();
+  info?.querySelector("[data-kf-map-bench]")?.remove();
+  info?.querySelector("[data-kf-map-park]")?.remove();
+  info?.querySelector("[data-kf-map-hall]")?.remove();
+  info?.querySelector("[data-kf-map-memory]")?.remove();
+  const next = memories[memoryCount()];
+  if (info && wmSel?.startsWith("pl:")) { ensureCss(); warm() }
+  if (info && wmSel?.startsWith("pl:") && next && S.hfFamilyActivities?.memoryTrail && !S.visiting) {
+   info.insertAdjacentHTML("beforeend", `<section data-kf-map-memory><p><b>Petunjuk Atuk</b> · ${next.clue}</p>
+     <button type="button" class="btn" data-kf-inspect-memory>Periksa lokasi</button><p role="status"></p></section>`);
+  }
+  if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
+   const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
+    (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
+   info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
+   if (wmSel === "pl:balai" && hallDecoration()?.published) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-hall><p>Balai dihias untuk kenduri</p>${hallArt(hallDecoration().published)}</div>`);
+   }
+   if (wmSel === "pl:padang" && p?.park) {
+    info.insertAdjacentHTML("beforeend", `<section data-kf-map-park><p><b>Hasil pembaikan</b></p>${parkArt(p)}</section>`);
+   }
+   if (wmSel === "pl:padang" && p?.bench?.spot) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-bench><p>Bangku rehat · ${benchSpots[p.bench.spot]}</p>${benchArt(p.bench)}</div>`);
+   }
+   if (wmSel === "pl:padang" && p?.swing?.tested) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-swing><p>Buaian siap dibaiki</p>${swingArt(p.swing)}</div>`);
+   }
+   if (wmSel === "pl:padang" && p?.fence?.boards) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-fence><p>Pagar padang · ${(fenceColours[p.fence.colour] || fenceColours.green)[0]}</p>${fenceArt(p.fence, false)}</div>`);
+   }
+  }
+  return result;
+ };
+ const legacyOriginal = openLegacy;
+ openLegacy = function () {
+  const result = legacyOriginal.apply(this, arguments);
+  const book = $("#tree .tree-wrap");
+  if (book) {
+   ensureCss(); warm();
+   const entries = (S.hfFamilyActivities?.recipes || []).filter(r => r.learned);
+   const parkMemory = S.hfFamilyActivities?.parkMemory;
+   if (parkMemory && project()?.park?.trial?.done) book.insertAdjacentHTML("beforeend",
+    `<section class="card"><h3>Hari di taman bersama jiran</h3>${/^data:image\/jpeg;base64,[a-z0-9+/=]+$/i.test(parkMemory.picture || "") ? `<img class="kf-park-picture" src="${parkMemory.picture}" alt="Ilustrasi kenangan taman permainan">` : parkArt(project())}
+     <p>Hari ${parkMemory.day + 1} · ${parkMemory.names.map(esc).join(", ")}</p></section>`);
+   book.insertAdjacentHTML("beforeend", `<section class="card"><h3>Resipi Turun-Temurun</h3>
+     ${entries.map(r => `<p>${esc(DISH[r.dish].name)} · ${esc(r.teacherName)} mengajar ${esc(r.studentName)}</p>`).join("")}
+     <button class="btn" type="button" data-kf-entry="recipes">📖 Resipi keluarga</button></section>`);
+   book.insertAdjacentHTML("beforeend", `<section class="card"><h3>Jejak Kenangan Atuk</h3>
+     ${memories.slice(0, memoryCount()).map(memoryCard).join("")}
+     <button class="btn" type="button" data-kf-entry="memories">Buka jejak kenangan</button></section>`);
+  }
+  return result;
+ };
+ document.addEventListener("click", event => {
+  const inspect = event.target.closest?.("[data-kf-inspect-memory]");
+  if (inspect) {
+   const next = memories[memoryCount()];
+   if (!next || !S.hfFamilyActivities?.memoryTrail || S.visiting) return;
+   if (wmSel !== "pl:" + next.place) {
+    inspect.parentElement.querySelector("[role=status]").textContent = "Belum sepadan. Pilih tempat lain pada peta.";
+    return;
+   }
+   show("memories", inspect);
+   matchingMemory = true;
+   render();
+   return;
+  }
+  const source = event.target.closest?.("[data-kf-entry]");
+  if (source) show(source.dataset.kfEntry, source);
+ });
+ /* the entry: Keperluan (the panel with Cheats and Mula semula), a button before Cheats (the PR put it in index.html; the layer adds it so index.html stays as it is) */
+ const entry = () => {
+  const cb = document.getElementById("cheatopen");
+  if (!cb || !cb.parentNode || document.querySelector('[data-kf-entry="activities"]')) return;
+  const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.dataset.kfEntry = "activities"; b.textContent = "Kampung & Keluarga";
+  cb.parentNode.insertBefore(b, cb);
+ };
+ entry();
+ HF.kk = { show: (k, src) => show(k || "activities", src || null), state: () => ({ open: dialog.open, page, project: S.hfVillageProject || null, act: S.hfFamilyActivities || null, hall: S.hfHallDecoration || null }), plans, parts, ERR: () => Object.keys(ERR).filter(k => /^hf_(project|playground|communityGarden|swing|bench|park_)/.test(k)) };
+} catch (e) { try { console.warn("RKHF §177", e); window.RKHF && (RKHF.err = (RKHF.err || 0) + 1) } catch (e2) { } }
 
 const __go=d=>{try{start(d)}finally{try{window.rkLoaded&&window.rkLoaded()}catch(e){}}};window.claude?.hot?.ready?window.claude.hot.ready(__go):__go(window.claude?.hot?.data??{})})();
