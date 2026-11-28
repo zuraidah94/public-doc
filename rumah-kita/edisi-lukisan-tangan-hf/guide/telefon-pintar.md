@@ -2,6 +2,9 @@
 
 Ketik tab **Telefon** (ikon telefon di panel kanan/bawah). Telefon muncul sebagai popup di atas paparan rumah, tanpa menukar tab; tutup dengan Escape atau menekan ‹ hingga skrin utama. Sim mesti ada telefon; telefon butang hanya ada beberapa aplikasi. Bateri berkurang sedikit setiap kali dibuka.
 
+## Semua apl dalam satu telefon
+Semua apl telefon yang dahulu ada (WasapKita, Belanja Kita, Drama, Bank, Kalendar, SihatKu, GelekTok, Gramku, Ciap, Tema dan lain-lain) kini ikon pada skrin utama telefon baharu. Ketik ikon: apl lama dibuka di dalam bingkai telefon baharu (panel lama dibungkus), ‹ kembali ke skrin utama. Tiada lagi panel Telefon lama di tepi skrin. Ikon dilukis daripada helaian ikon lukisan sedia ada permainan.
+
 ## Skrin utama
 Jam, hari, cuaca, perayaan, kerja dan mood Sim. Bulatan merah menunjukkan mesej belum dibaca. Ikon hanya membuka ciri yang sudah ada: Peta, Rumah (Bina), Kerja, Beli-belah, Hiburan, Makanan, Sudut Cinta, Khabar Kampung dan Kamera. Dok bawah: Mesej, Kenalan, Kamera, Tetapan.
 
