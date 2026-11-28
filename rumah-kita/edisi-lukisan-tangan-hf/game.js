@@ -43812,10 +43812,36 @@ try {
      ${!seed ? button("plant-" + i, "Tanam") : plot.watered == null ? button("water-" + i, "Siram") : button("harvest-" + i, "Petik", !harvestReady(p, plot))}</section>`;
    }).join("")}</div><p>${button("garden-refresh", "Semak petak")} ${button("garden-back", "Kembali ke projek")}</p>`;
  }
+ const hallOptions = {
+  tables: { sides: ["Dua baris di tepi"], centre: ["Meja tengah"] },
+  flags: { gold: ["Kuning", "#bf8c3c"], green: ["Hijau", "#497954"], red: ["Merah", "#a55141"] },
+  pots: { door: ["Di sisi pintu"], stage: ["Di tepi pentas"] }
+ };
+ let decoratingHall = false;
+ const hallDecoration = () => S.hfHallDecoration;
+ function hallArt(hall) {
+  const count = hall.tables === "centre" ? 1 : 2;
+  return `<div class="kf-hall ${hall.tables || ""} ${hall.pots || ""}" style="--kf-flags:${hallOptions.flags[hall.flags]?.[1] || "transparent"}" aria-hidden="true">
+   <div class="kf-hall-stage"></div>
+   ${hall.flags ? '<div class="kf-hall-flags"></div>' : ''}
+   ${hall.tables ? '<div class="kf-hall-tables">' + "<span></span>".repeat(count) + "</div>" : ""}
+   ${hall.pots ? '<div class="kf-hall-pots"><span>🪴</span><span>🪴</span></div>' : ''}</div>`;
+ }
+ function hallView() {
+  const hall = hallDecoration() || {};
+  const labels = { tables: "Susunan meja", flags: "Warna bendera", pots: "Kedudukan pasu" };
+  return `${hallArt(hall)}
+   <p role="status">${hall.saved ? "Susunan disimpan untuk kenduri." : "Pilih susunan meja, bendera dan pasu."}</p>
+   ${Object.entries(hallOptions).map(([kind, options]) => `<fieldset class="kf-hall-options"><legend>${labels[kind]}</legend>
+    ${Object.entries(options).map(([id, [label]]) => `<button type="button" class="btn" data-kf="hall-${kind}-${id}" aria-pressed="${hall[kind] === id}">${label}</button>`).join(" ")}</fieldset>`).join("")}
+   <div class="acts">${button("hall-save", "Siapkan balai", !hall.tables || !hall.flags || !hall.pots || hall.saved)}
+   ${button("hall-back", "Kembali")}</div>`;
+ }
+ const hallButton = () => button("hall-open", hallDecoration()?.saved ? "Ubah hiasan balai" : "Hias Balai Raya");
  function projectView() {
   const p = project();
   if (!p) return `<p>Pilih projek untuk diusahakan bersama jiran di Balai Raya.</p>
-   <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)}</div>`;
+   <div class="acts">${button("vote-play", projects.play)} ${button("vote-garden", projects.garden)} ${hallButton()}</div>`;
   const paintButton = p.kind === "play" ? button("paint", p.fence?.boards ? "Sambung cat pagar" : "Cat Pagar Padang") : "";
   const swingButton = p.kind === "play" ? button("swing", p.swing?.tested ? "Lihat buaian" : p.swing?.seat ? "Sambung baiki buaian" : "Baiki Buaian") : "";
   const benchButton = p.kind === "play" ? button("bench-open", p.bench?.spot ? "Lihat bangku" : p.bench?.left || p.bench?.right ? "Sambung pasang bangku" : "Pasang Bangku Rehat") : "";
@@ -43823,13 +43849,13 @@ try {
   if (p.done) return `<p><b>${projects[p.kind]} siap!</b></p>
    <p>${p.kind === "play" ? "Taman permainan kini dibuka di Padang." : "Petik hasil bersama jiran di Balai Raya."}</p>
    ${p.kind === "play" && p.fence?.boards ? fenceArt(p.fence, false) : ""}
-   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${benchButton} ${gardenButton} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}</div>`;
+   <div class="acts">${button("outing", p.kind === "play" ? "Bermain di taman permainan" : "Petik pisang bersama jiran")} ${paintButton} ${swingButton} ${benchButton} ${gardenButton} ${hallButton()} ${p.swing?.tested ? button("swing-outing", "Main buaian") : ""} ${p.bench?.spot ? button("bench-outing", "Duduk dan bersembang") : ""}</div>`;
   return `<p><b>${projects[p.kind]}</b> · ${p.points}%</p>
    <progress max="100" value="${p.points}" aria-label="Kemajuan projek"></progress>
    <p>Jiran menyumbang setiap hari. Projek mengambil sekurang-kurangnya dua hari.</p>
    <div class="acts">${button("work", "Sertai sesi kerja", p.work === dayIdx())}
    ${button("supplies", "Belikan cat dan peralatan · RM 25", p.supplies)}
-   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton} ${benchButton} ${gardenButton}</div>`;
+   ${button("cash", "Sumbang RM 40", p.cash)} ${paintButton} ${swingButton} ${benchButton} ${gardenButton} ${hallButton()}</div>`;
  }
  function plansView() {
   const h = household(), p = edit;
@@ -43871,23 +43897,24 @@ try {
    ${o ? `<p><b>${status}</b> · Tarikh tutup hari ${o.due + 1}</p>` : ""}
    <ul>${Object.entries(parts).map(([k, label]) => `<li>${label}${o ? (o.done[k] ? " · Dihantar" : " · Belum dihantar") : ""}</li>`).join("")}</ul>
    ${!o || dayIdx() > o.due ? button("order-start", "Terima pesanan Balai Raya") : ""}
+   <section><h3>Persiapan Balai Raya</h3>${o && hallDecoration()?.published ? hallArt(hallDecoration().published) : ""}${hallButton()}</section>
    <p class="hint">Perlu Kedai Kecil yang menjual kuih lapis dan bisnes Gubah Hantaran. Bekalan buah boleh dibeli atau dipetik.</p>`;
  }
  function render() {
   const me = act();
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
   if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
   flushPaint();
-  painting = false; repairing = false; buildingBench = false; gardening = false;
+  painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false;
   page = next;
   edit = null;
   returnTo = source || document.activeElement;
@@ -43971,7 +43998,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -43989,6 +44016,29 @@ try {
    return;
   }
   const p = project();
+  if (key === "hall-open") { decoratingHall = true; render(); return }
+  if (key === "hall-back") { decoratingHall = false; render(); return }
+  if (decoratingHall && key.startsWith("hall-")) {
+   const hall = hallDecoration() || (S.hfHallDecoration = {});
+   if (key === "hall-save" && hall.tables && hall.flags && hall.pots && !hall.saved) {
+    hall.saved = true;
+    hall.published = { tables: hall.tables, flags: hall.flags, pots: hall.pots };
+    if (!hall.rewarded) {
+     hall.rewarded = true;
+     if (p && !p.done) progress(p, 15);
+    }
+    notify("Balai Raya siap dihias untuk kenduri.");
+   } else {
+    const [, kind, choice] = key.split("-");
+    if (!Object.hasOwn(hallOptions, kind) || !Object.hasOwn(hallOptions[kind], choice) || hall[kind] === choice) return;
+    hall[kind] = choice;
+    hall.saved = false;
+    save();
+   }
+   render();
+   dialog.querySelector(`[data-kf="${key}"]:not([disabled])`)?.focus();
+   return;
+  }
   if (key === "garden-open" && p?.kind === "garden") { gardening = true; render(); return }
   if (key === "garden-back") { gardening = false; render(); return }
   if (gardening && p?.kind === "garden") {
@@ -44143,10 +44193,14 @@ try {
   info?.querySelector("[data-kf-map-fence]")?.remove();
   info?.querySelector("[data-kf-map-swing]")?.remove();
   info?.querySelector("[data-kf-map-bench]")?.remove();
+  info?.querySelector("[data-kf-map-hall]")?.remove();
   if (info && (wmSel === "pl:balai" || (wmSel === "pl:padang" && p?.done && p.kind === "play"))) {
    const label = p?.done && (wmSel === "pl:padang" || p.kind === "garden") ?
     (p.kind === "play" ? "🛝 Taman permainan · Dibuka" : "🌱 Kebun komuniti · Dibuka") : "🤝 Projek Kampung";
    info.insertAdjacentHTML("beforeend", `<button type="button" class="btn" data-kf-map data-kf-entry="project">${label}</button>`);
+   if (wmSel === "pl:balai" && hallDecoration()?.published) {
+    info.insertAdjacentHTML("beforeend", `<div data-kf-map-hall><p>Balai dihias untuk kenduri</p>${hallArt(hallDecoration().published)}</div>`);
+   }
    if (wmSel === "pl:padang" && p?.bench?.spot) {
     info.insertAdjacentHTML("beforeend", `<div data-kf-map-bench><p>Bangku rehat · ${benchSpots[p.bench.spot]}</p>${benchArt(p.bench)}</div>`);
    }

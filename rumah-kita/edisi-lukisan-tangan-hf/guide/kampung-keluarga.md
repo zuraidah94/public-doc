@@ -16,6 +16,8 @@ Pilih **Pasang Bangku Rehat**. Padankan kaki serong ke kiri dan kaki tegak ke ka
 
 Untuk projek kebun, buka **Tanam Kebun Komuniti**. Pilih benih cili, serai atau pandan, kemudian tanam dan siram. Siraman pertama bagi setiap petak menyumbang 8 mata jika projek masih berjalan. Petik tanaman dua hari selepas disiram, apabila kebun dibuka, untuk menambah bekalan memasak.
 
+Buka **Hias Balai Raya** melalui **Projek Kampung** atau **Pesanan Sekampung**. Pilih susunan meja, warna bendera dan tempat pasu, kemudian tekan **Siapkan balai**. Susunan siap dipaparkan pada kad Balai Raya dan dalam pesanan kenduri yang aktif.
+
 ## Janji Keluarga
 
 Pilih aktiviti, hari, jam dan ahli keluarga. Semak pertindihan jadual kerja atau sekolah sebelum menekan **Buat janji**.
