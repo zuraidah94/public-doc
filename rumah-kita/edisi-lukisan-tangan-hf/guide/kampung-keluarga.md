@@ -22,6 +22,8 @@ Buka **Hias Balai Raya** melalui **Projek Kampung** atau **Pesanan Sekampung**. 
 
 Pilih aktiviti, hari, jam dan ahli keluarga. Semak pertindihan jadual kerja atau sekolah sebelum menekan **Buat janji**.
 
+Buka **Cari Masa Bersama** untuk bandingkan waktu dalam tiga hari terdekat. Ketik satu waktu dan lihat potret Teman yang lapang atau ada jadual lain. Waktu yang dipilih mengisi borang. Tekan **Buat janji** untuk menyimpannya dalam **Minggu Ini**.
+
 ![Borang Janji Keluarga dengan potret Nadia](janji-keluarga.png)
 
 ## Resipi Turun-Temurun

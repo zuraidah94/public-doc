@@ -43868,6 +43868,11 @@ try {
    <fieldset><legend>Ahli keluarga</legend><div class="kf-people">${people.map(s => `
     <label class="kf-person"><input type="checkbox" name="guest" value="${s.id}" ${(p ? p.guests.includes(s.id) : s === act()) ? "checked" : ""}>
      ${face(s)} <span>${esc(s.name)}</span></label>`).join("")}</div></fieldset>
+   <details class="kf-calendar" data-kf-calendar>
+    <summary>Cari Masa Bersama</summary>
+    <p>Ketik waktu untuk lihat jadual Teman. Pilih waktu yang lapang, kemudian simpan janji.</p>
+    <div class="kf-slots" data-kf-slots></div><div class="kf-slot-people" data-kf-slot-people aria-live="polite"></div>
+   </details>
    <p class="hint" data-kf-conflicts aria-live="polite"></p>
    <button class="btn pri" type="submit">${p ? "Simpan jadual baharu" : "Buat janji"}</button>
    ${p ? button("stop-edit", "Batal sunting") : ""}
@@ -43938,19 +43943,54 @@ try {
   return { kind: data.get("kind"), at: (Number(data.get("day")) - 1) * 1440 + Number(data.get("hour")) * 60,
    guests: data.getAll("guest").map(Number) };
  }
+ function appointmentConflict(sim, at) {
+  if (household().plans.some(p => p !== edit && !p.status && Math.abs(p.at - at) < 60 && p.guests.includes(sim.id))) return "janji lain";
+  return conflict(sim, at);
+ }
  function planIssues(p) {
-  return family().filter(s => p.guests.includes(s.id)).map(s => {
-   const why = conflict(s, p.at);
-   return why ? `${s.name} (${why})` : "";
+  return family().filter(sim => p.guests.includes(sim.id)).map(sim => {
+   const why = appointmentConflict(sim, p.at);
+   return why ? `${sim.name} (${why})` : "";
   }).filter(Boolean);
  }
- function previewConflicts() {
+ function venueOpen(p) {
+  const errand = plans[p.kind]?.[1], hour = p.at % 1440 / 60;
+  return !errand || (ERR[errand].when?.(Math.floor(p.at / 1440), hour) ?? (hour >= 7 && hour < 22));
+ }
+ function refreshCalendar(form, keepSlots = false) {
+  const calendar = form.querySelector("[data-kf-calendar]");
+  if (!calendar.open) return;
+  const p = readPlan(form);
+  const days = Array.from({ length: 3 }, (_, i) => dayIdx() + i);
+  const people = family().filter(sim => p.guests.includes(sim.id));
+  const slots = calendar.querySelector("[data-kf-slots]");
+  if (!keepSlots) slots.innerHTML = days.map(day => {
+   const options = [9, 12, 16, 18].map(hour => day * 1440 + hour * 60).filter(at => at > S.t);
+   if (!options.length) return "";
+   return `<fieldset><legend>Hari ${day + 1}</legend>${options.map(at => {
+    const total = people.filter(sim => !appointmentConflict(sim, at)).length;
+    const label = !venueOpen({ kind: p.kind, at }) ? "Tempat tutup" : people.length ? `${total}/${people.length} lapang` : "Pilih Teman";
+    return `<button class="btn" type="button" data-kf-slot="${at}"><b>${fmtT(at)}</b><small>${label}</small></button>`;
+   }).join("")}</fieldset>`;
+  }).join("");
+  slots.querySelectorAll("[data-kf-slot]").forEach(b => b.setAttribute("aria-pressed", String(Number(b.dataset.kfSlot) === p.at)));
+  const review = calendar.querySelector("[data-kf-slot-people]");
+  review.innerHTML = people.length ? `<p><b>${when(p.at)}</b>${venueOpen(p) ? "" : " · Tempat tutup"}</p><div class="kf-people">${people.map(sim => {
+   const why = appointmentConflict(sim, p.at);
+   return `<div class="kf-person">${face(sim)}<span>${esc(sim.name)}<small>${why ? esc(why) : "Lapang"}</small></span></div>`;
+  }).join("")}</div>` : "<p>Pilih sekurang-kurangnya seorang Teman.</p>";
+ }
+ function previewConflicts(keepSlots = false) {
   const form = dialog.querySelector("#hfkf-plan");
   if (!form) return;
-  const issues = planIssues(readPlan(form));
+  const p = readPlan(form), issues = planIssues(p);
   form.querySelector("[data-kf-conflicts]").textContent = issues.length ? "Pertindihan jadual: " + issues.join(", ") : "";
+  refreshCalendar(form, keepSlots);
  }
- dialog.addEventListener("input", previewConflicts);
+ dialog.addEventListener("input", () => previewConflicts());
+ dialog.addEventListener("toggle", event => {
+  if (event.target.matches("[data-kf-calendar]")) previewConflicts();
+ }, true);
  dialog.addEventListener("close", () => {
   if (dialog.open) return;
   flushPaint();
@@ -43961,12 +44001,11 @@ try {
   event.preventDefault();
   const form = event.target, h = household();
   if (form.id === "hfkf-plan") {
-   const p = readPlan(form), errand = plans[p.kind]?.[1];
+   const p = readPlan(form);
    if (!Object.hasOwn(plans, p.kind) || !Number.isFinite(p.at) || p.at <= S.t || !p.guests.length) {
     toast("Pilih masa akan datang dan sekurang-kurangnya seorang ahli keluarga."); return;
    }
-   const hour = p.at % 1440 / 60;
-   if (errand && !(ERR[errand].when?.(Math.floor(p.at / 1440), hour) ?? (hour >= 7 && hour < 22))) {
+   if (!venueOpen(p)) {
     toast("Tempat ini tidak dibuka pada masa yang dipilih."); return;
    }
    if (planIssues(p).length) { toast("Pilih masa yang sesuai untuk semua ahli keluarga."); return }
@@ -43993,6 +44032,14 @@ try {
   render();
  });
  dialog.addEventListener("click", event => {
+  const slot = event.target.closest("[data-kf-slot]");
+  if (slot) {
+   const at = Number(slot.dataset.kfSlot), form = slot.closest("form");
+   form.elements.day.value = Math.floor(at / 1440) + 1;
+   form.elements.hour.value = Math.floor(at % 1440 / 60);
+   previewConflicts(true);
+   return;
+  }
   const board = event.target.closest("[data-kf-plank]");
   if (board) { paintBoard(board); flushPaint(); return }
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
