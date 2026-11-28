@@ -22578,6 +22578,7 @@ ${W.fam ? famKites() : ""}${W.nb ? `<div class="kite wnb" data-wakn="1" style="l
      = the release's ?v= in index.html (tools/publish_build.py refuses to build when the newest key is not that version);
      a new key shows the card once on each device */
   const BARU = [
+   ["hf146", "28 Nov 2026", ["📱 Antara muka telefon lama diganti telefon baharu; semua 56 apl dibuka dalam bingkai telefon", "🎨 Ikon apl lukisan tangan yang seragam pada skrin utama", "🧹 Panel telefon lama tidak lagi dipaparkan", "💾 Simpanan kekal seperti biasa"]],
    ["hf145", "28 Nov 2026", ["📱 Telefon pintar: casing 3D dan HF, charm gelung bulat, wallpaper, dan satu tempat Tema untuk semua", "💬 Kecoh digabung dengan Gramku dan Ciap dalam satu apl sosial", "🛒 Pasar Kilat: kedai online dengan kupon, harga kumpulan, ulasan dan troli", "🏠 Semua rumah kini 3D: kampung, bertingkat, estet dan istana; simpanan lama dipindah sendiri", "💰 Cukai naik pada teres 2 tingkat dan banglo 3-4 tingkat", "🧹 Aset rumah dan perabot lama dibuang"]],
    ["hf144", "28 Nov 2026", ["🗺️ Ikon Peta dan kad kedai kini bangunan kecil yang seragam dengan sekolah dan hospital (tiada kotak atau bulatan)", "🧍 Pose Nadia: menonton TV dan mengisi mesin basuh dilukis semula, termasuk rehat dan menyiram pokok", "⚡ Fail permainan lebih kecil kira-kira 135 KB"]],
    ["hf143", "28 Nov 2026", ["🏠 Baru: Bilik Sewa Murah kini rumah 3D, dengan perabot model dan dinding hangat; simpanan Bilik Murah lama dipindahkan sendiri", "🏡 Baru: Kampung & Keluarga di Keperluan: Projek Kampung (pagar, buaian, bangku, kebun, Balai Raya), Janji Keluarga, Resipi Turun-Temurun, Pesanan Sekampung dan Jejak Kenangan Atuk, dilukis sebagai diorama", "🛠️ Baiki: meja dan bangku lukisan lama tidak lagi muncul di atas perabot 3D, termasuk semasa digunakan", "⚡ Lebih pantas: ketik pin pada Peta kini terus memberi respons, dan imej watak menggunakan memori lebih sedikit pada telefon"]],
@@ -46387,8 +46388,9 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
 #hfph .wg .md{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.28);font:800 12px system-ui}
 #hfph .gr{flex:1 1 auto;min-height:0;overflow:auto;align-content:start;padding:4px 0 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px 6px}
 #hfph .ic{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;padding:0;min-height:72px;color:var(--lab)}
-#hfph .ic i{display:grid;place-items:center;width:56px;height:56px;border-radius:17px;background:rgba(255,255,255,.88);font-style:normal;font-size:27px;box-shadow:0 3px 8px rgba(0,0,0,.22)}
-#hfph .ic span{font:800 11.5px/1.15 system-ui;text-shadow:0 1px 3px rgba(0,0,0,.5);text-align:center;max-width:76px}
+#hfph .ic .ico{display:grid;place-items:center;width:56px;height:56px;border-radius:17px;background:rgba(255,255,255,.88);font-size:27px;box-shadow:0 3px 8px rgba(0,0,0,.22);overflow:hidden}
+#hfph .ic .ico img{width:100%;height:100%;object-fit:cover;display:block}
+#hfph .ic .lb{font:800 11.5px/1.15 system-ui;text-shadow:0 1px 3px rgba(0,0,0,.5);text-align:center;max-width:76px}
 #hfph .dot{position:absolute;top:-4px;right:6px;min-width:19px;height:19px;border-radius:10px;background:#e0302b;color:#fff;font:800 11px/19px system-ui;text-align:center;padding:0 4px;box-sizing:border-box;border:2px solid rgba(255,255,255,.9)}
 #hfph .dk{margin-top:6px;flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 8px;border-radius:26px;background:rgba(255,255,255,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 #hfph .dk .ic{min-height:64px}
@@ -46468,6 +46470,14 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
 #hfph .intro .row{display:flex;gap:8px;margin-top:12px}
 #hfph .intro .row button{flex:1}
 #hfph .sch{margin:0 12px 8px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--ln);background:var(--card);width:calc(100% - 24px);box-sizing:border-box;min-height:44px;color:var(--fg);font:600 14px system-ui}
+#hfph .lgw{padding:8px;background:var(--wp)}
+#hfph .lgw #p-phone{display:block;padding:0;margin:0}
+#hfph .lgw #p-phone>div{background:none!important;border:0!important;padding:0!important;box-shadow:none!important;max-width:none!important;border-radius:0!important}
+#hfph .lgw #p-phone>div>div:first-child{max-height:none!important;min-height:0!important;border-radius:16px!important;padding:8px!important}
+#hfph .lgw [data-phhome],#hfph .lgw #p-phone>p.hint{display:none}
+#hfph .lgw button{min-height:44px}
+#hfph .lgw .sheet{position:static!important;inset:auto!important;border:0;border-radius:12px;box-shadow:none;overflow:visible!important;background:rgba(255,255,255,.94);color:#222;display:block;margin:6px 0;z-index:auto!important}
+#hfph .lgw .sheet.hid2{display:none}
 #hfpop{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:91;max-width:min(360px,92vw);width:max-content;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:18px;background:rgba(32,24,18,.94);color:#fff;border:0;font:700 13.5px system-ui;box-shadow:0 6px 20px rgba(0,0,0,.4);min-height:48px;text-align:left}
 #hfpop[hidden]{display:none}
 #hfpop b{display:block;font-weight:800}
@@ -46657,7 +46667,7 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
   }
  };
  /* ---- views: home, settings, messages ---- */
- const LEG = { news: 1, weather: 1, store: 1 };
+ 
  const ICONS = () => {
   const a = me(), sm = smartOf(a), ad = a && ["teen", "adult", "elder"].includes(a.stage), L = [["msg", "💬", "Mesej"]];
   if (sm) L.push(["kecoh", "🗣️", "Kecoh"], ["trend", "🔥", "Trend"]);
@@ -46665,7 +46675,7 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
   if (sm) L.push(["pasar", "🛒", "Pasar Kilat"]);
   if (ad) L.push(["kerja", "💼", "Kerja"]);
   /* every app the game's own phone already has, as icons on this home screen (the old Telefon tab view stays for Berita, Cuaca and Tukar Telefon) */
-  try { for (const [k, ic, l] of APPS) { if (k === "call" || k === "cam" || k === "belanja" || k.indexOf("so_") === 0) continue; if (!appOk(a, k)) continue; L.push(["app:" + k, ic, k === "jodoh" ? "Sudut Cinta" : k === "mart" ? "Beli-belah" : l]) } } catch (e) { fail(e) }
+  try { for (const [k, ic, l] of APPS) { if (k === "call" || k === "cam") continue; if (!appOk(a, k)) continue; L.push(["app:" + k, ic, k === "jodoh" ? "Sudut Cinta" : k === "mart" ? "Beli-belah" : l]) } } catch (e) { fail(e) }
   L.push(["khabar", "📣", "Khabar"]);
   return L;
  };
@@ -46675,7 +46685,9 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
   const a = me(), w = wthr(), f = fest(), fn = festNear(), md = (() => { try { return moodLabel(mood(a)) } catch (e) { return "" } })(), job = a.job && a.job.career ? `💼 Kerja: ${E(String(a.job.career).replace(/^./, c => c.toUpperCase()))}` : "";
   const fline = f ? `${f.icon || "🎉"} Hari ini: ${E(f.name)}` : fn ? `🗓️ ${E(fn.f.name)} dalam ${fn.inDays} hari` : "";
   const un = unreadTot(), al = (ph(false) || {}).alu || 0;
-  const ic = (k, e, l, n) => `<button class="ic" type="button" data-a="ic" data-v="${k}"><i aria-hidden="true">${e}</i><span>${l}</span>${bdg(n)}</button>`;
+  const ICOAPP = { msg: "wa", msgs: "call", kecoh: "so_book", trend: "drama", peta: "where", rumah: "hartanah", kerja: "so_link", pasar: "belanja", khabar: "warta", cam: "cam", set: "panduan" };
+  /* data-app + a first <span> make the layer paint the icon from its existing painted phone-icon sheet (no new file); apps without a painted icon keep the emoji */
+  const ic = (k, e, l, n) => { const dk = k.indexOf("app:") === 0 ? k.slice(4) : ICOAPP[k]; return `<button class="ic" type="button" data-a="ic" data-v="${k}"${dk ? ` data-app="${dk}"` : ""}><span class="ico" aria-hidden="true">${e}</span><b class="lb">${l}</b>${bdg(n)}</button>` };
   const dock = [["msg", "💬", "Mesej", un], ["msgs", "👥", "Kenalan", 0]].concat((() => { try { return appOk(a, "cam") ? [["cam", "📷", "Kamera", 0]] : [] } catch (e) { return [] } })(), [["set", "⚙️", "Tetapan", 0]]);
   return `<div class="home"><div class="wg"><div class="tm">${clk()}</div><p>${dayName()} · ${w[0]} ${w[1]}, ${w[2]}°C</p>${fline ? `<p>${fline}</p>` : ""}${job ? `<p>${job}</p>` : ""}<span class="md">${E(md)}</span></div>
   <div class="gr">${ICONS().map(([k, e, l]) => ic(k, e, l, k === "msg" ? un : k === "kecoh" ? al : 0)).join("")}</div>
@@ -47175,10 +47187,12 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
   if (!UI) return; const t = themeW(); UI.querySelector(".hfp").style.cssText = THEMEVARS(t);
   { const a0 = me(), ff = UI.querySelector(".hff"), bw = UI.querySelector(".bkw"), ch = charmOf(a0); ff.hidden = VIEW.v === "back"; bw.hidden = VIEW.v !== "back"; bw.style.cssText = THEMEVARS(t); ff.style.cssText = caseFront(a0, curCase(a0)); ff.classList.toggle("hc", ch !== "tiada"); const old = ff.querySelector(".hfch"); if (old) old.remove(); if (ch !== "tiada") ff.insertAdjacentHTML("beforeend", `<div class="hfch">${charmImg(ch, 112)}</div>`); if (VIEW.v === "back") bw.innerHTML = vBack(); }
   const a = me(); UI.querySelector(".st").innerHTML = `<span>${clk()}</span><span>${E((() => { try { return PHONES[phoneOf(a)].n } catch (e) { return first(a.name) } })())}</span><span>📶 🔋${(() => { try { return Math.round(batt(a)) } catch (e) { return 100 } })()}%</span>`;
+  if (VIEW.v !== "lg" && VIEW.v !== "lgwa") lgUnmount();
   if (VIEW.v === "back") return;
   const bd = UI.querySelector(".hfc"); let h = "";
-  switch (VIEW.v) { case "home": h = vHome(); break; case "set": h = `<div class="hd"><button class="bt" type="button" data-a="home" aria-label="Skrin utama">‹</button><h3>Tetapan</h3></div><div class="hfb">${vSet()}</div>`; break; case "msgs": h = vMsgs(); break; case "new": h = vNew(); break; case "chat": h = vChat(); break; case "kecoh": h = vKecoh(); break; case "post": h = vPost(); break; case "shop": h = vShop(); break; default: h = vHome() }
+  switch (VIEW.v) { case "home": h = vHome(); break; case "set": h = `<div class="hd"><button class="bt" type="button" data-a="home" aria-label="Skrin utama">‹</button><h3>Tetapan</h3></div><div class="hfb">${vSet()}</div>`; break; case "msgs": h = vMsgs(); break; case "new": h = vNew(); break; case "chat": h = vChat(); break; case "kecoh": h = vKecoh(); break; case "post": h = vPost(); break; case "shop": h = vShop(); break; case "lg": h = vLg(false); break; case "lgwa": h = vLg(true); break; default: h = vHome() }
   bd.innerHTML = h; if (VIEW.v === "chat") chatUpd();
+  if (VIEW.v === "lg" || VIEW.v === "lgwa") lgMount(VIEW.v === "lgwa", VIEW.k);
   if (VIEW.v === "kecoh") { const P = ph(); if (VIEW.tab === "al" && P.alu) { P.alu = 0; badges() } }
  }
  const go = (v, o) => { VIEW = Object.assign({ v }, o || {}); draw() };
@@ -47187,7 +47201,7 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
   document.head.insertAdjacentHTML("beforeend", css());
   document.body.insertAdjacentHTML("beforeend", `<div id="hfph" hidden role="dialog" aria-modal="true" aria-label="Telefon pintar"><div class="hff"><div class="hfp"><div class="st"></div><div class="hfc" style="display:flex;flex-direction:column;flex:1 1 auto;min-height:0"></div></div></div><div class="bkw" hidden></div></div>`);
   UI = document.getElementById("hfph");
-  UI.addEventListener("click", ev => { try { onClick(ev) } catch (e) { fail(e) } });
+  UI.addEventListener("click", ev => { try { onClick(ev) } catch (e) { fail(e) } if (VIEW.v === "lgwa" || VIEW.v === "lg") setTimeout(() => { try { if ((VIEW.v === "lgwa" || VIEW.v === "lg") && LG.sh.length && LG.sh.every(x => x.e.hidden) && (VIEW.v === "lgwa" || phoneView === "home")) go("home") } catch (e) { fail(e) } }, 60) });
   UI.addEventListener("input", ev => { try { const t = ev.target; if (t.id === "hfphsch") document.getElementById("hfphlist").innerHTML = newList(t.value); else if (t.id === "hfphss") { VIEW.q = t.value; VIEW.pg = 0; const l = document.getElementById("hfphshl"); if (l) l.innerHTML = shopList(); } else if (t.id === "hfphtx") { VIEW.draft.x = t.value; document.getElementById("hfphcnt").textContent = t.value.length + "/140" } } catch (e) { fail(e) } });
   UI.addEventListener("change", ev => { try { if (ev.target.id === "hfphtag") VIEW.draft.tag = ev.target.value } catch (e) { fail(e) } });
   UI.addEventListener("keydown", ev => { try { if (ev.key === "Enter" && ev.target.id === "hfphin") { ev.preventDefault(); sendTyped() } else if ((ev.key === "Enter" || ev.key === " ") && ev.target.dataset && ev.target.dataset.a === "rx") { ev.preventDefault(); ev.target.click() } } catch (e) { fail(e) } });
@@ -47208,7 +47222,7 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
    case "pt": { const a2 = me(); VIEW.pt = v; if (v === "tiada" || own(a2, "hfCharms").includes(v)) a2.hfCharm = { t: v }; draw(); break }
    case "wp": me().phoneWP = v === "auto" ? null : v; draw(); break;
    case "shop": go("shop", { sc: VIEW.bt === "charm" ? "charm" : "casing", from: "back" }); break;
-   case "sc": if (v === "old") { out2(() => { st0("phone"); phoneView = "belanja"; renderPhone() }); break } VIEW.it = null; if (v === "cart") { VIEW.cart = true } else { VIEW.cart = false; VIEW.sc = v; VIEW.pg = 0 } draw(); break;
+   case "sc": if (v === "old") { go("lg", { k: "belanja" }); break } VIEW.it = null; if (v === "cart") { VIEW.cart = true } else { VIEW.cart = false; VIEW.sc = v; VIEW.pg = 0 } draw(); break;
    case "spg": VIEW.pg = (VIEW.pg || 0) + +v; draw(); break;
    case "pd": VIEW.it = v; draw(); break;
    case "ac": { const P2 = PP(), l = P2.cart.find(z => z.id === v); if (l) l.q = Math.min(9, l.q + 1); else if (P2.cart.length < 12) P2.cart.push({ id: v, q: 1 }); VIEW.it = null; toast("🛒 Ditambah ke troli."); draw(); break }
@@ -47252,16 +47266,55 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
    case "kh": close(); try { HF.khabar.open(null) } catch (e) { fail(e) } break;
   }
  }
+ /* ---- the old phone apps (everything PHONEV / openApp / the WasapKita sheet) now live inside this popup: the game's own #p-phone (or #wa) is moved into the host while an app is open and moved back after, so every old function, view and handler stays exactly as it was ---- */
+ const LG = { on: 0, busy: 0, prev: null, pHome: null, sh: [] };
+ /* old sheets an app opens (Drama, WasapKita, Majlis, Simpan … every .sheet except the big map) are moved into the host and wear the new frame; the map is a game screen: the popup closes and the map shows */
+ const hostSheets = host => {
+  const L = [...document.querySelectorAll(".sheet:not([hidden])")].filter(e => !host.contains(e) && e.id !== "kmap");
+  for (const e of L) { LG.sh.push({ e, p: e.parentNode, n: e.nextSibling }); host.appendChild(e) }
+  return L.length;
+ };
+ const mapOpen = () => { const m = document.getElementById("kmap"); return !!(m && !m.hidden) };
+ function lgMount(wa, k) {
+  const host = document.getElementById("hfphlg"); if (!host) return;
+  if (!LG.on) { LG.prev = tab; LG.on = 1 }
+  LG.busy = 1;
+  try {
+   if (wa) LG.owa();
+   else {
+    const pp = document.getElementById("p-phone"); if (pp.parentNode !== host) { LG.pHome = { p: pp.parentNode, n: pp.nextSibling }; host.appendChild(pp) }
+    pp.hidden = false; tab = "phone"; phoneView = "home"; phoneCapT = performance.now();
+    LG.oa(k);
+   }
+  } catch (e) { fail(e) } finally { LG.busy = 0 }
+  hostSheets(host);
+  if (mapOpen()) { setTimeout(close, 0); return }
+  setTimeout(() => { try {
+   if (!LG.on || (VIEW.v !== "lg" && VIEW.v !== "lgwa")) return; const h = document.getElementById("hfphlg"); if (!h) return;
+   hostSheets(h); if (mapOpen()) { close(); return }
+   if (!wa && phoneView === "home" && !LG.sh.some(x => !x.e.hidden)) go("home")
+  } catch (e) { fail(e) } }, 160);
+ }
+ function lgUnmount() {
+  if (!LG.on) return;
+  try {
+   const pp = document.getElementById("p-phone"); if (LG.pHome) { LG.pHome.p.insertBefore(pp, LG.pHome.n) } pp.hidden = true;
+   for (const x of LG.sh.splice(0)) { x.p.insertBefore(x.e, x.n); x.e.hidden = true }
+   tab = LG.prev || "needs"; phoneView = "home";
+  } catch (e) { fail(e) }
+  LG.on = 0; LG.pHome = null;
+ }
+ function vLg(wa) { const k = VIEW.k, nm = wa ? "WasapKita" : ((APPS.find(x => x[0] === k) || [0, 0, "Aplikasi"])[2]); return `<div class="hd"><button class="bt" type="button" data-a="home" aria-label="Skrin utama">‹</button><h3>${E(nm)}</h3></div><div class="hfb lgw" id="hfphlg"></div>` }
  const out2 = f => { close(); try { f() } catch (e) { fail(e) } };
  function icon(k) {
   const a = me();
   if (k === "pasar") { go("shop", { sc: "u" }); return }
   if (k === "app:theme") { go("back", { bt: "case" }); return }
-  if (k.indexOf("app:") === 0) { const ak = k.slice(4); out2(() => { if (LEG[ak]) { try { if (batt(a) <= 0) { toast("🪫 Bateri habis. Tekan 🔌 Cas telefon."); return } } catch (e) { } st0("phone"); phoneView = ak; renderPhone() } else { if (PHONEV[ak] || ak === "bank" || ak === "cam" || ak === "theme") st0("phone"); openApp(ak) } }); return }
+  if (k.indexOf("app:") === 0) { const ak = k.slice(4); if (ak === "wa") go("lgwa", { k: "wa" }); else go("lg", { k: ak }); return }
   const out = f => { close(); try { f() } catch (e) { fail(e) } };
   switch (k) {
    case "msg": case "msgs": go("msgs"); break; case "kecoh": go("kecoh", { tab: "feed" }); break; case "trend": go("kecoh", { tab: "trend", ft: "trend" }); break;
-   case "set": go("set"); break; case "cam": out(() => { st0("phone"); openApp("cam") }); break;
+   case "set": go("set"); break; case "cam": go("lg", { k: "cam" }); break;
    case "peta": out(() => openMap()); break; case "rumah": out(() => setTab("buy")); break; case "kerja": out(() => setTab("career")); break;
    case "beli": out(() => openApp("mart")); break; case "hibur": out(() => openApp("game")); break; case "makan": out(() => openApp("food")); break;
    case "khabar": out(() => HF.khabar.open(null)); break;
@@ -47273,16 +47326,17 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
    if (!smartOfAny(a)) { toast(isBaby(a) ? "Bayi belum boleh guna telefon 😄" : `${a.name} belum ada telefon. Beli di Kedai Telefon atau Epal Store.`); return }
    try { if (batt(a) <= 0) { toast("🪫 Bateri habis. Cas di tab Telefon."); return } useBatt(a, .5) } catch (e) { }
    const P = ph(); P.on = 1; cleanDup(); build(); SIM = a.id; UI.hidden = false; const p = document.getElementById("hfpop"); if (p) p.hidden = true;
-   VIEW = v === "chat" ? { v: "chat", k } : { v: v || "home" }; draw(); badges();
+   VIEW = v === "chat" || v === "lg" || v === "lgwa" ? { v, k } : { v: v || "home" }; draw(); badges();
    const x = UI.querySelector("[data-a]"); if (x && x.focus) UI.querySelector(".hfp").setAttribute("tabindex", "-1");
   } catch (e) { fail(e) }
  }
- function close() { if (UI) UI.hidden = true; badges() }
+ function close() { if (UI) UI.hidden = true; lgUnmount(); badges() }
  /* ---- entry buttons and poll ---- */
  /* the entry is the game's own Telefon tab: a tap on it pops the phone up over the house instead of switching tab (one capture listener on that one button, added once) */
  const ensure = () => { };
  /* a tap on the Telefon tab pops the phone up (setTab("phone") called from a click inside .tabs); every other setTab("phone") call (the layer's warm-up, "Berita/Cuaca/Tukar Telefon" icons) still shows the old view */
- try { const st1 = setTab; setTab = function (t) { try { const e = window.event; if (t === "phone" && e && /^(click|pointerdown|pointerup|mousedown|touchstart|touchend|keydown)$/.test(e.type) && e.target && e.target.closest && e.target.closest(".tabs")) { if (!(UI && !UI.hidden)) open("home"); return } } catch (e2) { fail(e2) } return st1.apply(this, arguments) } } catch (e) { fail(e) }
+ /* the Telefon tab, and every other way into the old phone, opens this phone: setTab("phone") (not during the loading warm-up), openApp(k), openWA(), the strip's WasapKita button */
+ try { const st1 = setTab; setTab = function (t) { if (t === "phone") { if (HF.warmQuiet) return; try { if (!(UI && !UI.hidden)) open("home") } catch (e) { fail(e) } return } return st1.apply(this, arguments) } } catch (e) { fail(e) }
  const tick = () => {
   try {
    if (document.hidden) return; ensure(); const P = ph(false);
@@ -47290,8 +47344,12 @@ try { (() => {   /* an IIFE: block-level function declarations would otherwise l
    worldTalk(); grpTick();
   } catch (e) { fail(e) }
  };
- try { const oa0 = openApp; openApp = function (k) { if (k === "theme" || k === "belanja") { try { const a0 = me(); if (a0 && smartOfAny(a0)) { open(k === "theme" ? "back" : "shop"); return } } catch (e) { fail(e) } } return oa0.apply(this, arguments) } } catch (e) { fail(e) }
- const st0 = setTab;   /* the layer-wrapped original: used by the old-app icons */
+ try {
+  const oa0 = openApp, owa0 = openWA, rp0 = renderPhone; LG.oa = k => oa0.call(null, k); LG.owa = () => owa0();
+  openApp = function (k) { if (LG.busy) return oa0.apply(this, arguments); try { const a0 = me(); if (a0 && smartOfAny(a0)) { if (k === "theme") { open("back"); return } if (k === "wa") { open("lgwa", "wa"); return } if (k === "call") { open("msgs"); return } if (k === "cam" || PHONEV[k] || k) { open("lg", k); return } } } catch (e) { fail(e) } return oa0.apply(this, arguments) };
+  openWA = function () { if (LG.busy) return owa0(); try { const a0 = me(); if (a0 && smartOfAny(a0)) { open("lgwa", "wa"); return } } catch (e) { fail(e) } return owa0() };
+  renderPhone = function () { if (LG.on && !LG.busy && VIEW.v === "lg" && phoneView === "home") { go("home"); return } return rp0.apply(this, arguments) };
+ } catch (e) { fail(e) }
  setInterval(tick, 2000); ensure();
  try { const ub = updWABadge; updWABadge = function () { const r = ub.apply(this, arguments); try { const t = document.querySelector('.tabs [data-tab="phone"]'), x = unreadTot() + ((ph(false) || {}).alu || 0); if (t && x > 0) { let sp = t.querySelector("span"); if (!sp) { t.insertAdjacentHTML("beforeend", `<span class="hfbdg" style="display:inline-block;min-width:15px;height:15px;line-height:15px;border-radius:8px;background:var(--bad);color:#fff;font-size:.6rem;margin-left:3px;vertical-align:top">0</span>`); sp = t.querySelector("span") } sp.textContent = String(Math.min(99, (parseInt(sp.textContent) || 0) + x)) } } catch (e) { } return r } } catch (e) { fail(e) }
  HF.phone = { rng: f => { if (f) R.rng = f; return R }, open, close, state: () => ({ open: !!(UI && !UI.hidden), view: VIEW, P: ph(false), unread: unreadTot(), bubbles: WB.L.length }), send: (k, kind, text, opt) => { const c = cOf(k); return c ? send(c, kind, text, opt) : null }, post, deliver: dueQ, tick, say, incoming, draw, go, contacts, cOf, TH: THEMES, DL, RP, INC, status, band, exchange, WB, reply: outcome, classify, ICONS };
