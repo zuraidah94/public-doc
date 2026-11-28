@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2c6b5a">
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Rumah Kita — Edisi Lukisan Tangan (HF)</title>
-<link rel="preload" href="game.js?v=hf143-kampus" as="script">
+<link rel="preload" href="game.js?v=hf143-papan-taman" as="script">
 <script>/* rk-ringan (laju): the two lists the game asks for first, fetched while game.js still downloads (same URLs, ?v= from the line above) */(function(){try{var v=(/game\.js\?v=([\w.-]+)/.exec(document.querySelector('link[rel=preload][as=script]').getAttribute('href'))||[])[1];if(!v)return;['img/orang-hf/index.json?v='+v,'img/orang/atlas.json'].forEach(function(u){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href=u;document.head.appendChild(l)})}catch(e){}})()</script>
 <div id="rkload" aria-live="polite" style="position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#efe5cf radial-gradient(120% 80% at 50% 30%,#fbf3df 0%,#efe2c4 55%,#dcc9a0 100%);color:#2e2418;font:600 16px system-ui,sans-serif;transition:opacity .35s">
 <div style="width:min(260px,70vw);animation:rkb 3.2s ease-in-out infinite"><svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:auto">
@@ -487,7 +487,7 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 #hfkf .kf-face{display:inline-grid;place-items:center;flex:none;width:2.85rem;height:2.85rem;border:1px solid var(--line);border-radius:50%;background:var(--panel);overflow:hidden}
 #hfkf .kf-host .kf-face{width:4.25rem;height:4.25rem;border:2px solid #fff2d5;background:#f0d9ae}
 #hfkf .kf-face .av,#hfkf .kf-face svg,#hfkf .kf-face img{width:100%;height:100%;display:block;object-fit:cover}
-#hfkf .kf-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
+#hfkf .kf-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
 #hfkf .kf-nav button{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25rem .4rem;white-space:normal;min-height:3.5rem;padding:.35rem;font-size:.86rem;line-height:1.2}
 #hfkf .kf-nav button[aria-pressed="true"]{background:#285b42;color:#fffcf1;border-color:#285b42}
 #hfkf .kf-content{padding:.75rem 1rem 1rem;line-height:1.5}
@@ -601,12 +601,6 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 .kf-slide-demo.rolling .kf-slide-ball{animation:kf-roll 1s ease-in forwards}
 @keyframes kf-roll{0%{left:42%;top:24%;opacity:1}100%{left:75%;top:63%;opacity:1}}
 @media(prefers-reduced-motion:reduce){.kf-slide-demo.rolling .kf-slide-ball{animation:none;left:75%;top:63%;opacity:1}}
-/* Universiti & Kolej */
-#hfkf .kf-campus-people{display:flex;flex-wrap:wrap;gap:.4rem;margin:.7rem 0}
-#hfkf .kf-campus-people button{display:flex;align-items:center;gap:.4rem}
-#hfkf .kf-campus-people [aria-pressed="true"]{background:#285b42;color:#fffcf1}
-#hfkf [data-kf-campus-enrol]{display:grid;align-content:start;margin:0}
-#hfkf [data-kf-campus-enrol] select{width:100%}
 @media(max-width:480px){#hfkf .kf-nav{grid-template-columns:repeat(2,minmax(0,1fr))}#hfkf .kf-nav button{min-height:2.75rem}#hfkf .kf-cover{min-height:8.5rem}}
 </style>
 <div class="app">
@@ -690,5 +684,5 @@ html:not([data-theme="dark"]) body #tree .ftband:nth-child(odd){background:rgba(
 <div id="cac" class="cac" hidden></div>
 <div id="tree" class="cac" hidden></div>
 
-<script src="game.js?v=hf143-kampus"></script>
+<script src="game.js?v=hf143-papan-taman"></script>
 </body></html>

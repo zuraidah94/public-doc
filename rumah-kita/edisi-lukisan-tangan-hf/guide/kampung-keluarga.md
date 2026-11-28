@@ -42,13 +42,3 @@ Terima pesanan di Balai Raya, kemudian pilih **Bungkus Bekalan Kenduri**. Padank
 ## Jejak Kenangan Atuk
 
 Buka **Jejak Kenangan Atuk** melalui **Projek Kampung** atau **Buku Warisan Keluarga**. Baca petunjuk, pilih **Cari tempat di peta**, dan tekan **Periksa lokasi** pada kad tempat yang anda rasa sepadan. Padankan gambar album selepas menemui lokasi. Ketiga-tiga cerita disimpan dalam Buku Warisan, dan jejak boleh disambung kemudian.
-
-
-## Universiti & Kolej
-
-Di peta Jalan Pekan, pilih lot **Kolej Harmoni**, **Pusat Tingkatan Enam Harmoni** atau **Universiti Teknologi Harmoni**. Anda juga boleh membukanya melalui **Kampung & Keluarga → Universiti & Kolej**.
-
-- **Kolej** menawarkan Matrikulasi, Asasi dan Diploma. **Tingkatan Enam** menawarkan STPM. Di **Universiti**, pilih Ijazah Sarjana Muda, Sarjana atau PhD.
-- Hadiri dua kelas dan lulus peperiksaan serta tugas khusus laluan seperti amali, projek atau esei. Perpustakaan memberi petunjuk dan pembentangan melatih komunikasi.
-- Untuk **Sarjana** dan **PhD**, pilih Kerja Kursus, Mod Campuran atau Penyelidikan. Mod campuran menggabungkan kerja kursus dan penyelidikan.
-- Dalam penyelidikan, lulus **proposal defense**, pilih Makmal Maya atau Simulasi Perisian, dan bandingkan dua ujian. Hantar manuskrip, jawab ulasan penilai dan tunggu keputusan sebelum **viva**. Nama jurnal dan penerbitan ialah simulasi dalam permainan.
