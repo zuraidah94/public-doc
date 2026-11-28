@@ -28,10 +28,10 @@ Buka **Cari Masa Bersama** untuk bandingkan waktu dalam tiga hari terdekat. Keti
 
 ## Resipi Turun-Temurun
 
-Pilih Teman yang ingin belajar, pilih ahli keluarga dewasa sebagai guru dan minta diajar. Selepas masak bersama, catatan resipi muncul dalam **Buku Warisan Keluarga**.
+Pilih Teman yang ingin belajar, pilih ahli keluarga dewasa sebagai guru dan minta diajar. Dalam **Masak Bersama Guru**, ikut petua untuk memasukkan bahan dan kacau. Pilih **Masak di dapur** untuk memulakan tugasan memasak. Selepas hidangan siap, catatan resipi muncul dalam **Buku Warisan Keluarga**.
 
 ## Pesanan Sekampung
 
-Terima pesanan di Balai Raya, kemudian hantar kuih, buah dan hantaran melalui buku tempahan masing-masing. Siapkan ketiga-tiganya sebelum tarikh tutup untuk mendapat bonus RM60.
+Terima pesanan di Balai Raya, kemudian pilih **Bungkus Bekalan Kenduri**. Padankan bekalan dengan bekas, semak dan sahkan. Sediakan stok dan hantar kuih, buah dan hantaran melalui buku tempahan masing-masing. Siapkan ketiga-tiganya sebelum tarikh tutup untuk mendapat bonus RM60.
 
 ![Senarai tiga bekalan kenduri dan status penghantaran](pesanan-sekampung.png)

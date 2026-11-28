@@ -31968,6 +31968,7 @@ try {
  };
  const deliver = i => {
   const B = cur(), o = B.ord[i]; if (!o) return false;
+  if (!HF.kenduriCanDeliver(o)) return false;
   const x = B.stok[o.id];
   if (!x || x.n < o.n) { toast(`Stok tak cukup: perlu ${o.n} ${PROD[o.id].u}, ada ${x ? x.n : 0}.`); return false }
   if (x.q < o.mq) { toast(`Mutu ${PROD[o.id].nm.toLowerCase()} belum cukup (perlu ${o.mq}+, stok ${x.q}). Buat yang lebih baik dulu.`); return false }
@@ -34202,7 +34203,9 @@ try {
  { const oh = onHour; onHour = function () { const r = oh.apply(this, arguments); try { hourly() } catch (e) { fail(e) } return r } }
  /* ---- deliver ---- */
  const deliver = i => {
-  const B = BH(), o = B.ord[i]; if (!o) return false; const p = plan(o);
+  const B = BH(), o = B.ord[i]; if (!o) return false;
+  if (!HF.kenduriCanDeliver(o)) return false;
+  const p = plan(o);
   if (!p.ok) { toast(`Stok belum cukup untuk ${o.nm}: kurang ${p.miss.map(r => `${r.short} ${FR[r.f][1].toLowerCase()}`).join(", ")} (mutu ${GR[o.g].toLowerCase()}+).`); return false }
   for (const r of p.rows) for (const [c, k] of r.take) { if (c.raga) ragaTake(r.f, k); else c.b.n -= k }
   for (const f of Object.keys(B.s)) { B.s[f] = B.s[f].filter(b => b.n > 0); if (!B.s[f].length) delete B.s[f] }
@@ -35704,6 +35707,7 @@ ${R.ord ? `<div class="gbk"><span>Upah<b>${rm(R.upah)}</b></span><span>Tip & var
  const begin = (ord, n) => { G.ord = ord; G.n = n; G.d = []; G.cur = null; G.sel = null; G.tab = "u"; sPick() };
  const accept = i => {
   const B = cur(), o = B.ord[i]; if (!o || !G) return false;
+  if (!HF.kenduriCanDeliver(o)) return false;
   if (!o.acc) { if (S.money < o.kos) { pop(`👛 Bahan ${rm(o.kos)} tak cukup.`, 1); return false } dpt(); S.money -= o.kos; o.acc = 1; B.wk.kos += o.kos; try { sfx("coin") } catch (e) { } }
   begin(o, o.n); return true
  };
@@ -43653,6 +43657,16 @@ try {
   } else save();
  }
  HF.kenduriDelivery = recordDelivery;
+ HF.kenduriCanDeliver = nativeOrder => {
+  if (!nativeOrder.hfKenduri) return true;
+  const order = S.hfFamilyActivities?.order;
+  if (order?.id !== nativeOrder.hfKenduri || dayIdx() > order.due) {
+   toast("Tempoh pesanan kenduri ini sudah tamat."); return false;
+  }
+  if (!order.needsPacking || order.packed) return true;
+  toast("Buka Pesanan Sekampung dan siapkan kotak kenduri dahulu.");
+  return false;
+ };
  function newOrder() {
   const shop = HF.kedai.TYPES[HF.kedai.cur().type];
   if (!shop?.ord || !shop.prod.includes("kuih") || !HF.gubah.cur().on) {
@@ -43667,7 +43681,7 @@ try {
    return;
   }
   const id = String(S.home || "main") + ":" + dayIdx(), due = dayIdx() + 3, nm = "Kenduri Balai Raya";
-  h.order = { id, due, done: {} };
+  h.order = { id, due, done: {}, needsPacking: true };
   books.bakery.unshift({ hfKenduri: id, id: "kuih", n: 16, mq: 30, rm: 24, due, nm, w: "Pesanan Sekampung" });
   books.fruit.unshift({ hfKenduri: id, t: "k", li: [["mangga", 12]], g: 1, rm: 36, due, nm });
   books.gifts.unshift({ hfKenduri: id, n: 3, tl: "putih", rb: "emas", upah: 60, kos: 18, tip: 8, due, nm, w: "Pesanan Sekampung" });
@@ -43883,6 +43897,33 @@ try {
    ${p.status === "done" ? " · Selesai" : p.status === "sent" ? " · Masuk giliran tindakan" : p.status === "missed" ? " · Terlepas" : ""}
    <div class="acts">${p.status !== "done" && p.status !== "sent" ? button("edit-" + i, "Jadual semula") : ""}${button("remove-" + i, "Padam")}</div></div>`).join("")}`;
  }
+ const ingredientLists = {
+  nasilemak: ["Beras", "Santan", "Daun pandan"], nasiayam: ["Beras", "Stok ayam", "Halia"],
+  buburlambuk: ["Beras", "Air", "Rempah"], asampedas: ["Pes cili", "Air asam jawa", "Ikan"]
+ };
+ let activeLesson = null, packing = false, pickedPackage = null;
+ const containers = { bakery: "Kotak kuih", fruit: "Bakul buah", gifts: "Kotak hantaran" };
+ function lessonView(lesson) {
+  const ingredients = ingredientLists[lesson.dish], step = lesson.prep || 0;
+  const teacher = family().find(sim => sim.id === lesson.teacher);
+  const hint = step < 3 ? "Masukkan " + ingredients[step].toLowerCase() + "." : step < 6 ? "Kacau perlahan hingga sebati." : "Bahan siap. Sambung memasak di dapur.";
+  return `<div class="kf-lesson-guide">${teacher ? face(teacher) : ""}<div><b>${esc(lesson.teacherName)} · ${esc(DISH[lesson.dish].name)}</b><p role="status">${hint}</p></div></div>
+   <div class="kf-pot" aria-hidden="true">${step ? "🥘" : "🍲"}</div><progress max="6" value="${step}" aria-label="Persediaan resipi"></progress>
+   <div class="acts">${step < 3 ? [2, 0, 1].map(i => button("lesson-add-" + i, ingredients[i], i < step)).join(" ") : ""}
+   ${step >= 3 && step < 6 ? button("lesson-stir", `Kacau (${step - 3}/3)`) : ""}
+   ${step === 6 ? button("lesson-start", "Masak di dapur") : ""} ${button("lesson-back", "Kembali ke resipi")}</div>`;
+ }
+ function packingView(o) {
+  if (!o || dayIdx() > o.due) return `<p>Tempoh pesanan sudah tamat.</p>${button("pack-back", "Kembali ke pesanan")}`;
+  const done = k => o.boxes?.[k];
+  return `<p>Pilih bekalan dan padankan dengan bekas. Sediakan stok sebenar melalui perniagaan masing-masing.</p>
+   <div class="acts kf-pack" role="group" aria-label="Bekalan kenduri">${Object.entries(parts).map(([k, label]) =>
+    `<button type="button" class="btn" data-kf="pack-item-${k}" aria-pressed="${pickedPackage === k}" ${o.packed || done(k) ? "disabled" : ""}>${esc(label)}</button>`).join("")}</div>
+   <div class="kf-pack-boxes">${Object.entries(containers).map(([k, label]) => `<section><b>${label}</b><p>${done(k) ? esc(parts[k]) : "Kosong"}</p>
+    ${done(k) ? button("pack-clear-" + k, "Keluarkan", o.packed) : button("pack-box-" + k, "Letak di sini", o.packed)}</section>`).join("")}</div>
+   <p role="status">${o.packed ? "Bekas siap dilabel. Buka buku tempahan untuk penghantaran." : "Semak semua bekas sebelum mengesahkan."}</p>
+   <div class="acts">${button("pack-confirm", "Sahkan bungkusan", o.packed || !Object.keys(parts).every(done))} ${button("pack-back", "Kembali ke pesanan")}</div>`;
+ }
  function recipeView() {
   const student = act(), teachers = family().filter(s => s !== student && ["adult", "elder"].includes(s.stage));
   const h = household();
@@ -43902,24 +43943,25 @@ try {
    ${o ? `<p><b>${status}</b> · Tarikh tutup hari ${o.due + 1}</p>` : ""}
    <ul>${Object.entries(parts).map(([k, label]) => `<li>${label}${o ? (o.done[k] ? " · Dihantar" : " · Belum dihantar") : ""}</li>`).join("")}</ul>
    ${!o || dayIdx() > o.due ? button("order-start", "Terima pesanan Balai Raya") : ""}
+   ${o?.needsPacking && dayIdx() <= o.due ? button("pack-open", o.packed ? "Lihat bungkusan kenduri" : "Bungkus Bekalan Kenduri") : ""}
    <section><h3>Persiapan Balai Raya</h3>${o && hallDecoration()?.published ? hallArt(hallDecoration().published) : ""}${hallButton()}</section>
    <p class="hint">Perlu Kedai Kecil yang menjual kuih lapis dan bisnes Gubah Hantaran. Bekalan buah boleh dibeli atau dipetik.</p>`;
  }
  function render() {
   const me = act();
   dialog.innerHTML = `<header class="kf-cover">
-    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : titles[page]}</h2></div>
+    <div class="kf-cover-copy"><p id="hfkf-title">Kampung &amp; Keluarga</p><h2>${painting ? "Cat Pagar Padang" : repairing ? "Baiki Buaian" : buildingBench ? "Pasang Bangku Rehat" : gardening ? "Tanam Kebun Komuniti" : decoratingHall ? "Hias Balai Raya" : activeLesson ? "Masak Bersama Guru" : packing ? "Bungkus Bekalan Kenduri" : titles[page]}</h2></div>
     ${me ? `<div class="kf-host">${face(me)}<span>${esc(me.name)}</span></div>` : ""}
     ${button("close", "Tutup")}</header>
     <nav class="kf-nav" aria-label="Aktiviti kampung dan keluarga">
     ${Object.keys(titles).map(k => `<button class="btn" type="button" data-kf="${k}" aria-pressed="${k === page}"><span aria-hidden="true">${icons[k]}</span>${titles[k]}</button>`).join("")}</nav>
-    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
+    <div class="kf-content">${painting ? fenceView(project()) : repairing ? swingView(project()) : buildingBench ? benchView(project()) : gardening ? gardenView(project()) : decoratingHall ? hallView() : activeLesson ? lessonView(activeLesson) : packing ? packingView(household().order) : ({ project: projectView, plans: plansView, recipes: recipeView, order: orderView })[page]()}</div>`;
   previewConflicts();
  }
  function show(next, source) {
   if (S.visiting) { toast("Pulang ke rumah untuk mengurus aktiviti keluarga."); return }
   flushPaint();
-  painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false;
+  painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null;
   page = next;
   edit = null;
   returnTo = source || document.activeElement;
@@ -44045,7 +44087,7 @@ try {
   const key = event.target.closest("button[data-kf]")?.dataset.kf;
   if (!key) return;
   if (key === "close") { dialog.close(); return }
-  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; page = key; edit = null; render(); return }
+  if (Object.hasOwn(titles, key)) { flushPaint(); painting = false; repairing = false; buildingBench = false; gardening = false; decoratingHall = false; activeLesson = null; packing = false; pickedPackage = null; page = key; edit = null; render(); return }
   if (key === "paint-back") { flushPaint(); painting = false; render(); return }
   if (key === "paint" && project()?.kind === "play") {
    painting = true;
@@ -44063,6 +44105,39 @@ try {
    return;
   }
   const p = project();
+  if (key === "pack-open") { packing = true; pickedPackage = null; render(); return }
+  if (key === "pack-back") { packing = false; pickedPackage = null; render(); return }
+  if (packing && key.startsWith("pack-")) {
+   const o = household().order;
+   if (!o?.needsPacking || o.packed || dayIdx() > o.due) { render(); return }
+   const [, action, part] = key.split("-");
+   const boxes = o.boxes || (o.boxes = {});
+   if (action === "confirm" && Object.keys(parts).every(k => boxes[k])) o.packed = true;
+   else if (!Object.hasOwn(parts, part)) return;
+   else if (action === "item" && !boxes[part]) pickedPackage = part;
+   else if (action === "box" && !boxes[part]) {
+    if (pickedPackage !== part) {
+     dialog.querySelector(".kf-content [role=status]").textContent = pickedPackage ? "Bekas ini tidak sepadan. Cuba bekas lain." : "Pilih bekalan dahulu.";
+     return;
+    }
+    boxes[part] = true; pickedPackage = null;
+   } else if (action === "clear") delete boxes[part];
+   else return;
+   save();
+   render();
+   dialog.querySelector(`[data-kf="${key}"]:not([disabled])`)?.focus();
+   return;
+  }
+  if (key === "lesson-back") { activeLesson = null; render(); return }
+  if (activeLesson && key.startsWith("lesson-") && key !== "lesson-start") {
+   const step = activeLesson.prep || 0;
+   if ((step < 3 && key === "lesson-add-" + step) || (step >= 3 && step < 6 && key === "lesson-stir")) {
+    activeLesson.prep = step + 1;
+    sfx("tap"); save(); render();
+    dialog.querySelector('.kf-content button:not([disabled])')?.focus();
+   } else if (step < 3) dialog.querySelector(".kf-content [role=status]").textContent = "Ikut petua guru: masukkan " + ingredientLists[activeLesson.dish][step].toLowerCase() + " dahulu.";
+   return;
+  }
   if (key === "hall-open") { decoratingHall = true; render(); return }
   if (key === "hall-back") { decoratingHall = false; render(); return }
   if (decoratingHall && key.startsWith("hall-")) {
@@ -44195,8 +44270,8 @@ try {
    edit = null;
    save();
    syncWeek();
-  } else if (key.startsWith("cook-")) {
-   const lesson = h.recipes[Number(key.slice(5))], student = act();
+  } else if (key.startsWith("cook-") || key === "lesson-start") {
+   const lesson = key === "lesson-start" ? activeLesson : h.recipes[Number(key.slice(5))], student = act();
    const teacher = family().find(s => s.id === lesson?.teacher);
    const stove = S.objs.find(o => ["stove", "island"].includes(o.type));
    if (!lesson || lesson.learned || !stove || student?.id !== lesson.student ||
@@ -44207,7 +44282,12 @@ try {
    if (lvlOf(student, "cooking") < dish.lvl || S.money < dish.cost) {
     toast(`Perlu Memasak tahap ${dish.lvl} dan RM ${dish.cost} untuk bahan.`); return;
    }
+   if (key !== "lesson-start") { activeLesson = lesson; render(); return }
+   if (lesson.prep !== 6 || [student.cur, ...student.queue].some(c => c?.hfFamilyRecipe === teacher.id && c.dish === lesson.dish)) {
+    toast("Semak persediaan resipi dan senarai tugasan Teman."); return;
+   }
    enqueue(student, { type: "obj", obj: stove.id, act: "cook", dish: lesson.dish, hfFamilyRecipe: teacher.id });
+   save();
    renderNow();
    dialog.close();
    return;
