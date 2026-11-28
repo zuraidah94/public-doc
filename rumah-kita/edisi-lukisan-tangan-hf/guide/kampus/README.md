@@ -1,8 +1,10 @@
 # Panduan Universiti & Kolej
 
-Buka **Keperluan → Universiti & Kolej**, atau pilih lot pendidikan di peta **Jalan Pekan** dan tekan **Daftar dan belajar**.
+Buka **Kerjaya → Universiti & Kolej**, atau pilih lot pendidikan di peta **Jalan Pekan** dan tekan **Daftar dan belajar**.
 
 ## Lot pendidikan di peta
+
+Ikon SVG membezakan Kolej, Tingkatan Enam dan Universiti. Pilih ikon untuk membuka kad lot.
 
 - **Kolej Harmoni** menawarkan Matrikulasi, Asasi dan Diploma.
 - **Pusat Tingkatan Enam Harmoni** menawarkan STPM.
